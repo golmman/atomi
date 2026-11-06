@@ -20,3 +20,6 @@ implement yet.
 
 Please revise the decisions of `docs/plans/prover/plan1.md`.
 
+---
+
+suggestion for atomic-movegen in prover/plan2.md

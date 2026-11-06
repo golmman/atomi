@@ -3,7 +3,8 @@
 ## Status
 
 **Open (2026-11-06).** Item 1 (M0) is done: [`plan1.md`](plan1.md),
-[`report1.md`](report1.md). Item 2 (M1) is next. This initiative is the successor to `atomic_solver`'s closed
+[`report1.md`](report1.md). Item 2 (M1) is planned: [`plan2.md`](plan2.md)
+(proposes D18–D20). This initiative is the successor to `atomic_solver`'s closed
 `winprover` initiative. Its starting point is the legacy handoff
 `docs/plans/winprover/HANDOFF.md` (revision 2026-11-06) in
 <https://github.com/golmman/atomic_solver>, read from `main`; legacy code pin
