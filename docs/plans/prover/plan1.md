@@ -9,6 +9,10 @@ output (JSONL writer + own validator + `provari check` veto), the adapted bench
 driver with the re-measured baseline rows, and the per-node cost baseline.
 **It makes no performance claim.**
 
+**Revised 2026-11-06** by a decision review against the pinned sources
+(§Decision review, R1–R11). The body below already reflects the revision; the
+review table records what changed and why.
+
 Prerequisite reading (all of it is summarized below; the plan is
 self-contained):
 
@@ -21,7 +25,9 @@ self-contained):
   `src/proof_event.rs`;
 - the pinned provari source (scratch clone, **never committed, ideas only**):
   `FORMAT.md` (proof rules), `src/check.rs` (module doc, JSONL reader
-  `check`/`Checker`), `src/dfpn.rs` (module doc), `src/walk.rs`.
+  `check`/`Checker`, `unjudged`/`unsettled`), `src/main.rs` (`write_proof`),
+  `src/search.rs` (`read_proof`), `src/dfpn.rs` (module doc), `src/walk.rs`;
+  `atomic-movegen` 2.4.0 `Board::outcome`/`is_material_draw` docs.
 
 ## Why this plan exists
 
@@ -62,34 +68,64 @@ engine, because it does not exist yet.
    `Always` the two positions differ; under `Legal` they are equal. So the
    search's key **must** be `Legal` (D4).
 4. **JSONL reader semantics** (`check.rs` `check`/`Checker`):
-   - the first non-empty line is the header. `root` is required, `moves` is
-     echoed back, and a `provari` field routes the file to the compact reader,
-     so it must be absent. The attacker is the root's side to move;
+   - the first non-empty line is the header. `root` is required. `moves` is
+     **echoed back unchecked**, because the JSONL reader computes no length. A
+     `provari` field routes the file to the compact reader, so it must be
+     absent. The attacker is the root's side to move;
    - every other line with a `move` is `{"fen":FEN,"move":UCI}`, keyed by
-     **(position, 50-move counter)**. Lines without `move` are ignored;
+     **(position, 50-move counter)**. Lines without `move` are ignored. A
+     later line with the same key silently replaces an earlier one;
    - at an attacker position: a tablebase win (unused here), else the stored
-     move (which must be legal), else *a capture that wins at once* (the
-     defender's king explodes) settles it, else the proof fails. **A mate in
-     one is not found automatically: it must be written**;
+     move (which must be legal), else *a capture after which the attacker has
+     won* settles it (the defender's king exploded, **or the defender mated by
+     that capture**), else the proof fails. **A non-capture mate in one is
+     not found automatically: it must be written**;
    - at a defender position: over with the attacker winning → done; the game
      over otherwise, or `halfmoves >= 100` while not over → fail; every legal
-     reply is followed;
-   - the outcome is tested before the clock, so a mate delivered on the
-     100th ply counts as a win (this matches 2.4.0's "mate outranks the
-     clock");
+     reply is followed. A reply that reaches an attacker position that is
+     over, or not over at counter `>= 100`, fails;
+   - "over" is shakmaty's outcome: a commoner gone, then mate or stalemate,
+     then **insufficient material** (finding 6). The clock is not part of it,
+     so a mate delivered on the 100th ply counts as a win (this matches
+     2.4.0's "mate outranks the clock");
    - edges are recorded between positions (attacker → defender after its
      move, defender → each attacker reply), and **any cycle in the union of
-     all walked lines** rejects the proof, not only a repeat along one line.
+     all walked lines** rejects the proof, not only a repeat along one line;
+   - won attacker positions are memoized by (position, counter). Their count,
+     capture wins included, is the verdict's `won_positions`;
+   - **`valid: null` on small material.** Without `--tablebases`, a failure
+     becomes `cannot check: needs the tablebases …` (`valid: null`) when the
+     failing position, **or any position above it on its line up to the
+     root**, has counter 0, no castling rights and at most 6 pieces. The
+     reader cannot exclude that a table would have settled that position. So
+     a broken proof of a small endgame reads `null`, not `false`. A valid
+     proof never needs the tables.
 5. **UCI:** `atomic-movegen` `Move::write_uci` writes standard castling
    (`e1g1`, `e1c1`, …) and lower-case promotion letters, which shakmaty's
    `UciMove` reads in standard castling mode. The legacy exporter's 168/168
    accepted shards cover ordinary moves; castling, promotion and en passant
    need an explicit check (task D6).
-6. **Rules divergence to expect:** shakmaty's atomic insufficient-material rule
-   is broader than `atomic-movegen`'s commoner-only `is_material_draw` (e.g.
-   bare king vs king + knight is insufficient there). A line through such a
-   position could pass our validator and fail the checker. The class is
-   `rules-divergence`, and it is still a veto.
+6. **Rules divergence: insufficient material (decided, R1).** The checker
+   ends a game as a draw when **both** sides have insufficient material under
+   Lichess's atomic rule. `atomic-movegen`'s `is_material_draw` covers only K
+   vs K. Restated in our words, side S has insufficient material iff the
+   opponent O still has its commoner and one of these holds:
+   - S has only its commoner;
+   - O has other pieces, the board holds only commoners and bishops, all of
+     S's bishops stand on one square colour, and all of O's on the other;
+   - O has only its commoner, the board has no queen and no pawn, and either
+     exactly one knight, bishop or rook is on the board, or the board holds
+     only commoners and at most two knights.
+
+   The checker's precedence is: a commoner gone, then no legal move (mate or
+   stalemate), then insufficient material. So K + R vs K, K + B vs K, K + N vs
+   K and K + N + N vs K are draws there, and **an immediate mate in such a
+   position does not count**. A search over plain `Board::outcome()` would
+   prove lines through them, and the checker would reject them. Decision:
+   the rules layer and the validator both apply the rule (each with its own
+   copy). Calling more positions `Failed` can only lose wins, never create
+   one. `rules-divergence` stays a class for any divergence still left, and
+   it is still a veto.
 7. **Legacy bench driver** (`docs/plans/winprover/measurements/bench/run_bench.py`,
    352 lines, stdlib only): runs provari and `atomic_solver` by path, medians
    over repeats, all-repeats-must-win, censored lower bound
@@ -113,6 +149,44 @@ engine, because it does not exist yet.
     4 vCPU, Linux 7.2.13 (Fedora 44), x86-64. The legacy rows ran on aarch64.
     Factors are same-session ratios (reading rule 1), so the host change is a
     recorded fact, not a problem.
+11. **provari's own JSONL writer** (`main.rs` `write_proof` → `search.rs`
+    `read_proof`) chooses each attacker position's move **per (position,
+    counter)**: the shortest proof that holds at that counter. It omits the
+    positions a capture wins at once, and its header `moves` is the
+    **search's** length, which can exceed the length of the walked proof.
+    `walk.rs`'s one-move-per-board map belongs to the compact path's
+    measuring, not to JSONL output.
+12. **Legacy `--outcome-only` prints no `pre_exit:` line** (legacy
+    `src/main.rs`, `if !outcome_only` around line 356). The bench command
+    always passes it, so fixing `exit_reason=` → `reason=` alone still leaves
+    `exit` null on every control run.
+13. **provari v0.2.0** (`224ce85dad083b1bc8fe429a9e4349de956f5305`, tagged
+    2026-10-30) exists. `check.rs` and `FORMAT.md` are byte-identical to the
+    pin. `dfpn.rs`, `proofs.rs` and `table.rs` are rewritten (~2,400 changed
+    lines), and it adds `--threads N` (default 1). The `prove` options the
+    bench uses are unchanged.
+14. **provari's `--memory MB`** covers its table *and* its proofs
+    (`dfpn::split`). A `prove` that finds no win exits with 2.
+
+## Decision review (2026-11-06)
+
+The original plan1 decisions were checked against the pinned provari source,
+`atomic-movegen` 2.4.0 and the legacy pin. These revisions are folded into the
+body. Owner decision on R8: keep v0.1.0 and add a v0.2.0 column.
+
+| # | Was | Now | Why |
+| --- | --- | --- | --- |
+| R1 | `Status` from `Board::outcome()` only; insufficient material left to the veto as `rules-divergence` | `Status` and the validator also apply the checker's insufficient-material draw (finding 6), after the mate test | It is a known, certain veto source, and it is sound to adopt: more `Failed` positions can only lose wins |
+| R2 | Writer: one move per position at every counter, with `rule50-limit` failures accepted as a gap | Writer: per **(position, counter)**, the shortest stored entry that holds at that counter; a post-walk cycle check over position edges, as the checker does | Lengths fall strictly along every line, so the walk always finds a usable entry and never repeats a position on a line. Only cross-line cycles remain, which fail closed. This matches provari's own JSONL writer (finding 11) |
+| R3 | Validator: header `moves` must equal the computed length; capture win = explosion only | `moves` is informational (reported as `header_moves`); a capture win includes a capture that mates; `positions` uses the checker's `won_positions` definition and is compared | The checker echoes `moves`, and provari writes the search length (finding 11), so equality would falsely reject the reverse control. Mate-by-capture positions are omitted by provari's writer |
+| R4 | Negative controls: "both reject" on any accepted proof | The checker must return `valid: false`, not `null`. Controls run on a row with ≥ 7 pieces and mutate the root's line. Replacements are scanned with an agreement rule, and a 50-move control is added | Small endgames turn every rejection into `null` (finding 4), which would make a control unreadable |
+| R5 | Round trip: written length = search length | Written length ≤ search length; `prove` reports both (`length`, `proof_length`) | The per-counter shortest choice can shorten lines |
+| R6 | D14 proof run "untimed", with flags unspecified | Proof run with `--seconds 600`, other flags equal | A proof run under the 10 s deadline could be censored by the store's overhead; counters do not depend on the deadline when the search ends by proof |
+| R7 | Legacy parse: fix `reason=` | Keep the fix, keep the command unchanged, and record that `exit` is null under `--outcome-only`; censoring comes from the outcome line | Finding 12 |
+| R8 | One reference, provari v0.1.0 | v0.1.0 stays the veto and the primary column. A **v0.2.0 hand** stretch column is recorded in the same session (initiative D17) | The current provari is probably faster. The gap must be known before M5 decides whether to re-pin the goal |
+| R9 | `make test` with `CARGO_PROFILE_RELEASE_LTO=thin` | `make test` = licence gate + `cargo test --release` (as in `AGENTS.md`). A named profile is the fallback, recorded in the report | The env override disagrees with `AGENTS.md` and rebuilds the release binary that `make veto` uses |
+| R10 | Repetition fixture: rook alone vs a king with a safe area | That FEN becomes a rules fixture (K + R vs K is a checker draw, so the root is `Failed`). Repetition is exercised by a sufficient-material hold | Under R1 the old fixture no longer reaches the repetition code |
+| R11 | Small gaps | Store uses a `Vec` per key (no new dependency); path-dependent refutations store nothing; value invariants stated; `--evals` overshoot defined; `build.rs` rerun triggers; already-over roots; the transposed GHI FEN named | Precision for the executor |
 
 ## Scope and non-goals
 
@@ -185,8 +259,17 @@ JSONL reader.
   attacker. `Draw` (stalemate, K vs K, `rule50 >= 100` without mate) is
   `Failed`. A side-to-move `Win` (the opponent has no commoner) is `Won` if
   the opponent is the defender and `Failed` otherwise.
-- A `Failed` status caused by `rule50 >= 100` is a 50-move refutation with
-  `from = 100` (see Search). Every other `Failed` status is unconditional
+- **Checker-compatible material draw (R1):** when `outcome()` returns `None`
+  (so the position is neither extinct nor without legal moves), the position
+  is `Failed` if both sides have insufficient material by finding 6's rule
+  (`rules::insufficient_material(board, color)`, a pure bitboard test). It
+  never applies to a mated or extinct position, because `outcome()` decides
+  those first, in the checker's order.
+- A `Failed` status at `rule50 >= 100` is a 50-move refutation with
+  `from = 100` (see Search). This includes a stalemate at counter 100 or
+  more, which `outcome()` does not distinguish from the clock; that is
+  conservative, because the entry is only reused at counter 100 or more. Every
+  other `Failed` status, including the material draw, is unconditional
   (`from = 0`).
 - `key(board) = board.hash_with(EnPassantMode::Legal)`,
   `child_key(board, m) = board.hash_after_with(m, EnPassantMode::Legal)`. This
@@ -234,6 +317,12 @@ TT-independent tactics.
     every path.
 - `Open { pn, dn }`. Saturating `u32` with `INFINITY = 1 << 30`. OR: `pn = min`,
   `dn = sum`. AND: `pn = sum`, `dn = min`.
+- **Invariants** (`debug_assert!`ed where the value is formed): a proof
+  formed at counter `c` has `limit >= c`, and a refutation formed at counter
+  `c` has `from <= c`. Hence `child.limit - 1` never underflows for a
+  non-zeroing child (its counter is `c + 1 >= 1`), and the OR rule may skip
+  zeroing children (their `from` is 0). A defender limit is at most 99
+  automatically, because every term is.
 
 **Soundness frame.** In attacker-only semantics a wrong *refutation* only loses
 a win (completeness). A false *win* can arise only from a wrong proof. So the
@@ -269,7 +358,14 @@ node is an attacker node that just became proved, it emits one event
 **Termination and budgets.**
 
 - `--seconds S`: the deadline is checked every 1024 expansions.
-- `--evals N`: a deterministic cap on `child_evals`, checked per expansion.
+- `--evals N`: a deterministic cap on `child_evals`, checked after each
+  expansion. The search stops at the first expansion after which
+  `child_evals >= N`. The overshoot is less than one expansion's child count,
+  and the reported `child_evals` is the true count.
+- A root that is already over (a Strict-valid FEN that is mate, stalemate, a
+  material draw, or at `rule50 >= 100`) reports `exit = "refuted"` with
+  `expansions = 0`. Roots without a commoner fail Strict parsing (exit 2);
+  such positions are exercised at the rules layer only.
 - Root proved → `exit = "proved"`. Root refuted → `exit = "refuted"` (no win
   exists under the format's rules, as far as this search can tell; it is
   **not** a draw or loss claim). Deadline → `"timeout"`. Evals cap →
@@ -291,7 +387,9 @@ node is an attacker node that just became proved, it emits one event
   during its last frame), and a payload: `Proved { mv, length, limit }`,
   `Refuted { from }`, or `Open`.
 - Store rules: proofs are always stored; refutations **only when
-  `cycle == ANY`** (with `from`); open entries are always stored.
+  `cycle == ANY`** (with `from`); open entries are always stored. A
+  path-dependent refutation (`cycle != ANY`) stores **nothing**: an existing
+  entry for the key stays as it was.
   Replacement: same key, else an empty slot, else the lowest-`work` non-proof
   entry, else the lowest-`work` entry. Dropping a table proof is sound,
   because the output lives in the strategy store.
@@ -305,14 +403,19 @@ node is an attacker node that just became proved, it emits one event
   is generic over the sink and depends only on `events`, never on `strategy`
   (the legacy dependency direction). `NullSink` is a no-op used when no proof
   is requested.
-- Invariant: every proof the table ever stored was emitted with the same
-  values. So the sink sees, for each table proof, an equal or dominating
-  entry.
+- Invariant: every **attacker** proof the table ever stored was emitted with
+  the same values, so the sink holds an equal or dominating entry for it.
+  Defender proofs are not emitted. They are re-derived by the writer from
+  their replies' attacker entries, which were emitted when those were proved.
+  An attacker position is never `Won` at child initialization (a defender
+  move cannot explode the defender's own commoner), so every attacker proof
+  is formed in a frame and emitted there.
 
 ### Strategy store and JSONL writer (`strategy/`, D15)
 
 **Store** (`store.rs`, implements `ProofSink`):
-`HashMap<u64, SmallSet<(Move, length, limit)>>`. Each key keeps a
+`HashMap<u64, Vec<(Move, length, limit)>>` (std only, no new dependency;
+lookups only, never iterated, so it stays deterministic). Each key keeps a
 **non-dominated** set: a new entry is dropped if an existing one has
 `length <=` and `limit >=` it, and it removes entries it dominates (provari's
 idea of "shorter or holds further"). The byte cap `--proof-memory MB` (default
@@ -320,40 +423,48 @@ idea of "shorter or holds further"). The byte cap `--proof-memory MB` (default
 stops taking entries, and the search continues unchanged. Export then fails
 with `store-full`. M4's bounded worker removes this stop.
 
-**Writer** (`write.rs`): walks real positions from the root and needs no
-search state beyond the store.
+**Writer** (`write.rs`, R2): walks real positions from the root and needs no
+search state beyond the store. It runs on the search's big-stack thread (or
+iteratively).
 
-- At an attacker position at counter `c`: on the first visit of this position
-  (by key), choose the shortest stored entry with `limit >= c`, and use **that
-  one move for this position at every counter** (one move per position, like
-  provari's `walk.rs`). The move must be legal (`Board::is_legal`); a
-  revisit at a higher counter is re-walked at that counter only if
-  `chosen.limit >=` the counter. A revisit at a lower or equal counter is done.
+- At an attacker position at counter `c` (memoized by (key, counter)): choose
+  the **shortest stored entry with `limit >= c`**. Ties go to a move already
+  chosen for this key at another counter, then the higher limit, then the
+  lower `Move::to_bits`. The move must be legal (`Board::is_legal`). Each
+  (key, counter) is walked once.
 - At a defender position: the position must not be over, unless it is a win
   for the attacker. A non-terminal position at `halfmoves >= 100` fails.
   Follow every legal reply in movegen order. A reply that ends the game must
   be an attacker win.
-- A grey-set (on the current walk) revisit is a cycle. With one move per
-  position, a DFS with grey/black marks finds every position cycle that the
-  checker would find.
+- Record position edges exactly as the checker does (attacker → defender
+  position after the chosen move, defender → each non-terminal attacker
+  reply; key = `rules::key`, counters ignored). After the walk, run an
+  iterative grey/black DFS over them. Any cycle → `cycle`.
 - Emit one `{"fen":<fen_with(Legal) with the real counter>,"move":<UCI>}` line
   per distinct (position, counter) actually reached, in DFS order.
   **Every** attacker move is written, mates in one included. The header is
-  `{"root":<root FEN>,"moves":<walk length>}`, with no `provari` field.
-- **Fail closed:** missing entry → `missing`, illegal move → `missing`,
-  cycle → `cycle`, counter above the chosen limit or a 50-move failure →
-  `rule50-limit`, I/O error → `io`. Lines are buffered and written to
-  `PATH.tmp`, then renamed. A failure writes nothing. Output is
-  byte-deterministic.
+  `{"root":<root FEN>,"moves":<walk length>}`, with no `provari` field. The
+  walk length is computed bottom-up from the written moves (≤ the search's
+  length, R5).
+- **Fail closed:** store full → `store-full`; cycle → `cycle`; no usable entry
+  → `missing`; illegal move → `missing`; a 50-move failure → `rule50-limit`;
+  I/O error → `io`. Lines are buffered and written to `PATH.tmp`, then
+  renamed. A failure writes nothing. Output is byte-deterministic.
 
-Why this terminates and is acyclic in practice: each stored entry was proved
-from child entries of strictly smaller length, and the non-dominated set keeps
-an equal or better entry, so the chosen lengths fall along almost every line.
-The one gap is a position first met at a lower counter whose shortest usable
-entry is longer. The grey-set check catches it and fails with `cycle` rather
-than writing an invalid file. The plan does not try to close that gap in M0:
-it is rare, it is visible, and M4 owns the scaled exporter. The report counts
-every `cycle`/`rule50-limit` export failure.
+Why it terminates, and why `missing`/`rule50-limit` indicate a bug: let the
+entry `e` chosen at (X, c) have length ℓ. `e` was formed from reply entries of
+length < ℓ, and the limit algebra makes each of them hold at the counter its
+position has when X is at any counter `<= e.limit`, so at least at the reached
+counter. The non-dominated set keeps an equal or better entry for each. So
+every reached attacker (position, counter) has a usable entry, of length
+< ℓ. Lengths fall strictly along every line, so the walk is finite. A position
+cannot repeat on one line either: at a higher counter the usable set only
+shrinks, so the chosen length could not have fallen. The residual is a
+**cross-line** cycle through a position that received different moves at
+different counters, which the checker rejects as well. The post-walk check
+catches it, and the export fails closed. The report counts every export
+failure by class and the number of positions written with more than one move.
+M4 owns the scaled exporter.
 
 ### Independent validator (`validate/`)
 
@@ -361,25 +472,36 @@ The legacy validator's rules (`src/proof_tree/validate.rs`), restated for
 attacker-only strategy maps, with the JSONL semantics of finding 4
 re-implemented over `atomic-movegen` only:
 
-- parse the header: `root` must be present and `provari` absent; `moves` is
-  optional, and when present it must equal the computed length. The root is
-  parsed with `Board::from_fen_with(.., FenPolicy::AllowTerminal)`. The
-  attacker is the root's side to move;
-- load every line with `move` into `(position, counter) -> UCI`. The position
-  identity is **exact**, not hashed: placement + side + castling + legal en
-  passant square (e.g. the first four fields of `fen_with(Legal)`).
-  Conflicting duplicates are an error; identical duplicates are allowed;
+- parse the header: `root` must be present and `provari` absent. `moves` is
+  **informational** (R3): it is reported as `header_moves`, never required to
+  match, because the checker echoes it and provari writes the search's
+  length (finding 11). The root is parsed with
+  `Board::from_fen_with(.., FenPolicy::AllowTerminal)`. The attacker is the
+  root's side to move;
+- load every line with `move` into `(position, counter) -> UCI`. Each line's
+  FEN is parsed (same policy) and **re-rendered**. The position identity is
+  **exact**, not hashed: placement + side + castling + legal en passant square
+  (the first four fields of the re-rendered `fen_with(Legal)`), so a
+  provari-written line matches even if its text differs. Conflicting
+  duplicates are an error (stricter than the checker, which keeps the last);
+  identical duplicates are allowed;
+- end-of-game rules: `Board::outcome()`, then the material draw of finding 6
+  (the validator's own copy), then the clock, as in the rules layer;
 - walk exactly as the checker does. At an attacker position: a stored move
   that must resolve via `Board::move_from_uci` and be legal; otherwise a
-  capture that wins at once; otherwise `missing move`. At a defender
-  position: a terminal win → done; any other terminal position or
-  `halfmoves >= 100` → fail; follow every legal reply. Memoize won
-  (position, counter) pairs;
+  **capture after which the attacker has won** (the defender's commoner gone,
+  or the defender mated); otherwise `missing move`. At a defender position: a
+  terminal win → done; any other terminal position or `halfmoves >= 100` →
+  fail; follow every legal reply. Memoize won (position, counter) pairs. The
+  walk runs on a 256 MiB-stack thread or iteratively;
 - record edges between exact positions and reject any cycle with an iterative
   DFS after the walk (the union of all lines, as the checker does);
-- compute the length bottom-up (a capture win at once counts 1) and the number
-  of won attacker (position, counter) pairs;
-- report `{"file","valid","positions","length","error"}` per file;
+- compute the length bottom-up (a capture win at once counts 1) and
+  `positions` = the number of won attacker (position, counter) pairs,
+  capture wins included. This is the checker's `won_positions` definition,
+  so on a valid proof the two must be equal (the veto compares them);
+- report `{"file","valid","positions","length","header_moves","error"}` per
+  file;
 - **independence:** `validate/` uses only `std`, `serde_json` and
   `atomic_movegen`, and nothing from `crate::` outside `validate`. A unit test
   reads the module's source files and fails on any other `crate::`/`super::`
@@ -400,16 +522,20 @@ atomi --help | --version
 - `prove` prints exactly one JSON line on stdout:
   `{"found":true,"length":7,"exit":"proved","child_evals":…,"expansions":…,
   "ms":…,"seconds":10,"memory_mb":192,"evals_limit":null,"proof":"written",
-  "proof_positions":…}`. `ms` is search time only (after table allocation).
-  `proof` is one of `not-requested`, `not-found`, `written`, `store-full`,
-  `missing`, `cycle`, `rule50-limit`, `io`.
+  "proof_positions":…,"proof_length":…}`. `ms` is search time only (after
+  table allocation). `length` is the search's length; `proof_length` is the
+  written walk's length (`null` unless written; ≤ `length`, R5). `proof` is
+  one of `not-requested`, `not-found`, `written`, `store-full`, `missing`,
+  `cycle`, `rule50-limit`, `io`.
 - Exit codes: 0 for any search result; 3 when a proof was requested, a win
   was found, and no proof was written; 2 for usage/input errors.
 - `validate` prints one JSON line per file and exits with 1 unless all files
   are valid (like `provari check`).
 - `--version` prints the package version and the git sha baked in at build
   time (via `build.rs` reading `git rev-parse HEAD` if available, else
-  `unknown`; no new dependency).
+  `unknown`; no new dependency). `build.rs` emits `cargo:rerun-if-changed`
+  for `.git/HEAD` and the ref it points to, so the sha is not stale after a
+  commit.
 
 ### Oracle and veto (D16)
 
@@ -419,23 +545,57 @@ atomi --help | --version
   `HEAD`, runs `cargo build --release` (the hand guide needs no features), and
   prints the binary path and `provari --version`. Nothing is vendored or
   committed. `.gitignore` covers likely accidents.
+- **Stretch reference (R8, initiative D17):** `scripts/build_oracle.sh
+  --ref v0.2.0 [DIR]` builds `224ce85dad083b1bc8fe429a9e4349de956f5305` into
+  `${DIR:-/tmp/atomi-oracle}/provari-v0.2.0` the same way (`HEAD` verified
+  against the full sha, not the tag). Only the bench uses it, as a
+  separately labelled reference column (`--threads` left at its default of
+  1). It is **never** the veto, and never mixed into the primary column.
 - `scripts/veto.py` (stdlib), run by `make veto` with
   `PROVARI=<path>` (default `/tmp/atomi-oracle/provari/target/release/provari`):
   1. if the oracle is missing: print `INCONCLUSIVE: oracle not built (run make
      oracle)` and exit non-zero (red, not skipped);
   2. for every row of `tests/fixtures/veto.tsv`: run `atomi prove` with
      `--proof-out target/veto/<name>.jsonl`, `atomi validate`, and
-     `provari check` (no tablebases), then classify (working agreement 4);
-  3. **negative controls** on one accepted proof: drop a line, replace a move
-     with another legal move that does not win, and point a move at an illegal
-     square. Both our validator and the checker must reject all three (neither
-     is vacuous);
+     `provari check` (no tablebases), then classify (working agreement 4).
+     `accepted` also requires our `positions` to equal the checker's
+     `won_positions` (R3); a mismatch is a disagreement;
+  3. **negative controls (R4)** on the accepted proof of the control row,
+     named in `veto.tsv`. It must have ≥ 7 pieces at the root and no capture
+     that wins at once there; prefer a root with castling rights (legacy
+     `dec08`/`dec09`-like mates in two qualify). Mutate **the root's line**,
+     so that the first failure is at the root, which keeps the checker's
+     small-material `null` (finding 4) out of play:
+     - drop the root's line;
+     - replace the root's move with an illegal UCI move (a legal-looking
+       move to an occupied own square);
+     - replace the root's move with each other legal root move in UCI order
+       until one is rejected by both. A candidate both accept (another win
+       in one) is skipped and counts as agreement. A candidate where the
+       verdicts differ fails the gate;
+     - **50-move control:** take the accepted proof of the counter-97
+       soundness row (Tests), add 1 to the counter field of every line and of
+       the root, and require both to reject it (the attacker reaches counter
+       100 before its mate). That row is a mate in two by a **pawnless
+       attacker against a bare defending commoner**. A commoner cannot
+       capture, and nothing else is there to capture, so neither side has a
+       zeroing move. Every line is quiet, the shift re-keys every line
+       consistently, and no counter is 0, so the checker answers `false`, not
+       `null`.
+
+     For every control, our validator must report `valid: false`, and the
+     checker must report `"valid": false`. A checker `null` is
+     `unchecked`, which makes the gate red ("control row too small: pick one
+     with more material"); it is never read as a rejection;
   4. **reverse control:** `provari prove "<FEN>" --guide hand --proofs
-     target/veto/provari/<name>.jsonl` for the same rows. Our validator's
-     verdict must equal `provari check`'s on those files. These
+     target/veto/provari/<name>.jsonl` for the same rows (exit 2 = no win
+     found, which fails the gate for that row). Our validator's `valid` must
+     equal `provari check`'s, and on valid files `positions` must equal
+     `won_positions`. Header `moves` is not compared (R3). These
      provari-written proofs stay in `target/` and are never committed;
-  5. print a table: row, atomi verdict class, positions, length, checker
-     `valid`, reverse-control agreement. Any non-`accepted` class or
+  5. print a table: row, atomi verdict class, positions vs `won_positions`,
+     length, `header_moves`, checker `valid`, reverse-control agreement, and
+     the control verdicts. Any non-`accepted` class, `unchecked` control or
      disagreement fails.
 
 ### Fixtures (copy, data only, with provenance)
@@ -448,45 +608,60 @@ header row.
 | --- | --- | --- |
 | `bench/corpus.json` | **verbatim** (no comment line; provenance only in `PROVENANCE.md` and `bench/README.md`); sha256 checked by tests and the driver | `docs/plans/provari/measurements/plan1/corpus.json` |
 | `tests/fixtures/wins.tsv` | `name, fen, source, legacy_note`: every side-to-move `Win` row (32 + 9 + 10 = 51, dedupe by FEN and report the count) | `tests/fixtures/decisive_positions.txt`, `decisive_remaining.txt`, `move_order_positions.txt` |
-| `tests/fixtures/never_prove.tsv` | `name, fen, source, reason`: every side-to-move `Loss` row (14 + 1 + 9 = 24), the legacy `Loss`/`Draw` search claims of `test_terminal_outcomes.rs`, the K-vs-K draws, and the rook-alone-vs-safe-king GHI case | the same files, `tests/test_terminal_outcomes.rs`, `tests/test_repetition.rs` |
-| `tests/fixtures/terminal.tsv` | `name, fen, expected_status (won/failed/open), refutation (none/rule50/unconditional), source`: static rules claims re-checked against 2.4.x (`fifty_move_checkmate`, `fifty_move_stalemate`, touching commoners with two pieces, extinction both ways, K vs K, a touching-commoner check-immunity case) | `tests/test_position.rs`, `tests/test_terminal_outcomes.rs`, legacy `docs/plans/movegen/report_update_2.4.0.md` §Rules behaviour |
+| `tests/fixtures/never_prove.tsv` | `name, fen, source, reason`: every side-to-move `Loss` row (14 + 1 + 9 = 24), the legacy `Loss`/`Draw` search claims of `test_terminal_outcomes.rs`, the K-vs-K draws, and the rook-alone case `8/8/8/8/2k5/8/8/4KR2 w - - 0 1` (a checker material draw under R1, so `Failed` at the root; its repetition role moves to `soundness.tsv`, R10) | the same files, `tests/test_terminal_outcomes.rs`, `tests/test_repetition.rs` |
+| `tests/fixtures/terminal.tsv` | `name, fen, expected_status (won/failed/open), refutation (none/rule50/unconditional), source`: static rules claims re-checked against 2.4.x (`fifty_move_checkmate`, `fifty_move_stalemate`, touching commoners with two pieces, extinction both ways, K vs K, a touching-commoner check-immunity case), plus the **material-draw rows of R1** (constructed): `failed`/`unconditional` for K+R vs K, K+B vs K, K+N vs K, K+N+N vs K, and kings + bishops with each side's bishops on one colour and the two sides on different colours; `open` for K+Q vs K, K+P vs K, K+R+R vs K, K+B+B vs K, K+N vs K+N, and kings + bishops on the same colour; `won` for a defender mated in a K+R vs K position (mate before material) | `tests/test_position.rs`, `tests/test_terminal_outcomes.rs`, legacy `docs/plans/movegen/report_update_2.4.0.md` §Rules behaviour; finding 6 for the material rows |
 | `tests/fixtures/soundness.tsv` | `name, fen, expectation (prove/never/refute), cap, note` (see Tests) | constructed from the above; record the construction |
 | `tests/fixtures/veto.tsv` | `name, fen`: the rows `make veto` must prove and get accepted | chosen from the above |
 
 `wins.tsv` is the outcome oracle: a **refutation** of a row is a regression to
-investigate. Censoring is expected in M0. `decisive_remaining.txt`'s 15
-unlabelled rows are not copied. The `test_ghi.rs` transposition claim
+investigate. Censoring is expected in M0. Under R1, a legacy `Win` whose every
+win passes through a checker material draw is legitimately refuted. That
+disposition (`checker-rules`) is allowed only with the evidence recorded in
+the row's note: the drawn position on the legacy line, and its material. The
+row stays in the file. `decisive_remaining.txt`'s 15 unlabelled rows are not
+copied. The `test_ghi.rs` transposition claim
 (`4k3/PP6/8/8/8/8/8/4K3 w - - 0 1` wins) goes into `wins.tsv`. Its
-black-to-move counterpart is a `Loss` and goes into `never_prove.tsv`.
+black-to-move counterpart `QQ2k3/8/8/8/8/8/8/4K3 b - - 0 1` is a `Loss` and
+goes into `never_prove.tsv`.
 
 ### Bench driver (copy + adapt, `bench/run_bench.py`)
 
 Copy legacy `docs/plans/winprover/measurements/bench/run_bench.py` with the
 provenance line in its docstring, then adapt it:
 
-1. **Three side kinds:** the reference `provari-<guide>` (unchanged command);
+1. **Four side kinds:** the reference `provari-<guide>` (unchanged command,
+   the primary column); an optional **stretch reference**
+   `provari-v0.2.0-<guide>` (`--provari-stretch BIN`, the same command, R8):
+   its rows are measured in the same session, and their factors are reported
+   in a separate `stretch` block, never in the primary ledger or geomean;
    candidate `atomi:<stack>` (`--atomi BIN`, repeatable
    `--atomi-stack NAME=FLAGS`, command `atomi prove "<FEN>" --seconds 10
    --memory 192 <flags>`, parsing the single JSON line: `found`, `length`,
    `exit`, `child_evals`, `expansions`, `ms`); legacy controls
    `atomic_solver:<stack>` (`--legacy-solver BIN`, `--legacy-stack
-   NAME=FLAGS`, the legacy command and parser unchanged, **plus** the
-   `reason=` fix for the `exit` field, with a comment citing legacy report5
-   §10). Remove the implicit always-added `default` stack: every stack is
-   named explicitly.
+   NAME=FLAGS`, the legacy command and parser unchanged). Change the parser's
+   `exit_reason=` key to `reason=` (comment citing legacy report5 §10), and
+   record in the README that under `--outcome-only` the legacy binary prints
+   no `pre_exit:` line, so `exit` stays null for control rows (finding 12,
+   R7). Control censoring comes from the `outcome:` line, as before. Remove
+   the implicit always-added `default` stack: every stack is named
+   explicitly.
 2. **Corpus:** the default is `bench/corpus.json`. Verify its sha256 against
    `9cd0169a…47d0e` before running, and refuse on a mismatch.
-3. **Claimed-win protocol (D14):** with `--proof-check --provari-check BIN`,
-   for every `atomi` cell where all timed repeats won, make one extra untimed
-   run with `--proof-out` (to `--proof-dir`, default under `/tmp`). Require
-   `child_evals` equal to the timed runs, `atomi validate` valid, and
-   `provari check` valid. Otherwise the cell becomes censored with the verdict
+3. **Claimed-win protocol (D14, R6):** with `--proof-check --provari-check
+   BIN`, for every `atomi` cell where all timed repeats won, make one extra
+   untimed run with the same flags plus `--proof-out` (to `--proof-dir`,
+   default under `/tmp`) and `--seconds 600` in place of `--seconds 10`, so
+   the deadline cannot censor the proof run. Require `exit = "proved"`,
+   `child_evals` equal to the timed runs, `proof = "written"`,
+   `atomi validate` valid, `provari check` valid, and `positions` =
+   `won_positions`. Otherwise the cell becomes censored with the verdict
    class in `note`. Record `proof_verdict` per cell.
 4. **Provenance:** record `atomi@<sha>` (from `atomi --version`),
    `solver@<sha>` (`--legacy-commit`), the provari commit and
-   `provari --version`, host, platform, CPU model, `rustc -V`, the
-   `atomic-movegen` version from `Cargo.lock`, and the dirty-tree flag of this
-   repo.
+   `provari --version` of both references, host, platform, CPU model,
+   `rustc -V`, the `atomic-movegen` version from `Cargo.lock`, and the
+   dirty-tree flag of this repo.
 5. Keep everything else: medians, all-repeats-must-win, censored lower bound,
    shared-cell geomean, `--dry-run`, no transcripts, and
    `sys.dont_write_bytecode`.
@@ -521,10 +696,14 @@ provari hand = 1.000):
 - `plan1` · `control` · legacy **opt** (`solver@5f85133`,
   `--move-class-pn --quiet-grouping --eval-pn or`);
 - `plan1` · **atomi M0** (`atomi@<sha>`, no flags). Expect censored cells;
-  censored is a result.
+  censored is a result;
+- `plan1` · `stretch` · **provari v0.2.0 hand** (`provari@224ce85`), as a
+  factor against v0.1.0 hand. It is labelled stretch reference, kept out of
+  the goal geomean, and recorded only (R8, D17).
 
 Plus the session reference walls/nodes/mates line, and a per-plan summary
-stating the re-priced gap after 2.4.0. **Do not** compare these factors with
+stating the re-priced gap after 2.4.0, and the v0.2.0/v0.1.0 ratio as the
+size of the moving target. **Do not** compare these factors with
 legacy rows (reading rule 1). Nothing is written to the legacy
 `winprover/bench.md`. The legacy repo is read-only for this initiative, and
 its frozen note already points to the successor.
@@ -552,25 +731,35 @@ its frozen note already points to the successor.
 ### Makefile
 
 ```
-test:       python3 scripts/check_licenses.py && CARGO_PROFILE_RELEASE_LTO=thin cargo test --release
-test-full:  cargo test --release -- --include-ignored && $(MAKE) veto
+test:       python3 scripts/check_licenses.py && cargo test --release
+test-full:  test, then cargo test --release -- --ignored && $(MAKE) veto
 test-lite:  cargo test
 lint:       cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo doc --no-deps
 oracle:     scripts/build_oracle.sh
+oracle-stretch: scripts/build_oracle.sh --ref v0.2.0
 veto:       cargo build --release && python3 scripts/veto.py --atomi target/release/atomi --provari $(PROVARI)
-bench:      python3 bench/run_bench.py … (documented defaults; needs PROVARI, LEGACY_SOLVER)
+bench:      python3 bench/run_bench.py … (documented defaults; needs PROVARI, LEGACY_SOLVER; PROVARI_STRETCH optional)
 pernode:    python3 bench/run_pernode.py --atomi target/release/atomi …
 ```
 
-`make test` targets < ~60 s of test time. Slow tests use
-`#[ignore = "slow: ..."]` and never `cfg_attr(debug_assertions, ignore)`.
+`make test` targets < ~60 s of test time. No profile env overrides (R9): the
+test binaries and `make veto`'s `target/release/atomi` share the release
+profile, so neither rebuilds the other. If the target is missed because of
+LTO link time, add a named profile (`[profile.gate]`, `inherits = "release"`,
+`lto = "thin"`) used by `make test` only, and record it in the report. Tests
+pass `--memory 16` (or build small tables directly), never the 192 MB default,
+so parallel test threads do not each allocate a bench-size table. Slow tests
+use `#[ignore = "slow: ..."]` and never `cfg_attr(debug_assertions, ignore)`.
 
 ## Tests
 
 Unit tests sit at the bottom of each module; integration tests live in `tests/`.
 "Fast" tests run in `make test`; "slow" tests run in `make test-full`.
 
-**Rules (fast):** `terminal.tsv` round-trip through `Status`. For the key:
+**Rules (fast):** `terminal.tsv` round-trip through `Status`, including the
+R1 material rows (both colours as attacker, both colours to move). The
+validator's copy of the material rule runs over the same rows in its own
+unit test, which reads `terminal.tsv` itself (no shared helper). For the key:
 the `e2e4 … Nf3g1` shuffle gives equal `Legal` keys and unequal `Always`
 keys; a capturable en passant square keeps the keys distinct; the same
 position at different counters has equal keys.
@@ -582,34 +771,46 @@ keeps proofs over open entries.
 
 **Value algebra (fast):** the length/limit rules (zeroing vs non-zeroing,
 terminal win → 99, defender min), refutation `cycle`/`from` propagation, and
-the frame-exit `cycle` reset, each with hand-built child sets.
+the frame-exit `cycle` reset, each with hand-built child sets; the invariants
+(`limit >= c`, `from <= c`) hold on every hand-built case.
 
 **Search (fast):**
 
 - a mate-in-1 by explosion and a mate-in-1 by checkmate: `found`, length 1;
   a mate-in-2: length 2 (fixture choice recorded; the legacy "mate_in_1"
-  FEN is a 2-move win);
+  FEN is a 2-move win). Gate fixtures must have checker-sufficient material
+  at the root (a K + R vs K "mate in one" is a checker draw at the root, R1);
+- a mate in one inside a checker material draw (a K + R vs K position with
+  an immediate rook mate) is **not** found (`exit = "refuted"`, R1);
 - `never_prove.tsv` rows that are cheap (K vs K, already-terminal roots,
-  stalemate-only lines) are refuted or censored, never found;
+  stalemate-only lines, the rook-alone row) are refuted or censored, never
+  found;
 - determinism: two runs give identical counters/exit/length. `NullSink` vs
   the store sink give identical counters (proof collection does not change the
   trajectory);
-- `--evals` honoured exactly (stops at the first expansion that reaches the
-  cap; `exit = "evals"`).
+- `--evals` honoured: the run stops at the first expansion after which
+  `child_evals >= N`, with `exit = "evals"` and an overshoot smaller than
+  that expansion's child count.
 
 **Soundness (`soundness.tsv`; fast where cheap, slow otherwise):**
 
-- rook alone vs a king with a safe area (`8/8/8/8/2k5/8/8/4KR2 w - - 0 1`):
-  never found within its cap (repetition is never a win);
-- a mate delivered on the 100th ply (a checkmate-shaped mate-in-1 with the
-  counter set to 99): proved, with limit 99;
-- the 50-move edge on a mate in two whose every winning line is quiet
-  (no zeroing move by either side). Per the limit rules it holds up to counter
-  97: the attacker position after the defender's reply sits at counter
-  `c + 2`, which must be below 100. Rows: counter 0 and 97 → proved (limit
-  97); counter 98 → not proved (refuted or censored, never found). If the
-  fixture has a zeroing winning line, pick another one. The exact
-  expectations are verified with the checker before they are trusted;
+- **repetition hold (R10):** a position with checker-*sufficient* material
+  where the defender holds only by repetition or the clock. Example shape:
+  K + R + R vs a bare commoner that can keep touching the attacker's
+  commoner (touching commoners cannot be checked). Never found within its
+  cap. The construction and its evidence go in the file header: the legacy
+  binary's `Draw` verdict for the FEN (external process, built in E3 or
+  earlier) and atomi's `refuted`/censored result. If the legacy binary proves
+  it a win or is censored on it, pick another;
+- a mate delivered on the 100th ply (a checkmate-shaped mate-in-1 with
+  sufficient material and the counter set to 99): proved, with limit 99;
+- the 50-move edge on a mate in two by a **pawnless attacker against a bare
+  defending commoner**, so no zeroing move exists for either side (this row
+  also feeds the veto's 50-move control). Per the limit rules it holds up to
+  counter 97: the attacker position after the defender's reply sits at
+  counter `c + 2`, which must be below 100. Rows: counter 0 and 97 → proved
+  (limit 97); counter 98 → not proved (refuted or censored, never found). The
+  exact expectations are verified with the checker before they are trusted;
 - a position where the only win needs a repetition-free detour: proved, and
   the written proof has no position cycle.
 
@@ -617,22 +818,32 @@ Each constructed row is verified by `make veto` (the checker agrees) before
 it is trusted, and its construction is recorded in the fixture file header.
 
 **Strategy store / writer (fast):** non-dominated insertion; the cap sets
-`full`; the writer produces byte-identical output twice; a store with a
-missing entry, a forced cycle, or an exceeded limit yields the right error and
-**no file**; UCI rendering of castling, promotion (all four pieces) and en
-passant round-trips through `Board::move_from_uci`.
+`full`; the writer produces byte-identical output twice. A hand-built store
+where one position is reached at two counters and its shortest entry does not
+hold at the higher one: the writer writes **two different moves** for the
+two (position, counter) keys, and the result validates (R2). A hand-built
+store that forces a cross-line cycle gives `cycle`, a store with a missing
+entry gives `missing`, and a full store gives `store-full`, each with **no
+file**. UCI rendering of castling, promotion (all four pieces) and en passant
+round-trips through `Board::move_from_uci`.
 
 **Validator (fast):** accepts writer output for the small wins; rejects
 hand-made JSONL with a missing move, an illegal move, a move into stalemate, a
-50-move-limit line, a position cycle across two lines, a wrong `moves`
-header, a `provari` header field, and conflicting duplicates; accepts a proof
-that omits a capture-wins-at-once position; the independence test.
+move into a checker material draw, a 50-move-limit line, a position cycle
+across two lines, a `provari` header field, and conflicting duplicates.
+Accepts a proof whose header `moves` differs from the computed length, and
+reports both. Accepts proofs that omit a capture-wins-at-once position, both
+by explosion and by a capture that mates. Matches lines whose FEN text
+differs from our rendering but parses to the same position. The independence
+test.
 
 **Proof round trip (fast):** for each small win, `prove --proof-out` →
-`validate` → valid, with length = the search's length.
+`validate` → valid, with `length` (validator) = `proof_length` = header
+`moves`, and `proof_length <=` the search's `length` (R5).
 
 **Fixture oracle (slow):** every `wins.tsv` row at `--evals 2_000_000`:
-a refutation fails the test, censored is allowed, and every proved row's proof
+a refutation fails the test unless the row carries a recorded `checker-rules`
+disposition (§Fixtures), censored is allowed, and every proved row's proof
 must validate. Every `never_prove.tsv` row at `--evals 2_000_000`: `found`
 fails the test. Record the proved/censored/refuted counts in the report.
 
@@ -640,16 +851,19 @@ fails the test. Record the proved/censored/refuted counts in the report.
 
 ## Measurement
 
-1. Build provari (`make oracle`), the legacy binary (export at the pin, above)
-   and `atomi` (release).
-2. `make veto`: all rows `accepted`, controls rejected, reverse control
-   agreeing.
+1. Build provari (`make oracle`), the v0.2.0 stretch reference
+   (`make oracle-stretch`), the legacy binary (export at the pin, above) and
+   `atomi` (release).
+2. `make veto`: all rows `accepted`, every control `valid: false` on both
+   sides, reverse control agreeing.
 3. Bench, one session:
 
    ```sh
    python3 bench/run_bench.py \
      --provari /tmp/atomi-oracle/provari/target/release/provari \
      --provari-commit 48686bc6c786d6ea70568f0b2ad4002cf0520206 \
+     --provari-stretch /tmp/atomi-oracle/provari-v0.2.0/target/release/provari \
+     --provari-stretch-commit 224ce85dad083b1bc8fe429a9e4349de956f5305 \
      --legacy-solver /tmp/atomic_solver-5f85133/target/release/atomic_solver \
      --legacy-commit 5f85133ea9d751368a682e53e354bd3fc0016d00 \
      --legacy-stack 'default=' \
@@ -684,7 +898,10 @@ proof output and the veto exist. Phase E alone may move to `plan2`, recorded in
 - A3. `PROVENANCE.md` (columns: destination, source
   `atomic_solver@<sha>:<path>`, source sha256 at copy, date, `verbatim` /
   `adapted: …`); `docs/plans/README.md` (one `prover` row: open, item 1).
-- A4. `scripts/build_oracle.sh`; build it once and record `provari --version`.
+- A4. `scripts/build_oracle.sh` (with `--ref v0.2.0`); build both once and
+  record both `provari --version` outputs. Build the legacy binary from the
+  pin export (§Bench driver) here, because D5 needs it as evidence for the
+  repetition-hold fixture (R10).
 - Gate: `make test`, `make lint` green.
 
 **Phase B — fixtures + rules**
@@ -692,8 +909,9 @@ proof output and the veto exist. Phase E alone may move to `plan2`, recorded in
 - B1. Copy `bench/corpus.json` verbatim and add a sha256 test.
 - B2. Build `wins.tsv`, `never_prove.tsv`, `terminal.tsv` from the legacy
   sources (a small throwaway script outside the repo, or by hand; not
-  committed). Re-check every `terminal.tsv` row against 2.4.x.
-- B3. `rules.rs` + rules tests.
+  committed). Re-check every `terminal.tsv` row against 2.4.x. Add the R1
+  material rows.
+- B3. `rules.rs` (including `insufficient_material`) + rules tests.
 - Gate: `make test`, `make lint`.
 
 **Phase C — search + CLI**
@@ -709,11 +927,14 @@ proof output and the veto exist. Phase E alone may move to `plan2`, recorded in
 **Phase D — proof output + veto**
 
 - D1. `strategy/store.rs` + tests.
-- D2. `strategy/write.rs` + tests (including fail-closed and determinism).
-- D3. `validate/` + tests (including independence).
+- D2. `strategy/write.rs` + tests (per-(position, counter) choice, post-walk
+  cycle check, fail-closed, determinism).
+- D3. `validate/` + tests (including independence and its own copy of the
+  material rule).
 - D4. `atomi validate` subcommand; proof round-trip tests.
-- D5. `soundness.tsv`, `veto.tsv`; `scripts/veto.py` (classification,
-  negative controls, reverse control).
+- D5. `soundness.tsv`, `veto.tsv` (naming the control row); `scripts/veto.py`
+  (classification, `positions`/`won_positions` agreement, the R4 controls
+  including the 50-move control, reverse control).
 - D6. Find and record a proof covering castling, promotion or en passant, if
   any `wins.tsv` row that M0 proves contains one. Otherwise record which
   shapes stay unexercised by the checker (the unit round trip still covers
@@ -725,9 +946,10 @@ proof output and the veto exist. Phase E alone may move to `plan2`, recorded in
 
 - E1. `bench/run_bench.py` (adapted), `bench/README.md` (provenance + usage).
 - E2. `bench/run_pernode.py`.
-- E3. Build the legacy binary at the pin. Run the bench (Measurement 3) and
-  the per-node baseline (Measurement 4).
-- E4. Create `docs/plans/prover/bench.md` with the plan1 rows.
+- E3. Run the bench (Measurement 3, both references and the legacy
+  controls) and the per-node baseline (Measurement 4).
+- E4. Create `docs/plans/prover/bench.md` with the plan1 rows, including the
+  v0.2.0 stretch row.
 - Gate: Python files parse (`ast.parse`); `make test`.
 
 **Phase F — close-out**
@@ -745,13 +967,17 @@ proof output and the veto exist. Phase E alone may move to `plan2`, recorded in
   graph. There is no `atomic_solver` dependency of any kind.
 - The two mates in one, the mate in two and one small win (the smallest
   `wins.tsv` row M0 proves within 10 M child evals, recorded) are each proved,
-  validator-accepted and checker-accepted. The negative controls are rejected
-  by both, and the reverse control agrees.
+  validator-accepted and checker-accepted, with our `positions` equal to the
+  checker's `won_positions`. Every negative control (R4, including the 50-move
+  control) is `valid: false` on both sides, never `null`, and the reverse
+  control agrees.
 - No `never_prove.tsv` row and no soundness negative is ever `found`. No
-  `wins.tsv` row is refuted.
+  `wins.tsv` row is refuted, except rows with a recorded `checker-rules`
+  disposition (R1).
 - Determinism and sink-independence tests pass.
-- `bench.md` exists with the three plan1 rows, the session reference line and
-  the provenance pins. Any `atomi` win cell passed D14.
+- `bench.md` exists with the three plan1 rows, the v0.2.0 stretch row, the
+  session reference line and the provenance pins. Any `atomi` win cell passed
+  D14 (R6 protocol).
 - The per-node baseline is recorded, and the M1 reference number is stated in
   `initiative.md`.
 - Every copied file has a provenance line (where the format allows it) and a
@@ -766,6 +992,7 @@ proof output and the veto exist. Phase E alone may move to `plan2`, recorded in
 make test
 make lint
 make oracle            # once per host
+make oracle-stretch    # once per host; bench only
 make test-full         # includes make veto
 cargo build --release
 python3 - <<'PY'
@@ -782,10 +1009,13 @@ git status --porcelain
 | Risk | Mitigation |
 | --- | --- |
 | The uniform-numbers search proves very little within budgets | Expected; M0 makes no performance claim. Gate positions are small. Censored is a result |
-| The writer's one-move-per-position choice hits `cycle`/`rule50-limit` | Fails closed; counted in the report; M4 owns the scaled exporter |
+| The per-(position, counter) writer produces a cross-line cycle | Post-walk cycle check, as the checker does; fails closed with `cycle`; counted in the report with the multi-move position count; M4 owns the scaled exporter |
+| The checker answers `null` instead of `false` on a broken small-material proof | Controls run on a ≥ 7-piece row and fail at the root; `null` is `unchecked` and red, never read as a rejection (R4) |
+| The material rule is restated wrongly (search and validator agree with each other, not with the checker) | `terminal.tsv` rows on both sides of every clause; the veto and the reverse control would show `rules-divergence`; the rule's sources are the checker's observable behaviour and the Lichess rules |
+| The v0.2.0 column shows a much larger gap than v0.1.0 | Recorded as a fact (stretch, D17); the goal re-pin question goes to M5, not to plan1 |
 | Path-dependent refutations thrash | Per-frame child records; only completeness is at stake. The report records the thrash signal (expansions per proved node) if visible |
 | Validator and writer share a bug | The validator is independent (source-level import test) and parses the file, not the store; the checker veto; the reverse control on provari-written proofs |
-| Rules divergence (insufficient material, etc.) | `rules-divergence` class; still a veto; documented with the FEN |
+| Rules divergence beyond insufficient material | `rules-divergence` class; still a veto; documented with the FEN; insufficient material itself is adopted (R1) |
 | Copied fixtures carry stale legacy claims | Re-checked against 2.4.x; a refuted `wins.tsv` row is investigated (legacy bug, rules change, or ours), never silently dropped |
 | Oracle build fails (network/toolchain) | `INCONCLUSIVE`, recorded; the gate stays red; never substituted |
 | GPL leakage via copy-paste from the scratch clone | AGENTS.md rule; ideas only; the reviewer checks new code for transliteration; FORMAT.md text not copied |
@@ -798,13 +1028,16 @@ results, gate table, verdict, not measured, problems and findings, missing
 tests, next steps, delivered files. Specifically include:
 
 - the fixture counts (copied / deduped / per file) and every re-check
-  disagreement with 2.4.x;
-- the veto table (per row: class, positions, length, checker verdict, reverse
-  control) and the three negative controls;
+  disagreement with 2.4.x, and every `checker-rules` disposition with its
+  evidence;
+- the veto table (per row: class, positions vs `won_positions`, length,
+  `header_moves`, checker verdict, reverse control) and every negative control
+  with both verdicts;
 - fixture-oracle counts (proved / censored / refuted) and export failure
-  counts by class;
-- the plan1 bench rows and the re-priced gap. Explicitly: **no performance
-  claim** for `atomi` M0;
+  counts by class, with the number of positions written with more than one
+  move;
+- the plan1 bench rows and the re-priced gap, and the v0.2.0/v0.1.0 stretch
+  ratio. Explicitly: **no performance claim** for `atomi` M0;
 - the per-node table and the M1 reference number;
 - a session closure block with the kickoff prompt for plan2 (M1, per-node
   cost), or for the Phase E remainder if it was split.
@@ -819,6 +1052,8 @@ tests, next steps, delivered files. Specifically include:
 - Tests and data: `tests/*.rs`, `tests/fixtures/{wins, never_prove, terminal,
   soundness, veto}.tsv`.
 - Bench: `bench/{corpus.json, run_bench.py, run_pernode.py, README.md}`.
+- Oracles (scratch, never committed): `/tmp/atomi-oracle/provari` (v0.1.0)
+  and `/tmp/atomi-oracle/provari-v0.2.0`.
 - Docs: `docs/plans/README.md`, `docs/plans/prover/bench.md`,
   `docs/plans/prover/measurements/plan1/{README.md, env.json, bench.json,
   pernode.json, pernode.csv}`, updated `initiative.md` and `AGENTS.md`,

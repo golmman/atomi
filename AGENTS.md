@@ -38,8 +38,9 @@ gate), `docs/plans/prover/` (initiative, plans, reports, `bench.md`,
 
 ## GPL boundary (hard rules)
 
-- provari (`aiorla/provari`, pin `48686bc6c786d6ea70568f0b2ad4002cf0520206`)
-  and shakmaty / shakmaty-syzygy are **GPL-3.0-or-later**. Nothing from them
+- provari (`aiorla/provari`, pin `48686bc6c786d6ea70568f0b2ad4002cf0520206`;
+  v0.2.0 `224ce85dad083b1bc8fe429a9e4349de956f5305` only as a bench stretch
+  column, D17) and shakmaty / shakmaty-syzygy are **GPL-3.0-or-later**. Nothing from them
   enters this repo: no code, no transliterated code, no copied comments or doc
   text (including `FORMAT.md`), no dependency of any kind (normal, dev or
   build), no binary, no network or model, and no provari-written proof files.

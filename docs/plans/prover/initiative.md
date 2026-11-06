@@ -16,6 +16,7 @@ code exists yet. This initiative is the successor to `atomic_solver`'s closed
 | Initiative directory | `docs/plans/prover/` |
 | Rules crate | `atomic-movegen` 2.4.x (crates.io, MIT) |
 | Pinned oracle | `aiorla/provari` `48686bc6c786d6ea70568f0b2ad4002cf0520206` (`v0.1.0`), GPL-3.0, scratch build only |
+| Stretch reference | provari `224ce85dad083b1bc8fe429a9e4349de956f5305` (`v0.2.0`), bench column only, never the veto (D17) |
 | Legacy reference | `atomic_solver` at `5f85133ea9d751368a682e53e354bd3fc0016d00`, read-only sibling clone (`../atomic_solver`), never a dependency |
 | Corpus | `corpus-v1`, sha256 `9cd0169a30bb7d5b162b6a1ec119fe194b776c8a24a46cdf1582c07062847d0e` |
 
@@ -138,9 +139,10 @@ rest and adds D12–D16.
 | D11 | Per-node counters | **Both.** `child_evals`: +1 per child classified during an expansion (legacy `child_evals` semantics). `expansions`: +1 per node expansion that generates a child list (the analogue of provari's `nodes`; a diagnostic, not a ratio target). `--evals` bounds `child_evals`. The per-node cost metric is search time per 1 M child evals, from a fixed-`--evals` run |
 | D12 | GPL boundary for dependencies (new) | **No GPL/LGPL/AGPL crate anywhere in the dependency graph, including dev- and build-dependencies.** shakmaty 0.30.1 is `GPL-3.0-or-later` (verified in its crate metadata), so the handoff §6's "shakmaty as dev-dependency" is overruled. The second rules implementation is reached only as the external `provari check` process. Enforced by a `cargo metadata` licence gate in `make test` |
 | D13 | Names (new) | Package/binary `atomi`, initiative `docs/plans/prover/`, ledger rows `atomi@<sha>` (owner decision 2026-11-06) |
-| D14 | Claimed-win protocol for the bench (new) | Timed runs write no proof, like provari's bench command. For each cell `atomi` wins, one extra untimed run with `--proof-out` must show identical `child_evals`, and its proof must pass the validator and `provari check`. Only then does the cell count as a win. Otherwise it is reported as censored with the verdict class |
-| D15 | M0 proof store (new) | An event-fed in-memory store, active only with `--proof-out`, with its own cap (`--proof-memory`). It keeps a non-dominated set of `(move, length, limit)` per key. The writer emits one move per position and fails closed. M4 replaces the store with the bounded event-fed strategy worker (no proof-memory stop) |
-| D16 | Oracle gate (new) | `make veto` (our validator + `provari check` + corrupted-proof controls + a reverse control that validates provari-written JSONL) is part of `make test-full`. A missing oracle makes the gate **red**, not skipped |
+| D14 | Claimed-win protocol for the bench (new) | Timed runs write no proof, like provari's bench command. For each cell `atomi` wins, one extra untimed run with `--proof-out` (and `--seconds 600`, so the deadline cannot censor it; plan1 R6) must show identical `child_evals`, and its proof must pass the validator and `provari check`. Only then does the cell count as a win. Otherwise it is reported as censored with the verdict class |
+| D15 | M0 proof store (new; writer revised by plan1 R2) | An event-fed in-memory store, active only with `--proof-out`, with its own cap (`--proof-memory`). It keeps a non-dominated set of `(move, length, limit)` per key. The writer chooses, per **(position, counter)**, the shortest entry that holds at that counter. It checks the position graph for cycles as the checker does, and fails closed. M4 replaces the store with the bounded event-fed strategy worker (no proof-memory stop) |
+| D16 | Oracle gate (new; controls revised by plan1 R4) | `make veto` (our validator + `provari check` + corrupted-proof controls + a reverse control that validates provari-written JSONL) is part of `make test-full`. A missing oracle makes the gate **red**, not skipped. A control counts only as `valid: false`: the checker's `null` (small-material "cannot check") is `unchecked` and red |
+| D17 | Stretch reference (new, owner decision 2026-11-06) | provari **v0.2.0** (`224ce85`, its `check.rs`/`FORMAT.md` identical to the pin, its search rewritten) is built in scratch and measured in the same session as a separately labelled `provari-v0.2.0-hand` column, with the default single thread. v0.1.0 stays the veto and the primary column of the success condition. Whether to re-pin the goal is decided at M5 from the recorded gap |
 
 ## Backlog
 
@@ -265,7 +267,8 @@ re-measures before adopting or rejecting:
 | Risk | Mitigation |
 | --- | --- |
 | GPL contamination (provari, shakmaty) | D12 licence gate; scratch-only oracle; ideas only; no provari text or code copied |
-| Rules divergence between `atomic-movegen` and shakmaty (e.g. shakmaty's atomic insufficient-material draws are broader than `atomic-movegen`'s commoner-only `is_material_draw`) | Checker veto; the `rules-divergence` class; reported upstream when real |
+| Rules divergence between `atomic-movegen` and shakmaty (e.g. shakmaty's atomic insufficient-material draws are broader than `atomic-movegen`'s commoner-only `is_material_draw`) | Insufficient material: the checker's rule is adopted in our rules layer and validator (plan1 R1). Anything else: checker veto, the `rules-divergence` class, reported upstream when real |
+| The reference moves (provari v0.2.0 rewrote its search) | D17 stretch column from M0; the re-pin decision is at M5 |
 | Repetition identity mismatch (en passant) | D4: `EnPassantMode::Legal` key; validator compares exact positions with legal en passant |
 | Cross-clock proof reuse produces a position cycle or a 50-move failure in the written proof | Length/limit reuse rules; the writer fails closed on cycle/limit/missing; validator + checker |
 | Per-node cost is not the bottleneck | M1 stop rule |
@@ -283,3 +286,11 @@ re-measures before adopting or rejecting:
   D2–D8, D11 and new D12–D16. Recorded two corrections to the handoff:
   no shakmaty dev-dependency (GPL) and `EnPassantMode::Legal` as a correctness
   requirement. Wrote [`plan1.md`](plan1.md) (M0) and `AGENTS.md`.
+- **2026-11-06**: plan1 decision review (plan1 §Decision review, R1–R11)
+  against the pinned provari `check.rs`/`main.rs`/`search.rs`,
+  `atomic-movegen` 2.4.0 and the legacy pin. It adopted the checker's
+  insufficient-material draw (R1) and switched the writer to per-(position,
+  counter) moves (R2, D15). The header `moves` became informational and
+  capture-mates were counted as capture wins (R3). Controls must be
+  `valid: false`, never `null` (R4, D16). Added D17 (v0.2.0 stretch column,
+  owner decision).
