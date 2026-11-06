@@ -10,25 +10,41 @@ shared-win bench (geomean wall `< 1.0`, coverage ≥ provari). The current
 initiative is `docs/plans/prover/` (read `initiative.md` first). Its
 predecessor is the closed `winprover` initiative of `atomic_solver`.
 
-## Status
+## Architecture
 
-The repo holds docs only. `docs/plans/prover/plan1.md` (M0) creates the
-package, the gates and the engine. **Until plan1 lands, none of the commands
-below exist.** plan1's close-out replaces this section with the real
-architecture.
+plan1 (M0) has landed; see `docs/plans/prover/report1.md` for the close-out.
 
-Planned layout (plan1): `src/` (`rules`, `table`, `search/`, `events`,
-`strategy/`, `validate/`, `cli`, `main`), `tests/` + `tests/fixtures/`,
-`bench/` (pinned corpus, drivers), `scripts/` (oracle build, veto, licence
-gate), `docs/plans/prover/` (initiative, plans, reports, `bench.md`,
-`measurements/`).
+- `src/rules.rs` — end-of-game classification (`Won`/`Failed`/`Open`, the
+  insufficient-material rule), the position key, `is_zeroing`, `child_key`.
+- `src/table.rs` — the df-pn transposition table (4-entry buckets,
+  work-guided replacement, `usable` limits on proofs/refutations).
+- `src/search/` — `mod.rs` (the `prove` driver: 256 MiB thread, MID loop,
+  budgets), `frame.rs` (per-node children + thresholds), `value.rs` (the
+  `Proved`/`Refuted`/`Open` algebra; Open numbers saturate at `OPEN_MAX`).
+- `src/events.rs` — `ProofEvent`/`ProofSink`/`NullSink` (search's only
+  proof-store hook).
+- `src/strategy/` — `store.rs` (event-fed non-dominated proof store,
+  `--proof-memory` cap) + `write.rs` (the JSONL proof writer).
+- `src/validate/` — the independent replay validator (own rules copy; only
+  `std` + `serde_json` + `atomic_movegen`).
+- `src/cli.rs` + `src/main.rs` — `atomi prove | validate | moves` and the
+  JSON output contract.
+- `tests/` — fast gate in `make test`; `#[ignore = "slow: ..."]` tiers
+  (`tests/fixture_oracle.rs`); fixtures under `tests/fixtures/`.
+- `bench/` — pinned corpus (`corpus.json`, sha256-verified) + the
+  `run_bench.py` / `run_pernode.py` drivers (see `bench/README.md`).
+- `scripts/` — `build_oracle.sh`, `check_licenses.py`, `veto.py`.
 
-## Commands (after plan1)
+## Commands
 
 - `make test`: licence gate + `cargo test --release` (the fast gate, every
-  change).
-- `make test-full`: adds the slow tier and `make veto`. Required for search,
-  table, proof-output and validator changes.
+  change; ≈ 12 s).
+- `make test-full`: adds the `#[ignore]` slow tier (fixture oracle,
+  regressions) and `make veto`. Required for search, table, proof-output
+  and validator changes.
+- The binary: `atomi prove "<FEN>" [--seconds S --memory MB --evals N
+  --proof-out P --proof-memory MB]`, `atomi validate FILE...`, and
+  `atomi moves "<FEN>"` (legal UCI moves in movegen order).
 - `make lint`: `cargo fmt --check`, `cargo clippy --all-targets -- -D
   warnings`, `cargo doc --no-deps`.
 - `make oracle`: builds pinned provari in `/tmp/atomi-oracle` (outside the
@@ -88,6 +104,14 @@ gate), `docs/plans/prover/` (initiative, plans, reports, `bench.md`,
   clock. Proofs carry length + limit (decision D4).
 - `src/validate/` must stay independent: it uses only `std`, `serde_json` and
   `atomic_movegen`, never other `crate::` modules (enforced by a test).
+- Gotchas (learned in plan1):
+  - Open proof/disproof numbers saturate at `OPEN_MAX = INFINITY - 1`,
+    never at `INFINITY` — `INFINITY` marks decided values only; an Open
+    value saturating at INFINITY caused false refutations (completeness
+    bug, fixed in plan1).
+  - provari v0.1.0 accepts `--guide hand` (and `model`/`none`/`network`)
+    although its short `--help` omits the flag; it is documented in its
+    README only.
 - The search is deterministic: the same binary, FEN and flags give the same
   counters. Collecting a proof must not change the trajectory.
 

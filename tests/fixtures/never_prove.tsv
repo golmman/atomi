@@ -1,0 +1,38 @@
+# from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:tests/fixtures/decisive_positions.txt
+# from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:tests/fixtures/decisive_remaining.txt
+# from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:tests/fixtures/move_order_positions.txt
+# from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:tests/test_terminal_outcomes.rs
+# from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:tests/test_repetition.rs
+# from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:tests/test_ghi.rs
+name	fen	source	reason
+dec02	8/1k1p4/1P2p3/p2P1P2/P7/6p1/6K1/8 b - - 0 27	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 30 plies)
+dec06	3r2k1/8/p7/2P2P2/8/1P1p3P/P2K2r1/6R1 w - - 1 32	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 22 plies)
+dec24	rnbq1k1r/ppN4p/Bbp3p1/8/4PPPP/1QPp4/PP6/R4K1R b - - 1 16	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 10 plies)
+dec28	rnb2kRr/pppB4/3b4/3p3p/3P3P/4P3/PPP5/RNB1K3 b Q - 1 15	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 8 plies)
+dec31	r1bq1k2/ppN3p1/2p1p2P/6P1/1b1P1p2/8/PP3P2/R2K1B1R b - - 0 15	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 22 plies)
+dec36	8/pp6/5ppP/6P1/kP6/3R4/P1P5/6K1 b - - 0 28	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 8 plies)
+dec37	3r3k/2p4p/6p1/8/5P2/2P1P2P/1P4Pb/4K2R w K - 0 19	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 12 plies)
+dec38	6k1/4r1P1/2pp1P2/8/2b4p/4R3/1PP1n2K/4R3 b - - 0 35	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 14 plies)
+dec40	2kr4/p1pb1p2/3p3p/3Pp3/4P3/7P/P2QK3/6R1 b - - 0 24	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 12 plies)
+dec41	1k1r1N2/3P2p1/p6r/P3pp2/7P/Bpp1P3/4b3/2K1R1R1 w - - 0 33	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 10 plies)
+dec42	2kr3r/p5pp/4p2n/2pP4/8/1R6/PP3PPP/2K4R b - - 1 15	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 12 plies)
+dec43	2r2r1k/2Bq3p/p4pp1/7Q/P1pPP3/1p5P/1P6/R5RK b - - 3 24	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 14 plies)
+dec44	r7/1Rp4k/4P2B/6p1/3P2P1/p6p/P6K/8 b - - 0 35	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 48 plies)
+dec46	4k2r/1p2P3/7P/p1Pp4/3P4/8/5pp1/2K2R2 w - - 0 34	tests/fixtures/decisive_positions.txt	legacy Loss (solves in 5s, 14 plies)
+rem23	7k/pp6/4prpp/3pQp2/3P1P2/4P3/PP4PP/4K2R b K - 0 23	tests/fixtures/decisive_remaining.txt	legacy Loss (solvable_evals:271000000)
+m20_black	4r2k/3p4/p1pB2p1/5p1p/7P/2N1PPP1/P1PP4/1R4RK b - - 5 20	tests/fixtures/move_order_positions.txt	legacy Loss (hardest)
+m21_black	4r2k/3p4/2pB2p1/p4p1p/6PP/2N1PP2/P1PP4/1R4RK b - - 0 21	tests/fixtures/move_order_positions.txt	legacy Loss (very hard)
+m22_black	4r2k/3p4/2pB2p1/p5Pp/5p1P/2N1PP2/P1PP4/1R4RK b - - 0 22	tests/fixtures/move_order_positions.txt	legacy Loss (hard)
+m23_black	4r1k1/3p4/2pB2p1/p5Pp/5p1P/2N1PP2/P1PP4/1R2R2K b - - 2 23	tests/fixtures/move_order_positions.txt	legacy Loss (medium)
+m24_black	4r1k1/3p4/2pB2p1/6Pp/p6P/2N2P2/P1PP4/1R2R2K b - - 0 24	tests/fixtures/move_order_positions.txt	legacy Loss (medium)
+m25_black	6k1/3p4/2pB2p1/6Pp/7P/p1N2P2/P1PP4/1R5K b - - 0 25	tests/fixtures/move_order_positions.txt	legacy Loss (easy)
+m26_black	1R4k1/3p4/3B2p1/2p3Pp/7P/p1N2P2/P1PP4/7K b - - 1 26	tests/fixtures/move_order_positions.txt	legacy Loss (easy)
+m27_black	6R1/3p1k2/3B2p1/2p3Pp/7P/p1N2P2/P1PP4/7K b - - 3 27	tests/fixtures/move_order_positions.txt	legacy Loss (easier)
+m28_black	5R2/3p4/3Bk1p1/2p3Pp/7P/p1N2P2/P1PP4/7K b - - 5 28	tests/fixtures/move_order_positions.txt	legacy Loss (very easy)
+mate_in_3_black	rnbqkbnr/ppppp1pp/5p2/7Q/8/4P3/PPPP1PPP/RNB1KBNR b KQkq - 1 2	tests/test_terminal_outcomes.rs	legacy Loss: white mates in 3
+mate_in_2_black	rnbqkbnr/ppppp2p/5pp1/3Q4/8/4P3/PPPP1PPP/RNB1KBNR b KQkq - 1 3	tests/test_terminal_outcomes.rs	legacy Loss: white mates in 2
+mate_in_1_black	rnbqkbnr/ppp1pQ1p/3p1pp1/8/8/4P3/PPPP1PPP/RNB1KBNR b KQkq - 1 4	tests/test_terminal_outcomes.rs	legacy Loss: white mates in 2 plies
+only_two_kings_white	7k/8/8/8/8/8/8/7K w - - 0 1	tests/test_terminal_outcomes.rs	legacy Draw: K vs K
+only_two_kings_black	7k/8/8/8/8/8/8/7K b - - 0 1	tests/test_terminal_outcomes.rs	legacy Draw: K vs K
+rook_alone_vs_safe_king	8/8/8/8/2k5/8/8/4KR2 w - - 0 1	tests/test_repetition.rs	checker material draw, R1
+ghi_transposition_black	QQ2k3/8/8/8/8/8/8/4K3 b - - 0 1	tests/test_ghi.rs	legacy Loss: transposed position loses for black

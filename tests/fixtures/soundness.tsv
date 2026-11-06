@@ -1,0 +1,25 @@
+# Constructed 2026-11-06 (plan1 D5). Columns: name, fen, expectation
+# (prove|never|refute), cap (child_evals), note.
+#
+# repetition_hold: K + two same-colour bishops vs a bare commoner —
+# sufficient material (two bishops fail clause (c)), but neither bishop can
+# cover the other colour and there is nothing to capture, so the defender
+# holds forever. Evidence: the legacy binary
+# (/tmp/atomic_solver-5f85133, pin 5f85133) reports `outcome: draw` on this
+# FEN (timeout, ~294M evals). atomi is censored within its cap; the row only
+# requires "never found".
+# mate_100th_ply: checkmate-shaped mate in 1 at counter 99; mate outranks
+# the clock, so the root proof holds with limit 99.
+# rule50_edge_*: mate in 2 (no mate in 1, no captures) by a pawnless
+# attacker (K+Q+R) vs a bare defending commoner — neither side has a
+# zeroing move, so the root proof holds up to counter 97 (the attacker
+# position after the reply sits at c+2 < 100). Counter 98 -> never found.
+# detour: legacy dec08 — the win needs a quiet detour; the written proof
+# must have no position cycle.
+name	fen	expectation	cap	note
+repetition_hold	k7/8/8/8/8/8/2B5/KB6 w - - 0 1	never	2000000	sufficient material, defender holds by shuffling; legacy Draw
+mate_100th_ply	k7/8/1Q6/8/8/8/8/K6R w - - 99 1	prove	100000	checkmate-shaped mate in 1 at counter 99; root limit 99
+rule50_edge_0	k7/8/8/8/8/7Q/8/K6R w - - 0 1	prove	100000	pawnless attacker vs bare commoner; root limit 97
+rule50_edge_97	k7/8/8/8/8/7Q/8/K6R w - - 97 1	prove	100000	same at counter 97 (last allowed); root limit 97
+rule50_edge_98	k7/8/8/8/8/7Q/8/K6R w - - 98 1	never	100000	counter 98: no proof can hold
+detour	r4r1k/3q1P2/pp4pp/2pp4/N4Q2/2P3PP/PP2p3/R4R1K w - - 0 25	prove	2000000	legacy dec08 mate in 2; proof must be acyclic

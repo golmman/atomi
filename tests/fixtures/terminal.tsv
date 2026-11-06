@@ -1,0 +1,58 @@
+# from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:tests/test_position.rs
+# from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:tests/test_terminal_outcomes.rs
+# Material rows constructed per plan1 finding 6 (checker insufficient-material rule).
+# Columns: name, fen, attacker (w|b|both), expected_status (won|failed|open),
+#          refutation (none|rule50|unconditional), source.
+# Re-checked against atomic-movegen 2.4.0 on 2026-11-06; deviations and
+# construction notes are recorded in report1.md.
+name	fen	attacker	expected_status	refutation	source
+fifty_move_checkmate_w	7K/8/8/8/8/8/1Q6/k7 b - - 100 1	w	won	none	tests/test_position.rs
+fifty_move_checkmate_b	7K/8/8/8/8/8/1Q6/k7 b - - 100 1	b	failed	rule50	tests/test_position.rs
+fifty_move_stalemate	7k/8/8/8/8/8/2q5/K7 w - - 100 1	both	failed	rule50	tests/test_position.rs
+touching_commoners_two_pieces	8/8/8/8/8/8/1K6/k7 b - - 0 1	both	failed	unconditional	tests/test_position.rs
+extinction_stm_w	8/8/8/8/8/8/8/k7 w - - 0 1	w	failed	unconditional	tests/test_terminal_outcomes.rs
+extinction_stm_b	8/8/8/8/8/8/8/k7 w - - 0 1	b	won	none	tests/test_terminal_outcomes.rs
+extinction_opponent_w	8/8/8/8/8/8/8/K7 w - - 0 1	w	won	none	tests/test_terminal_outcomes.rs
+extinction_opponent_b	8/8/8/8/8/8/8/K7 w - - 0 1	b	failed	unconditional	tests/test_terminal_outcomes.rs
+kvk_w	7k/8/8/8/8/8/8/7K w - - 0 1	both	failed	unconditional	tests/test_terminal_outcomes.rs
+kvk_b	7k/8/8/8/8/8/8/7K b - - 0 1	both	failed	unconditional	tests/test_terminal_outcomes.rs
+touching_commoner_check_immunity	2Q5/8/8/8/8/8/1k6/K6r w - - 0 1	both	open	none	tests/test_terminal_outcomes.rs
+kr_v_k_w_wtm	4k3/8/8/8/8/8/8/R3K3 w - - 0 1	both	failed	unconditional	material:R1
+kr_v_k_w_btm	4k3/8/8/8/8/8/8/R3K3 b - - 0 1	both	failed	unconditional	material:R1
+kr_v_k_b_wtm	r3k3/8/8/8/8/8/8/4K3 w - - 0 1	both	failed	unconditional	material:R1
+kr_v_k_b_btm	r3k3/8/8/8/8/8/8/4K3 b - - 0 1	both	failed	unconditional	material:R1
+kb_v_k_w_wtm	4k3/8/8/8/8/8/8/2B1K3 w - - 0 1	both	failed	unconditional	material:R1
+kb_v_k_w_btm	4k3/8/8/8/8/8/8/2B1K3 b - - 0 1	both	failed	unconditional	material:R1
+kb_v_k_b_wtm	2b1k3/8/8/8/8/8/8/4K3 w - - 0 1	both	failed	unconditional	material:R1
+kb_v_k_b_btm	2b1k3/8/8/8/8/8/8/4K3 b - - 0 1	both	failed	unconditional	material:R1
+kn_v_k_w_wtm	4k3/8/8/8/8/8/8/2N1K3 w - - 0 1	both	failed	unconditional	material:R1
+kn_v_k_w_btm	4k3/8/8/8/8/8/8/2N1K3 b - - 0 1	both	failed	unconditional	material:R1
+kn_v_k_b_wtm	2n1k3/8/8/8/8/8/8/4K3 w - - 0 1	both	failed	unconditional	material:R1
+kn_v_k_b_btm	2n1k3/8/8/8/8/8/8/4K3 b - - 0 1	both	failed	unconditional	material:R1
+knn_v_k_w_wtm	4k3/8/8/8/8/8/8/2N1K1N1 w - - 0 1	both	failed	unconditional	material:R1
+knn_v_k_w_btm	4k3/8/8/8/8/8/8/2N1K1N1 b - - 0 1	both	failed	unconditional	material:R1
+knn_v_k_b_wtm	2n1k1n1/8/8/8/8/8/8/4K3 w - - 0 1	both	failed	unconditional	material:R1
+knn_v_k_b_btm	2n1k1n1/8/8/8/8/8/8/4K3 b - - 0 1	both	failed	unconditional	material:R1
+opp_bishops_a_wtm	3bk3/8/8/8/8/8/8/4KB2 w - - 0 1	both	failed	unconditional	material:R1
+opp_bishops_a_btm	3bk3/8/8/8/8/8/8/4KB2 b - - 0 1	both	failed	unconditional	material:R1
+opp_bishops_b_wtm	4k1b1/8/8/8/8/8/8/2B1K3 w - - 0 1	both	failed	unconditional	material:R1
+kq_v_k_w_wtm	4k3/8/8/8/8/8/8/3QK3 w - - 0 1	both	open	none	material:R1
+kq_v_k_w_btm	4k3/8/8/8/8/8/8/3QK3 b - - 0 1	both	open	none	material:R1
+kq_v_k_b_wtm	3qk3/8/8/8/8/8/8/4K3 w - - 0 1	both	open	none	material:R1
+kq_v_k_b_btm	3qk3/8/8/8/8/8/8/4K3 b - - 0 1	both	open	none	material:R1
+kp_v_k_w_wtm	4k3/8/8/8/8/8/3P4/4K3 w - - 0 1	both	open	none	material:R1
+kp_v_k_w_btm	4k3/8/8/8/8/8/3P4/4K3 b - - 0 1	both	open	none	material:R1
+kp_v_k_b_wtm	4k3/8/8/8/8/8/2p5/4K3 w - - 0 1	both	open	none	material:R1
+kp_v_k_b_btm	4k3/8/8/8/8/8/2p5/4K3 b - - 0 1	both	open	none	material:R1
+krr_v_k_w_wtm	4k3/8/8/8/8/8/8/R3K2R w - - 0 1	both	open	none	material:R1
+krr_v_k_w_btm	4k3/8/8/8/8/8/8/R3K2R b - - 0 1	both	open	none	material:R1
+krr_v_k_b_wtm	r3k2r/8/8/8/8/8/8/4K3 w - - 0 1	both	open	none	material:R1
+krr_v_k_b_btm	r3k2r/8/8/8/8/8/8/4K3 b - - 0 1	both	open	none	material:R1
+kbb_v_k_w_wtm	4k3/8/8/8/8/8/8/2B1KB2 w - - 0 1	both	open	none	material:R1
+kbb_v_k_w_btm	4k3/8/8/8/8/8/8/2B1KB2 b - - 0 1	both	open	none	material:R1
+kbb_v_k_b_wtm	2b1kb2/8/8/8/8/8/8/4K3 w - - 0 1	both	open	none	material:R1
+kbb_v_k_b_btm	2b1kb2/8/8/8/8/8/8/4K3 b - - 0 1	both	open	none	material:R1
+kn_v_kn_wtm	3nk3/8/8/8/8/8/8/2N1K3 w - - 0 1	both	open	none	material:R1
+kn_v_kn_btm	3nk3/8/8/8/8/8/8/2N1K3 b - - 0 1	both	open	none	material:R1
+same_bishops_wtm	2b1k3/8/8/8/8/8/8/4KB2 w - - 0 1	both	open	none	material:R1
+same_bishops_btm	2b1k3/8/8/8/8/8/8/4KB2 b - - 0 1	both	open	none	material:R1

@@ -2,8 +2,8 @@
 
 ## Status
 
-**Open (2026-11-06).** Item 1 (M0) is planned in [`plan1.md`](plan1.md); no
-code exists yet. This initiative is the successor to `atomic_solver`'s closed
+**Open (2026-11-06).** Item 1 (M0) is done: [`plan1.md`](plan1.md),
+[`report1.md`](report1.md). Item 2 (M1) is next. This initiative is the successor to `atomic_solver`'s closed
 `winprover` initiative. Its starting point is the legacy handoff
 `docs/plans/winprover/HANDOFF.md` (revision 2026-11-06) in
 <https://github.com/golmman/atomic_solver>, read from `main`; legacy code pin
@@ -151,8 +151,8 @@ independently of items. One mechanism per plan, except item 1.
 
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
-| 1 | **M0** bootstrap + correctness + proof output + baseline | Cargo package, small `AGENTS.md`, Makefile gates, licence gate, provenance registry, oracle build script; copied corpus and fixtures; attacker-only DF-PN with 1+ε and uniform starting numbers over plain `atomic-movegen` movegen (no `Mover`, no heuristics); CLI; event sink + proof store + JSONL writer + own validator + `make veto`; adapted bench driver; successor `bench.md` with the re-measured baseline row; per-node cost baseline | gates green (incl. veto); proves a mate-in-1, a mate-in-2 and a small win, each validator- **and** checker-accepted; never proves a fixture loss or a soundness negative; baseline row and per-node baseline recorded; **no performance claim** | **planned: [`plan1.md`](plan1.md)** |
-| 2 | **M1** per-node cost | `Mover`/`Effect` per expanded node; no make/unmake for most children; incremental keys; TT clusters + prefetch + filter + lazy zeroed allocation (copy legacy `src/search/tt/alloc.rs`); in-search proof store with length/limit, inside the `--memory` label | wall per 1 M child evals ≤ the M0 baseline **and** ≤ the legacy front-end's (cross-repo, same session); a small reference win proved within a stated cap and checker-accepted; soundness fixtures green | open |
+| 1 | **M0** bootstrap + correctness + proof output + baseline | Cargo package, small `AGENTS.md`, Makefile gates, licence gate, provenance registry, oracle build script; copied corpus and fixtures; attacker-only DF-PN with 1+ε and uniform starting numbers over plain `atomic-movegen` movegen (no `Mover`, no heuristics); CLI; event sink + proof store + JSONL writer + own validator + `make veto`; adapted bench driver; successor `bench.md` with the re-measured baseline row; per-node cost baseline | gates green (incl. veto); proves a mate-in-1, a mate-in-2 and a small win, each validator- **and** checker-accepted; never proves a fixture loss or a soundness negative; baseline row and per-node baseline recorded; **no performance claim** | **done: [`plan1`](plan1.md), [`report1`](report1.md)** |
+| 2 | **M1** per-node cost | `Mover`/`Effect` per expanded node; no make/unmake for most children; incremental keys; TT clusters + prefetch + filter + lazy zeroed allocation (copy legacy `src/search/tt/alloc.rs`); in-search proof store with length/limit, inside the `--memory` label | wall per 1 M child evals ≤ the M0 baseline **and** ≤ the legacy front-end's (cross-repo, same session); a small reference win proved within a stated cap and checker-accepted; soundness fixtures green | open — reference: M0 = 162.0 ms per 1 M child evals on `core` at 10 M (plan1) |
 | 3 | **M2** search guidance | move-class starting numbers, EF-PN hand-eval scaling, quiet grouping; constants exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | `core` and `easy-win` proved within a stated cap; measured vs M1 | open |
 | 4 | **M3** static tactics + simulation | per-child static tactics (immediate explosion, exposed king, check with no safe evasion, unparried double threat, cannot-win material, mate in one) as child scoring; sibling simulation as part of the AND-node loop | `core`/`easy-win` proved at a product-affordable cap; measured | open |
 | 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | open |
@@ -294,3 +294,11 @@ re-measures before adopting or rejecting:
   capture-mates were counted as capture wins (R3). Controls must be
   `valid: false`, never `null` (R4, D16). Added D17 (v0.2.0 stretch column,
   owner decision).
+- **2026-11-06** — plan1 (M0) executed: all gates green incl. `make veto`.
+  The false-refutation bug (Open numbers saturating at `INFINITY` instead
+  of `OPEN_MAX`) was found and fixed; the 10 M fixture sweep is 0 refuted.
+  Bench baseline: legacy `default` 45.358 (1 cell), legacy `opt` 6.322
+  (2 cells), atomi M0 36.365 (1 cell, no performance claim); stretch
+  provari v0.2.0/v0.1.0 hand = 1.001 with identical single-thread node
+  counts (342,289 / 72,523 / 4,574,912). M1 reference: **162.0 ms per
+  1 M child evals** on `core` at `--evals 10000000`.

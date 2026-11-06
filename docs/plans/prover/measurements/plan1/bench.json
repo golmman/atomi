@@ -1,0 +1,948 @@
+{
+ "provenance": {
+  "date": "2026-11-06",
+  "host": "ae54d05b36f8",
+  "platform": "Linux-7.2.13-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "cpu_model": "AMD Ryzen 9 5950X 16-Core Processor",
+  "cpu_count": 32,
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "atomic_movegen": "2.4.0",
+  "atomi": {
+   "version": "atomi 0.1.0 (0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb)",
+   "binary_sha256": "7e2e0c20429fe16dfa09a97bb121c2d861a1388d1dae73ae6f73c5fc9173818f",
+   "binary": "target/release/atomi"
+  },
+  "repo_head": "0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb",
+  "repo_dirty": true,
+  "provari": {
+   "commit": "48686bc6c786d6ea70568f0b2ad4002cf0520206",
+   "guide": "hand",
+   "version": "provari 0.1.0",
+   "binary": "/tmp/atomi-oracle/provari/target/release/provari"
+  },
+  "provari_stretch": {
+   "commit": "224ce85dad083b1bc8fe429a9e4349de956f5305",
+   "guide": "hand",
+   "version": "provari 0.2.0",
+   "binary": "/tmp/atomi-oracle/provari-v0.2.0/target/release/provari"
+  },
+  "legacy": {
+   "commit": "5f85133ea9d751368a682e53e354bd3fc0016d00",
+   "binary": "/tmp/atomic_solver-5f85133/target/release/atomic_solver"
+  },
+  "stacks": {
+   "atomi": {
+    "m0": []
+   },
+   "legacy": {
+    "default": [],
+    "opt": [
+     "--move-class-pn",
+     "--quiet-grouping",
+     "--eval-pn",
+     "or"
+    ]
+   }
+  },
+  "budgets": {
+   "seconds": 10.0,
+   "memory_mb": 192,
+   "repeats": 3
+  },
+  "corpus": {
+   "path": "/workspace/atomi/bench/corpus.json",
+   "sha256": "9cd0169a30bb7d5b162b6a1ec119fe194b776c8a24a46cdf1582c07062847d0e"
+  },
+  "proof_verdicts": {
+   "atomi:m0": {
+    "core": null,
+    "1eb80b92f92c": "accepted",
+    "db6a741c723f": null
+   }
+  }
+ },
+ "runs": [
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 0.525,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 497
+  },
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 0.537,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 508
+  },
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 0.533,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 504
+  },
+  {
+   "case": "core",
+   "side": "provari-v0.2.0-hand",
+   "run": 1,
+   "wall_s": 0.526,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 498
+  },
+  {
+   "case": "core",
+   "side": "provari-v0.2.0-hand",
+   "run": 2,
+   "wall_s": 0.526,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 497
+  },
+  {
+   "case": "core",
+   "side": "provari-v0.2.0-hand",
+   "run": 3,
+   "wall_s": 0.54,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 510
+  },
+  {
+   "case": "core",
+   "side": "atomi:m0",
+   "run": 1,
+   "wall_s": 10.062,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 59453947,
+   "expansions": 1946624,
+   "ms": 10003,
+   "flags": []
+  },
+  {
+   "case": "core",
+   "side": "atomi:m0",
+   "run": 2,
+   "wall_s": 10.06,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 59032393,
+   "expansions": 1933312,
+   "ms": 10002,
+   "flags": []
+  },
+  {
+   "case": "core",
+   "side": "atomi:m0",
+   "run": 3,
+   "wall_s": 10.059,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 58774677,
+   "expansions": 1924096,
+   "ms": 10000,
+   "flags": []
+  },
+  {
+   "case": "core",
+   "side": "atomic_solver:default",
+   "run": 1,
+   "wall_s": 10.017,
+   "returncode": 0,
+   "win": false,
+   "outcome": "draw",
+   "pv_length": 0,
+   "evals": 66157674,
+   "exit": null,
+   "pv_status": null,
+   "flags": []
+  },
+  {
+   "case": "core",
+   "side": "atomic_solver:default",
+   "run": 2,
+   "wall_s": 10.02,
+   "returncode": 0,
+   "win": false,
+   "outcome": "draw",
+   "pv_length": 0,
+   "evals": 66465506,
+   "exit": null,
+   "pv_status": null,
+   "flags": []
+  },
+  {
+   "case": "core",
+   "side": "atomic_solver:default",
+   "run": 3,
+   "wall_s": 10.022,
+   "returncode": 0,
+   "win": false,
+   "outcome": "draw",
+   "pv_length": 0,
+   "evals": 66062589,
+   "exit": null,
+   "pv_status": null,
+   "flags": []
+  },
+  {
+   "case": "core",
+   "side": "atomic_solver:opt",
+   "run": 1,
+   "wall_s": 3.96,
+   "returncode": 0,
+   "win": true,
+   "outcome": "win",
+   "pv_length": 29,
+   "evals": 17217076,
+   "exit": null,
+   "pv_status": "first-outcome",
+   "flags": [
+    "--move-class-pn",
+    "--quiet-grouping",
+    "--eval-pn",
+    "or"
+   ]
+  },
+  {
+   "case": "core",
+   "side": "atomic_solver:opt",
+   "run": 2,
+   "wall_s": 3.976,
+   "returncode": 0,
+   "win": true,
+   "outcome": "win",
+   "pv_length": 29,
+   "evals": 17217076,
+   "exit": null,
+   "pv_status": "first-outcome",
+   "flags": [
+    "--move-class-pn",
+    "--quiet-grouping",
+    "--eval-pn",
+    "or"
+   ]
+  },
+  {
+   "case": "core",
+   "side": "atomic_solver:opt",
+   "run": 3,
+   "wall_s": 3.96,
+   "returncode": 0,
+   "win": true,
+   "outcome": "win",
+   "pv_length": 29,
+   "evals": 17217076,
+   "exit": null,
+   "pv_status": "first-outcome",
+   "flags": [
+    "--move-class-pn",
+    "--quiet-grouping",
+    "--eval-pn",
+    "or"
+   ]
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 0.138,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 109
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 0.137,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 109
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 0.133,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 104
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-v0.2.0-hand",
+   "run": 1,
+   "wall_s": 0.14,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 111
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-v0.2.0-hand",
+   "run": 2,
+   "wall_s": 0.134,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 105
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-v0.2.0-hand",
+   "run": 3,
+   "wall_s": 0.138,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 109
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:m0",
+   "run": 1,
+   "wall_s": 5.027,
+   "returncode": 0,
+   "win": true,
+   "length": 17,
+   "exit": "proved",
+   "child_evals": 30245030,
+   "expansions": 1046253,
+   "ms": 4966,
+   "flags": []
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:m0",
+   "run": 2,
+   "wall_s": 4.982,
+   "returncode": 0,
+   "win": true,
+   "length": 17,
+   "exit": "proved",
+   "child_evals": 30245030,
+   "expansions": 1046253,
+   "ms": 4918,
+   "flags": []
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:m0",
+   "run": 3,
+   "wall_s": 4.918,
+   "returncode": 0,
+   "win": true,
+   "length": 17,
+   "exit": "proved",
+   "child_evals": 30245030,
+   "expansions": 1046253,
+   "ms": 4858,
+   "flags": []
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomic_solver:default",
+   "run": 1,
+   "wall_s": 6.252,
+   "returncode": 0,
+   "win": true,
+   "outcome": "win",
+   "pv_length": 37,
+   "evals": 43266033,
+   "exit": null,
+   "pv_status": "first-outcome",
+   "flags": []
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomic_solver:default",
+   "run": 2,
+   "wall_s": 6.214,
+   "returncode": 0,
+   "win": true,
+   "outcome": "win",
+   "pv_length": 37,
+   "evals": 43266033,
+   "exit": null,
+   "pv_status": "first-outcome",
+   "flags": []
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomic_solver:default",
+   "run": 3,
+   "wall_s": 6.202,
+   "returncode": 0,
+   "win": true,
+   "outcome": "win",
+   "pv_length": 37,
+   "evals": 43266033,
+   "exit": null,
+   "pv_status": "first-outcome",
+   "flags": []
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomic_solver:opt",
+   "run": 1,
+   "wall_s": 0.736,
+   "returncode": 0,
+   "win": true,
+   "outcome": "win",
+   "pv_length": 31,
+   "evals": 3231686,
+   "exit": null,
+   "pv_status": "first-outcome",
+   "flags": [
+    "--move-class-pn",
+    "--quiet-grouping",
+    "--eval-pn",
+    "or"
+   ]
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomic_solver:opt",
+   "run": 2,
+   "wall_s": 0.741,
+   "returncode": 0,
+   "win": true,
+   "outcome": "win",
+   "pv_length": 31,
+   "evals": 3231686,
+   "exit": null,
+   "pv_status": "first-outcome",
+   "flags": [
+    "--move-class-pn",
+    "--quiet-grouping",
+    "--eval-pn",
+    "or"
+   ]
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomic_solver:opt",
+   "run": 3,
+   "wall_s": 0.737,
+   "returncode": 0,
+   "win": true,
+   "outcome": "win",
+   "pv_length": 31,
+   "evals": 3231686,
+   "exit": null,
+   "pv_status": "first-outcome",
+   "flags": [
+    "--move-class-pn",
+    "--quiet-grouping",
+    "--eval-pn",
+    "or"
+   ]
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 6.55,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6521
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 6.65,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6621
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 6.567,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6538
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-v0.2.0-hand",
+   "run": 1,
+   "wall_s": 6.542,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6513
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-v0.2.0-hand",
+   "run": 2,
+   "wall_s": 6.729,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6699
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-v0.2.0-hand",
+   "run": 3,
+   "wall_s": 6.632,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6601
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:m0",
+   "run": 1,
+   "wall_s": 10.061,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 61843269,
+   "expansions": 2095104,
+   "ms": 10002,
+   "flags": []
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:m0",
+   "run": 2,
+   "wall_s": 10.064,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 62265800,
+   "expansions": 2110464,
+   "ms": 10002,
+   "flags": []
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:m0",
+   "run": 3,
+   "wall_s": 10.061,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 60441568,
+   "expansions": 2046976,
+   "ms": 10003,
+   "flags": []
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomic_solver:default",
+   "run": 1,
+   "wall_s": 10.017,
+   "returncode": 0,
+   "win": false,
+   "outcome": "draw",
+   "pv_length": 0,
+   "evals": 67599020,
+   "exit": null,
+   "pv_status": null,
+   "flags": []
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomic_solver:default",
+   "run": 2,
+   "wall_s": 10.027,
+   "returncode": 0,
+   "win": false,
+   "outcome": "draw",
+   "pv_length": 0,
+   "evals": 67819991,
+   "exit": null,
+   "pv_status": null,
+   "flags": []
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomic_solver:default",
+   "run": 3,
+   "wall_s": 10.019,
+   "returncode": 0,
+   "win": false,
+   "outcome": "draw",
+   "pv_length": 0,
+   "evals": 68037756,
+   "exit": null,
+   "pv_status": null,
+   "flags": []
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomic_solver:opt",
+   "run": 1,
+   "wall_s": 10.019,
+   "returncode": 0,
+   "win": false,
+   "outcome": "draw",
+   "pv_length": 0,
+   "evals": 46244690,
+   "exit": null,
+   "pv_status": null,
+   "flags": [
+    "--move-class-pn",
+    "--quiet-grouping",
+    "--eval-pn",
+    "or"
+   ]
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomic_solver:opt",
+   "run": 2,
+   "wall_s": 10.024,
+   "returncode": 0,
+   "win": false,
+   "outcome": "draw",
+   "pv_length": 0,
+   "evals": 45867724,
+   "exit": null,
+   "pv_status": null,
+   "flags": [
+    "--move-class-pn",
+    "--quiet-grouping",
+    "--eval-pn",
+    "or"
+   ]
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomic_solver:opt",
+   "run": 3,
+   "wall_s": 10.011,
+   "returncode": 0,
+   "win": false,
+   "outcome": "draw",
+   "pv_length": 0,
+   "evals": 46300744,
+   "exit": null,
+   "pv_status": null,
+   "flags": [
+    "--move-class-pn",
+    "--quiet-grouping",
+    "--eval-pn",
+    "or"
+   ]
+  }
+ ],
+ "ledger": {
+  "cells": {
+   "core": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 0.533,
+     "win": true,
+     "nodes": 342289,
+     "mate": 17,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "m0": {
+     "runs": 3,
+     "wall_s": 10.06,
+     "win": false,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 59453947,
+     "exit": "timeout",
+     "returncodes": [
+      0
+     ],
+     "factor": null,
+     "factor_lower_bound": 18.76,
+     "note": "candidate censored"
+    },
+    "default": {
+     "runs": 3,
+     "wall_s": 10.02,
+     "win": false,
+     "nodes": null,
+     "mate": null,
+     "evals": 66157674,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ],
+     "factor": null,
+     "factor_lower_bound": 18.76,
+     "note": "candidate censored"
+    },
+    "opt": {
+     "runs": 3,
+     "wall_s": 3.96,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": 17217076,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ],
+     "factor": 7.43,
+     "note": "shared win"
+    }
+   },
+   "1eb80b92f92c": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 0.137,
+     "win": true,
+     "nodes": 72523,
+     "mate": 15,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "m0": {
+     "runs": 3,
+     "wall_s": 4.982,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 30245030,
+     "exit": "proved",
+     "returncodes": [
+      0
+     ],
+     "proof_run": {
+      "wall_s": 5.021,
+      "returncode": 0,
+      "exit": "proved",
+      "child_evals": 30245030,
+      "proof": "written",
+      "proof_positions": 2083,
+      "proof_length": 17
+     },
+     "proof_verdict": "accepted",
+     "factor": 36.365,
+     "note": "shared win"
+    },
+    "default": {
+     "runs": 3,
+     "wall_s": 6.214,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": 43266033,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ],
+     "factor": 45.358,
+     "note": "shared win"
+    },
+    "opt": {
+     "runs": 3,
+     "wall_s": 0.737,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": 3231686,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ],
+     "factor": 5.38,
+     "note": "shared win"
+    }
+   },
+   "db6a741c723f": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 6.567,
+     "win": true,
+     "nodes": 4574912,
+     "mate": 22,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "m0": {
+     "runs": 3,
+     "wall_s": 10.061,
+     "win": false,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 61843269,
+     "exit": "timeout",
+     "returncodes": [
+      0
+     ],
+     "factor": null,
+     "factor_lower_bound": 1.52,
+     "note": "candidate censored"
+    },
+    "default": {
+     "runs": 3,
+     "wall_s": 10.019,
+     "win": false,
+     "nodes": null,
+     "mate": null,
+     "evals": 67599020,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ],
+     "factor": null,
+     "factor_lower_bound": 1.52,
+     "note": "candidate censored"
+    },
+    "opt": {
+     "runs": 3,
+     "wall_s": 10.019,
+     "win": false,
+     "nodes": null,
+     "mate": null,
+     "evals": 46244690,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ],
+     "factor": null,
+     "factor_lower_bound": 1.52,
+     "note": "candidate censored"
+    }
+   }
+  },
+  "summary": {
+   "m0": {
+    "shared_cells": [
+     "1eb80b92f92c"
+    ],
+    "shared_count": 1,
+    "geomean_factor": 36.365,
+    "coverage_reference": 3,
+    "coverage_candidate": 1,
+    "censored_cells": [
+     "core",
+     "db6a741c723f"
+    ]
+   },
+   "default": {
+    "shared_cells": [
+     "1eb80b92f92c"
+    ],
+    "shared_count": 1,
+    "geomean_factor": 45.358,
+    "coverage_reference": 3,
+    "coverage_candidate": 1,
+    "censored_cells": [
+     "core",
+     "db6a741c723f"
+    ]
+   },
+   "opt": {
+    "shared_cells": [
+     "core",
+     "1eb80b92f92c"
+    ],
+    "shared_count": 2,
+    "geomean_factor": 6.322,
+    "coverage_reference": 3,
+    "coverage_candidate": 2,
+    "censored_cells": [
+     "db6a741c723f"
+    ]
+   }
+  }
+ },
+ "stretch": {
+  "cells": {
+   "core": {
+    "reference_wall_s": 0.533,
+    "stretch_wall_s": 0.526,
+    "ratio": 0.987
+   },
+   "1eb80b92f92c": {
+    "reference_wall_s": 0.137,
+    "stretch_wall_s": 0.138,
+    "ratio": 1.007
+   },
+   "db6a741c723f": {
+    "reference_wall_s": 6.567,
+    "stretch_wall_s": 6.632,
+    "ratio": 1.01
+   }
+  },
+  "shared_ratio_geomean": 1.001,
+  "shared_count": 3
+ }
+}

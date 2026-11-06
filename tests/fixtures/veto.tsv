@@ -1,0 +1,15 @@
+# Rows `make veto` must prove and get accepted. Columns: name, fen, role
+# (prove|control|rule50). role=control is the negative-control source
+# (>= 7 pieces, no capture winning at once at the root, castling rights);
+# role=rule50 feeds the 50-move control (counter-97 mate in 2 by a pawnless
+# attacker vs a bare commoner). m29_white is the smallest wins.tsv row M0
+# proves within 10M child evals (34 evals, length 1).
+name	fen	role
+m1_explosion	6rk/8/8/8/8/8/8/6QK w - - 0 1	prove
+m1_checkmate	k7/8/1Q6/8/8/8/8/K6R w - - 0 1	prove
+m2	k7/8/8/8/8/7Q/8/K6R w - - 0 1	prove
+smallest_win	5R2/3p4/3Bk1p1/6Pp/2p4P/p1N2P2/P1PP4/7K w - - 0 29	prove
+mate_100th_ply	k7/8/1Q6/8/8/8/8/K6R w - - 99 1	prove
+rule50_97	k7/8/8/8/8/7Q/8/K6R w - - 97 1	rule50
+detour	r4r1k/3q1P2/pp4pp/2pp4/N4Q2/2P3PP/PP2p3/R4R1K w - - 0 25	prove
+control	rnb1k2r/p2p3p/4ppp1/qp6/3PPQ2/8/PPP2PPP/R3KB1R w KQkq - 2 11	control
