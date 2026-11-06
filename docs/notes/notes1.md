@@ -17,3 +17,6 @@ per-node cost baseline). No crate dependency on `atomic_solver`. Do not
 implement yet.
 
 ---
+
+Please revise the decisions of `docs/plans/prover/plan1.md`.
+
