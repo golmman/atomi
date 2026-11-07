@@ -3,7 +3,7 @@
 use atomi::cli;
 use atomi::events::NullSink;
 use atomi::search::{self, Limits};
-use atomi::strategy::{self, ProofStore};
+use atomi::strategy;
 use atomi::validate;
 use atomic_movegen::board::{Board, FenPolicy};
 use std::path::PathBuf;
@@ -18,7 +18,7 @@ fn print_help() {
          \n\
          USAGE:\n\
          \x20   atomi prove \"<FEN>\" [--seconds S] [--memory MB] [--evals N]\n\
-         \x20                       [--proof-out PATH.jsonl] [--proof-memory MB]\n\
+         \x20                       [--proof-out PATH.jsonl]\n\
          \x20   atomi validate PROOF.jsonl...\n\
          \x20   atomi moves \"<FEN>\"\n\
          \x20   atomi --help | --version"
@@ -40,29 +40,17 @@ fn prove(args: &[String]) -> ExitCode {
         seconds: Some(opts.seconds),
         evals: opts.evals,
         memory_mb: opts.memory_mb,
+        filter: true,
     };
-    let (result, proof, positions, proof_length, proof_written) = match &opts.proof_out {
-        None => {
-            let (result, _sink) = search::prove(&root, &limits, NullSink);
-            (result, "not-requested", None, None, false)
-        }
-        Some(path) => {
-            let (result, store) = search::prove(&root, &limits, ProofStore::new(opts.proof_memory));
-            if result.exit != search::Exit::Proved {
-                (result, "not-found", None, None, false)
-            } else {
-                match strategy::write_proof(&root, &store, &PathBuf::from(path)) {
-                    Ok(stats) => (
-                        result,
-                        "written",
-                        Some(stats.positions),
-                        Some(stats.length),
-                        true,
-                    ),
-                    Err(e) => (result, e.as_str(), None, None, false),
-                }
-            }
-        }
+    let output = search::prove(&root, &limits, NullSink);
+    let result = output.result;
+    let (proof, positions, proof_length, proof_written) = match &opts.proof_out {
+        None => ("not-requested", None, None, false),
+        Some(path) if result.exit != search::Exit::Proved => ("not-found", None, None, false),
+        Some(path) => match strategy::write_proof(&root, &output.proofs, &PathBuf::from(path)) {
+            Ok(stats) => ("written", Some(stats.positions), Some(stats.length), true),
+            Err(e) => (e.as_str(), None, None, false),
+        },
     };
     let evals_limit = opts.evals.map_or("null".to_string(), |n| n.to_string());
     let length = result.length.map_or("null".to_string(), |n| n.to_string());
@@ -73,7 +61,7 @@ fn prove(args: &[String]) -> ExitCode {
         "{{\"found\":{},\"length\":{},\"exit\":\"{}\",\"child_evals\":{},\
          \"expansions\":{},\"ms\":{},\"seconds\":{},\"memory_mb\":{},\
          \"evals_limit\":{},\"proof\":\"{}\",\"proof_positions\":{},\
-         \"proof_length\":{}}}",
+         \"proof_length\":{},\"proof_entries\":{},\"proof_full\":{}}}",
         found,
         length,
         result.exit.as_str(),
@@ -86,6 +74,8 @@ fn prove(args: &[String]) -> ExitCode {
         proof,
         positions,
         proof_length,
+        result.proof_entries,
+        result.proof_full,
     );
     if opts.proof_out.is_some() && found && !proof_written {
         return ExitCode::from(3);

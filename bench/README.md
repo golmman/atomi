@@ -29,6 +29,11 @@ Usage:
 the legacy binary prints no `pre_exit:` line, so `exit` stays null on
 control rows and control censoring comes from the `outcome:` line.
 
-`run_pernode.py` measures the per-node cost baseline (`--evals` caps,
-medians over runs that reached the cap, `m1_reference` on `core`), JSON +
-CSV out.
+`run_pernode.py` measures per-node cost (`--evals` caps, medians over runs
+that reached the cap, `m1_reference` on `core`), JSON + CSV out. Sides:
+`--atomi NAME=PATH` (repeatable; a bare `PATH` is the side `atomi`) at every
+`--memory` value (comma list), and optionally `--legacy-probe PATH
+--legacy-commit SHA` (the legacy plan3 front-end probe, fixed 32 MB table).
+Per (case, cap) each repeat runs every side once, one process at a time.
+The `gate` block compares sides `m1`, `m0` and `legacy-fe` on `core` at the
+largest cap and 192 MB (plan2 G1).

@@ -1,3 +1,6 @@
+// Justification for >10 KB: the attacker-rules layer is one contract
+// (status, keys, the checker material rule and their tests).
+
 //! Attacker-only rules layer over `atomic_movegen`.
 //!
 //! The attacker is the root's side to move for the whole search. A position's
@@ -9,7 +12,7 @@
 //! clock (decision D4): the checker treats positions as repeated under the
 //! legal-en-passant identity.
 
-use atomic_movegen::board::Board;
+use atomic_movegen::board::{Board, StateInfo};
 use atomic_movegen::types::{Bitboard, Color, EnPassantMode, Move, Outcome, PieceType};
 
 /// Attacker-perspective status of a position.
@@ -63,6 +66,33 @@ pub fn status(board: &Board, attacker: Color) -> Status {
     }
 }
 
+/// The status of `board` for `attacker`, reusing a populated `state` and the
+/// caller's legal-move existence bit (the movegen it ran anyway). Identical
+/// mapping, precedence and `from` to [`status`].
+pub fn status_with(board: &Board, attacker: Color, state: &StateInfo, moves_exist: bool) -> Status {
+    let from = if board.rule50() >= 100 { 100 } else { 0 };
+    let stm = board.side_to_move();
+    match board.outcome_with(state, moves_exist) {
+        Some(Outcome::Loss) => {
+            if stm == attacker {
+                Status::Failed { from }
+            } else {
+                Status::Won
+            }
+        }
+        Some(Outcome::Win) => {
+            if stm.flip() == attacker {
+                Status::Failed { from }
+            } else {
+                Status::Won
+            }
+        }
+        Some(_) => Status::Failed { from },
+        None if material_draw(board) => Status::Failed { from },
+        None => Status::Open,
+    }
+}
+
 /// Position key: board, side to move, castling rights and the en passant
 /// square only when an en passant capture is legal; no clock.
 pub fn key(board: &Board) -> u64 {
@@ -78,6 +108,53 @@ pub fn child_key(board: &Board, m: Move) -> u64 {
 pub fn is_zeroing(board: &Board, m: Move) -> bool {
     board.is_zeroing(m)
 }
+
+/// The per-file en passant Zobrist key: the value `hash_with(Always)` XORs
+/// in for an en passant square on `file` that [`EnPassantMode::Legal`] drops
+/// again. `hash_after_with(m, Legal)` needs it only to turn an `Always`
+/// child key into a `Legal` one on a double push no enemy pawn can capture.
+///
+/// Upstream feedback (D2): `hash_after_with(m, Legal)` could skip its clone
+/// when no enemy pawn attacks the passed square, or expose the per-file en
+/// passant key. Either would retire this derivation.
+///
+/// The keys are derived, not hard-coded: for each file a board is built
+/// with a white pawn on rank 2 of that file and nothing else but the two
+/// commoners, the double push is made, and the key is the made child's
+/// `hash_with(Always) ^ hash_with(Legal)` (the child's en passant square is
+/// present and uncapturable — no black pawn attacks it).
+pub fn ep_key(file: usize) -> u64 {
+    debug_assert!(file < 8);
+    static KEYS: std::sync::OnceLock<[u64; 8]> = std::sync::OnceLock::new();
+    KEYS.get_or_init(|| {
+        let mut keys = [0u64; 8];
+        for (f, k) in keys.iter_mut().enumerate() {
+            // White pawn on {file}2 (rank-2 row: f empty files, `P`, the
+            // rest); commoners stay on e1/e8, off every pawn file.
+            let rank2 = format!(
+                "{}P{}",
+                if f > 0 { f.to_string() } else { String::new() },
+                if 7 - f > 0 {
+                    (7 - f).to_string()
+                } else {
+                    String::new()
+                }
+            );
+            let b = Board::from_fen(&format!("4k3/8/8/8/8/8/{rank2}/4K3 w - - 0 1")).unwrap();
+            let m = b
+                .move_from_uci(&format!("{}2{}4", FILES[f], FILES[f]))
+                .unwrap();
+            let mut child = b.clone();
+            child.do_move(m, &mut StateInfo::new());
+            debug_assert!(child.ep_square().is_some());
+            debug_assert!(child.legal_ep_square().is_none());
+            *k = child.hash_with(EnPassantMode::Always) ^ child.hash_with(EnPassantMode::Legal);
+        }
+        keys
+    })[file]
+}
+
+const FILES: [char; 8] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 /// Checker-compatible insufficient material for side `s`: `s` cannot win
 /// because the opponent `o` still has its commoner and one of these holds:

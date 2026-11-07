@@ -12,19 +12,35 @@ predecessor is the closed `winprover` initiative of `atomic_solver`.
 
 ## Architecture
 
-plan1 (M0) has landed; see `docs/plans/prover/report1.md` for the close-out.
+plan1 (M0) and plan2 (M1, per-node cost) have landed; see
+`docs/plans/prover/report2.md` for the latest close-out.
 
-- `src/rules.rs` — end-of-game classification (`Won`/`Failed`/`Open`, the
-  insufficient-material rule), the position key, `is_zeroing`, `child_key`.
-- `src/table.rs` — the df-pn transposition table (4-entry buckets,
-  work-guided replacement, `usable` limits on proofs/refutations).
+- `src/rules.rs` — end-of-game classification (`status`, `status_with`
+  reusing the node's own movegen; `Won`/`Failed`/`Open`, the
+  insufficient-material rule), the position key, `is_zeroing`, `child_key`
+  (tests only), `ep_key` (the derived per-file en passant key).
+- `src/mover.rs` — `Mover` (per expanded node) + `Effect` (per move): the
+  child key, counter and `needs_board` flag without making the move.
+- `src/table/` — `mod.rs` (`split` of the `--memory` label, the `Tables`
+  lookup/store routing, the prefetch wrapper), `tt.rs` (TT v2: 64-byte
+  clusters of 4 × 16-byte slots, 32-bit partial keys, Open values and
+  path-independent refutations only), `filter.rs` (one-hash "possibly
+  stored" bit filter), `proofs.rs` (the full-key proof table: attacker and
+  defender proofs, non-dominated `(mv, length, limit)` per key, never
+  evicts, refuses at 90% load), `alloc.rs` (lazy zeroed `Zeroed<T>` +
+  `madvise(MADV_HUGEPAGE)`; copied from legacy, see `PROVENANCE.md`).
 - `src/search/` — `mod.rs` (the `prove` driver: 256 MiB thread, MID loop,
-  budgets), `frame.rs` (per-node children + thresholds), `value.rs` (the
-  `Proved`/`Refuted`/`Open` algebra; Open numbers saturate at `OPEN_MAX`).
-- `src/events.rs` — `ProofEvent`/`ProofSink`/`NullSink` (search's only
-  proof-store hook).
-- `src/strategy/` — `store.rs` (event-fed non-dominated proof store,
-  `--proof-memory` cap) + `write.rs` (the JSONL proof writer).
+  budgets, `Output { result, proofs, sink }`, the soundness argument),
+  `frame.rs` (frame v2: node-entry status, effects / filter / classify
+  passes), `value.rs` (the `Proved`/`Refuted`/`Open` algebra; Open numbers
+  saturate at `OPEN_MAX`).
+- `src/events.rs` — `ProofEvent`/`ProofSink`/`NullSink` (the search's
+  event hook; the CLI uses `NullSink`).
+- `src/strategy/` — `ProofSource` (the writer's input: the proof table, or
+  the event-fed `store.rs` `ProofStore`, now a test-only differential
+  source) + `write.rs` (the JSONL proof writer).
+- `src/testutil.rs` — `#[cfg(test)]` seeded playout positions shared by the
+  differential unit tests.
 - `src/validate/` — the independent replay validator (own rules copy; only
   `std` + `serde_json` + `atomic_movegen`).
 - `src/cli.rs` + `src/main.rs` — `atomi prove | validate | moves` and the
@@ -43,8 +59,10 @@ plan1 (M0) has landed; see `docs/plans/prover/report1.md` for the close-out.
   regressions) and `make veto`. Required for search, table, proof-output
   and validator changes.
 - The binary: `atomi prove "<FEN>" [--seconds S --memory MB --evals N
-  --proof-out P --proof-memory MB]`, `atomi validate FILE...`, and
-  `atomi moves "<FEN>"` (legal UCI moves in movegen order).
+  --proof-out P]`, `atomi validate FILE...`, and
+  `atomi moves "<FEN>"` (legal UCI moves in movegen order). `--memory`
+  covers the TT, the proof table and the filter (a quarter to proofs);
+  there is no separate proof budget (`--proof-memory` was removed in M1).
 - `make lint`: `cargo fmt --check`, `cargo clippy --all-targets -- -D
   warnings`, `cargo doc --no-deps`.
 - `make oracle`: builds pinned provari in `/tmp/atomi-oracle` (outside the
@@ -112,6 +130,22 @@ plan1 (M0) has landed; see `docs/plans/prover/report1.md` for the close-out.
   - provari v0.1.0 accepts `--guide hand` (and `model`/`none`/`network`)
     although its short `--help` omits the flag; it is documented in its
     README only.
+- Gotchas (learned in plan2):
+  - Proofs never live in the TT (partial keys there are sound only because
+    a collision can cost a win, never invent one); every proof goes to the
+    full-key proof table.
+  - The filter changes no result (no false negatives); a test pins identical
+    counters with it on and off.
+  - Lazy stalemate (D19 + G1): a quiet non-checking child starts `(1, 1)`
+    and its stalemate is found at its node entry, **unless** the child's
+    side to move has only commoner + pawns (then every child is built).
+    Without that gate `rem01` went from 9.4 M evals to censored at 60 M.
+  - The per-file en passant key is derived (`rules::ep_key`) because the
+    movegen's Zobrist tables are private; its test pins it against
+    `hash_after_with(Legal)`.
+  - std's `alloc_zeroed` memsets any layout aligned above 16 bytes (no lazy
+    calloc pages): `Zeroed<T>` over-allocates with align 16 and rounds up.
+    Check peak RSS of a mate-in-1 after touching `alloc.rs`.
 - The search is deterministic: the same binary, FEN and flags give the same
   counters. Collecting a proof must not change the trajectory.
 

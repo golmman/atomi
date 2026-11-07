@@ -3,9 +3,10 @@
 ## Status
 
 **Open (2026-11-06).** Item 1 (M0) is done: [`plan1.md`](plan1.md),
-[`report1.md`](report1.md). Item 2 (M1) is planned: [`plan2.md`](plan2.md)
-(proposes D18–D20). This initiative is the successor to `atomic_solver`'s closed
-`winprover` initiative. Its starting point is the legacy handoff
+[`report1.md`](report1.md). Item 2 (M1) is done: [`plan2.md`](plan2.md),
+[`report2.md`](report2.md) (D18–D20). Item 3 (M2) is next. This
+initiative is the successor to `atomic_solver`'s closed `winprover`
+initiative. Its starting point is the legacy handoff
 `docs/plans/winprover/HANDOFF.md` (revision 2026-11-06) in
 <https://github.com/golmman/atomic_solver>, read from `main`; legacy code pin
 `5f85133ea9d751368a682e53e354bd3fc0016d00`.
@@ -141,9 +142,12 @@ rest and adds D12–D16.
 | D12 | GPL boundary for dependencies (new) | **No GPL/LGPL/AGPL crate anywhere in the dependency graph, including dev- and build-dependencies.** shakmaty 0.30.1 is `GPL-3.0-or-later` (verified in its crate metadata), so the handoff §6's "shakmaty as dev-dependency" is overruled. The second rules implementation is reached only as the external `provari check` process. Enforced by a `cargo metadata` licence gate in `make test` |
 | D13 | Names (new) | Package/binary `atomi`, initiative `docs/plans/prover/`, ledger rows `atomi@<sha>` (owner decision 2026-11-06) |
 | D14 | Claimed-win protocol for the bench (new) | Timed runs write no proof, like provari's bench command. For each cell `atomi` wins, one extra untimed run with `--proof-out` (and `--seconds 600`, so the deadline cannot censor it; plan1 R6) must show identical `child_evals`, and its proof must pass the validator and `provari check`. Only then does the cell count as a win. Otherwise it is reported as censored with the verdict class |
-| D15 | M0 proof store (new; writer revised by plan1 R2) | An event-fed in-memory store, active only with `--proof-out`, with its own cap (`--proof-memory`). It keeps a non-dominated set of `(move, length, limit)` per key. The writer chooses, per **(position, counter)**, the shortest entry that holds at that counter. It checks the position graph for cycles as the checker does, and fails closed. M4 replaces the store with the bounded event-fed strategy worker (no proof-memory stop) |
+| D15 | M0 proof store (new; writer revised by plan1 R2; **store revised by D18**) | An event-fed in-memory store, active only with `--proof-out`, with its own cap (`--proof-memory`). It keeps a non-dominated set of `(move, length, limit)` per key. The writer chooses, per **(position, counter)**, the shortest entry that holds at that counter. It checks the position graph for cycles as the checker does, and fails closed. M4 replaces the store with the bounded event-fed strategy worker (no proof-memory stop). From M1 the writer reads the proof table (D18); the event-fed store is a test-only differential source |
 | D16 | Oracle gate (new; controls revised by plan1 R4) | `make veto` (our validator + `provari check` + corrupted-proof controls + a reverse control that validates provari-written JSONL) is part of `make test-full`. A missing oracle makes the gate **red**, not skipped. A control counts only as `valid: false`: the checker's `null` (small-material "cannot check") is `unchecked` and red |
 | D17 | Stretch reference (new, owner decision 2026-11-06) | provari **v0.2.0** (`224ce85`, its `check.rs`/`FORMAT.md` identical to the pin, its search rewritten) is built in scratch and measured in the same session as a separately labelled `provari-v0.2.0-hand` column, with the default single thread. v0.1.0 stays the veto and the primary column of the success condition. Whether to re-pin the goal is decided at M5 from the recorded gap |
+| D18 | Proof memory from M1 (plan2; revises D15) | A fixed-size **proof table** (full 64-bit keys, 16-byte slots, a non-dominated `(mv, length, limit)` set per key, never evicts, refuses inserts at 90% load) is the search's proof memory **and** the writer's source. It is always on, so collecting a proof cannot change the trajectory (D14 by construction). `--memory` covers the TT, the proof table (a quarter) and the filter; `--proof-memory` is removed. The event sink stays the search's hook for M4's bounded worker; the CLI uses `NullSink`. A full proof table fails the export closed (`store-full`) |
+| D19 | Lazy terminal detection (plan2, narrowed by gate G1) | Child classification is exact for explosion, mate, material draw and the 50-move limit. A **stalemate reached by a quiet, non-checking move** is not detected at child initialization (the child starts Open `(1, 1)`; its node-entry status, computed from the movegen every node runs, refutes it) — **unless the child's side to move has only its commoner and pawns**, in which case every child is built (G1, plan2 finding: without it the pawn-ending row `rem01` went from 9.4 M evals to censored at 60 M). `child_evals` keeps its D11 meaning |
+| D20 | `unsafe` in M1 (plan2) | Three sites, each with `// SAFETY:` comments and a measured keep rule: (1) the copied lazy zeroed allocator (`Zeroed<T>`, over-allocated with align 16 so calloc's lazy pages also serve the 64-byte-aligned clusters); (2) the x86-64 `_mm_prefetch` wrapper (kept: 3.3% on the final tree); (3) `madvise(MADV_HUGEPAGE)` via a 3-line `extern "C"` (Linux, x86-64/aarch64; kept: −18%) |
 
 ## Backlog
 
@@ -153,8 +157,8 @@ independently of items. One mechanism per plan, except item 1.
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
 | 1 | **M0** bootstrap + correctness + proof output + baseline | Cargo package, small `AGENTS.md`, Makefile gates, licence gate, provenance registry, oracle build script; copied corpus and fixtures; attacker-only DF-PN with 1+ε and uniform starting numbers over plain `atomic-movegen` movegen (no `Mover`, no heuristics); CLI; event sink + proof store + JSONL writer + own validator + `make veto`; adapted bench driver; successor `bench.md` with the re-measured baseline row; per-node cost baseline | gates green (incl. veto); proves a mate-in-1, a mate-in-2 and a small win, each validator- **and** checker-accepted; never proves a fixture loss or a soundness negative; baseline row and per-node baseline recorded; **no performance claim** | **done: [`plan1`](plan1.md), [`report1`](report1.md)** |
-| 2 | **M1** per-node cost | `Mover`/`Effect` per expanded node; no make/unmake for most children; incremental keys; TT clusters + prefetch + filter + lazy zeroed allocation (copy legacy `src/search/tt/alloc.rs`); in-search proof store with length/limit, inside the `--memory` label | wall per 1 M child evals ≤ the M0 baseline **and** ≤ the legacy front-end's (cross-repo, same session); a small reference win proved within a stated cap and checker-accepted; soundness fixtures green | open — reference: M0 = 162.0 ms per 1 M child evals on `core` at 10 M (plan1) |
-| 3 | **M2** search guidance | move-class starting numbers, EF-PN hand-eval scaling, quiet grouping; constants exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | `core` and `easy-win` proved within a stated cap; measured vs M1 | open |
+| 2 | **M1** per-node cost | `Mover`/`Effect` per expanded node; no make/unmake for most children; incremental keys; TT clusters + prefetch + filter + lazy zeroed allocation (copy legacy `src/search/tt/alloc.rs`); in-search proof store with length/limit, inside the `--memory` label | wall per 1 M child evals ≤ the M0 baseline **and** ≤ the legacy front-end's (cross-repo, same session); a small reference win proved within a stated cap and checker-accepted; soundness fixtures green | **done: [`plan2`](plan2.md), [`report2`](report2.md)** — `core`/10 M/192 MB: **53.4** ms per 1 M child evals (m0 166.7, legacy front-end 137.3, same session) |
+| 3 | **M2** search guidance | move-class starting numbers, EF-PN hand-eval scaling, quiet grouping; constants exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | `core` and `easy-win` proved within a stated cap; measured vs M1 | open — M1 reference: 53.4 ms per 1 M child evals (`core`, 10 M); `easy-win` proved in 30,335,618 child evals, 1.482 s bench wall (factor 10.897); `core` censored at 10 s with ≈ 182 M child evals |
 | 4 | **M3** static tactics + simulation | per-child static tactics (immediate explosion, exposed king, check with no safe evasion, unparried double threat, cannot-win material, mate in one) as child scoring; sibling simulation as part of the AND-node loop | `core`/`easy-win` proved at a product-affordable cap; measured | open |
 | 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | open |
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
@@ -303,3 +307,12 @@ re-measures before adopting or rejecting:
   provari v0.2.0/v0.1.0 hand = 1.001 with identical single-thread node
   counts (342,289 / 72,523 / 4,574,912). M1 reference: **162.0 ms per
   1 M child evals** on `core` at `--evals 10000000`.
+- **2026-11-06** — plan2 (M1) executed in phases A–D, all gates green
+  (G1–G8). Per-node on `core`/10 M/192 MB: m0 166.7 → m1A (memory half)
+  77.3 → m1B (compute half) 63.8 → m1 (+ huge pages) **53.4** ms per 1 M
+  child evals; legacy front-end 137.3. D18–D20 adopted; D19 narrowed by
+  the stalemate gate G1 after `rem01` regressed under fully lazy
+  stalemates. Found and fixed: std's `alloc_zeroed` memsets over-aligned
+  layouts, so the TT was not lazily allocated. 10 M sweep: 41 / 11 / 0,
+  all 41 proofs accepted by both checkers. Bench: atomi m1 `easy-win`
+  10.897 (1 cell, no goal claim).

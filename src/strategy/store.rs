@@ -1,11 +1,12 @@
-//! Event-fed in-memory proof store (D15), active only with `--proof-out`.
+//! Event-fed in-memory proof store (D15), a test-only differential source
+//! next to the search's own proof table (D18).
 //!
 //! Each key keeps a **non-dominated** set of `(move, length, limit)` entries:
 //! a new entry is dropped when an existing one has `length <=` and `limit >=`
 //! it, and it removes the entries it dominates (shorter-or-holds-further).
 //! Lookups only, never iterated, so the store stays deterministic.
 //!
-//! The `--proof-memory MB` byte cap is accounted conservatively: a new key is
+//! The byte cap (formerly `--proof-memory`) is accounted conservatively: a new key is
 //! charged the key plus a Vec header plus 32 bytes of hash-map overhead, and
 //! each entry `2 × size_of::<StoreEntry>()` (Vec growth slack). When a charge
 //! would exceed the cap the store sets `full`, stops taking entries, and the
@@ -38,7 +39,7 @@ const KEY_CHARGE: usize = std::mem::size_of::<u64>() + std::mem::size_of::<Vec<S
 const ENTRY_CHARGE: usize = 2 * std::mem::size_of::<StoreEntry>();
 
 impl ProofStore {
-    /// A store with the `--proof-memory` cap in MiB.
+    /// A store with a MiB cap (test-only; the CLI uses the proof table).
     pub fn new(proof_memory_mb: usize) -> ProofStore {
         Self::with_cap_bytes(proof_memory_mb.saturating_mul(1 << 20))
     }

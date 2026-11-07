@@ -11,7 +11,8 @@
 //! a failure writes nothing.
 
 use crate::rules;
-use crate::strategy::store::{ProofStore, StoreEntry};
+use crate::strategy::ProofSource;
+use crate::strategy::store::StoreEntry;
 use atomic_movegen::board::{Board, StateInfo};
 use atomic_movegen::movegen::generate_legal;
 use atomic_movegen::types::{Color, EnPassantMode, Move, MoveList};
@@ -59,9 +60,9 @@ impl ExportError {
 
 /// Walk the store into a JSONL proof file. `root`'s side to move is the
 /// attacker. Fails closed on any error.
-pub fn write_proof(
+pub fn write_proof<S: ProofSource + Sync + ?Sized>(
     root: &Board,
-    store: &ProofStore,
+    store: &S,
     path: &Path,
 ) -> Result<WriteStats, ExportError> {
     if store.is_full() {
@@ -103,9 +104,9 @@ pub fn write_proof(
     write_file(root, path, walk)
 }
 
-struct Walker<'a> {
+struct Walker<'a, S: ProofSource + Sync + ?Sized> {
     attacker: Color,
-    store: &'a ProofStore,
+    store: &'a S,
     /// Recorded `(fen, uci)` lines in preorder.
     lines: Vec<(String, String)>,
     /// Deduplicated position edges (keys, counters ignored).
@@ -122,7 +123,7 @@ struct WalkResult {
     root_length: u16,
 }
 
-impl Walker<'_> {
+impl<S: ProofSource + Sync + ?Sized> Walker<'_, S> {
     fn edge(&mut self, from: u64, to: u64) {
         self.edges.entry(from).or_default().insert(to);
     }
@@ -208,7 +209,9 @@ impl Walker<'_> {
     fn choose(&self, key: u64, c: u16, bound: u16) -> Option<StoreEntry> {
         let chosen = self.chosen.get(&key).map(Vec::as_slice).unwrap_or(&[]);
         let mut best: Option<StoreEntry> = None;
-        for &e in self.store.get(key) {
+        let mut entries = Vec::new();
+        self.store.entries(key, &mut entries);
+        for &e in &entries {
             if u16::from(e.limit) < c || e.length >= bound {
                 continue;
             }
@@ -305,6 +308,7 @@ fn tmp_path(path: &Path) -> PathBuf {
 mod tests {
     use super::*;
     use crate::events::{ProofEvent, ProofSink};
+    use crate::strategy::store::ProofStore;
 
     fn insert(store: &mut ProofStore, key: u64, from: &str, length: u16, limit: u8) {
         let mv = Move::from_uci(from).unwrap();

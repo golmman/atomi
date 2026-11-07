@@ -14,6 +14,7 @@
 use atomi::events::{NullSink, ProofEvent, ProofSink};
 use atomi::rules;
 use atomi::search::{self, Exit, Limits};
+use atomi::strategy::{ProofSource, ProofStore};
 use atomic_movegen::board::Board;
 use std::process::Command;
 
@@ -21,6 +22,8 @@ const MATE_IN_1_EXPLOSION: &str = "6rk/8/8/8/8/8/8/6QK w - - 0 1";
 const MATE_IN_1_CHECKMATE: &str = "k7/8/1Q6/8/8/8/8/K6R w - - 0 1";
 const MATE_IN_2: &str = "k7/8/8/8/8/7Q/8/K6R w - - 0 1";
 const ROOK_ALONE: &str = "8/8/8/8/2k5/8/8/4KR2 w - - 0 1";
+const VETO_CONTROL: &str = "rnb1k2r/p2p3p/4ppp1/qp6/3PPQ2/8/PPP2PPP/R3KB1R w KQkq - 2 11";
+const PAWN_ENDING: &str = "1k6/8/8/p4p1p/P4P1P/4K1p1/8/8 b - - 1 54";
 
 fn board(fen: &str) -> Board {
     Board::from_fen(fen).unwrap()
@@ -31,6 +34,7 @@ fn limits() -> Limits {
         seconds: Some(60),
         evals: None,
         memory_mb: 16,
+        filter: true,
     }
 }
 
@@ -43,31 +47,31 @@ impl ProofSink for VecSink {
 
 #[test]
 fn mate_in_1_by_explosion() {
-    let (r, _sink) = search::prove(&board(MATE_IN_1_EXPLOSION), &limits(), NullSink);
-    assert_eq!(r.exit, Exit::Proved);
-    assert_eq!(r.length, Some(1));
+    let out = search::prove(&board(MATE_IN_1_EXPLOSION), &limits(), NullSink);
+    assert_eq!(out.result.exit, Exit::Proved);
+    assert_eq!(out.result.length, Some(1));
 }
 
 #[test]
 fn mate_in_1_by_checkmate() {
-    let (r, _sink) = search::prove(&board(MATE_IN_1_CHECKMATE), &limits(), NullSink);
-    assert_eq!(r.exit, Exit::Proved);
-    assert_eq!(r.length, Some(1));
+    let out = search::prove(&board(MATE_IN_1_CHECKMATE), &limits(), NullSink);
+    assert_eq!(out.result.exit, Exit::Proved);
+    assert_eq!(out.result.length, Some(1));
 }
 
 #[test]
 fn mate_in_2() {
-    let (r, _sink) = search::prove(&board(MATE_IN_2), &limits(), NullSink);
-    assert_eq!(r.exit, Exit::Proved);
-    assert_eq!(r.length, Some(2));
+    let out = search::prove(&board(MATE_IN_2), &limits(), NullSink);
+    assert_eq!(out.result.exit, Exit::Proved);
+    assert_eq!(out.result.length, Some(2));
 }
 
 #[test]
 fn rook_alone_is_refuted_at_root() {
     // R1: K+R vs K is a checker material draw → refuted before any expansion.
-    let (r, _sink) = search::prove(&board(ROOK_ALONE), &limits(), NullSink);
-    assert_eq!(r.exit, Exit::Refuted);
-    assert_eq!(r.expansions, 0);
+    let out = search::prove(&board(ROOK_ALONE), &limits(), NullSink);
+    assert_eq!(out.result.exit, Exit::Refuted);
+    assert_eq!(out.result.expansions, 0);
 }
 
 #[test]
@@ -81,6 +85,7 @@ fn never_prove_rows_are_never_found() {
         seconds: Some(60),
         evals: Some(20_000),
         memory_mb: 16,
+        filter: true,
     };
     let mut rows = 0;
     for line in text.lines() {
@@ -93,33 +98,34 @@ fn never_prove_rows_are_never_found() {
             Ok(b) => b,
             Err(_) => continue, // unparseable rows are not this test's concern
         };
-        let (r, _sink) = search::prove(&board, &lim, NullSink);
-        assert_ne!(r.exit, Exit::Proved, "{name} must not be proved");
+        let out = search::prove(&board, &lim, NullSink);
+        assert_ne!(out.result.exit, Exit::Proved, "{name} must not be proved");
         rows += 1;
     }
     assert!(rows >= 30, "only {rows} rows");
 }
 
 #[test]
-fn determinism_and_sink_independence() {
+fn determinism_and_sink_events() {
     let lim = limits();
     let root = board(MATE_IN_2);
-    let (a, _a) = search::prove(&root, &lim, NullSink);
-    let (b, _b) = search::prove(&root, &lim, NullSink);
+    let a = search::prove(&root, &lim, NullSink).result;
+    let b = search::prove(&root, &lim, NullSink).result;
     assert_eq!(a.exit, b.exit);
     assert_eq!(a.length, b.length);
     assert_eq!(a.child_evals, b.child_evals);
     assert_eq!(a.expansions, b.expansions);
 
     // A collecting sink must not change the trajectory.
-    let (c, sink) = search::prove(&root, &lim, VecSink(Vec::new()));
-    assert_eq!(a.exit, c.exit);
-    assert_eq!(a.child_evals, c.child_evals);
-    assert_eq!(a.expansions, c.expansions);
+    let c = search::prove(&root, &lim, VecSink(Vec::new()));
+    assert_eq!(a.exit, c.result.exit);
+    assert_eq!(a.child_evals, c.result.child_evals);
+    assert_eq!(a.expansions, c.result.expansions);
 
     // The root's attacker proof is emitted with the root length/limit.
     let root_key = rules::key(&root);
-    let ev = sink
+    let ev = c
+        .sink
         .0
         .iter()
         .find_map(|e| match e {
@@ -132,8 +138,30 @@ fn determinism_and_sink_independence() {
             _ => None,
         })
         .expect("root AttackerProven event missing");
-    assert_eq!(ev.0, c.length.unwrap());
+    assert_eq!(ev.0, c.result.length.unwrap());
     assert!(ev.1 >= 90, "root limit should be high, got {}", ev.1);
+}
+
+#[test]
+fn filter_on_off_identical() {
+    // The filter changes no result: identical counters with and without it.
+    for fen in [MATE_IN_2, VETO_CONTROL, PAWN_ENDING] {
+        let root = board(fen);
+        let mut lim = Limits {
+            seconds: Some(120),
+            evals: Some(2_000_000),
+            memory_mb: 192,
+            filter: true,
+        };
+        let on = search::prove(&root, &lim, NullSink).result;
+        lim.filter = false;
+        let off = search::prove(&root, &lim, NullSink).result;
+        assert_eq!(
+            (on.exit, on.length, on.child_evals, on.expansions),
+            (off.exit, off.length, off.child_evals, off.expansions),
+            "{fen}"
+        );
+    }
 }
 
 #[test]
@@ -143,20 +171,25 @@ fn evals_cap_is_honoured() {
         seconds: Some(120),
         evals: Some(5_000),
         memory_mb: 16,
+        filter: true,
     };
-    let (r, _sink) = search::prove(
+    let out = search::prove(
         &board("r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1"),
         &lim,
         NullSink,
     );
-    assert_eq!(r.exit, Exit::Evals);
-    assert!(r.child_evals >= 5_000, "child_evals={}", r.child_evals);
+    assert_eq!(out.result.exit, Exit::Evals);
+    assert!(
+        out.result.child_evals >= 5_000,
+        "child_evals={}",
+        out.result.child_evals
+    );
     // Overshoot is smaller than one expansion's child count (< 256 is a
     // generous bound for any single position).
     assert!(
-        r.child_evals - 5_000 < 256,
+        out.result.child_evals - 5_000 < 256,
         "overshoot {}",
-        r.child_evals - 5_000
+        out.result.child_evals - 5_000
     );
 }
 
@@ -188,6 +221,16 @@ fn cli_errors() {
     let out = atomi(&["prove", MATE_IN_1_CHECKMATE, "--bogus-opt", "1"]);
     assert_eq!(out.status.code(), Some(2));
 
+    // --proof-memory is gone (D18): proof memory lives inside --memory.
+    let out = atomi(&["prove", MATE_IN_1_CHECKMATE, "--proof-memory", "1"]);
+    assert_eq!(out.status.code(), Some(2));
+    let json: serde_json::Value =
+        serde_json::from_str(&String::from_utf8_lossy(&out.stdout)).unwrap();
+    assert!(
+        json["error"].as_str().unwrap().contains("unknown option"),
+        "{json}"
+    );
+
     let out = atomi(&["nonsense"]);
     assert_eq!(out.status.code(), Some(2));
 }
@@ -209,7 +252,9 @@ fn cli_prove_output_contract() {
     assert_eq!(json["length"], 1);
     assert_eq!(json["exit"], "proved");
     assert_eq!(json["proof"], "not-requested");
-    // All 12 keys in the contract order.
+    assert!(json["proof_entries"].is_number());
+    assert!(json["proof_full"].is_boolean());
+    // All 14 keys in the contract order.
     let keys = [
         "\"found\"",
         "\"length\"",
@@ -223,6 +268,8 @@ fn cli_prove_output_contract() {
         "\"proof\"",
         "\"proof_positions\"",
         "\"proof_length\"",
+        "\"proof_entries\"",
+        "\"proof_full\"",
     ];
     let mut pos = 0usize;
     for k in keys {
@@ -237,25 +284,51 @@ fn cli_prove_output_contract() {
     }
 }
 
-// ---- Phase D: proof round trip + soundness ----
+#[test]
+fn cli_proof_out_does_not_change_counters() {
+    // D14: collecting a proof cannot change the trajectory.
+    for fen in [MATE_IN_2, VETO_CONTROL] {
+        let plain = atomi(&["prove", fen, "--seconds", "60", "--memory", "192"]);
+        let dir = std::path::Path::new(env!("CARGO_TARGET_TMPDIR"));
+        let path = dir.join("cli-counters.jsonl").to_string_lossy().to_string();
+        let with_proof = atomi(&[
+            "prove",
+            fen,
+            "--seconds",
+            "60",
+            "--memory",
+            "192",
+            "--proof-out",
+            path.as_str(),
+        ]);
+        let a: serde_json::Value =
+            serde_json::from_str(&String::from_utf8_lossy(&plain.stdout)).unwrap();
+        let b: serde_json::Value =
+            serde_json::from_str(&String::from_utf8_lossy(&with_proof.stdout)).unwrap();
+        for k in ["found", "length", "exit", "child_evals", "expansions"] {
+            assert_eq!(a[k], b[k], "{k} differs on {fen}");
+        }
+        assert_eq!(b["proof"], "written");
+    }
+}
 
-fn prove_with_store(
-    fen: &str,
-    evals: Option<u64>,
-) -> (search::SearchResult, atomi::strategy::ProofStore) {
+// ---- proof round trip + soundness ----
+
+fn prove(fen: &str, evals: Option<u64>) -> search::Output<NullSink> {
     let lim = Limits {
         seconds: Some(120),
         evals,
         memory_mb: 192,
+        filter: true,
     };
-    search::prove(&board(fen), &lim, atomi::strategy::ProofStore::new(1024))
+    search::prove(&board(fen), &lim, NullSink)
 }
 
 fn roundtrip(fen: &str, dir: &std::path::Path, name: &str) {
-    let (r, store) = prove_with_store(fen, None);
-    assert_eq!(r.exit, Exit::Proved, "{name}");
+    let out = prove(fen, None);
+    assert_eq!(out.result.exit, Exit::Proved, "{name}");
     let path = dir.join(format!("{name}.jsonl"));
-    let stats = atomi::strategy::write_proof(&board(fen), &store, &path).unwrap();
+    let stats = atomi::strategy::write_proof(&board(fen), &out.proofs, &path).unwrap();
     let report = atomi::validate::validate_file(&path);
     assert!(report.valid, "{name}: {}", report.error.unwrap_or_default());
     assert_eq!(report.length, Some(stats.length), "{name}");
@@ -272,7 +345,7 @@ fn roundtrip(fen: &str, dir: &std::path::Path, name: &str) {
         stats.length,
         "{name}"
     );
-    assert!(stats.length <= r.length.unwrap(), "{name}");
+    assert!(stats.length <= out.result.length.unwrap(), "{name}");
 }
 
 #[test]
@@ -294,15 +367,61 @@ fn proof_round_trips() {
 }
 
 #[test]
+fn writer_differential_veto_rows() {
+    // The proof table and the event-fed store must write byte-identical
+    // proofs: same search, two sources.
+    let text = std::fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/tests/fixtures/veto.tsv"
+    ))
+    .unwrap();
+    let dir = std::path::Path::new(env!("CARGO_TARGET_TMPDIR"));
+    let lim = Limits {
+        seconds: Some(600),
+        evals: None,
+        memory_mb: 192,
+        filter: true,
+    };
+    let mut rows = 0;
+    for line in text.lines() {
+        if line.is_empty() || line.starts_with('#') || line.starts_with("name\t") {
+            continue;
+        }
+        let f: Vec<&str> = line.split('\t').collect();
+        let (name, fen) = (f[0], f[1]);
+        let root = board(fen);
+        let out = search::prove(&root, &lim, ProofStore::new(1024));
+        assert_eq!(out.result.exit, Exit::Proved, "{name}");
+        let p_table = dir.join(format!("diff-{name}-table.jsonl"));
+        let p_store = dir.join(format!("diff-{name}-store.jsonl"));
+        atomi::strategy::write_proof(&root, &out.proofs, &p_table)
+            .unwrap_or_else(|e| panic!("{name} table: {e:?}"));
+        atomi::strategy::write_proof(&root, &out.sink, &p_store)
+            .unwrap_or_else(|e| panic!("{name} store: {e:?}"));
+        assert_eq!(
+            std::fs::read(&p_table).unwrap(),
+            std::fs::read(&p_store).unwrap(),
+            "{name}: table vs store proofs differ"
+        );
+        assert!(
+            atomi::validate::validate_file(&p_table).valid,
+            "{name}: proof table's proof invalid"
+        );
+        rows += 1;
+    }
+    assert_eq!(rows, 8);
+}
+
+#[test]
 fn byte_deterministic_output() {
     let dir = std::path::Path::new(env!("CARGO_TARGET_TMPDIR"));
-    let (r, store) = prove_with_store(MATE_IN_2, None);
-    assert_eq!(r.exit, Exit::Proved);
+    let out = prove(MATE_IN_2, None);
+    assert_eq!(out.result.exit, Exit::Proved);
     let b = board(MATE_IN_2);
     let p1 = dir.join("det1.jsonl");
     let p2 = dir.join("det2.jsonl");
-    atomi::strategy::write_proof(&b, &store, &p1).unwrap();
-    atomi::strategy::write_proof(&b, &store, &p2).unwrap();
+    atomi::strategy::write_proof(&b, &out.proofs, &p1).unwrap();
+    atomi::strategy::write_proof(&b, &out.proofs, &p2).unwrap();
     assert_eq!(std::fs::read(&p1).unwrap(), std::fs::read(&p2).unwrap());
 }
 
@@ -320,18 +439,17 @@ fn soundness_rows() {
         }
         let f: Vec<&str> = line.split('\t').collect();
         let (name, fen, want, cap) = (f[0], f[1], f[2], f[3].parse::<u64>().unwrap());
-        let (r, store) = prove_with_store(fen, Some(cap));
+        let out = prove(fen, Some(cap));
         match want {
             "prove" => {
-                assert_eq!(r.exit, Exit::Proved, "{name}");
+                assert_eq!(out.result.exit, Exit::Proved, "{name}");
                 let path = dir.join(format!("{name}.jsonl"));
-                let stats = atomi::strategy::write_proof(&board(fen), &store, &path)
+                atomi::strategy::write_proof(&board(fen), &out.proofs, &path)
                     .unwrap_or_else(|e| panic!("{name}: {e:?}"));
                 assert!(atomi::validate::validate_file(&path).valid, "{name}");
-                let _ = stats;
             }
-            "never" => assert_ne!(r.exit, Exit::Proved, "{name}"),
-            "refute" => assert_eq!(r.exit, Exit::Refuted, "{name}"),
+            "never" => assert_ne!(out.result.exit, Exit::Proved, "{name}"),
+            "refute" => assert_eq!(out.result.exit, Exit::Refuted, "{name}"),
             other => panic!("bad expectation {other}"),
         }
     }
@@ -345,6 +463,28 @@ fn moves_subcommand() {
     assert!(j["moves"].as_array().unwrap().len() > 10);
     let out = atomi(&["moves", "nonsense"]);
     assert_eq!(out.status.code(), Some(2));
+}
+
+#[test]
+fn proof_source_for_store_is_complete() {
+    // The ProofSource impl for ProofStore returns the same entries get()
+    // exposes (the impl is a thin forwarder; kept so the differential test
+    // exercises both sources).
+    let mut store = ProofStore::with_cap_bytes(1 << 20);
+    store.proven(ProofEvent::AttackerProven {
+        key: 5,
+        mv: atomic_movegen::types::Move::make_move(
+            atomic_movegen::types::Square::A1,
+            atomic_movegen::types::Square::A2,
+        ),
+        length: 2,
+        limit: 40,
+    });
+    let mut v = Vec::new();
+    ProofSource::entries(&store, 5, &mut v);
+    assert_eq!(v.len(), 1);
+    assert_eq!(v[0].length, 2);
+    assert!(!ProofSource::is_full(&store));
 }
 
 #[test]

@@ -4,7 +4,8 @@
 //!
 //! Output: exactly one JSON line in this field order:
 //! `{"found","length","exit","child_evals","expansions","ms","seconds",
-//! "memory_mb","evals_limit","proof","proof_positions","proof_length"}`.
+//! "memory_mb","evals_limit","proof","proof_positions","proof_length",
+//! "proof_entries","proof_full"}`.
 
 use atomic_movegen::board::{Board, FenPolicy};
 
@@ -18,10 +19,8 @@ pub struct ProveOptions {
     pub memory_mb: usize,
     /// `child_evals` cap.
     pub evals: Option<u64>,
-    /// Proof output path (Phase D).
+    /// Proof output path.
     pub proof_out: Option<String>,
-    /// Proof store byte cap in MiB (Phase D).
-    pub proof_memory: usize,
 }
 
 /// Parse `prove` arguments (everything after the `prove` subcommand).
@@ -31,7 +30,6 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
     let mut memory_mb = 192usize;
     let mut evals = None;
     let mut proof_out = None;
-    let mut proof_memory = 1024usize;
 
     let mut i = 0;
     while i < args.len() {
@@ -45,7 +43,6 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
                 "--memory" => memory_mb = parse_num(arg, value)?,
                 "--evals" => evals = Some(parse_num(arg, value)?),
                 "--proof-out" => proof_out = Some(value.clone()),
-                "--proof-memory" => proof_memory = parse_num(arg, value)?,
                 _ => return Err(format!("unknown option: {arg}")),
             }
             i += 2;
@@ -64,7 +61,6 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
         memory_mb,
         evals,
         proof_out,
-        proof_memory,
     })
 }
 

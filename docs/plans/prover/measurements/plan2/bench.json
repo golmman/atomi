@@ -1,0 +1,524 @@
+{
+ "provenance": {
+  "date": "2026-11-07",
+  "host": "ae54d05b36f8",
+  "platform": "Linux-7.2.13-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "cpu_model": "AMD Ryzen 9 5950X 16-Core Processor",
+  "cpu_count": 32,
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "atomic_movegen": "2.4.0",
+  "atomi": {
+   "version": "atomi 0.1.0 (a4c135d6ee1956588e01733bd101f6373e7d2e72)",
+   "binary_sha256": "2008857f10146e48656f12132199cd8633068af74076a206245e4a15e82847ab",
+   "binary": "target/release/atomi"
+  },
+  "repo_head": "a4c135d6ee1956588e01733bd101f6373e7d2e72",
+  "repo_dirty": true,
+  "provari": {
+   "commit": "48686bc6c786d6ea70568f0b2ad4002cf0520206",
+   "guide": "hand",
+   "version": "provari 0.1.0",
+   "binary": "/tmp/atomi-oracle/provari/target/release/provari"
+  },
+  "provari_stretch": {
+   "commit": "224ce85dad083b1bc8fe429a9e4349de956f5305",
+   "guide": "hand",
+   "version": "provari 0.2.0",
+   "binary": "/tmp/atomi-oracle/provari-v0.2.0/target/release/provari"
+  },
+  "legacy": {
+   "commit": "unknown",
+   "binary": null
+  },
+  "stacks": {
+   "atomi": {
+    "m1": []
+   },
+   "legacy": {}
+  },
+  "budgets": {
+   "seconds": 10.0,
+   "memory_mb": 192,
+   "repeats": 3
+  },
+  "corpus": {
+   "path": "/workspace/atomi/bench/corpus.json",
+   "sha256": "9cd0169a30bb7d5b162b6a1ec119fe194b776c8a24a46cdf1582c07062847d0e"
+  },
+  "proof_verdicts": {
+   "atomi:m1": {
+    "core": null,
+    "1eb80b92f92c": "accepted",
+    "db6a741c723f": null
+   }
+  }
+ },
+ "runs": [
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 0.529,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 501
+  },
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 0.528,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 499
+  },
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 0.544,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 515
+  },
+  {
+   "case": "core",
+   "side": "provari-v0.2.0-hand",
+   "run": 1,
+   "wall_s": 0.546,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 516
+  },
+  {
+   "case": "core",
+   "side": "provari-v0.2.0-hand",
+   "run": 2,
+   "wall_s": 0.55,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 521
+  },
+  {
+   "case": "core",
+   "side": "provari-v0.2.0-hand",
+   "run": 3,
+   "wall_s": 0.557,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342289,
+   "ms": 526
+  },
+  {
+   "case": "core",
+   "side": "atomi:m1",
+   "run": 1,
+   "wall_s": 10.003,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 181824995,
+   "expansions": 6103040,
+   "ms": 10000,
+   "flags": []
+  },
+  {
+   "case": "core",
+   "side": "atomi:m1",
+   "run": 2,
+   "wall_s": 10.003,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 182403909,
+   "expansions": 6123520,
+   "ms": 10000,
+   "flags": []
+  },
+  {
+   "case": "core",
+   "side": "atomi:m1",
+   "run": 3,
+   "wall_s": 10.005,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 181492541,
+   "expansions": 6091776,
+   "ms": 10001,
+   "flags": []
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 0.142,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 113
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 0.133,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 105
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 0.136,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 105
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-v0.2.0-hand",
+   "run": 1,
+   "wall_s": 0.141,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 112
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-v0.2.0-hand",
+   "run": 2,
+   "wall_s": 0.134,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 105
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-v0.2.0-hand",
+   "run": 3,
+   "wall_s": 0.134,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 105
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:m1",
+   "run": 1,
+   "wall_s": 1.488,
+   "returncode": 0,
+   "win": true,
+   "length": 17,
+   "exit": "proved",
+   "child_evals": 30335618,
+   "expansions": 1047370,
+   "ms": 1485,
+   "flags": []
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:m1",
+   "run": 2,
+   "wall_s": 1.482,
+   "returncode": 0,
+   "win": true,
+   "length": 17,
+   "exit": "proved",
+   "child_evals": 30335618,
+   "expansions": 1047370,
+   "ms": 1478,
+   "flags": []
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:m1",
+   "run": 3,
+   "wall_s": 1.478,
+   "returncode": 0,
+   "win": true,
+   "length": 17,
+   "exit": "proved",
+   "child_evals": 30335618,
+   "expansions": 1047370,
+   "ms": 1475,
+   "flags": []
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 6.86,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6831
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 6.679,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6648
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 6.767,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6736
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-v0.2.0-hand",
+   "run": 1,
+   "wall_s": 6.776,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6746
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-v0.2.0-hand",
+   "run": 2,
+   "wall_s": 6.804,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6774
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-v0.2.0-hand",
+   "run": 3,
+   "wall_s": 6.716,
+   "returncode": 0,
+   "win": true,
+   "mate": 22,
+   "nodes": 4574912,
+   "ms": 6687
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:m1",
+   "run": 1,
+   "wall_s": 10.003,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 186637530,
+   "expansions": 6497280,
+   "ms": 10000,
+   "flags": []
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:m1",
+   "run": 2,
+   "wall_s": 10.004,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 188096471,
+   "expansions": 6547456,
+   "ms": 10000,
+   "flags": []
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:m1",
+   "run": 3,
+   "wall_s": 10.003,
+   "returncode": 0,
+   "win": false,
+   "length": null,
+   "exit": "timeout",
+   "child_evals": 188368139,
+   "expansions": 6557696,
+   "ms": 10000,
+   "flags": []
+  }
+ ],
+ "ledger": {
+  "cells": {
+   "core": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 0.529,
+     "win": true,
+     "nodes": 342289,
+     "mate": 17,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "m1": {
+     "runs": 3,
+     "wall_s": 10.003,
+     "win": false,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 181824995,
+     "exit": "timeout",
+     "returncodes": [
+      0
+     ],
+     "factor": null,
+     "factor_lower_bound": 18.9,
+     "note": "candidate censored"
+    }
+   },
+   "1eb80b92f92c": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 0.136,
+     "win": true,
+     "nodes": 72523,
+     "mate": 15,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "m1": {
+     "runs": 3,
+     "wall_s": 1.482,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 30335618,
+     "exit": "proved",
+     "returncodes": [
+      0
+     ],
+     "proof_run": {
+      "wall_s": 1.504,
+      "returncode": 0,
+      "exit": "proved",
+      "child_evals": 30335618,
+      "proof": "written",
+      "proof_positions": 2048,
+      "proof_length": 17
+     },
+     "proof_verdict": "accepted",
+     "factor": 10.897,
+     "note": "shared win"
+    }
+   },
+   "db6a741c723f": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 6.767,
+     "win": true,
+     "nodes": 4574912,
+     "mate": 22,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "m1": {
+     "runs": 3,
+     "wall_s": 10.003,
+     "win": false,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 186637530,
+     "exit": "timeout",
+     "returncodes": [
+      0
+     ],
+     "factor": null,
+     "factor_lower_bound": 1.48,
+     "note": "candidate censored"
+    }
+   }
+  },
+  "summary": {
+   "m1": {
+    "shared_cells": [
+     "1eb80b92f92c"
+    ],
+    "shared_count": 1,
+    "geomean_factor": 10.897,
+    "coverage_reference": 3,
+    "coverage_candidate": 1,
+    "censored_cells": [
+     "core",
+     "db6a741c723f"
+    ]
+   }
+  }
+ },
+ "stretch": {
+  "cells": {
+   "core": {
+    "reference_wall_s": 0.529,
+    "stretch_wall_s": 0.55,
+    "ratio": 1.04
+   },
+   "1eb80b92f92c": {
+    "reference_wall_s": 0.136,
+    "stretch_wall_s": 0.134,
+    "ratio": 0.985
+   },
+   "db6a741c723f": {
+    "reference_wall_s": 6.767,
+    "stretch_wall_s": 6.776,
+    "ratio": 1.001
+   }
+  },
+  "shared_ratio_geomean": 1.008,
+  "shared_count": 3
+ }
+}

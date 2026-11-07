@@ -16,9 +16,10 @@ sections below stay untouched:
 - The item-2 checker is here the repo's own `atomi validate` **plus**
   `provari check` (decisions D9/D14): a win counts only when both accept.
 - The candidate command is `atomi prove "<FEN>" --seconds 10 --memory 192`.
-- Protocol note: atomi's `--memory` labels only the transposition table in
-  M0 (the proof store has its own `--proof-memory` budget, M0 outside the
-  label). From M1 every in-search store must live inside the label.
+- Protocol note: atomi's `--memory` labelled only the transposition table in
+  M0 (the proof store had its own `--proof-memory` budget outside the
+  label). From M1 (plan2) `--memory` covers the TT, the proof table and the
+  filter; `--proof-memory` is gone.
 
 ## The goal this ledger measures
 
@@ -213,7 +214,9 @@ ledger row is appended: plan1 does not touch the win path. Details in
 ## Ledger
 
 **Pins.** `atomi@0c5a882+d` = atomi built from HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
-on a dirty tree (uncommitted work-in-progress) · `solver@5f85133` =
+on a dirty tree (uncommitted work-in-progress) · `atomi@a4c135d+d` = atomi
+built from HEAD `a4c135d6ee1956588e01733bd101f6373e7d2e72` on a dirty tree
+(plan2 work uncommitted) · `solver@5f85133` =
 `5f85133ea9d751368a682e53e354bd3fc0016d00` · `provari-v0.1.0` =
 `48686bc6c786d6ea70568f0b2ad4002cf0520206` (the 1.000 side of every factor).
 
@@ -223,6 +226,8 @@ on a dirty tree (uncommitted work-in-progress) · `solver@5f85133` =
 | `plan1` | 2026-11-06 | `ae54d05b36f8` · `solver@5f85133` | legacy **default** | censored (≥ 18.76) 10.020 s / 66.2 M | **45.358** (6.214 s / 43.3 M) | censored (≥ 1.52) 10.019 s / 67.6 M | **45.358** (1 cell) | 1/3 |
 | `plan1` | 2026-11-06 | `ae54d05b36f8` · `solver@5f85133` | legacy **opt** | **7.43** (3.960 s / 17.2 M) | **5.38** (0.737 s / 3.23 M) | censored (≥ 1.52) 10.019 s / 46.2 M | **6.322** (2 cells) | 2/3 |
 | `plan1` (stretch) | 2026-11-06 | `ae54d05b36f8` · `provari-v0.2.0@224ce85` | v0.2.0 **hand** | 0.987× | 1.007× | 1.010× | **1.001** (3 cells, stretch block only) | 3/3 |
+| `plan2` | 2026-11-06 | `ae54d05b36f8` · `atomi@a4c135d+d` | atomi **m1** | censored (≥ 18.9) 10.003 s / 181.8 M | **10.897** (1.482 s / 30.3 M) | censored (≥ 1.48) 10.003 s / 186.6 M | **10.897** (1 cell) | 1/3 |
+| `plan2` (stretch) | 2026-11-06 | `ae54d05b36f8` · `provari-v0.2.0@224ce85` | v0.2.0 **hand** | 1.040× | 0.985× | 1.001× | **1.008** (3 cells, stretch block only) | 3/3 |
 
 Cell syntax: `factor (candidate wall / candidate evals)`; legacy evals are
 its `evals:` counter, atomi's are `child_evals`. Reference
@@ -268,6 +273,31 @@ per-node baseline: [`measurements/plan1/pernode.json`](measurements/plan1/pernod
   rounds its bucket count down to a power of two). This is M1's reference
   number.
 
+### plan2 summary
+
+Numbers: [`measurements/plan2/bench.json`](measurements/plan2/bench.json);
+per-node: [`measurements/plan2/pernode.json`](measurements/plan2/pernode.json).
+Pin: `atomi@a4c135d+d` = HEAD `a4c135d6ee1956588e01733bd101f6373e7d2e72` on
+a dirty tree (plan2 work uncommitted), binary sha256 `2008857f…2847ab`.
+
+- **Session reference line** (v0.1.0 hand medians, 3 repeats): `core`
+  0.529 s · 342,289 nodes · mate 17; `easy-win` 0.136 s · 72,523 · mate 15;
+  `deep-win` 6.767 s · 4,574,912 · mate 22.
+- **atomi m1: no goal claim.** Same heuristic-free search as m0 (uniform
+  numbers, movegen order); M1 changed only the per-node cost. `easy-win`
+  **10.897** (1.482 s, 30,335,618 child evals vs m0's 30,245,030); the D14
+  proof run had identical `child_evals`, wrote 2,048 positions (length 17)
+  and was accepted by `atomi validate` and `provari check`. `core` and
+  `deep-win` stay censored (≥ 18.9 / ≥ 1.48), now at ≈ 18 M child evals
+  per second instead of ≈ 6 M.
+- **Per-node (M1 gate, same session).** `core` at 10 M, 192 MB: m1
+  **53.4 ms per 1 M child evals**, m0 166.7, legacy front-end 137.3
+  (fixed 32 MB table). This is M2's per-node reference.
+- **Stretch.** v0.2.0 / v0.1.0 hand = 1.040 / 0.985 / 1.001, geomean
+  1.008: wall noise around unchanged single-thread node counts.
+- Legacy controls were not re-run (plan1's rows stand; their factors are
+  ratios of their own session).
+
 ## History
 
 - **2026-11-06** — `bench.md` opened for the `prover` initiative: the
@@ -276,3 +306,7 @@ per-node baseline: [`measurements/plan1/pernode.json`](measurements/plan1/pernod
   conventions, and plan1 appends the first row: m0 as the no-claim
   baseline, the legacy default/opt controls re-priced under
   atomic-movegen 2.4.0, and the v0.2.0 stretch block.
+- **2026-11-06** — plan2 (M1, per-node cost) appends the atomi **m1** row
+  (`easy-win` 10.897, coverage 1/3, no goal claim) and its stretch block;
+  per-node `core`/10 M/192 MB is 53.4 ms per 1 M child evals (m0 166.7,
+  legacy front-end 137.3, same session).

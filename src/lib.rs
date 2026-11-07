@@ -6,12 +6,17 @@
 //!
 //! Layer rules: `validate` uses only `std`, `serde_json` and `atomic_movegen`,
 //! never other `crate::` modules (enforced by a test); `search` depends only
-//! on `events`, `rules`, `table` and `value`; `strategy` is a `ProofSink`.
+//! on `events`, `mover`, `rules`, `table` and `value`; `strategy` depends on
+//! `table::proofs` (read only) and `rules`; `mover` depends only on
+//! `rules`.
 
 pub mod cli;
 pub mod events;
+pub mod mover;
 pub mod rules;
 pub mod search;
 pub mod strategy;
 pub mod table;
+#[cfg(test)]
+mod testutil;
 pub mod validate;
