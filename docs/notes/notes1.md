@@ -23,3 +23,39 @@ Please revise the decisions of `docs/plans/prover/plan1.md`.
 ---
 
 suggestion for atomic-movegen in prover/plan2.md
+
+---
+
+Let's have a scrum-like retrospective.
+
+`atomic_solver` was meant to be the fastest winprover for atomic chess.
+We put a lot of effort into refining ideas, taking measurements, analyzing papers, etc..
+Then we found `provari` which is two orders of magnitude faster and started over, working on `atomi`.
+
+Some of my questions are:
+
+- Is there some secret sauce in `provari` that was easy to miss?
+- Was the formulation of the goal not clear enough?
+- Did i instruct the coding agents in a wrong way?
+- What can i do to prevent drift like this in future sessions with coding agents?
+
+Please be direct, no need to be polite. I want to learn something.
+
+---
+
+Please summarize this into three lists that help me improve.
+
+1. Long term and general improvements to the way i communicate, focus, structurize.
+2. Checklist of methods i can use to prevent drift from my intended goal.
+3. Immediate todos i should apply for `atomi`.
+
+---
+
+I asked multiple times "where could we improve, think out of the box" and i expected (in hindsight) a response like "we could drop solving for draws". I also asked "should we abandon solving for draws to get more performance", apparently dropping draw-solving conflicted with the goals so much that it was never convincingly suggested by the coding agent.
+
+I explicitly want this sort of push back and ideation process though, i thought i even added this in the AGENTS.md.
+
+---
+
+Plan session for atomi. Read docs/notes/retro.md , docs/plans/prover/initiative.md , report2.md and bench.md . Record an owner decision replacing "one mechanism per plan" with stack-level gating. Merge M2+M3 into one "hand-guide stack" item: move classes, check evasions, quiet grouping, EF-PN, per-child static closures including the one-ply explosion settle, defender priors ( UNLIKELY , defence history), history tie-breaks, sibling simulation and the null-move threat replay. Gate it on the whole stack: easy-win ≤ 2× provari hand nodes, core proved at 10 s, measured over ≥ 20 cells and several seeds, with ablations in both directions afterwards. Write plan3.md .
+Do not implement.

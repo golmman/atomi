@@ -10,6 +10,20 @@ shared-win bench (geomean wall `< 1.0`, coverage ≥ provari). The current
 initiative is `docs/plans/prover/` (read `initiative.md` first). Its
 predecessor is the closed `winprover` initiative of `atomic_solver`.
 
+## Collaboration
+
+- The fixed point is the goal (Goal section) plus the correctness and GPL
+  rules. Everything else here and in the initiative (milestones, working
+  agreement, decisions) is a means and may be challenged.
+- Push back proactively: when a plan, a decision or the owner's request
+  conflicts with the goal or rests on an untested assumption, say so first.
+- When asked for improvements or "out of the box" ideas, include at least one
+  option that changes the problem formulation (what is computed, what counts
+  as output, which constraint is dropped), with an estimated gain and the
+  cheapest experiment that measures it.
+- When asked "should we X?", answer yes/no first, then the strongest case for
+  each side, then the cheapest decisive experiment.
+
 ## Architecture
 
 plan1 (M0) and plan2 (M1, per-node cost) have landed; see
