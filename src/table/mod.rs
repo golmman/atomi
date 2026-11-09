@@ -42,13 +42,23 @@ pub struct Budget {
     pub filter_bits: usize,
 }
 
-/// Split `mb` MiB into the TT / proof-table / filter budgets (§Memory
-/// budget). Invariant: `64*tt_clusters + 16*proof_slots + filter_bits/8`
-/// bytes fit the label.
+/// Split `mb` MiB into the TT / proof-table / filter budgets with the
+/// default proof share (1/4).
 pub fn split(mb: usize) -> Budget {
+    split_share(mb, 25)
+}
+
+/// Split `mb` MiB with `proof_percent` of the label for the proof table
+/// (1..=90; the CLI and `Tables` validate). Invariant:
+/// `64*tt_clusters + 16*proof_slots + filter_bits/8` bytes fit the label.
+pub fn split_share(mb: usize, proof_percent: u8) -> Budget {
     let total = mb.saturating_mul(1 << 20);
-    let proof_slots = (total / 4) / 16;
-    let proof_bytes = proof_slots * 16;
+    let pct = usize::from(proof_percent.clamp(1, 90));
+    // The filter has a 2^20-bit floor (128 KiB); reserve it plus one TT
+    // cluster, so every share keeps the byte invariant even at 1 MiB.
+    let proof_cap = total.saturating_sub(64 + (1 << 17));
+    let proof_bytes = (total * pct / 100).min(proof_cap);
+    let proof_slots = proof_bytes / 16;
     let tt_slot_estimate = (total - proof_bytes) / 16;
     // prev_power_of_two(8 * tt_slot_estimate), clamped to [2^20, 2^25].
     let x = (8 * tt_slot_estimate).max(1);
@@ -90,7 +100,12 @@ impl Tables {
     /// test hook for the filter-neutrality test; the CLI always passes
     /// `true`.
     pub fn new(memory_mb: usize, filter: bool) -> Tables {
-        let b = split(memory_mb);
+        Tables::with_share(memory_mb, filter, 25)
+    }
+
+    /// Allocate with an explicit proof-table share (percent of `--memory`).
+    pub fn with_share(memory_mb: usize, filter: bool, proof_percent: u8) -> Tables {
+        let b = split_share(memory_mb, proof_percent);
         Tables {
             tt: Tt::new(b.tt_clusters),
             proofs: ProofTable::new(b.proof_slots),
@@ -199,6 +214,22 @@ mod tests {
             assert!(b.tt_clusters >= 1);
             assert!(b.filter_bits.is_power_of_two());
         }
+    }
+
+    #[test]
+    fn split_share_invariant() {
+        for mb in [1usize, 7, 16, 64, 192, 1024, 4096] {
+            for pct in 1u8..=90 {
+                let b = split_share(mb, pct);
+                assert!(
+                    64 * b.tt_clusters + 16 * b.proof_slots + b.filter_bits / 8 <= mb << 20,
+                    "mb={mb} pct={pct}: {b:?}"
+                );
+                assert!(b.tt_clusters >= 1);
+                assert!(b.filter_bits.is_power_of_two());
+            }
+        }
+        assert_eq!(split_share(192, 25).proof_slots, split(192).proof_slots);
     }
 
     #[test]

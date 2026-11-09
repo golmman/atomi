@@ -8,11 +8,12 @@
 //! proof number and a higher disproof number:
 //!
 //! ```text
-//! f = clamp(16 + e, 8, 32)
+//! f = clamp(16 + e * w / 16, 8, 32)
 //! pn = max(1, pn_base * 16 / f)
 //! dn = max(1, dn_base * f / 16)
 //! ```
 //!
+//! `w` is `GuideParams.ef_weight` (`16` = the plan3 formula, `0` = neutral).
 //! Every result is bounded by `OPEN_MAX` by the caller. The eval never
 //! turns an `Open` value into `Proved`/`Refuted`.
 
@@ -104,9 +105,19 @@ pub fn factor(eval: i32) -> i32 {
     (16 + eval).clamp(8, 32)
 }
 
-/// The EF-PN scaling of a mover-perspective `(pn, dn)` pair.
+/// The weighted factor: `f = clamp(16 + e * w / 16, 8, 32)`.
+pub fn factor_weighted(eval: i32, weight: u32) -> i32 {
+    factor((i64::from(eval) * i64::from(weight) / 16) as i32)
+}
+
+/// The EF-PN scaling of a mover-perspective `(pn, dn)` pair (weight 16).
 pub fn scale(pn: u32, dn: u32, eval: i32) -> (u32, u32) {
-    let f = factor(eval) as u64;
+    scale_weighted(pn, dn, eval, 16)
+}
+
+/// The EF-PN scaling of a mover-perspective `(pn, dn)` pair at `weight`.
+pub fn scale_weighted(pn: u32, dn: u32, eval: i32, weight: u32) -> (u32, u32) {
+    let f = factor_weighted(eval, weight) as u64;
     let pn = (u64::from(pn) * 16 / f).max(1) as u32;
     let dn = (u64::from(dn) * f / 16).max(1) as u32;
     (pn, dn)
@@ -120,6 +131,16 @@ mod tests {
     fn neutral_factor_is_16_and_scaling_is_identity() {
         assert_eq!(factor(0), 16);
         assert_eq!(scale(4, 16, 0), (4, 16));
+    }
+
+    #[test]
+    fn weight_16_is_the_plan3_scale() {
+        for e in [-256, -37, 0, 9, 64, 256] {
+            assert_eq!(scale_weighted(9, 11, e, 16), scale(9, 11, e));
+        }
+        assert_eq!(scale_weighted(4, 16, 100, 0), (4, 16));
+        assert_eq!(factor_weighted(256, 0), 16);
+        assert_eq!(factor_weighted(256, 32), 32);
     }
 
     #[test]

@@ -1,0 +1,119 @@
+{
+ "phase": "pressure",
+ "fen": "r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1",
+ "seconds": 120,
+ "evals": 300000000,
+ "memory": 192,
+ "seed": 0,
+ "rows": [
+  {
+   "name": "chosen",
+   "flags": "--guide hand --guide-scale 64 --guide-ef-weight 0",
+   "payload": {
+    "found": false,
+    "length": null,
+    "exit": "timeout",
+    "child_evals": 60418220,
+    "expansions": 1966080,
+    "seed": 0,
+    "sim_nodes": 307720931,
+    "settle_nodes": 108341567,
+    "ms": 120044,
+    "seconds": 120,
+    "memory_mb": 192,
+    "evals_limit": 300000000,
+    "proof": "not-requested",
+    "proof_positions": null,
+    "proof_length": null,
+    "proof_entries": 112475,
+    "proof_full": false
+   }
+  },
+  {
+   "name": "default",
+   "flags": "--guide hand",
+   "payload": {
+    "found": false,
+    "length": null,
+    "exit": "timeout",
+    "child_evals": 60061195,
+    "expansions": 2010112,
+    "seed": 0,
+    "sim_nodes": 307359579,
+    "settle_nodes": 106949016,
+    "ms": 120036,
+    "seconds": 120,
+    "memory_mb": 192,
+    "evals_limit": 300000000,
+    "proof": "not-requested",
+    "proof_positions": null,
+    "proof_length": null,
+    "proof_entries": 77635,
+    "proof_full": false
+   }
+  },
+  {
+   "name": "chosen_aux",
+   "flags": "--guide hand --guide-scale 64 --guide-ef-weight 0 --guide-max-sim 1 --guide-max-settle 1",
+   "payload": {
+    "found": true,
+    "length": 20,
+    "exit": "proved",
+    "child_evals": 278497676,
+    "expansions": 9667450,
+    "seed": 0,
+    "sim_nodes": 52119931,
+    "settle_nodes": 18519011,
+    "ms": 59855,
+    "seconds": 120,
+    "memory_mb": 192,
+    "evals_limit": 300000000,
+    "proof": "not-requested",
+    "proof_positions": null,
+    "proof_length": null,
+    "proof_entries": 691117,
+    "proof_full": false
+   }
+  }
+ ],
+ "core_proof": {
+  "name": "core_aux_proof",
+  "flags": "--guide hand --guide-scale 64 --guide-ef-weight 0 --guide-max-sim 1 --guide-max-settle 1",
+  "payload": {
+   "found": true,
+   "length": 20,
+   "exit": "proved",
+   "child_evals": 278497676,
+   "expansions": 9667450,
+   "seed": 0,
+   "sim_nodes": 52119931,
+   "settle_nodes": 18519011,
+   "ms": 60208,
+   "seconds": 120,
+   "memory_mb": 192,
+   "evals_limit": 300000000,
+   "proof": "written",
+   "proof_positions": 14332,
+   "proof_length": 20,
+   "proof_entries": 691117,
+   "proof_full": false
+  },
+  "validator": {
+   "file": "/tmp/atomi-plan4-proofs/core-aux-s0.jsonl",
+   "valid": true,
+   "positions": 14332,
+   "length": 20,
+   "header_moves": 20,
+   "error": null
+  },
+  "provari_check": {
+   "highest_counter": 0,
+   "moves": 20,
+   "proof": "/tmp/atomi-plan4-proofs/core-aux-s0.jsonl",
+   "valid": true,
+   "won_positions": 14332
+  },
+  "verdict": "accepted"
+ },
+ "note": "The proof run used --proof-out and reproduced the same child_evals; the proof table did not fill (proof_full=false)."
+}

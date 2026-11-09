@@ -37,6 +37,7 @@ fn limits() -> Limits {
         filter: true,
         guide: atomi::guide::GuideConfig::none(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     }
 }
@@ -91,6 +92,7 @@ fn never_prove_rows_are_never_found() {
         filter: true,
         guide: atomi::guide::GuideConfig::none(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     };
     let mut rows = 0;
@@ -160,6 +162,7 @@ fn filter_on_off_identical() {
             filter: true,
             guide: atomi::guide::GuideConfig::none(),
             guide_params: atomi::guide::GuideParams::default(),
+            proof_share_percent: 25,
             seed: 0,
         };
         let on = search::prove(&root, &lim, NullSink).result;
@@ -183,6 +186,7 @@ fn evals_cap_is_honoured() {
         filter: true,
         guide: atomi::guide::GuideConfig::none(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     };
     let out = search::prove(
@@ -337,6 +341,7 @@ fn prove(fen: &str, evals: Option<u64>) -> search::Output<NullSink> {
         filter: true,
         guide: atomi::guide::GuideConfig::none(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     };
     search::prove(&board(fen), &lim, NullSink)
@@ -401,6 +406,7 @@ fn writer_differential_veto_rows() {
         filter: true,
         guide: atomi::guide::GuideConfig::none(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     };
     let mut rows = 0;
@@ -614,6 +620,85 @@ fn same_seed_is_repeatable() {
 }
 
 #[test]
+fn calibration_defaults_are_the_plan3_tree() {
+    let fen = "rnbq1b1r/pp1p1kpp/2p1pp1n/8/3PP1P1/2N2N2/PPP2P1P/R1BQKB1R w KQ - 0 1";
+    let run = |extra: &[&str]| {
+        let mut args = vec![
+            "prove",
+            fen,
+            "--seconds",
+            "60",
+            "--memory",
+            "192",
+            "--evals",
+            "200000",
+            "--guide",
+            "hand",
+            "--seed",
+            "1",
+        ];
+        args.extend_from_slice(extra);
+        let out = atomi(&args);
+        let j: serde_json::Value =
+            serde_json::from_str(String::from_utf8_lossy(&out.stdout).trim()).unwrap();
+        (
+            j["exit"].clone(),
+            j["child_evals"].clone(),
+            j["expansions"].clone(),
+        )
+    };
+    assert_eq!(
+        run(&[]),
+        run(&["--guide-scale", "1", "--guide-ef-weight", "16"])
+    );
+    assert_eq!(
+        run(&[]),
+        run(&["--guide-max-sim", "0", "--guide-max-settle", "0"])
+    );
+}
+
+#[test]
+fn aux_budget_is_deterministic_and_caps_work() {
+    let fen = "rnbq1b1r/pp1p1kpp/2p1pp1n/8/3PP1P1/2N2N2/PPP2P1P/R1BQKB1R w KQ - 0 1";
+    let run = |extra: &[&str]| {
+        let mut args = vec![
+            "prove",
+            fen,
+            "--seconds",
+            "60",
+            "--memory",
+            "192",
+            "--evals",
+            "200000",
+            "--guide",
+            "hand",
+            "--seed",
+            "1",
+        ];
+        args.extend_from_slice(extra);
+        let out = atomi(&args);
+        let j: serde_json::Value =
+            serde_json::from_str(String::from_utf8_lossy(&out.stdout).trim()).unwrap();
+        (
+            j["child_evals"].as_u64().unwrap(),
+            j["sim_nodes"].as_u64().unwrap(),
+            j["settle_nodes"].as_u64().unwrap(),
+        )
+    };
+    let full = run(&[]);
+    let capped = run(&["--guide-max-sim", "1", "--guide-max-settle", "1"]);
+    assert_eq!(
+        capped,
+        run(&["--guide-max-sim", "1", "--guide-max-settle", "1"])
+    );
+    assert!(capped.1 <= full.1, "{capped:?} vs {full:?}");
+    assert!(capped.2 <= full.2, "{capped:?} vs {full:?}");
+    // The auxiliary caps change the guide's starts (so the main tree may
+    // differ), but they stay out of `child_evals`/`expansions` accounting.
+    assert!(capped.0 > 0 && full.0 > 0);
+}
+
+#[test]
 fn settled_child_proof_round_trip() {
     // MATE_IN_2 with the hand guide exercises the one-ply settle (a child is
     // settled Proved without being expanded). The writer must find the
@@ -626,6 +711,7 @@ fn settled_child_proof_round_trip() {
         filter: true,
         guide: atomi::guide::GuideConfig::hand(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     };
     let out = search::prove(&root, &lim, ProofStore::new(64));

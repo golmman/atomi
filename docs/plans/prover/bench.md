@@ -37,24 +37,30 @@ The initiative's success condition, quoted verbatim from
 
 ## Absolute distance to the goal (read this first)
 
-State on 2026-11-09, after M1 and the failed M2+M3 stack gate:
+State on 2026-11-10, after plan4 CORE-RESET (item 3 closed):
 
-- **Wall factor on the only proved bench cell is 10.897.** `easy-win`: atomi
-  m1 1.482 s / 30.3 M child evals (≈ 1.05 M expansions) versus provari hand
-  72,523 nodes / 0.136 s. Coverage is **1/3** against provari's 3/3;
-  `core` and `deep-win` are censored at 10 s.
-- **Per node atomi is already at or better than provari.** Same-session M1
-  per-node on `core`/10 M/192 MB is **53.4 ms per 1 M child evals** (M0
-  166.7, legacy front-end 137.3). Therefore all of the remaining 10.9× on
-  `easy-win` is **tree size**, not per-node cost.
-- **The hand-guide stack did not close the tree gap.** Plan3 coverage is
-  19/24 on `guidance-v1`; `easy-win` is 211,254–631,763 expansions (1.5–4.4×
-  the 145,046 gate) and `core` is censored at 10 s and 20 M. `--guide-off
-  efpn` alone reaches 110,293 expansions on `easy-win`.
+- **`easy-win` is now a 10 s win, with a 42× wall.** Calibration
+  (`global_scale=64, ef_weight=0`) proves it on seeds 0–2 in
+  121,866 / 110,533 / 115,147 expansions (limit 145,046) at 5.8 s median
+  versus provari hand 0.137 s / 72,523 nodes. Tree ratio 1.52–1.68×; wall
+  ratio ≈ 42× because simulation/settle work dominates.
+- **`core` still censors at 10 s.** Best calibrated 10 s count is ≈ 146 k
+  expansions (provari 0.51 s / 342,289 nodes); at 50 M child evals the tree
+  is 1.61 M expansions (4.7× provari). A per-frame auxiliary budget proves
+  `core` at **120 s** (278.5 M evals, length 20, proof accepted by both
+  checkers), not at the 10 s product budget.
+- **Per node atomi is still at or better than provari** (M1: 53.4 ms per
+  1 M child evals on `core`/10 M/192 MB). The remaining `core` gap is tree
+  size plus guide-auxiliary cost, not raw movegen.
+- Plan3's uncalibrated hand stack is in the row history below:
+  `easy-win` 211,254–631,763 expansions, `core` censored. Plan4's EF-PN-off
+  point reproduces the plan3 `--guide-off efpn` count exactly (110,293 at
+  scale 1 / weight 0).
 
-Implication: the next gain must come from reducing the proof tree (and
-proving `core`/`deep-win`), not from more per-node engineering. This section
-is the absolute number; the rows below are relative history.
+Implication: the next step is the M4-first pivot recorded in `report4.md`
+(scale the accepted `core` proof), or a wall-time auxiliary budget. No new
+per-node work is indicated. This section is the absolute number; the rows
+below are relative history.
 
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
@@ -330,6 +336,17 @@ both are censored. `hand` coverage is 19/24 versus provari hand 24/24; the
 18 `wins.tsv`-derived cells are proved on every seed. Full details in
 [`report3.md`](report3.md).
 
+### plan4 (no ledger row — G1 failed)
+
+Plan4 CORE-RESET did not meet G1 (`core` proved at 10 s), so no ledger row
+is appended (`measurements/plan4/gate.json`). The calibrated point
+(scale 64, EF-PN weight 0) proves `easy-win` at 10 s on seeds 0–2
+(121,866 / 110,533 / 115,147 expansions) and is censored on `core`
+(146,432 / 147,456 / 148,480 expansions at 10 s). A per-frame auxiliary
+budget proves `core` at 120 s (278.5 M child evals, length 20) with an
+accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
+[`report4.md`](report4.md).
+
 ## History
 
 - **2026-11-06** — `bench.md` opened for the `prover` initiative: the
@@ -347,3 +364,9 @@ both are censored. `hand` coverage is 19/24 versus provari hand 24/24; the
   145,046) and `core` censored at 20 M child evals and at 10 s; coverage
   19/24. No ledger row. The stack is recorded for the D21 kill review;
   `--guide none --seed 0` remains counter-identical to m1.
+- **2026-11-10** — plan4 CORE-RESET executed; **G1 failed on `core` at
+  10 s**, item 3 closed. Calibration proves `easy-win` at 10 s on seeds
+  0–2 (121,866 / 110,533 / 115,147, under 145,046) but `core` stays
+  censored. The auxiliary-budget configuration proves `core` at 120 s
+  (278.5 M child evals, both checkers accept the 14,332-position proof);
+  no ledger row.

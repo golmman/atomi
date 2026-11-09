@@ -121,6 +121,8 @@ impl Frame {
         );
         let mover_ctx = Mover::new(board);
         let guide_on = guide.config.enabled;
+        let max_settle = u64::from(guide.params.max_settle);
+        let max_sim = u64::from(guide.params.max_sim);
 
         // Pass 1 (effects + guide).
         let mut keys = Vec::with_capacity(moves.len());
@@ -169,6 +171,7 @@ impl Frame {
             if matches!(value, Value::Open { .. })
                 && guide_on
                 && guide.config.static_closures
+                && (max_settle == 0 || settle_nodes < max_settle)
                 && (built.is_some() || threat::settle_screen(board, m, mover))
             {
                 if built.is_none() {
@@ -228,7 +231,11 @@ impl Frame {
                 (0, 0)
             };
             if let Some(child) = child_ref {
-                if matches!(value, Value::Open { .. }) && guide_on && guide.config.sibling_sim {
+                if matches!(value, Value::Open { .. })
+                    && guide_on
+                    && guide.config.sibling_sim
+                    && (max_sim == 0 || sim_nodes < max_sim)
+                {
                     let (score, moves_made) = guide::simulate::playout(child, attacker);
                     sim_nodes += moves_made;
                     start = guide.sim_adjust(start.0, start.1, score);

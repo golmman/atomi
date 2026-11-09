@@ -31,6 +31,7 @@ fn wins_oracle() {
         filter: true,
         guide: atomi::guide::GuideConfig::none(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     };
     let dir = Path::new(env!("CARGO_TARGET_TMPDIR"));
@@ -79,6 +80,7 @@ fn never_prove_oracle() {
         filter: true,
         guide: atomi::guide::GuideConfig::none(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     };
     for r in rows("never_prove.tsv") {
@@ -106,6 +108,7 @@ fn pawn_ending_proved() {
         filter: true,
         guide: atomi::guide::GuideConfig::none(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     };
     let out = search::prove(&b, &lim, NullSink);
@@ -139,6 +142,7 @@ fn false_refutation_regressions() {
             filter: true,
             guide: atomi::guide::GuideConfig::none(),
             guide_params: atomi::guide::GuideParams::default(),
+            proof_share_percent: 25,
             seed: 0,
         };
         let out = search::prove(&b, &lim, NullSink);
@@ -164,6 +168,7 @@ fn wins_oracle_hand() {
         filter: true,
         guide: atomi::guide::GuideConfig::hand(),
         guide_params: atomi::guide::GuideParams::default(),
+        proof_share_percent: 25,
         seed: 0,
     };
     let dir = Path::new(env!("CARGO_TARGET_TMPDIR"));

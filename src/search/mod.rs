@@ -54,6 +54,8 @@ pub struct Limits {
     pub guide: GuideConfig,
     /// The starting-number table (`--guide-params` or built-in).
     pub guide_params: GuideParams,
+    /// Share of `--memory` given to the proof table, in percent.
+    pub proof_share_percent: u8,
     /// The tie-break seed (0 = movegen order).
     pub seed: u64,
 }
@@ -131,7 +133,8 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
     std::thread::Builder::new()
         .stack_size(256 << 20)
         .spawn(move || {
-            let tables = Tables::new(limits.memory_mb, limits.filter);
+            let tables =
+                Tables::with_share(limits.memory_mb, limits.filter, limits.proof_share_percent);
             let start = Instant::now();
             let deadline = limits.seconds.map(|s| start + Duration::from_secs(s));
             let guide = Guide::new(limits.guide).with_params(limits.guide_params);
@@ -240,6 +243,7 @@ impl<S: ProofSink> Engine<S> {
             return Value::Open { pn: 0, dn: 0 };
         }
         self.expansions += 1;
+        let mut proved_pending: Vec<(u64, Value)> = Vec::new();
         if self.expansions.is_multiple_of(DEADLINE_CHECK_INTERVAL)
             && let Some(dl) = self.deadline
             && Instant::now() >= dl
@@ -272,20 +276,16 @@ impl<S: ProofSink> Engine<S> {
                 self.child_evals += spent;
                 self.settle_nodes += settle;
                 self.sim_nodes += sim;
+                // Plan4 proof-table pressure: a settled refutation is still a
+                // path-independent TT refutation, but a settled proof is only
+                // installed when this node exits proved (and, at an OR node,
+                // only for the child the OR value selects).
+                proved_pending.clear();
                 for (child_key, value) in pending {
-                    self.tables.store(child_key, &value, 0);
-                    if let Value::Proved {
-                        length,
-                        limit,
-                        mv: Some(mv),
-                    } = value
-                    {
-                        self.sink.proven(ProofEvent::AttackerProven {
-                            key: child_key,
-                            mv,
-                            length,
-                            limit,
-                        });
+                    if matches!(value, Value::Proved { .. }) {
+                        proved_pending.push((child_key, value));
+                    } else {
+                        self.tables.store(child_key, &value, 0);
                     }
                 }
                 frame
@@ -341,10 +341,66 @@ impl<S: ProofSink> Engine<S> {
                 limit,
             });
         }
+        if matches!(v, Value::Proved { .. }) {
+            let selected = if frame.attacker_node {
+                selected_proved_child(&frame).map(|i| frame.keys[i])
+            } else {
+                None
+            };
+            for (child_key, value) in &proved_pending {
+                let keep = !frame.attacker_node || selected == Some(*child_key);
+                if !keep {
+                    continue;
+                }
+                self.tables.store(*child_key, value, 0);
+                if let Value::Proved {
+                    length,
+                    limit,
+                    mv: Some(mv),
+                } = *value
+                {
+                    self.sink.proven(ProofEvent::AttackerProven {
+                        key: *child_key,
+                        mv,
+                        length,
+                        limit,
+                    });
+                }
+            }
+        }
         debug_assert!(value_invariant(&v, board.rule50()));
         self.line.pop();
         v
     }
+}
+
+/// The child `or_value` would select among proved children (same
+/// length/higher-limit/movegen-order rule).
+fn selected_proved_child(frame: &Frame) -> Option<usize> {
+    let mut best: Option<usize> = None;
+    for (i, c) in frame.children.iter().enumerate() {
+        let Value::Proved { length, limit, .. } = c.value else {
+            continue;
+        };
+        let better = match best {
+            None => true,
+            Some(j) => {
+                let Value::Proved {
+                    length: bl,
+                    limit: bli,
+                    ..
+                } = frame.children[j].value
+                else {
+                    unreachable!()
+                };
+                length < bl || (length == bl && limit > bli)
+            }
+        };
+        if better {
+            best = Some(i);
+        }
+    }
+    best
 }
 
 fn node_value(frame: &Frame) -> Value {
@@ -473,6 +529,48 @@ mod tests {
     /// moves` prints none and `rules::status` says `Failed`. The frame
     /// starts that child `Open(1, 1)` (lazy); a `mid` descent refutes it at
     /// node entry.
+    #[test]
+    fn selected_proved_child_matches_or_value() {
+        // OR selects the shortest proof, then the higher limit, then the
+        // earlier movegen slot. Only that child's settled proof is retained.
+        let mv = atomic_movegen::types::Move::make_move(
+            atomic_movegen::types::Square::A2,
+            atomic_movegen::types::Square::A3,
+        );
+        let child = |length, limit| Child {
+            mv,
+            zeroing: false,
+            class: crate::guide::MoveClass::Quiet,
+            value: Value::Proved {
+                length,
+                limit,
+                mv: Some(mv),
+            },
+        };
+        let make = |children: Vec<Child>| Frame {
+            keys: (0..children.len() as u64).collect(),
+            children,
+            work_start: 0,
+            attacker_node: true,
+            key: 0,
+            mover: Color::White,
+            order_classes: false,
+            order_history: false,
+        };
+        assert_eq!(
+            selected_proved_child(&make(vec![child(4, 90), child(3, 50), child(3, 80)])),
+            Some(2)
+        );
+        assert_eq!(
+            selected_proved_child(&make(vec![child(2, 90), child(3, 99)])),
+            Some(0)
+        );
+        assert_eq!(
+            selected_proved_child(&make(vec![child(2, 9), child(2, 9)])),
+            Some(0)
+        );
+    }
+
     #[test]
     fn lazy_stalemate_end_to_end() {
         let parent = Board::from_fen("1K5n/5p2/5Pp1/6P1/8/3N4/N7/kN6 w - - 0 1").unwrap();

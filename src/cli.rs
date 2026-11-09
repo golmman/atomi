@@ -26,6 +26,8 @@ pub struct ProveOptions {
     pub guide: GuideConfig,
     /// The starting-number table.
     pub guide_params: GuideParams,
+    /// Share of `--memory` given to the proof table, in percent (default 25).
+    pub proof_share_percent: u8,
     /// Tie-break seed (0 = movegen order).
     pub seed: u64,
 }
@@ -39,6 +41,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
     let mut proof_out = None;
     let mut guide = GuideConfig::none();
     let mut guide_params = GuideParams::default();
+    let mut proof_share_percent = 25u8;
     let mut seed = 0u64;
 
     let mut i = 0;
@@ -80,6 +83,33 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
                         .map_err(|e| format!("bad value for {arg}: {e}"))?;
                     guide_params = GuideParams::parse(&text)?;
                 }
+                "--guide-scale" => {
+                    guide_params.global_scale = parse_num(arg, value)?;
+                }
+                "--guide-ef-weight" => {
+                    let n: u32 = value
+                        .parse()
+                        .map_err(|_| format!("bad value for {arg}: {value}"))?;
+                    if n > crate::search::value::OPEN_MAX {
+                        return Err(format!("bad value for {arg}: {value}"));
+                    }
+                    guide_params.ef_weight = n;
+                }
+                "--guide-max-sim" => {
+                    guide_params.max_sim = parse_zero_ok(arg, value)?;
+                }
+                "--guide-max-settle" => {
+                    guide_params.max_settle = parse_zero_ok(arg, value)?;
+                }
+                "--proof-share" => {
+                    let n: u8 = value
+                        .parse()
+                        .map_err(|_| format!("bad value for {arg}: {value}"))?;
+                    if !(1..=90).contains(&n) {
+                        return Err(format!("bad value for {arg}: {value} (1..=90)"));
+                    }
+                    proof_share_percent = n;
+                }
                 _ => return Err(format!("unknown option: {arg}")),
             }
             i += 2;
@@ -100,8 +130,15 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
         proof_out,
         guide,
         guide_params,
+        proof_share_percent,
         seed,
     })
+}
+
+fn parse_zero_ok(opt: &str, value: &str) -> Result<u32, String> {
+    value
+        .parse()
+        .map_err(|_| format!("bad value for {opt}: {value}"))
 }
 
 fn parse_num<T>(opt: &str, value: &str) -> Result<T, String>

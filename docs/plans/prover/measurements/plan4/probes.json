@@ -1,0 +1,94 @@
+{
+ "phase": "probe",
+ "provari_nodes": {
+  "core": 342289,
+  "easy-win": 72523
+ },
+ "memory": 192,
+ "evals": 50000000,
+ "seed": 0,
+ "rows": [
+  {
+   "cell": "core",
+   "stack": "bare",
+   "label": "default",
+   "seed": 0,
+   "evals_cap": 50000000,
+   "wall_s": 3.041,
+   "returncode": 0,
+   "found": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 50000034,
+   "expansions": 1633456,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "proof_entries": 71088,
+   "proof_full": false
+  },
+  {
+   "cell": "core",
+   "stack": "hand",
+   "label": "default",
+   "seed": 0,
+   "evals_cap": 50000000,
+   "wall_s": 104.666,
+   "returncode": 0,
+   "found": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 50000018,
+   "expansions": 1674119,
+   "settle_nodes": 88831634,
+   "sim_nodes": 256537039,
+   "proof_entries": 61294,
+   "proof_full": false
+  },
+  {
+   "cell": "easy-win",
+   "stack": "bare",
+   "label": "default",
+   "seed": 0,
+   "evals_cap": 50000000,
+   "wall_s": 1.72,
+   "returncode": 0,
+   "found": true,
+   "exit": "proved",
+   "length": 17,
+   "child_evals": 30335618,
+   "expansions": 1047370,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "proof_entries": 69772,
+   "proof_full": false
+  },
+  {
+   "cell": "easy-win",
+   "stack": "hand",
+   "label": "default",
+   "seed": 0,
+   "evals_cap": 50000000,
+   "wall_s": 22.777,
+   "returncode": 0,
+   "found": true,
+   "exit": "proved",
+   "length": 18,
+   "child_evals": 11842338,
+   "expansions": 468301,
+   "settle_nodes": 21873291,
+   "sim_nodes": 60005079,
+   "proof_entries": 30412,
+   "proof_full": false
+  }
+ ],
+ "prior_art": {
+  "source": "docs/notes/retro.md appendix (2026-11-09 provari v0.1.0 ablation), re-read 2026-11-10",
+  "facts": [
+   "EF-PN removal: core 1.96x nodes, easy-win 0.44x (provari hand)",
+   "move-class numbers are the largest single lever (core 2.30x, easy-win 4.29x)",
+   "the stack is worth 25x on core; single levers multiply to only 7.3x",
+   "the retro warning: the size of the starting proof numbers was never tested"
+  ],
+  "plan4_action": "sweep global_scale x ef_weight on the canonical cells before any mechanism change"
+ }
+}

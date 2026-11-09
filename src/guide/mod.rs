@@ -156,6 +156,14 @@ pub struct GuideParams {
     /// Evasion pair (the base is the legal-move count; this pair is the
     /// fallback when the count is zero).
     pub evasion: Pair,
+    /// Global multiplier on fresh start numbers (`1` = plan3 identity).
+    pub global_scale: u32,
+    /// EF-PN weight (`16` = plan3 identity; `0` neutralises the eval).
+    pub ef_weight: u32,
+    /// Per-frame settle budget in settle work units (`0` = unlimited).
+    pub max_settle: u32,
+    /// Per-frame simulation budget in playout moves (`0` = unlimited).
+    pub max_sim: u32,
 }
 
 impl Default for GuideParams {
@@ -166,6 +174,10 @@ impl Default for GuideParams {
             quiet: Pair { pn: 9, dn: 9 },
             hanging: Pair { pn: 15, dn: 9 },
             evasion: Pair { pn: 1, dn: 1 },
+            global_scale: 1,
+            ef_weight: 16,
+            max_settle: 0,
+            max_sim: 0,
         }
     }
 }
@@ -198,7 +210,8 @@ impl GuideParams {
                 .trim()
                 .parse()
                 .map_err(|_| format!("params line {}: bad value {value}", index + 1))?;
-            if v == 0 || v > OPEN_MAX {
+            let zero_ok = matches!(key.trim(), "ef_weight" | "max_sim" | "max_settle");
+            if (v == 0 && !zero_ok) || v > OPEN_MAX {
                 return Err(format!("params line {}: {v} out of range", index + 1));
             }
             let slot = match key.trim() {
@@ -212,6 +225,10 @@ impl GuideParams {
                 "hanging_dn" => &mut p.hanging.dn,
                 "evasion_pn" => &mut p.evasion.pn,
                 "evasion_dn" => &mut p.evasion.dn,
+                "global_scale" => &mut p.global_scale,
+                "ef_weight" => &mut p.ef_weight,
+                "max_sim" => &mut p.max_sim,
+                "max_settle" => &mut p.max_settle,
                 other => return Err(format!("params: unknown key {other}")),
             };
             *slot = v;
@@ -232,6 +249,10 @@ impl GuideParams {
         for (name, p) in rows {
             out.push_str(&format!("{name}_pn={}\n{name}_dn={}\n", p.pn, p.dn));
         }
+        out.push_str(&format!(
+            "global_scale={}\nef_weight={}\nmax_sim={}\nmax_settle={}\n",
+            self.global_scale, self.ef_weight, self.max_sim, self.max_settle
+        ));
         out
     }
 }
@@ -347,6 +368,13 @@ impl Guide {
         } else {
             (base.dn, base.pn)
         };
+        // Calibration (plan4): the fresh base magnitude only. Decided values
+        // never pass through here.
+        let scale = u64::from(self.params.global_scale);
+        if scale != 1 {
+            pn = (u64::from(pn) * scale).min(u64::from(OPEN_MAX)) as u32;
+            dn = (u64::from(dn) * scale).min(u64::from(OPEN_MAX)) as u32;
+        }
         // Defence/attacker history: good for the mover is good for the
         // mover's orientation, so at AND nodes the attacker numbers invert.
         if self.config.defender_priors {
@@ -359,7 +387,7 @@ impl Guide {
         if self.config.ef_pn != EfPnMode::Off
             && (attacker_node || self.config.ef_pn == EfPnMode::Both)
         {
-            (pn, dn) = eval::scale(pn, dn, child_eval);
+            (pn, dn) = eval::scale_weighted(pn, dn, child_eval, self.params.ef_weight);
         }
         (pn.clamp(1, OPEN_MAX), dn.clamp(1, OPEN_MAX))
     }
@@ -552,10 +580,52 @@ mod tests {
     fn params_parse_and_dump_round_trip() {
         let mut p = GuideParams::default();
         p.threat.pn = 3;
+        p.global_scale = 64;
+        p.ef_weight = 0;
+        p.max_sim = 7;
+        p.max_settle = 0;
         let text = p.dump();
         assert_eq!(GuideParams::parse(&text).unwrap(), p);
         assert!(GuideParams::parse("threat_pn=0").is_err());
+        assert!(GuideParams::parse("global_scale=0").is_err());
         assert!(GuideParams::parse("bogus=1").is_err());
+        // The new zero-allowed keys accept zero.
+        assert_eq!(GuideParams::parse("ef_weight=0").unwrap().ef_weight, 0);
+        assert_eq!(GuideParams::parse("max_sim=0").unwrap().max_sim, 0);
+    }
+
+    #[test]
+    fn calibration_scales_only_fresh_numbers() {
+        let h = History::new();
+        let c = ctx(false);
+        let mut p = GuideParams::default();
+        let g = Guide::new(GuideConfig::hand()).with_params(p);
+        assert_eq!(
+            g.start_numbers(&c, MoveClass::Threat, true, Color::White, mv(), &h, 0),
+            (4, 16)
+        );
+        p.global_scale = 4;
+        let g = Guide::new(GuideConfig::hand()).with_params(p);
+        assert_eq!(
+            g.start_numbers(&c, MoveClass::Threat, true, Color::White, mv(), &h, 0),
+            (16, 64)
+        );
+        // Weight 16 is the plan3 identity, weight 0 neutralises the eval.
+        p.global_scale = 1;
+        p.ef_weight = 0;
+        let g = Guide::new(GuideConfig::hand()).with_params(p);
+        assert_eq!(
+            g.start_numbers(
+                &NodeContext { eval: 200, ..c },
+                MoveClass::Threat,
+                true,
+                Color::White,
+                mv(),
+                &h,
+                200,
+            ),
+            (4, 16)
+        );
     }
 
     #[test]

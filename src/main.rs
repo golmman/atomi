@@ -21,6 +21,9 @@ fn print_help() {
          \x20                       [--proof-out PATH.jsonl] [--seed N]\n\
          \x20                       [--guide none|hand] [--guide-off LIST]\n\
          \x20                       [--guide-on LIST] [--guide-params PATH]\n\
+         \x20                       [--guide-scale N] [--guide-ef-weight N]\n\
+         \x20                       [--guide-max-sim N] [--guide-max-settle N]\n\
+         \x20                       [--proof-share PERCENT]\n\
          \x20   atomi validate PROOF.jsonl...\n\
          \x20   atomi moves \"<FEN>\"\n\
          \x20   atomi --help | --version"
@@ -45,6 +48,7 @@ fn prove(args: &[String]) -> ExitCode {
         filter: true,
         guide: opts.guide,
         guide_params: opts.guide_params,
+        proof_share_percent: opts.proof_share_percent,
         seed: opts.seed,
     };
     let output = search::prove(&root, &limits, NullSink);
