@@ -4,7 +4,8 @@
 
 **Open (2026-11-06).** Item 1 (M0) is done: [`plan1.md`](plan1.md),
 [`report1.md`](report1.md). Item 2 (M1) is done: [`plan2.md`](plan2.md),
-[`report2.md`](report2.md) (D18–D20). Item 3 (M2) is next. This
+[`report2.md`](report2.md) (D18–D20). Item 3 is now the merged **M2+M3
+"hand-guide stack"** (D21/D22); item 4 is merged into it. This
 initiative is the successor to `atomic_solver`'s closed `winprover`
 initiative. Its starting point is the legacy handoff
 `docs/plans/winprover/HANDOFF.md` (revision 2026-11-06) in
@@ -89,9 +90,14 @@ Adapted from `winprover`'s working agreement.
 
 1. **Measure before planning.** Every plan starts from the committed baseline
    and read-only probes. Sizing spikes are temporary and reverted.
-2. **One mechanism per plan.** A plan adds one mechanism, or one coupled pair
-   stated up front. The exception is M0 (plan1), which is a declared bootstrap
-   bundle because nothing exists yet.
+2. **Stack-level gating.** A plan may add a **named stack** of coupled
+   mechanisms under one gate, stated up front with its constituent
+   mechanisms and its gate. The gate is judged on the whole stack;
+   mechanism-level adopt/reject decisions come only from **both-direction
+   ablations after the stack gate**, not from single-lever runs before it.
+   A single-mechanism plan remains allowed when the mechanism is
+   independently meaningful. M0 (plan1) was a declared bootstrap bundle;
+   M2+M3 (plan3) is the first deliberate stack (D21).
 3. **Correctness gates are vetoes.** `make test` runs on every change.
    `make test-full`, which includes the oracle veto, runs for search, table,
    proof-output and validator changes. A bench row or speed claim is written
@@ -123,8 +129,9 @@ Adapted from `winprover`'s working agreement.
 
 ## Decisions
 
-The handoff settled D1, D9 and D10. This plan session (2026-11-06) decides the
-rest and adds D12–D16.
+The handoff settled D1, D9 and D10. The 2026-11-06 plan session decided
+the rest and added D12–D17; plan2 added D18–D20; the 2026-11-09 plan
+session added D21–D22.
 
 | # | Decision | Resolution |
 | --- | --- | --- |
@@ -132,7 +139,7 @@ rest and adds D12–D16.
 | D2 | Board | **`atomic_movegen::Board` 2.4.x**. M0 uses plain legal movegen and make-move. M1 adds the own `Mover`/`Effect` layer on the 2.4.0 primitives (`hash_after_with`, `hash_and_rule50_after`, `is_legal`, `outcome_with`, `has_legal_move_with_state`, `blast_zone`, `attackers_to_color`). A new board only if M1 shows make/unmake cannot leave the hot path; first ask upstream for the missing primitive (legacy `movegen/feedback2.md` pattern). Any new board is differential-tested against `atomic-movegen` and, through proofs, the external checker (no shakmaty linkage, D12) |
 | D3 | Proof format | **provari JSON lines first (M0)**. Header `{"root":FEN,"moves":L}`, which must have no `provari` field: that field routes the checker to its compact reader. Then one `{"fen":FEN,"move":UCI}` line per attacker (position, 50-move counter) pair. Compact `.pvr` comes in M4 (zstd + the format's move order). No `proof_tree.bin` and no native format |
 | D4 | Key / rule50 / repetition | **Board-only key + proof length/limit from M0.** The key is `Board::hash_with(EnPassantMode::Legal)`; `atomic-movegen`'s hash already excludes the halfmove clock. **Correction to the handoff:** the `Legal` mode is a *correctness requirement*, not an M1 A/B. The checker treats positions as repeated using the legal-en-passant identity, so an `Always` key would let the search accept lines the checker rejects as repetitions. M1 may A/B the *cost* of computing the key (an effect-level flag), never its meaning |
-| D5 | Restarts | A/B after M2, paired with generation-aware replacement (legacy `RestartSchedule::SHIPPED` idea). Not a default before measured |
+| D5 | Restarts | A/B after the M2+M3 stack (D21), paired with generation-aware replacement (legacy `RestartSchedule::SHIPPED` idea). Not a default before measured |
 | D6 | Portfolio | A separate driver outside the search core, after M5 (horizon) |
 | D7 | Tablebases | None through M5. Proofs carry no tablebase verdicts, and `provari check` runs without `--tablebases`. An external optional path is a horizon item |
 | D8 | Model / NNUE | Hand guide only. `--guide model` may be recorded as a stretch column and is never mixed into the primary one |
@@ -148,31 +155,35 @@ rest and adds D12–D16.
 | D18 | Proof memory from M1 (plan2; revises D15) | A fixed-size **proof table** (full 64-bit keys, 16-byte slots, a non-dominated `(mv, length, limit)` set per key, never evicts, refuses inserts at 90% load) is the search's proof memory **and** the writer's source. It is always on, so collecting a proof cannot change the trajectory (D14 by construction). `--memory` covers the TT, the proof table (a quarter) and the filter; `--proof-memory` is removed. The event sink stays the search's hook for M4's bounded worker; the CLI uses `NullSink`. A full proof table fails the export closed (`store-full`) |
 | D19 | Lazy terminal detection (plan2, narrowed by gate G1) | Child classification is exact for explosion, mate, material draw and the 50-move limit. A **stalemate reached by a quiet, non-checking move** is not detected at child initialization (the child starts Open `(1, 1)`; its node-entry status, computed from the movegen every node runs, refutes it) — **unless the child's side to move has only its commoner and pawns**, in which case every child is built (G1, plan2 finding: without it the pawn-ending row `rem01` went from 9.4 M evals to censored at 60 M). `child_evals` keeps its D11 meaning |
 | D20 | `unsafe` in M1 (plan2) | Three sites, each with `// SAFETY:` comments and a measured keep rule: (1) the copied lazy zeroed allocator (`Zeroed<T>`, over-allocated with align 16 so calloc's lazy pages also serve the 64-byte-aligned clusters); (2) the x86-64 `_mm_prefetch` wrapper (kept: 3.3% on the final tree); (3) `madvise(MADV_HUGEPAGE)` via a 3-line `extern "C"` (Linux, x86-64/aarch64; kept: −18%) |
+| D21 | Stack-level gating and the hand-guide stack (owner decision 2026-11-09; replaces working agreement 2 for this initiative) | A plan may add a **named stack** of coupled mechanisms under **one gate**. The gate is judged on the whole stack; individual mechanisms are not pre-gated. After the stack passes, **both-direction ablations** (leave-one-out from the full stack, add-one-in to the bare skeleton) decide which mechanisms stay, over the same frozen ≥20-cell set and several seeds. The first stack is **M2+M3 "hand-guide stack"** (item 3): move classes, check evasions, quiet grouping, EF-PN hand-eval scaling, per-child static closures including the one-ply explosion settle on every child for both sides, defender priors (`UNLIKELY`, defence history), history tie-breaks, sibling simulation and the null-move threat replay. **Gate:** `easy-win` `expansions` ≤ 2 × provari hand's 72,523 = **145,046 nodes**; `core` **proved** at `--seconds 10 --memory 192`; no guidance-set refutations; measured on **≥20 frozen cells and ≥3 seeds**; wall and `child_evals` are recorded, never substituted for the node gate |
+| D22 | Guidance measurement and seeds (owner decision 2026-11-09) | `--seed N` perturbs **only tie-breaks after** the guide metric, class and history; seed 0 preserves movegen order. The seed is part of the deterministic flag set (same binary + FEN + flags + seed = identical counters) and is carried into D14 proof runs. The gate uses seeds 0, 1, 2, 3. `guidance-v1` is frozen by a **provari-hand census before any atomi stack run** (rule in plan3): ≥20 deduplicated cells from `core + sample20` and `wins.tsv` where provari hand proves inside the stated selection budget. Auxiliary guide work (simulation, settle movegens, threat replay) is reported as `sim_nodes`/`settle_nodes`; `child_evals` and `expansions` keep D11 meaning and stay main-search only |
 
 ## Backlog
 
 Items are stable semantic identities. Plans are numbered sequentially and
-independently of items. One mechanism per plan, except item 1.
+independently of items. Plans use stack-level gating (D21), except a
+single-mechanism plan that is independently meaningful.
 
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
 | 1 | **M0** bootstrap + correctness + proof output + baseline | Cargo package, small `AGENTS.md`, Makefile gates, licence gate, provenance registry, oracle build script; copied corpus and fixtures; attacker-only DF-PN with 1+ε and uniform starting numbers over plain `atomic-movegen` movegen (no `Mover`, no heuristics); CLI; event sink + proof store + JSONL writer + own validator + `make veto`; adapted bench driver; successor `bench.md` with the re-measured baseline row; per-node cost baseline | gates green (incl. veto); proves a mate-in-1, a mate-in-2 and a small win, each validator- **and** checker-accepted; never proves a fixture loss or a soundness negative; baseline row and per-node baseline recorded; **no performance claim** | **done: [`plan1`](plan1.md), [`report1`](report1.md)** |
 | 2 | **M1** per-node cost | `Mover`/`Effect` per expanded node; no make/unmake for most children; incremental keys; TT clusters + prefetch + filter + lazy zeroed allocation (copy legacy `src/search/tt/alloc.rs`); in-search proof store with length/limit, inside the `--memory` label | wall per 1 M child evals ≤ the M0 baseline **and** ≤ the legacy front-end's (cross-repo, same session); a small reference win proved within a stated cap and checker-accepted; soundness fixtures green | **done: [`plan2`](plan2.md), [`report2`](report2.md)** — `core`/10 M/192 MB: **53.4** ms per 1 M child evals (m0 166.7, legacy front-end 137.3, same session) |
-| 3 | **M2** search guidance | move-class starting numbers, EF-PN hand-eval scaling, quiet grouping; constants exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | `core` and `easy-win` proved within a stated cap; measured vs M1 | open — M1 reference: 53.4 ms per 1 M child evals (`core`, 10 M); `easy-win` proved in 30,335,618 child evals, 1.482 s bench wall (factor 10.897); `core` censored at 10 s with ≈ 182 M child evals |
-| 4 | **M3** static tactics + simulation | per-child static tactics (immediate explosion, exposed king, check with no safe evasion, unparried double threat, cannot-win material, mate in one) as child scoring; sibling simulation as part of the AND-node loop | `core`/`easy-win` proved at a product-affordable cap; measured | open |
+| 3 | **M2+M3** hand-guide stack | move classes, check evasions, quiet grouping, EF-PN hand-eval scaling; per-child static closures including the one-ply explosion settle on every child (both sides); defender priors (`UNLIKELY`, defence history); history tie-breaks; sibling simulation; null-move threat replay; constants in one `GuideParams` table exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | **D21 stack gate:** `easy-win` expansions ≤ 145,046 (2 × provari hand's 72,523 nodes); `core` proved at 10 s / 192 MB; no guidance-set refutations; ≥20 frozen cells × seeds 0–3; both-direction ablations after the gate | open — M1 reference: 53.4 ms per 1 M child evals (`core`, 10 M); `easy-win` proved in 30,335,618 child evals / 1,047,370 expansions, 1.482 s bench wall (factor 10.897); `core` censored at 10 s with ≈ 182 M child evals |
+| 4 | ~~M3 static tactics + simulation~~ | **merged into item 3** (D21, 2026-11-09): per-child static tactics, one-ply explosion settle, sibling simulation, defender priors, history, null-move replay | — | merged |
 | 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | open |
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
-legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose before
-M2–M3. If M3 cannot prove `core`/`easy-win` at a product-affordable cap, the
-from-scratch path is not viable at this scope: record it and close.
+legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose
+before the M2+M3 stack. If the hand-guide stack cannot meet D21, do not split
+it back into mechanism plans: record the stack, its census and both-direction
+ablations, and take the continue/re-scope/close decision at a kill review.
 
 **Horizon (unranked, after M5; carries `winprover` item 8):**
 
 | # | Item | Note |
 | --- | --- | --- |
-| 7 | Restart schedule A/B (D5) | after M2; paired with generation-aware replacement |
+| 7 | Restart schedule A/B (D5) | after the M2+M3 stack; paired with generation-aware replacement |
 | 8 | Salt-seeded portfolio driver (D6) | wall-clock play, outside the core |
 | 9 | Portable attacker-only export for proofdb transport | needs a JSONL → `proof_tree.bin` importer **in the legacy repo** (also the D9 optional cross-check) |
 | 10 | External `high200` corpus | out-of-distribution guard, added as a separate set with a recorded selection rule |
@@ -181,7 +192,7 @@ from-scratch path is not viable at this scope: record it and close.
 | 13 | Optional external tablebases (D7) | provari's path is external and optional too |
 | 14 | `--guide model` stretch column (D8) | recorded only |
 
-Cannot-win material is part of M3. Compact `.pvr` is M4. Root-`Loss`
+Cannot-win material is part of the M2+M3 stack. Compact `.pvr` is M4. Root-`Loss`
 coverage needs a defender-side mode (a new item if ever wanted). `winprover`
 item 7 (workspace split) does not apply to a new repository.
 
@@ -199,8 +210,9 @@ GPL); **spec** = re-implement from a legacy module doc or document;
 | provari | per-frame child numbers (a position keeps its children's numbers while searched) | idea | M0 |
 | provari | `Mover`/`Effect` precomputation, child key before materialization, TT prefetch | idea | M1 |
 | provari | 4-slot clusters, filter, least-work replacement; 12-byte proof entries | idea | M1 |
-| provari | move-class numbers (`THREAT=4`, `QUIET=9`, `HANGING=15`, `WEAK_THREAT=8`, `EVASIONS=8`), EF-PN scaling, quiet grouping, 1+ε (`second + 1 + second/8`) | idea | M0 (1+ε only), M2 |
-| provari | per-child static tactics; simulation (`SIMULATION=16`) | idea | M3 |
+| provari | move-class numbers (`THREAT=4`, `QUIET=9`, `HANGING=15`, `WEAK_THREAT=8`, `EVASIONS=8`), EF-PN scaling, quiet grouping, 1+ε (`second + 1 + second/8`) | idea | M0 (1+ε only), M2+M3 (D21) |
+| provari | per-child static tactics; one-ply explosion settle on every child; simulation (`SIMULATION=16`) | idea | M2+M3 (D21) |
+| provari | null-move threat replay; defender priors (`UNLIKELY`, defence history); history tie-breaks | idea | M2+M3 (D21) |
 | provari | JSONL / `.pvr` proof format (FORMAT.md as interoperability spec; text not copied) | idea | M0 (JSONL), M4 (`.pvr`) |
 | provari | `provari check` | external (veto) | M0 |
 | provari | "the checker uses nothing from the prover" independence test | idea | M0 (our validator) |
@@ -210,7 +222,7 @@ GPL); **spec** = re-implement from a legacy module doc or document;
 | legacy | restart schedule + generation-aware victim score | idea | horizon 7 |
 | legacy | portfolio driver (`examples/portfolio`) | idea | horizon 8 |
 | legacy | bench driver (`docs/plans/winprover/measurements/bench/run_bench.py`) | copy + adapt | M0 |
-| legacy | optimizer contract (`docs/spec/optimizer_interface.md`) | spec | M2 |
+| legacy | optimizer contract (`docs/spec/optimizer_interface.md`) | spec | M2+M3 (D21) |
 | legacy | test tiers, drift protocol, repetition/rule50 soundness gate | spec (discipline) | M0 |
 | legacy | corpus, bench cells + reference values, decisive fixtures, terminal and soundness fixtures | copy (data only) | M0 |
 | legacy | `atomic_solver` binary (`default`/`opt` controls; front-end per-node control) | external | M0 (controls), M1 (front-end) |
@@ -229,9 +241,10 @@ These were measured inside the **general** solver under legacy conventions
 re-measures before adopting or rejecting:
 
 - node-entry static immediate-explosion closure: neutral/worse, because it
-  discards DF-PN ordering feedback. M3 uses the per-child form instead;
+  discards DF-PN ordering feedback. The hand-guide stack uses the per-child
+  form instead;
 - EF-PN on both node kinds: rejected in the general solver (per-case floor).
-  M2 measures it against the attacking-branch-only form;
+  The stack measures it against the attacking-branch-only form (D21);
 - rule50-free key: ~0–0.7 % in the general solver. This is not a reason to
   drop the board-only key here, which is primarily a soundness and proof-reuse
   design (D4).
@@ -244,6 +257,12 @@ re-measures before adopting or rejecting:
   `easy-win` (`1eb80b92f92c`), `deep-win` (`db6a741c723f`). FENs and the
   selection rule are in [`bench.md`](bench.md) (created by plan1, copied from
   the frozen legacy ledger).
+- **Guidance set (`guidance-v1`, D21/D22):** separate from the 3-cell bench.
+  It is frozen by a provari-hand census (plan3) over `core + sample20` and
+  `wins.tsv`: ≥20 deduplicated cells where provari hand wins inside the
+  stated selection budget, in a fixed order. Its hash, census and per-cell
+  reference nodes/walls live under `measurements/plan3/`. The bench geomean
+  still uses only the 3 bench cells.
 - **Corpus:** `bench/corpus.json`, a verbatim copy of legacy
   `docs/plans/provari/measurements/plan1/corpus.json`, sha256
   `9cd0169a30bb7d5b162b6a1ec119fe194b776c8a24a46cdf1582c07062847d0e`. The sha256
@@ -277,7 +296,7 @@ re-measures before adopting or rejecting:
 | Repetition identity mismatch (en passant) | D4: `EnPassantMode::Legal` key; validator compares exact positions with legal en passant |
 | Cross-clock proof reuse produces a position cycle or a 50-move failure in the written proof | Length/limit reuse rules; the writer fails closed on cycle/limit/missing; validator + checker |
 | Per-node cost is not the bottleneck | M1 stop rule |
-| Scope creep | One mechanism per plan; milestone gates |
+| Scope creep | Named stacks with one stated gate (D21); milestone gates |
 | Measurement drift | Same-session ratios; re-measured baseline; reading rules |
 | Proof memory cap on deep wins | D15 now, bounded worker in M4 |
 | Copied data drifts from its source | Provenance lines + `PROVENANCE.md` with source sha256 |
@@ -316,3 +335,10 @@ re-measures before adopting or rejecting:
   layouts, so the TT was not lazily allocated. 10 M sweep: 41 / 11 / 0,
   all 41 proofs accepted by both checkers. Bench: atomi m1 `easy-win`
   10.897 (1 cell, no goal claim).
+- **2026-11-09** — owner decision in plan session 3 (D21/D22): replaced
+  "one mechanism per plan" with **stack-level gating**; merged M2+M3 into
+  the **hand-guide stack** (item 3; item 4 merged) with the D21 gate
+  (`easy-win` ≤ 145,046 expansions, `core` proved at 10 s, ≥20 frozen
+  cells × seeds 0–3); added the null-move threat replay, defender
+  priors/history, history tie-breaks and the per-child one-ply explosion
+  settle to the take-list. Wrote `plan3.md`. No code changed.
