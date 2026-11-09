@@ -13,7 +13,7 @@ Everything here is parsed output; no raw transcripts, provari artifacts or
 | `env.json` | host, toolchain, pins, binary/corpus/guidance hashes |
 | `guidance.json` | D21 node gate (`bare`/`hand`, seeds 0–3, `--evals 20000000`) |
 | `wall.json` | `core`/`easy-win` wall/coverage gate (10 s, 3 repeats) |
-| `ablation.json` | both-direction ablations (only when the gate passes) |
+| `ablation.json` | both-direction ablations (evidence only; the gate failed): `core`/`easy-win`/`deep-win`, seed 0, 10 s / 10 M, 3 repeats |
 | `bench.json` | the canonical 3-cell bench row (only when G1–G7 pass) |
 | `run_guidance.py` | the stdlib-only driver |
 
@@ -65,6 +65,14 @@ committed). The deterministic `rows`/`summary`/`gate` blocks were merged into
 `guidance.json`; `expansions` and `child_evals` are seed-deterministic, so
 the merge is exact. Reference walls from the contended shard period are not
 used for any wall claim; `wall.json` is the clean 10 s measurement.
+
+**Ablation scope.** The committed `ablation.json` is a reduced run, not the
+plan's conditional G7 matrix: the three bench cells (not all 24
+`guidance-v1` cells), seed 0 (not 0–2), and 10 s / 10 M. `core` and
+`easy-win` were run together; `deep-win` was run separately and merged into
+the same file (the gate-sharding rule; exact because `expansions` are
+deterministic). The full 24-cell × seeds 0–2 ablation remains unrun while
+the D21 gate fails.
 
 ## Notes
 

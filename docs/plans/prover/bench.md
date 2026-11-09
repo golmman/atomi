@@ -35,6 +35,27 @@ The initiative's success condition, quoted verbatim from
   copied fixture oracle (§Corpus and fixtures). The legacy solver's gates are
   not this repo's gates.
 
+## Absolute distance to the goal (read this first)
+
+State on 2026-11-09, after M1 and the failed M2+M3 stack gate:
+
+- **Wall factor on the only proved bench cell is 10.897.** `easy-win`: atomi
+  m1 1.482 s / 30.3 M child evals (≈ 1.05 M expansions) versus provari hand
+  72,523 nodes / 0.136 s. Coverage is **1/3** against provari's 3/3;
+  `core` and `deep-win` are censored at 10 s.
+- **Per node atomi is already at or better than provari.** Same-session M1
+  per-node on `core`/10 M/192 MB is **53.4 ms per 1 M child evals** (M0
+  166.7, legacy front-end 137.3). Therefore all of the remaining 10.9× on
+  `easy-win` is **tree size**, not per-node cost.
+- **The hand-guide stack did not close the tree gap.** Plan3 coverage is
+  19/24 on `guidance-v1`; `easy-win` is 211,254–631,763 expansions (1.5–4.4×
+  the 145,046 gate) and `core` is censored at 10 s and 20 M. `--guide-off
+  efpn` alone reaches 110,293 expansions on `easy-win`.
+
+Implication: the next gain must come from reducing the proof tree (and
+proving `core`/`deep-win`), not from more per-node engineering. This section
+is the absolute number; the rows below are relative history.
+
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
 ## Names and ids (read this first)

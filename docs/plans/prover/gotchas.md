@@ -1,0 +1,48 @@
+# Correctness gotchas (binding)
+
+Short index of bugs already found and the invariant that prevents them. These
+are load-bearing: a change that breaks one needs a test and a report finding.
+Referenced from `AGENTS.md` §Correctness.
+
+## Search and values
+
+- **`Open` numbers saturate at `OPEN_MAX = INFINITY - 1`, never `INFINITY`.**
+  `INFINITY` marks decided values only. An `Open` value that saturated at
+  `INFINITY` invented false refutations (plan1).
+- **Proofs never live in the TT.** TT partial keys are sound only because a
+  collision can cost a win, never invent one. Every proof goes to the full-key
+  proof table.
+- **The filter changes no result** (no false negatives). A test pins identical
+  counters with it on and off.
+- **Lazy stalemate (D19, narrowed by G1).** A quiet, non-checking child starts
+  `(1, 1)`; its stalemate is found at node entry, **unless** the child's side
+  to move has only its commoner and pawns, in which case every child is built.
+  Without that gate `rem01` went from 9.4 M evals to censored at 60 M.
+- **The per-file en passant key is derived** (`rules::ep_key`) because the
+  movegen's Zobrist tables are private; its test pins it against
+  `hash_after_with(Legal)`.
+
+## Allocation and performance
+
+- std's `alloc_zeroed` memsets any layout aligned above 16 bytes (no lazy
+  calloc pages). `Zeroed<T>` over-allocates with align 16 and rounds up; check
+  peak RSS of a mate-in-1 after touching `alloc.rs`.
+- `unsafe` sites (lazy allocator, `_mm_prefetch`, `madvise(MADV_HUGEPAGE)`)
+  each carry `// SAFETY:` and a measured keep rule (D20).
+
+## Determinism and the guide
+
+- The search is deterministic: same binary + FEN + flags (+ `--seed`) gives
+  the same counters. `--proof-out` never changes the trajectory.
+- `--guide none --seed 0` must stay counter-identical to m1: the guide's fresh
+  pair is the identity `(1, 1)`, `select` only tie-breaks after the DF-PN
+  metric, and the equal-metric branch must still update `second` (skipping it
+  changes the 1+ε thresholds and the trajectory).
+- The guide may only write fresh `Open` numbers; the verified one-ply settle is
+  its only exact closure. A settled `Proved` child is stored at the **child's**
+  key with its own winning move and emitted, or the writer cannot resolve a
+  parent proof whose child was never expanded.
+- `settle_nodes` and `sim_nodes` are auxiliary; `child_evals` and `expansions`
+  keep D11 meaning and stay main-search only.
+- The null-side threat signature is a pure function of the board; no null
+  position is ever keyed, searched, stored, put on `line` or emitted.

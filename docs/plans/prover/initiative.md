@@ -9,6 +9,8 @@
 **failed** ([`report3.md`](report3.md)): `easy-win` misses the 145,046
 expansion limit and `core` is censored at 10 s / 20 M. The item stays
 **open** for the D21 kill review; there is no split into mechanism plans.
+The stack-level ablation premise and atomi's reduced both-direction run are
+recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
 initiative. Its starting point is the legacy handoff
 `docs/plans/winprover/HANDOFF.md` (revision 2026-11-06) in
@@ -305,6 +307,77 @@ re-measures before adopting or rejecting:
 | Copied data drifts from its source | Provenance lines + `PROVENANCE.md` with source sha256 |
 | The new engine never beats provari | `atomic_solver` stays the legacy product; this repo is archived with its measured record |
 
+## Findings
+
+### The stack, not the lever, is the unit of judgement (2026-11-09)
+
+This is the retro todo-5 finding. It records the ablation premise and atomi's
+own re-measurement; it does not adopt or remove any mechanism (the D21 gate
+failed, so the D21 stop rule applies).
+
+**Premise — provari v0.1.0 scratch ablation** (pin `48686bc`, single runs,
+`--guide hand --seconds 30 --memory 192`; node counts relative to the full
+stack; the `nodes` counter may exclude simulation visits):
+
+| Removed from provari | `core` | `easy-win` | `deep-win` |
+| --- | ---: | ---: | ---: |
+| nothing (full) | 342k | 73k | 4.58M |
+| null-move threat replay | 1.37× | 1.03× | 1.18× |
+| sibling simulation | 0.91× | 0.78× | 0.88× |
+| `UNLIKELY` defence priors | 1.05× | 1.01× | 1.13× |
+| history tie-break | 1.40× | 0.86× | 0.95× |
+| check = number of evasions | 0.89× | 0.79× | 0.87× |
+| per-child static closures | 0.99× | 1.48× | 1.04× |
+| move-class numbers (flat) | 2.30× | 4.29× | 2.21× |
+| guide (EF-PN) | 1.96× | 0.44× | 1.27× |
+| **all of the above** | **25×** (8.65M) | **10.9×** (788k) | censored at 30 s |
+
+The product of the single-lever costs on `core` is 7.3×, against the measured
+25× for the whole stack. The levers are coupled; judging them one at a time
+understates the stack and can invert a lever's sign (`EF-PN` is 1.96× worse
+on `core` and 0.44× on `easy-win`).
+
+**atomi re-measurement — reduced, both directions**
+([`measurements/plan3/ablation.json`](measurements/plan3/ablation.json)): the
+three bench cells, `--guide hand`, seed 0, `--seconds 10 --evals 10000000
+--memory 192`, 3 repeats. `expansions` are deterministic; apart from the one
+proved `easy-win` run, every cell below is censored at 10 s, so those walls
+are lower bounds only. `lo_X` removes `X` from the full stack; `ai_X` adds
+`X` to `--guide none`.
+
+| Stack (seed 0) | `core` | `easy-win` | `deep-win` |
+| --- | ---: | ---: | ---: |
+| full | 148,480 | 185,344 | 174,080 |
+| `lo_efpn` | 144,384 | **110,293 (proved)** | 175,104 |
+| `lo_classes` | 137,216 | 160,768 | 174,080 |
+| `lo_evasions` | 146,432 | 196,608 | 173,056 |
+| `lo_quiet` | 160,768 | 223,232 | 194,560 |
+| `lo_priors` | 156,672 | 174,080 | 178,176 |
+| `lo_history` | 148,480 | 199,680 | 175,104 |
+| `lo_replay` | 157,696 | 172,032 | 178,176 |
+| `lo_closures` | 323,559 | 316,559 | 341,774 |
+| `lo_sim` | 311,735 | 386,992 | 328,390 |
+| best `ai_*` (`evasions`) | 298,900 | 313,561 | 330,089 |
+| bare skeleton (report3) | 312,551 | 312,551 | not separately run |
+
+Reading (evidence only, per D21):
+
+- `EF-PN` is the `easy-win` cost: removing it proves `easy-win` in 110,293
+expansions, under the 145,046 gate, while the full stack is 1.3–4.4× above
+the gate. The reverse holds on `core` at this horizon, matching provari's 0.44× /
+1.96× split.
+- `closures` and `sim` are the `easy-win` tree levers (removing either pushes
+the censored count up), but they dominate per-node cost and `core`/`deep-win`
+stay censored on every stack.
+- No `ai_*` stack proves a gate cell or comes near the full stack; only
+`ai_evasions` reduces `core`'s censored count (298,900 vs bare 312,551).
+Adding one mechanism to the bare skeleton needs the rest of the coupled
+stack, exactly the retro's point.
+- No keep/remove decision follows from a failed gate. The plan3-specified
+full ablation (24 cells × seeds 0–2, `--seconds 600 --evals 10000000`) is the
+conditional G7 step and remains **unrun**; this reduced run and the provari
+premise are the recorded starting point for the D21 kill review.
+
 ## History
 
 - **2026-11-06**: initiative opened in plan session 1. Read the legacy handoff
@@ -355,3 +428,8 @@ re-measures before adopting or rejecting:
   easy-win D14 proof was accepted by both checkers. The D21 stop rule is
   active: record, kill-review, do not split into mechanism plans. No ledger
   row was appended.
+- **2026-11-09** — retro follow-up (todos 5–8): recorded the stack-level
+  ablation finding above (provari premise + atomi's reduced both-direction
+  run, extended to `deep-win`); put the absolute distance at the top of
+  `bench.md`; added the plan/AGENTS size caps and the kill-review prompt to
+  `AGENTS.md`; trimmed `AGENTS.md` to the cap. No engine code changed.

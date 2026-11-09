@@ -36,6 +36,20 @@
    "win": true,
    "wall_s": 0.135,
    "nodes": 72523
+  },
+  "deep-win": {
+   "runs": [
+    {
+     "wall_s": 6.579,
+     "win": true,
+     "nodes": 4574912,
+     "mate": 22,
+     "returncode": 0
+    }
+   ],
+   "win": true,
+   "wall_s": 6.579,
+   "nodes": 4574912
   }
  },
  "rows": [
@@ -1748,6 +1762,861 @@
    "settle_nodes": 0,
    "sim_nodes": 0,
    "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "full",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 10.014,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5295569,
+   "expansions": 174080,
+   "settle_nodes": 10066168,
+   "sim_nodes": 26615000,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "full",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 10.021,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5295569,
+   "expansions": 174080,
+   "settle_nodes": 10066168,
+   "sim_nodes": 26615000,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "full",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 10.029,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5295569,
+   "expansions": 174080,
+   "settle_nodes": 10066168,
+   "sim_nodes": 26615000,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_classes",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 10.029,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5445387,
+   "expansions": 174080,
+   "settle_nodes": 10323569,
+   "sim_nodes": 26695757,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_classes",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 10.027,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5415132,
+   "expansions": 173056,
+   "settle_nodes": 10266748,
+   "sim_nodes": 26533264,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_classes",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 10.059,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5445387,
+   "expansions": 174080,
+   "settle_nodes": 10323569,
+   "sim_nodes": 26695757,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_evasions",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 10.012,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5278441,
+   "expansions": 173056,
+   "settle_nodes": 10025444,
+   "sim_nodes": 26784442,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_evasions",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 10.025,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5278441,
+   "expansions": 173056,
+   "settle_nodes": 10025444,
+   "sim_nodes": 26784442,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_evasions",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 10.041,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5183684,
+   "expansions": 169984,
+   "settle_nodes": 9849970,
+   "sim_nodes": 26277073,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_quiet",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 10.015,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5409279,
+   "expansions": 195584,
+   "settle_nodes": 10250376,
+   "sim_nodes": 28224413,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_quiet",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 10.005,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5325782,
+   "expansions": 192512,
+   "settle_nodes": 10094464,
+   "sim_nodes": 27772404,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_quiet",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 10.009,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5383126,
+   "expansions": 194560,
+   "settle_nodes": 10201309,
+   "sim_nodes": 28079554,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_efpn",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 10.046,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5387830,
+   "expansions": 175104,
+   "settle_nodes": 10305168,
+   "sim_nodes": 26484721,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_efpn",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 10.046,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5387830,
+   "expansions": 175104,
+   "settle_nodes": 10305168,
+   "sim_nodes": 26484721,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_efpn",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 10.02,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5356676,
+   "expansions": 174080,
+   "settle_nodes": 10244273,
+   "sim_nodes": 26346796,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_closures",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 3.622,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000019,
+   "expansions": 341774,
+   "settle_nodes": 0,
+   "sim_nodes": 8923342,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_closures",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 3.591,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000019,
+   "expansions": 341774,
+   "settle_nodes": 0,
+   "sim_nodes": 8923342,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_closures",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 3.792,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000019,
+   "expansions": 341774,
+   "settle_nodes": 0,
+   "sim_nodes": 8923342,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_priors",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 10.058,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5413207,
+   "expansions": 179200,
+   "settle_nodes": 10259949,
+   "sim_nodes": 27287266,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_priors",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 10.006,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5383141,
+   "expansions": 178176,
+   "settle_nodes": 10204730,
+   "sim_nodes": 27123422,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_priors",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 10.019,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5383141,
+   "expansions": 178176,
+   "settle_nodes": 10204730,
+   "sim_nodes": 27123422,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_history",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 10.045,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5323088,
+   "expansions": 175104,
+   "settle_nodes": 10118498,
+   "sim_nodes": 26698991,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_history",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 10.04,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5323088,
+   "expansions": 175104,
+   "settle_nodes": 10118498,
+   "sim_nodes": 26698991,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_history",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 10.051,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5291001,
+   "expansions": 174080,
+   "settle_nodes": 10058073,
+   "sim_nodes": 26542262,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_sim",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 5.943,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000006,
+   "expansions": 328390,
+   "settle_nodes": 18968425,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_sim",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 5.95,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000006,
+   "expansions": 328390,
+   "settle_nodes": 18968425,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_sim",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 5.944,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000006,
+   "expansions": 328390,
+   "settle_nodes": 18968425,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_replay",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 10.006,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5369471,
+   "expansions": 177152,
+   "settle_nodes": 10185114,
+   "sim_nodes": 27007392,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_replay",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 10.015,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5397155,
+   "expansions": 178176,
+   "settle_nodes": 10237603,
+   "sim_nodes": 27149490,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "lo_replay",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 10.036,
+   "win": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 5397155,
+   "expansions": 178176,
+   "settle_nodes": 10237603,
+   "sim_nodes": 27149490,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_classes",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 1.026,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000016,
+   "expansions": 346397,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_classes",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 1.021,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000016,
+   "expansions": 346397,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_classes",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 1.019,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000016,
+   "expansions": 346397,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_evasions",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 1.03,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000009,
+   "expansions": 330089,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_evasions",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 1.027,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000009,
+   "expansions": 330089,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_evasions",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 1.035,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000009,
+   "expansions": 330089,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_quiet",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 1.169,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000011,
+   "expansions": 367175,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_quiet",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 1.169,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000011,
+   "expansions": 367175,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_quiet",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 1.158,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000011,
+   "expansions": 367175,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_efpn",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 1.138,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000040,
+   "expansions": 331598,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_efpn",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 1.18,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000040,
+   "expansions": 331598,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_efpn",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 1.14,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000040,
+   "expansions": 331598,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_closures",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 5.641,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000008,
+   "expansions": 326216,
+   "settle_nodes": 18958829,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_closures",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 5.648,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000008,
+   "expansions": 326216,
+   "settle_nodes": 18958829,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_closures",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 5.626,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000008,
+   "expansions": 326216,
+   "settle_nodes": 18958829,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_priors",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 1.065,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000022,
+   "expansions": 331514,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_priors",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 1.095,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000022,
+   "expansions": 331514,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_priors",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 1.096,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000022,
+   "expansions": 331514,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_history",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 1.061,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000027,
+   "expansions": 329952,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_history",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 1.093,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000027,
+   "expansions": 329952,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_history",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 1.059,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000027,
+   "expansions": 329952,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_sim",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 3.239,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000008,
+   "expansions": 331072,
+   "settle_nodes": 0,
+   "sim_nodes": 8179312,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_sim",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 3.235,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000008,
+   "expansions": 331072,
+   "settle_nodes": 0,
+   "sim_nodes": 8179312,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_sim",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 3.266,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000008,
+   "expansions": 331072,
+   "settle_nodes": 0,
+   "sim_nodes": 8179312,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_replay",
+   "seed": 0,
+   "repeat": 1,
+   "wall_s": 1.055,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000009,
+   "expansions": 332535,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_replay",
+   "seed": 0,
+   "repeat": 2,
+   "wall_s": 1.091,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000009,
+   "expansions": 332535,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
+  },
+  {
+   "cell": "deep-win",
+   "stack": "ai_replay",
+   "seed": 0,
+   "repeat": 3,
+   "wall_s": 1.055,
+   "win": false,
+   "exit": "evals",
+   "length": null,
+   "child_evals": 10000009,
+   "expansions": 332535,
+   "settle_nodes": 0,
+   "sim_nodes": 0,
+   "returncode": 0
   }
  ],
  "summary": {
@@ -1789,6 +2658,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 10.021,
+    "expansions": 174080,
+    "child_evals": 5295569,
+    "settle_nodes": 10066168,
+    "sim_nodes": 26615000,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 10.021,
+      "expansions": 174080,
+      "child_evals": 5295569
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "lo_classes": {
@@ -1829,6 +2717,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 10.029,
+    "expansions": 174080,
+    "child_evals": 5445387,
+    "settle_nodes": 10323569,
+    "sim_nodes": 26695757,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 10.029,
+      "expansions": 174080,
+      "child_evals": 5445387
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "lo_evasions": {
@@ -1869,6 +2776,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 10.025,
+    "expansions": 173056,
+    "child_evals": 5278441,
+    "settle_nodes": 10025444,
+    "sim_nodes": 26784442,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 10.025,
+      "expansions": 173056,
+      "child_evals": 5278441
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "lo_quiet": {
@@ -1909,6 +2835,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 10.009,
+    "expansions": 194560,
+    "child_evals": 5383126,
+    "settle_nodes": 10201309,
+    "sim_nodes": 28079554,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 10.009,
+      "expansions": 194560,
+      "child_evals": 5383126
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "lo_efpn": {
@@ -1949,6 +2894,25 @@
      }
     },
     "wall_factor": 40.985
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 10.046,
+    "expansions": 175104,
+    "child_evals": 5387830,
+    "settle_nodes": 10305168,
+    "sim_nodes": 26484721,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 10.046,
+      "expansions": 175104,
+      "child_evals": 5387830
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "lo_closures": {
@@ -1989,6 +2953,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 3.622,
+    "expansions": 341774,
+    "child_evals": 10000019,
+    "settle_nodes": 0,
+    "sim_nodes": 8923342,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 3.622,
+      "expansions": 341774,
+      "child_evals": 10000019
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "lo_priors": {
@@ -2029,6 +3012,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 10.019,
+    "expansions": 178176,
+    "child_evals": 5383141,
+    "settle_nodes": 10204730,
+    "sim_nodes": 27123422,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 10.019,
+      "expansions": 178176,
+      "child_evals": 5383141
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "lo_history": {
@@ -2069,6 +3071,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 10.045,
+    "expansions": 175104,
+    "child_evals": 5323088,
+    "settle_nodes": 10118498,
+    "sim_nodes": 26698991,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 10.045,
+      "expansions": 175104,
+      "child_evals": 5323088
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "lo_sim": {
@@ -2109,6 +3130,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 5.944,
+    "expansions": 328390,
+    "child_evals": 10000006,
+    "settle_nodes": 18968425,
+    "sim_nodes": 0,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 5.944,
+      "expansions": 328390,
+      "child_evals": 10000006
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "lo_replay": {
@@ -2149,6 +3189,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 10.015,
+    "expansions": 178176,
+    "child_evals": 5397155,
+    "settle_nodes": 10237603,
+    "sim_nodes": 27149490,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 10.015,
+      "expansions": 178176,
+      "child_evals": 5397155
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "ai_classes": {
@@ -2189,6 +3248,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 1.021,
+    "expansions": 346397,
+    "child_evals": 10000016,
+    "settle_nodes": 0,
+    "sim_nodes": 0,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 1.021,
+      "expansions": 346397,
+      "child_evals": 10000016
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "ai_evasions": {
@@ -2229,6 +3307,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 1.03,
+    "expansions": 330089,
+    "child_evals": 10000009,
+    "settle_nodes": 0,
+    "sim_nodes": 0,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 1.03,
+      "expansions": 330089,
+      "child_evals": 10000009
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "ai_quiet": {
@@ -2269,6 +3366,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 1.169,
+    "expansions": 367175,
+    "child_evals": 10000011,
+    "settle_nodes": 0,
+    "sim_nodes": 0,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 1.169,
+      "expansions": 367175,
+      "child_evals": 10000011
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "ai_efpn": {
@@ -2309,6 +3425,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 1.14,
+    "expansions": 331598,
+    "child_evals": 10000040,
+    "settle_nodes": 0,
+    "sim_nodes": 0,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 1.14,
+      "expansions": 331598,
+      "child_evals": 10000040
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "ai_closures": {
@@ -2349,6 +3484,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 5.641,
+    "expansions": 326216,
+    "child_evals": 10000008,
+    "settle_nodes": 18958829,
+    "sim_nodes": 0,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 5.641,
+      "expansions": 326216,
+      "child_evals": 10000008
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "ai_priors": {
@@ -2389,6 +3543,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 1.095,
+    "expansions": 331514,
+    "child_evals": 10000022,
+    "settle_nodes": 0,
+    "sim_nodes": 0,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 1.095,
+      "expansions": 331514,
+      "child_evals": 10000022
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "ai_history": {
@@ -2429,6 +3602,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 1.061,
+    "expansions": 329952,
+    "child_evals": 10000027,
+    "settle_nodes": 0,
+    "sim_nodes": 0,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 1.061,
+      "expansions": 329952,
+      "child_evals": 10000027
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "ai_sim": {
@@ -2469,6 +3661,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 3.239,
+    "expansions": 331072,
+    "child_evals": 10000008,
+    "settle_nodes": 0,
+    "sim_nodes": 8179312,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 3.239,
+      "expansions": 331072,
+      "child_evals": 10000008
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   },
   "ai_replay": {
@@ -2509,6 +3720,25 @@
      }
     },
     "wall_factor_lower_bound": 74.07
+   },
+   "deep-win": {
+    "runs": 3,
+    "wins": 0,
+    "win_all": false,
+    "wall_s": 1.055,
+    "expansions": 332535,
+    "child_evals": 10000009,
+    "settle_nodes": 0,
+    "sim_nodes": 0,
+    "by_seed": {
+     "0": {
+      "win": false,
+      "wall_s": 1.055,
+      "expansions": 332535,
+      "child_evals": 10000009
+     }
+    },
+    "wall_factor_lower_bound": 1.52
    }
   }
  }
