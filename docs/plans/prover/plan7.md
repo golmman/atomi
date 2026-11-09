@@ -33,7 +33,7 @@ and one settle per frame.
 **In:** an attribution driver over the frozen `guidance-v1` cells; a
 deterministic **global auxiliary-work budget** behind opt-in flags; cheaper
 auxiliary paths justified by the attribution; unit/integration tests; a
-measurement README and `report8.md`.
+measurement README and `report7.md`.
 
 **Out:** a wall-clock budget inside the search (forbidden by D22); proof
 output / `planX`; restarts (D5) and the portfolio (horizon 8); hand-guide
@@ -121,7 +121,7 @@ node-based goal; both are owner decisions, not silent changes.
 - **B1** `--guide-aux-budget` + tests; stop if a work cap cannot reproduce
   the uncapped trajectory's counters at the same cap.
 - **B2** cheaper-aux leave-one-out; keep only measured gains.
-- **C** wall gate, `deep-win` classification, `report8.md`.
+- **C** wall gate, `deep-win` classification, `report7.md`.
 
 ## Risks
 
@@ -136,7 +136,7 @@ node-based goal; both are owner decisions, not silent changes.
 
 ## Report and deliverables
 
-`report8.md`: headline, provenance, commands, the phase A matrix, the budget
+`report7.md`: headline, provenance, commands, the phase A matrix, the budget
 grid, wall factors, gates, problems, and a closure block with the kill-review
 options. State explicitly whether the wall premise survived.
 
@@ -146,4 +146,4 @@ options. State explicitly whether the wall premise survived.
 - **Measurements:** `measurements/plan7/{README.md,env.json,attribution.json,
   budget.json,wall.json}`.
 - **Docs:** `initiative.md` (item 16 status, history), `bench.md` (no goal
-  claim), `report8.md`; `planX.md` stays parked.
+  claim), `report7.md`; `planX.md` stays parked.

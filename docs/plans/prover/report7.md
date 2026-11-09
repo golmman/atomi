@@ -1,4 +1,4 @@
-# Prover Report 8: item 16 — the wall premise survives, the wall gate does not
+# Prover Report 7: item 16 — the wall premise survives, the wall gate does not
 
 Plan: [`plan7.md`](plan7.md) (item 16, wall attribution and a deterministic
 auxiliary budget). Executed 2026-11-09. **G3 fails**; B1/B2 landed behind
@@ -213,7 +213,7 @@ both checkers with equal position counts. `make test`, `make test-full`
 
 Follow-up options:
 
-1. **Kickoff (recommended):** "Read `docs/plans/prover/report8.md`,
+1. **Kickoff (recommended):** "Read `docs/plans/prover/report7.md`,
    `plan7.md`, `measurements/plan7/` and `initiative.md`. Run the D24 kill
    review with the measured distance: easy-win 26.7×, core censored at
    10 s (≥ 19.4×), deep-win censored, coverage 1/3. Decide continue /

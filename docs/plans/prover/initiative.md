@@ -62,7 +62,7 @@ all 17 proved D14 proofs accepted by both checkers, `make test-full` and
 `make lint` green. Per the plan stop rule, no third hand-guide/auxiliary
 plan: the continue / re-pin / close decision is the D24 kill review. See
 [`measurements/plan7/`](measurements/plan7/README.md) and
-[`report8.md`](report8.md).
+[`report7.md`](report7.md).
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -234,7 +234,7 @@ single-mechanism plan that is independently meaningful.
 | 4 | ~~M3 static tactics + simulation~~ | **merged into item 3** (D21, 2026-11-09): per-child static tactics, one-ply explosion settle, sibling simulation, defender priors, history, null-move replay | — | merged |
 | 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | **parked (D24)** — probe [`plan5`](plan5.md) executed ([data](measurements/plan5/README.md): 19/24 cells at 10 s, scale case `easy-win` 3,527 positions / 65,179 entries / 293 KB, `deep-win` censored for search at 120 s); implementation [`planX`](planX.md). Plan6 re-check ([data](measurements/plan6/README.md)): `core` aux 120 s = 14,332 positions / 691,117 entries, `easy-win` aux = 3,527 / 65,179; both accepted. Resumes only after a 3/3 10 s win |
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
-| 16 | **Wall attribution + deterministic auxiliary budget** | same-session attribution of wall on `easy-win`/`core` (main search vs sim vs settle vs threat replay vs guide eval); a deterministic global auxiliary-work budget (not wall-clock) and cheaper aux paths; wall-gated measurement | **wall gate:** `easy-win` wall ≤ 0.5 s (factor ≤ 3.6) and `core` proved at 10 s / 192 MB on seeds 0–2, with no guidance-set refutations; `deep-win` attempted at 10 s and classified; counters recorded, never substituted for wall | **executed; G3 failed** — [plan7](plan7.md), [report8](report8.md), [data](measurements/plan7/README.md). Wall premise survives (no-sim 64 % share); best budgeted `easy-win` 3.7–4.2 s (26.7–29.9×), `core` censored at 10 s, `deep-win` censored for search. `--guide-aux-budget`/`--guide-sim-plies` behind flags; no default changed. Kill review (D24) decides continue / re-pin / close |
+| 16 | **Wall attribution + deterministic auxiliary budget** | same-session attribution of wall on `easy-win`/`core` (main search vs sim vs settle vs threat replay vs guide eval); a deterministic global auxiliary-work budget (not wall-clock) and cheaper aux paths; wall-gated measurement | **wall gate:** `easy-win` wall ≤ 0.5 s (factor ≤ 3.6) and `core` proved at 10 s / 192 MB on seeds 0–2, with no guidance-set refutations; `deep-win` attempted at 10 s and classified; counters recorded, never substituted for wall | **executed; G3 failed** — [plan7](plan7.md), [report7](report7.md), [data](measurements/plan7/README.md). Wall premise survives (no-sim 64 % share); best budgeted `easy-win` 3.7–4.2 s (26.7–29.9×), `core` censored at 10 s, `deep-win` censored for search. `--guide-aux-budget`/`--guide-sim-plies` behind flags; no default changed. Kill review (D24) decides continue / re-pin / close |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
 legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose
@@ -467,7 +467,7 @@ premise are the recorded starting point for the D21 kill review.
   fails**; G1/G2/G4/G5 pass (0 refutations, 17 D14 proofs accepted by both
   checkers). No ledger row; D25 recorded as proposed. Data:
   [`measurements/plan7/`](measurements/plan7/README.md); report:
-  [`report8.md`](report8.md).
+  [`report7.md`](report7.md).
 - **2026-11-09**: plan session 7 (kill review). Parked the M4 plan as
   [`planX`](planX.md) and added D24: M4 resumes only after a 3/3 10 s win;
   search/guide gates are wall-based; auxiliary budgets stay deterministic.
