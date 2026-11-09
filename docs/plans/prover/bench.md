@@ -298,6 +298,17 @@ a dirty tree (plan2 work uncommitted), binary sha256 `2008857f…2847ab`.
 - Legacy controls were not re-run (plan1's rows stand; their factors are
   ratios of their own session).
 
+### plan3 (no ledger row — gate failed)
+
+Plan3's hand-guide stack did **not** meet the D21 gate, so by the plan's rule
+no ledger row is appended (`measurements/plan3/guidance.json`). For the
+record: on the frozen 24-cell `guidance-v1` set at `--evals 20000000`,
+`easy-win` proves on all four seeds in 211,254–631,763 expansions (limit
+145,046) and `core` is censored on all seeds; at the 10 s canonical budget
+both are censored. `hand` coverage is 19/24 versus provari hand 24/24; the
+18 `wins.tsv`-derived cells are proved on every seed. Full details in
+[`report3.md`](report3.md).
+
 ## History
 
 - **2026-11-06** — `bench.md` opened for the `prover` initiative: the
@@ -310,3 +321,8 @@ a dirty tree (plan2 work uncommitted), binary sha256 `2008857f…2847ab`.
   (`easy-win` 10.897, coverage 1/3, no goal claim) and its stretch block;
   per-node `core`/10 M/192 MB is 53.4 ms per 1 M child evals (m0 166.7,
   legacy front-end 137.3, same session).
+- **2026-11-09** — plan3 (M2+M3 hand-guide stack) executed and closed with a
+  **failed D21 gate**: `easy-win` 211,254–631,763 expansions (limit
+  145,046) and `core` censored at 20 M child evals and at 10 s; coverage
+  19/24. No ledger row. The stack is recorded for the D21 kill review;
+  `--guide none --seed 0` remains counter-identical to m1.

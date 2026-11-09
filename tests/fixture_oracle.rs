@@ -29,6 +29,9 @@ fn wins_oracle() {
         evals: Some(2_000_000),
         memory_mb: 192,
         filter: true,
+        guide: atomi::guide::GuideConfig::none(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
     };
     let dir = Path::new(env!("CARGO_TARGET_TMPDIR"));
     let (mut proved, mut censored, mut refuted, mut multi, mut fails) = (0, 0, 0, 0, 0);
@@ -74,6 +77,9 @@ fn never_prove_oracle() {
         evals: Some(2_000_000),
         memory_mb: 192,
         filter: true,
+        guide: atomi::guide::GuideConfig::none(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
     };
     for r in rows("never_prove.tsv") {
         let (name, fen) = (&r[0], &r[1]);
@@ -98,6 +104,9 @@ fn pawn_ending_proved() {
         evals: Some(200_000),
         memory_mb: 192,
         filter: true,
+        guide: atomi::guide::GuideConfig::none(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
     };
     let out = search::prove(&b, &lim, NullSink);
     assert_eq!(out.result.exit, Exit::Proved, "{:?}", out.result.exit);
@@ -128,6 +137,9 @@ fn false_refutation_regressions() {
             evals: Some(cap),
             memory_mb: 192,
             filter: true,
+            guide: atomi::guide::GuideConfig::none(),
+            guide_params: atomi::guide::GuideParams::default(),
+            seed: 0,
         };
         let out = search::prove(&b, &lim, NullSink);
         assert_eq!(
@@ -140,4 +152,43 @@ fn false_refutation_regressions() {
         strategy::write_proof(&b, &out.proofs, &path).unwrap_or_else(|e| panic!("{name}: {e:?}"));
         assert!(atomi::validate::validate_file(&path).valid, "{name}");
     }
+}
+
+#[test]
+#[ignore = "slow: 52 rows x up to 2M evals with the hand guide"]
+fn wins_oracle_hand() {
+    let lim = Limits {
+        seconds: Some(180),
+        evals: Some(2_000_000),
+        memory_mb: 192,
+        filter: true,
+        guide: atomi::guide::GuideConfig::hand(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
+    };
+    let dir = Path::new(env!("CARGO_TARGET_TMPDIR"));
+    let (mut proved, mut censored, mut refuted) = (0, 0, 0);
+    for r in rows("wins.tsv") {
+        let (name, fen, note) = (&r[0], &r[1], &r[3]);
+        let b = Board::from_fen(fen).unwrap();
+        let out = search::prove(&b, &lim, NullSink);
+        match out.result.exit {
+            Exit::Proved => {
+                proved += 1;
+                let path = dir.join(format!("hand-{name}.jsonl"));
+                strategy::write_proof(&b, &out.proofs, &path)
+                    .unwrap_or_else(|e| panic!("{name}: {e:?}"));
+                assert!(atomi::validate::validate_file(&path).valid, "{name}");
+            }
+            Exit::Refuted => {
+                refuted += 1;
+                assert!(
+                    note.contains("checker-rules:"),
+                    "{name} refuted without disposition"
+                );
+            }
+            _ => censored += 1,
+        }
+    }
+    eprintln!("wins (hand): proved={proved} censored={censored} refuted={refuted}");
 }

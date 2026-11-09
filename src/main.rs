@@ -18,7 +18,9 @@ fn print_help() {
          \n\
          USAGE:\n\
          \x20   atomi prove \"<FEN>\" [--seconds S] [--memory MB] [--evals N]\n\
-         \x20                       [--proof-out PATH.jsonl]\n\
+         \x20                       [--proof-out PATH.jsonl] [--seed N]\n\
+         \x20                       [--guide none|hand] [--guide-off LIST]\n\
+         \x20                       [--guide-on LIST] [--guide-params PATH]\n\
          \x20   atomi validate PROOF.jsonl...\n\
          \x20   atomi moves \"<FEN>\"\n\
          \x20   atomi --help | --version"
@@ -41,6 +43,9 @@ fn prove(args: &[String]) -> ExitCode {
         evals: opts.evals,
         memory_mb: opts.memory_mb,
         filter: true,
+        guide: opts.guide,
+        guide_params: opts.guide_params,
+        seed: opts.seed,
     };
     let output = search::prove(&root, &limits, NullSink);
     let result = output.result;
@@ -59,7 +64,8 @@ fn prove(args: &[String]) -> ExitCode {
     let found = result.exit == search::Exit::Proved;
     println!(
         "{{\"found\":{},\"length\":{},\"exit\":\"{}\",\"child_evals\":{},\
-         \"expansions\":{},\"ms\":{},\"seconds\":{},\"memory_mb\":{},\
+         \"expansions\":{},\"seed\":{},\"sim_nodes\":{},\"settle_nodes\":{},\
+         \"ms\":{},\"seconds\":{},\"memory_mb\":{},\
          \"evals_limit\":{},\"proof\":\"{}\",\"proof_positions\":{},\
          \"proof_length\":{},\"proof_entries\":{},\"proof_full\":{}}}",
         found,
@@ -67,6 +73,9 @@ fn prove(args: &[String]) -> ExitCode {
         result.exit.as_str(),
         result.child_evals,
         result.expansions,
+        opts.seed,
+        result.sim_nodes,
+        result.settle_nodes,
         result.ms,
         opts.seconds,
         opts.memory_mb,

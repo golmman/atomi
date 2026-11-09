@@ -23,3 +23,12 @@ changed. Source sha256 is computed at copy time against the pinned commit
 | bench/run_bench.py | atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/measurements/bench/run_bench.py | `c702786c18d3813d44fe07c66e99696edd3d8e6755d514dd88f65a8022068444` (filled in by plan2, finding 11) | 2026-11-06 | adapted: provari reference/stretch sides; atomi and legacy named stacks (no implicit default); corpus sha256 gate; --proof-check D14 cells; atomi/legacy parsers; expanded provenance block |
 | docs/plans/prover/bench.md §Names and ids, §The metric, §The bench set, §Reading rules | atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md | `f11f0e731d9ef405df499d36ef28e7dd08ea4f3002aa6d2e9e5497e8c725fbfb` (filled in by plan2, finding 11) | 2026-11-06 | verbatim sections with provenance comments |
 | `src/table/alloc.rs` | `atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:src/search/tt/alloc.rs` | `0c49511e8806121e90565960982973679b6f7fdb6e0ac08c20f1b9efd0fa5582` | 2026-11-06 | adapted: generic `zeroed<T: ZeroValid>` over a crate-private `unsafe trait ZeroValid` (impl'd for `Cluster`, `ProofSlot`, `u64`); invariant rewritten for our liveness signals (`check == 0`, `state != 1`, bit 0); legacy TtEntry/generation tests replaced with ours; owning `Zeroed<T>` with over-allocation + alignment offset so over-aligned clusters still get calloc's lazy zero pages |
+
+## Independent material (not copied)
+
+`docs/plans/prover/measurements/plan3/run_guidance.py` and the plan3
+measurement files are new work for this repository. The census only records
+the output of the pinned `provari` binary run as an external process; no
+provari source, text, artifact or proof is copied into the repository. The
+driver's provenance is therefore a plan3 design (stack gate, frozen
+`guidance-v1` set and both-direction ablation names), not a legacy copy.

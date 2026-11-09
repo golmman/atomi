@@ -35,6 +35,9 @@ fn limits() -> Limits {
         evals: None,
         memory_mb: 16,
         filter: true,
+        guide: atomi::guide::GuideConfig::none(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
     }
 }
 
@@ -86,6 +89,9 @@ fn never_prove_rows_are_never_found() {
         evals: Some(20_000),
         memory_mb: 16,
         filter: true,
+        guide: atomi::guide::GuideConfig::none(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
     };
     let mut rows = 0;
     for line in text.lines() {
@@ -152,6 +158,9 @@ fn filter_on_off_identical() {
             evals: Some(2_000_000),
             memory_mb: 192,
             filter: true,
+            guide: atomi::guide::GuideConfig::none(),
+            guide_params: atomi::guide::GuideParams::default(),
+            seed: 0,
         };
         let on = search::prove(&root, &lim, NullSink).result;
         lim.filter = false;
@@ -172,6 +181,9 @@ fn evals_cap_is_honoured() {
         evals: Some(5_000),
         memory_mb: 16,
         filter: true,
+        guide: atomi::guide::GuideConfig::none(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
     };
     let out = search::prove(
         &board("r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1"),
@@ -261,6 +273,9 @@ fn cli_prove_output_contract() {
         "\"exit\"",
         "\"child_evals\"",
         "\"expansions\"",
+        "\"seed\"",
+        "\"sim_nodes\"",
+        "\"settle_nodes\"",
         "\"ms\"",
         "\"seconds\"",
         "\"memory_mb\"",
@@ -320,6 +335,9 @@ fn prove(fen: &str, evals: Option<u64>) -> search::Output<NullSink> {
         evals,
         memory_mb: 192,
         filter: true,
+        guide: atomi::guide::GuideConfig::none(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
     };
     search::prove(&board(fen), &lim, NullSink)
 }
@@ -381,6 +399,9 @@ fn writer_differential_veto_rows() {
         evals: None,
         memory_mb: 192,
         filter: true,
+        guide: atomi::guide::GuideConfig::none(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
     };
     let mut rows = 0;
     for line in text.lines() {
@@ -499,4 +520,128 @@ fn cycle_line_rejected() {
     let r = atomi::validate::validate_text(t);
     assert!(!r.valid);
     assert_eq!(r.error.as_deref(), Some("cycle"));
+}
+
+#[test]
+fn cli_seed_and_guide_contract() {
+    let out = atomi(&[
+        "prove",
+        MATE_IN_2,
+        "--seconds",
+        "30",
+        "--memory",
+        "16",
+        "--guide",
+        "hand",
+        "--seed",
+        "3",
+    ]);
+    assert_eq!(out.status.code(), Some(0));
+    let line = String::from_utf8_lossy(&out.stdout);
+    let json: serde_json::Value = serde_json::from_str(line.trim()).unwrap();
+    assert_eq!(json["seed"], 3);
+    assert!(json["sim_nodes"].is_number());
+    assert!(json["settle_nodes"].is_number());
+    assert_eq!(json["found"], true);
+
+    // Unknown guide mechanisms and bad guides are errors.
+    for args in [
+        vec!["prove", MATE_IN_2, "--guide", "bogus"],
+        vec!["prove", MATE_IN_2, "--guide-off", "bogus"],
+        vec!["prove", MATE_IN_2, "--guide-on", "bogus"],
+        vec!["prove", MATE_IN_2, "--seed", "-1"],
+    ] {
+        let out = atomi(&args);
+        assert_eq!(out.status.code(), Some(2), "{args:?}");
+    }
+}
+
+#[test]
+fn no_guide_seed_zero_is_m1_identical() {
+    // The m1 counters on `core` at 1 M child evals (rebuilt baseline
+    // `git archive HEAD` in /tmp, same session): 1000032 / 30786.
+    let fen = "r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1";
+    let out = atomi(&[
+        "prove",
+        fen,
+        "--seconds",
+        "60",
+        "--memory",
+        "192",
+        "--evals",
+        "1000000",
+        "--guide",
+        "none",
+        "--seed",
+        "0",
+    ]);
+    let json: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&out.stdout).trim()).unwrap();
+    assert_eq!(json["exit"], "evals");
+    assert_eq!(json["child_evals"], 1_000_032);
+    assert_eq!(json["expansions"], 30_786);
+    assert_eq!(json["settle_nodes"], 0);
+    assert_eq!(json["sim_nodes"], 0);
+}
+
+#[test]
+fn same_seed_is_repeatable() {
+    let fen = "rnbq1b1r/pp1p1kpp/2p1pp1n/8/3PP1P1/2N2N2/PPP2P1P/R1BQKB1R w KQ - 0 1";
+    let run = || {
+        let out = atomi(&[
+            "prove",
+            fen,
+            "--seconds",
+            "60",
+            "--memory",
+            "192",
+            "--evals",
+            "200000",
+            "--guide",
+            "hand",
+            "--seed",
+            "1",
+        ]);
+        let j: serde_json::Value =
+            serde_json::from_str(String::from_utf8_lossy(&out.stdout).trim()).unwrap();
+        (
+            j["exit"].clone(),
+            j["child_evals"].clone(),
+            j["expansions"].clone(),
+        )
+    };
+    assert_eq!(run(), run());
+}
+
+#[test]
+fn settled_child_proof_round_trip() {
+    // MATE_IN_2 with the hand guide exercises the one-ply settle (a child is
+    // settled Proved without being expanded). The writer must find the
+    // child's own proof entry, and the event-fed store must agree.
+    let root = board(MATE_IN_2);
+    let lim = Limits {
+        seconds: Some(60),
+        evals: None,
+        memory_mb: 192,
+        filter: true,
+        guide: atomi::guide::GuideConfig::hand(),
+        guide_params: atomi::guide::GuideParams::default(),
+        seed: 0,
+    };
+    let out = search::prove(&root, &lim, ProofStore::new(64));
+    assert_eq!(out.result.exit, Exit::Proved);
+    assert!(out.result.settle_nodes > 0, "{:?}", out.result);
+    let dir = std::path::Path::new(env!("CARGO_TARGET_TMPDIR"));
+    let p_table = dir.join("settle-table.jsonl");
+    let p_store = dir.join("settle-store.jsonl");
+    let stats = atomi::strategy::write_proof(&root, &out.proofs, &p_table)
+        .unwrap_or_else(|e| panic!("{e:?}"));
+    atomi::strategy::write_proof(&root, &out.sink, &p_store).unwrap_or_else(|e| panic!("{e:?}"));
+    assert_eq!(
+        std::fs::read(&p_table).unwrap(),
+        std::fs::read(&p_store).unwrap(),
+        "settled-child proof: table vs store"
+    );
+    assert!(atomi::validate::validate_file(&p_table).valid);
+    assert!(stats.positions > 0);
 }

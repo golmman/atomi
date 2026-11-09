@@ -29,6 +29,7 @@ mod frame;
 pub mod value;
 
 use crate::events::{ProofEvent, ProofSink};
+use crate::guide::{Guide, GuideConfig, GuideParams, History};
 use crate::rules;
 use crate::table::Tables;
 use atomic_movegen::board::{Board, StateInfo};
@@ -49,6 +50,12 @@ pub struct Limits {
     /// The "possibly stored" bit filter. A test hook for the
     /// filter-neutrality test; the CLI always passes `true`.
     pub filter: bool,
+    /// The hand-guide configuration (`--guide none|hand` + ablations).
+    pub guide: GuideConfig,
+    /// The starting-number table (`--guide-params` or built-in).
+    pub guide_params: GuideParams,
+    /// The tie-break seed (0 = movegen order).
+    pub seed: u64,
 }
 
 /// How the search ended.
@@ -91,6 +98,10 @@ pub struct SearchResult {
     pub child_evals: u64,
     /// Nodes expanded (a child list generated).
     pub expansions: u64,
+    /// Settle movegens/makes (not in `child_evals`/`expansions`).
+    pub settle_nodes: u64,
+    /// Simulation expansions (not in `child_evals`/`expansions`).
+    pub sim_nodes: u64,
     /// Search time in milliseconds (allocation excluded).
     pub ms: u64,
     /// Live entries in the proof table at exit.
@@ -123,6 +134,7 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
             let tables = Tables::new(limits.memory_mb, limits.filter);
             let start = Instant::now();
             let deadline = limits.seconds.map(|s| start + Duration::from_secs(s));
+            let guide = Guide::new(limits.guide).with_params(limits.guide_params);
             let mut engine = Engine {
                 attacker: root.side_to_move(),
                 tables,
@@ -131,8 +143,13 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
                 evals_cap: limits.evals,
                 child_evals: 0,
                 expansions: 0,
+                settle_nodes: 0,
+                sim_nodes: 0,
                 stop: None,
                 sink,
+                guide,
+                history: History::new(),
+                seed: limits.seed,
             };
             let mut result = engine.run(&root);
             result.ms = start.elapsed().as_millis() as u64;
@@ -157,8 +174,13 @@ struct Engine<S> {
     evals_cap: Option<u64>,
     child_evals: u64,
     expansions: u64,
+    settle_nodes: u64,
+    sim_nodes: u64,
     stop: Option<Exit>,
     sink: S,
+    guide: Guide,
+    history: History,
+    seed: u64,
 }
 
 impl<S: ProofSink> Engine<S> {
@@ -171,6 +193,8 @@ impl<S: ProofSink> Engine<S> {
                 length: None,
                 child_evals: 0,
                 expansions: 0,
+                settle_nodes: 0,
+                sim_nodes: 0,
                 ms: 0,
                 proof_entries: 0,
                 proof_full: false,
@@ -195,6 +219,8 @@ impl<S: ProofSink> Engine<S> {
             length,
             child_evals: self.child_evals,
             expansions: self.expansions,
+            settle_nodes: self.settle_nodes,
+            sim_nodes: self.sim_nodes,
             ms: 0,
             proof_entries: 0,
             proof_full: false,
@@ -230,6 +256,9 @@ impl<S: ProofSink> Engine<S> {
             &self.line,
             &self.tables,
             self.expansions,
+            &self.guide,
+            &self.history,
+            self.seed,
         ) {
             Entered::Terminal(v) => {
                 // The node is over: no children were initialized (the
@@ -239,8 +268,26 @@ impl<S: ProofSink> Engine<S> {
                 self.line.pop();
                 return v;
             }
-            Entered::Open(frame, spent) => {
+            Entered::Open(frame, spent, settle, sim, pending) => {
                 self.child_evals += spent;
+                self.settle_nodes += settle;
+                self.sim_nodes += sim;
+                for (child_key, value) in pending {
+                    self.tables.store(child_key, &value, 0);
+                    if let Value::Proved {
+                        length,
+                        limit,
+                        mv: Some(mv),
+                    } = value
+                    {
+                        self.sink.proven(ProofEvent::AttackerProven {
+                            key: child_key,
+                            mv,
+                            length,
+                            limit,
+                        });
+                    }
+                }
                 frame
             }
         };
@@ -258,7 +305,7 @@ impl<S: ProofSink> Engine<S> {
             if pn >= tpn || dn >= tdn {
                 break;
             }
-            let (best, second) = select(&frame);
+            let (best, second) = select(&frame, &self.history, self.seed);
             let (ctpn, ctdn) = child_thresholds(&frame, best, second, tpn, tdn, pn, dn);
             let mut next = board.clone();
             next.do_move(frame.children[best].mv, &mut StateInfo::new());
@@ -266,6 +313,12 @@ impl<S: ProofSink> Engine<S> {
             if self.stop.is_some() {
                 self.line.pop();
                 return Value::Open { pn: 0, dn: 0 };
+            }
+            if self.guide.config.enabled {
+                let good = (frame.attacker_node && matches!(cv, Value::Proved { .. }))
+                    || (!frame.attacker_node && matches!(cv, Value::Refuted { .. }));
+                self.history
+                    .observe(frame.mover, frame.children[best].mv, good);
             }
             frame.children[best].value = cv;
         }
@@ -310,23 +363,55 @@ fn value_invariant(v: &Value, counter: u16) -> bool {
     }
 }
 
-/// The best child's index (OR: minimum pn; AND: minimum dn; ties to the
-/// first) and the second-best value of the selecting metric
-/// ([`INFINITY`] when there is no second).
-fn select(frame: &Frame) -> (usize, u32) {
+/// The best child's index and the second-best value of the selecting metric
+/// ([`INFINITY`] when there is no second). Ties compare, in order: the guide
+/// class rank, the history score, the seeded hash (only for `seed != 0`) and
+/// movegen order.
+fn select(frame: &Frame, history: &History, seed: u64) -> (usize, u32) {
     let metric = |c: &Child| {
         let (pn, dn) = pn_dn(&c.value);
         if frame.attacker_node { pn } else { dn }
     };
+    let tie = |c: &Child| -> (u8, u16, u64) {
+        let class = if frame.order_classes {
+            c.class.rank()
+        } else {
+            0
+        };
+        let hist = if frame.order_history {
+            u16::MAX - history.score(frame.mover, c.mv)
+        } else {
+            u16::MAX
+        };
+        let salted = if seed != 0 {
+            History::seeded(seed, frame.key, c.mv)
+        } else {
+            0
+        };
+        (class, hist, salted)
+    };
     let mut best = usize::MAX;
     let mut best_m = INFINITY;
+    let mut best_tie = (u8::MAX, u16::MAX, u64::MAX);
     let mut second = INFINITY;
     for (i, c) in frame.children.iter().enumerate() {
         let m = metric(c);
+        let t = tie(c);
         if m < best_m {
             second = best_m;
             best_m = m;
             best = i;
+            best_tie = t;
+        } else if m == best_m {
+            if t < best_tie {
+                // The old best keeps the same metric, so it is still the
+                // second-best value.
+                best = i;
+                best_tie = t;
+            }
+            if m < second {
+                second = m;
+            }
         } else if m < second {
             second = m;
         }
@@ -409,18 +494,26 @@ mod tests {
             evals_cap: None,
             child_evals: 0,
             expansions: 0,
+            settle_nodes: 0,
+            sim_nodes: 0,
             stop: None,
             sink: NullSink,
+            guide: Guide::new(GuideConfig::none()),
+            history: History::new(),
+            seed: 0,
         };
         let key = rules::key(&parent);
         engine.line.push(key);
-        let Entered::Open(frame, _) = Frame::enter(
+        let Entered::Open(frame, _, _, _, _) = Frame::enter(
             &parent,
             key,
             engine.attacker,
             &engine.line,
             &engine.tables,
             0,
+            &engine.guide,
+            &engine.history,
+            engine.seed,
         ) else {
             panic!("parent must be open");
         };
@@ -455,8 +548,13 @@ mod tests {
             evals_cap: Some(2_000_000),
             child_evals: 0,
             expansions: 0,
+            settle_nodes: 0,
+            sim_nodes: 0,
             stop: None,
             sink: NullSink,
+            guide: Guide::new(GuideConfig::none()),
+            history: History::new(),
+            seed: 0,
         };
         let r = engine.run(&parent);
         assert_eq!(r.exit, Exit::Proved);

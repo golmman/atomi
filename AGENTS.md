@@ -35,6 +35,12 @@ plan1 (M0) and plan2 (M1, per-node cost) have landed; see
   (tests only), `ep_key` (the derived per-file en passant key).
 - `src/mover.rs` — `Mover` (per expanded node) + `Effect` (per move): the
   child key, counter and `needs_board` flag without making the move.
+- `src/guide/` — the hand-guide stack (D21): `class.rs` (move classes),
+  `eval.rs` (bounded hand eval + EF-PN), `threat.rs` (threat signatures, the
+  null-side replay and the exact one-ply explosion settle), `history.rs`
+  (fixed history tables + the seeded tie-break) and `simulate.rs` (bounded
+  sibling playout). `mod.rs` is the only public surface; the guide writes
+  only fresh `Open` numbers and tie-breaks.
 - `src/table/` — `mod.rs` (`split` of the `--memory` label, the `Tables`
   lookup/store routing, the prefetch wrapper), `tt.rs` (TT v2: 64-byte
   clusters of 4 × 16-byte slots, 32-bit partial keys, Open values and
@@ -162,6 +168,20 @@ plan1 (M0) and plan2 (M1, per-node cost) have landed; see
     Check peak RSS of a mate-in-1 after touching `alloc.rs`.
 - The search is deterministic: the same binary, FEN and flags give the same
   counters. Collecting a proof must not change the trajectory.
+- Gotchas (learned in plan3):
+  - `--guide none --seed 0` must stay counter-identical to m1: the guide's
+    fresh pair is the identity `(1, 1)`, `select` only tie-breaks after the
+    DF-PN metric, and the equal-metric branch must still update `second`
+    (skipping it changes the 1+ε thresholds and the trajectory).
+  - A one-ply settled `Proved` child must be stored at the **child's** key
+    with its own winning move and emitted, or the writer cannot resolve a
+    parent proof whose child was never expanded.
+  - `settle_nodes` and `sim_nodes` are auxiliary work; `child_evals` and
+    `expansions` keep D11 meaning and stay main-search only.
+  - The null-side threat signature is a pure function of the board; no null
+    position is ever keyed, searched, stored, put on `line` or emitted.
+  - The guide may only write fresh `Open` numbers; the verified one-ply
+    settle is its only exact closure.
 
 ## Session protocol
 

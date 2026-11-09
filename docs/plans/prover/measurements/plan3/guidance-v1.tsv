@@ -1,0 +1,25 @@
+name	fen	source	ref_nodes	ref_wall_s	selection_budget_s
+core	r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1	corpus.json	342289	0.515	30.0
+easy-win	rnbq1b1r/pp1p1kpp/2p1pp1n/8/3PP1P1/2N2N2/PPP2P1P/R1BQKB1R w KQ - 0 1	corpus.json	72523	0.139	30.0
+deep-win	rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1	corpus.json	4574912	6.468	30.0
+b9a7ed7eb368	rnbqkbnr/p1pp2pp/8/1p1P1pN1/4p3/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1	corpus.json	13952139	18.018	30.0
+3004d09cef79	rnbqkb1r/p2pp2p/5ppn/1pp1P3/3P2P1/2N2N2/PPP2P1P/R1BQKB1R w KQkq - 0 1	corpus.json	18273275	28.285	30.0
+dd3f89766a40	rnbqkbnr/pp1p2pp/2p5/3P1pN1/4p3/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1	corpus.json	17714846	25.078	30.0
+dec01	r5r1/5N1k/2p2p2/pp1p3p/3Pp3/2P1P3/P7/2bQ1R1K w - - 0 30	wins.tsv	28229	0.068	30.0
+dec03	r4r2/pp2p1Bk/2p3p1/1B1pP1bp/3P3P/1PN5/2P5/5R1K w - - 1 21	wins.tsv	7	0.028	30.0
+dec04	3k3r/1p1P4/4p2P/5p2/P7/2n1P3/6K1/7R b - - 0 25	wins.tsv	68	0.029	30.0
+dec05	7k/7p/1pp3p1/3B4/2P5/5pPP/P7/R5K1 w - - 0 26	wins.tsv	10654	0.04	30.0
+dec07	r2qk2r/p2n4/6pp/1ppppp2/3P1B2/5PPP/PPP1Q1B1/R4RK1 w kq - 0 18	wins.tsv	17	0.029	30.0
+dec08	r4r1k/3q1P2/pp4pp/2pp4/N4Q2/2P3PP/PP2p3/R4R1K w - - 0 25	wins.tsv	3	0.029	30.0
+dec09	5k2/p1Rb1P2/6r1/1P2p3/P2pP1np/3P3B/3b4/3K2R1 b - - 0 28	wins.tsv	1	0.028	30.0
+dec10	3r3k/2rB3P/p7/P4p2/1p3Pp1/1P4P1/2p1p3/2R1R2K b - - 5 41	wins.tsv	32863	0.066	30.0
+dec11	rnb1k2r/p2p3p/4ppp1/qp6/3PPQ2/8/PPP2PPP/R3KB1R w KQkq - 2 11	wins.tsv	219	0.03	30.0
+dec12	2b2k1r/pp5p/2ppp3/8/4P2P/qPPP4/P1Q2b2/5R1K w - - 0 23	wins.tsv	3052	0.035	30.0
+dec13	r1bq1k1r/ppN4p/n1p1p3/3p1n1P/1b1P2P1/2P5/PP6/RNBQKB1R w KQ - 1 14	wins.tsv	9315	0.047	30.0
+dec14	r1bq1k1r/ppN5/n1p1p1pp/3p1p1P/3P4/P1PB4/1P3PP1/R1BQK2R w KQ - 0 15	wins.tsv	2450	0.035	30.0
+dec15	r3k1r1/1b1n3p/3p1pPb/pp1Pp3/P3P3/4B3/1PP4P/R3KBR1 w Qq - 1 20	wins.tsv	13225	0.048	30.0
+dec16	2kr1b1r/ppp3pp/4bp2/4p3/2B1P3/2PP2PP/PP1n1P2/RN1Q1R1K w - - 3 14	wins.tsv	87	0.03	30.0
+dec17	r1bqk2r/pp4pp/2p2p1n/1P4B1/4P3/2Pp1PP1/7P/R2QKBNR w KQkq - 0 14	wins.tsv	10118	0.047	30.0
+dec18	r1b2k1r/p1p4p/1pnNppp1/1B1p4/1b1PP3/2P5/PP4PP/RNB1K2R w KQ - 0 13	wins.tsv	6	0.029	30.0
+dec19	r2qkbnr/4p1pp/p1n2p2/1B6/3P4/8/1PP2P1P/R1BQK2R w KQkq - 0 10	wins.tsv	679	0.03	30.0
+dec20	rnbqk2r/4n3/2p3pp/pp1p1p1B/3PP3/6PN/PPPB3P/R2Q1RK1 w kq - 1 12	wins.tsv	418	0.03	30.0

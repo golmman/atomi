@@ -4,9 +4,12 @@
 
 **Open (2026-11-06).** Item 1 (M0) is done: [`plan1.md`](plan1.md),
 [`report1.md`](report1.md). Item 2 (M1) is done: [`plan2.md`](plan2.md),
-[`report2.md`](report2.md) (D18–D20). Item 3 is now the merged **M2+M3
-"hand-guide stack"** (D21/D22); item 4 is merged into it. This
-initiative is the successor to `atomic_solver`'s closed `winprover`
+[`report2.md`](report2.md) (D18–D20). Item 3 is the merged **M2+M3
+"hand-guide stack"** (D21/D22); item 4 is merged into it. Its stack gate
+**failed** ([`report3.md`](report3.md)): `easy-win` misses the 145,046
+expansion limit and `core` is censored at 10 s / 20 M. The item stays
+**open** for the D21 kill review; there is no split into mechanism plans.
+This initiative is the successor to `atomic_solver`'s closed `winprover`
 initiative. Its starting point is the legacy handoff
 `docs/plans/winprover/HANDOFF.md` (revision 2026-11-06) in
 <https://github.com/golmman/atomic_solver>, read from `main`; legacy code pin
@@ -168,7 +171,7 @@ single-mechanism plan that is independently meaningful.
 | --- | --- | --- | --- | --- |
 | 1 | **M0** bootstrap + correctness + proof output + baseline | Cargo package, small `AGENTS.md`, Makefile gates, licence gate, provenance registry, oracle build script; copied corpus and fixtures; attacker-only DF-PN with 1+ε and uniform starting numbers over plain `atomic-movegen` movegen (no `Mover`, no heuristics); CLI; event sink + proof store + JSONL writer + own validator + `make veto`; adapted bench driver; successor `bench.md` with the re-measured baseline row; per-node cost baseline | gates green (incl. veto); proves a mate-in-1, a mate-in-2 and a small win, each validator- **and** checker-accepted; never proves a fixture loss or a soundness negative; baseline row and per-node baseline recorded; **no performance claim** | **done: [`plan1`](plan1.md), [`report1`](report1.md)** |
 | 2 | **M1** per-node cost | `Mover`/`Effect` per expanded node; no make/unmake for most children; incremental keys; TT clusters + prefetch + filter + lazy zeroed allocation (copy legacy `src/search/tt/alloc.rs`); in-search proof store with length/limit, inside the `--memory` label | wall per 1 M child evals ≤ the M0 baseline **and** ≤ the legacy front-end's (cross-repo, same session); a small reference win proved within a stated cap and checker-accepted; soundness fixtures green | **done: [`plan2`](plan2.md), [`report2`](report2.md)** — `core`/10 M/192 MB: **53.4** ms per 1 M child evals (m0 166.7, legacy front-end 137.3, same session) |
-| 3 | **M2+M3** hand-guide stack | move classes, check evasions, quiet grouping, EF-PN hand-eval scaling; per-child static closures including the one-ply explosion settle on every child (both sides); defender priors (`UNLIKELY`, defence history); history tie-breaks; sibling simulation; null-move threat replay; constants in one `GuideParams` table exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | **D21 stack gate:** `easy-win` expansions ≤ 145,046 (2 × provari hand's 72,523 nodes); `core` proved at 10 s / 192 MB; no guidance-set refutations; ≥20 frozen cells × seeds 0–3; both-direction ablations after the gate | open — M1 reference: 53.4 ms per 1 M child evals (`core`, 10 M); `easy-win` proved in 30,335,618 child evals / 1,047,370 expansions, 1.482 s bench wall (factor 10.897); `core` censored at 10 s with ≈ 182 M child evals |
+| 3 | **M2+M3** hand-guide stack | move classes, check evasions, quiet grouping, EF-PN hand-eval scaling; per-child static closures including the one-ply explosion settle on every child (both sides); defender priors (`UNLIKELY`, defence history); history tie-breaks; sibling simulation; null-move threat replay; constants in one `GuideParams` table exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | **D21 stack gate:** `easy-win` expansions ≤ 145,046 (2 × provari hand's 72,523 nodes); `core` proved at 10 s / 192 MB; no guidance-set refutations; ≥20 frozen cells × seeds 0–3; both-direction ablations after the gate | **executed; gate failed** — [plan3](plan3.md), [report3](report3.md). Frozen 24-cell `guidance-v1`; hand coverage 19/24; `easy-win` 211,254–631,763 expansions (all seeds above the limit; `--guide-off efpn` is 110,293 at 10 s); `core` censored at 20 M and 10 s; no refutations; one D14 proof accepted by both checkers. D21 stop rule applies (kill review, no mechanism split) |
 | 4 | ~~M3 static tactics + simulation~~ | **merged into item 3** (D21, 2026-11-09): per-child static tactics, one-ply explosion settle, sibling simulation, defender priors, history, null-move replay | — | merged |
 | 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | open |
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
@@ -342,3 +345,13 @@ re-measures before adopting or rejecting:
   cells × seeds 0–3); added the null-move threat replay, defender
   priors/history, history tie-breaks and the per-child one-ply explosion
   settle to the take-list. Wrote `plan3.md`. No code changed.
+- **2026-11-09** — plan3 executed. The nine mechanisms, `--seed` and the
+  ablation flags landed; `--guide none --seed 0` stayed counter-identical
+  to m1 (with a measured +8.2 % per-node plumbing cost). The 73-candidate
+  provari census froze `guidance-v1` (24 cells, sha256 `2da2a65b…8c7d`).
+  D21 **failed**: `easy-win` 211,254–631,763 expansions (limit 145,046),
+  `core` censored at 20 M child evals and at 10 s, coverage 19/24 vs
+  provari 24/24. No refutations; `make test-full` and the veto passed; one
+  easy-win D14 proof was accepted by both checkers. The D21 stop rule is
+  active: record, kill-review, do not split into mechanism plans. No ledger
+  row was appended.

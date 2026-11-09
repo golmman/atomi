@@ -14,6 +14,7 @@
 //! path-independent) and `from` (the lowest counter at which it holds; `0` =
 //! any counter).
 
+use crate::guide::MoveClass;
 use atomic_movegen::types::Move;
 
 /// Saturating proof/disproof-number infinity.
@@ -49,6 +50,8 @@ pub struct Child {
     pub mv: Move,
     /// Whether the move resets the 50-move counter (pawn move or capture).
     pub zeroing: bool,
+    /// The hand-guide class (only an ordering/starting-number hint).
+    pub class: MoveClass,
     /// The child's value.
     pub value: Value,
 }
@@ -235,7 +238,12 @@ mod tests {
     }
 
     fn child(mv: Move, zeroing: bool, value: Value) -> Child {
-        Child { mv, zeroing, value }
+        Child {
+            mv,
+            zeroing,
+            class: MoveClass::Quiet,
+            value,
+        }
     }
 
     fn proved(length: u16, limit: u8) -> Value {
