@@ -49,6 +49,20 @@ move the wall geomean (D14 times runs without `--proof-out`). The next plan
 is [`plan7`](plan7.md) (item 16): wall attribution, then a deterministic
 global auxiliary budget under a **wall** gate. D24 records the decision;
 plan7 proposes D25 for the budget's deterministic semantics.
+
+**Plan7 (item 16) executed (2026-11-09).** The wall premise survives —
+removing sibling simulation alone cuts the calibrated `easy-win` wall from a
+5.829 s median to 2.096 s (64 %) — but **G3 fails**. The deterministic global
+`--guide-aux-budget` and the opt-in `--guide-sim-plies` are implemented
+behind flags; no default changed. Best budgeted `easy-win` is 3.7–4.2 s
+(26.7–29.9× the reference wall), `core` is censored at 10 s on all seeds,
+and `deep-win` is censored for search. Shortening playouts (6 → 2) gives
+4.196 s; disabling simulation gives 2.073 s. Soundness holds: no refutation,
+all 17 proved D14 proofs accepted by both checkers, `make test-full` and
+`make lint` green. Per the plan stop rule, no third hand-guide/auxiliary
+plan: the continue / re-pin / close decision is the D24 kill review. See
+[`measurements/plan7/`](measurements/plan7/README.md) and
+[`report8.md`](report8.md).
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -204,6 +218,7 @@ session added D21–D22.
 | D22 | Guidance measurement and seeds (owner decision 2026-11-09) | `--seed N` perturbs **only tie-breaks after** the guide metric, class and history; seed 0 preserves movegen order. The seed is part of the deterministic flag set (same binary + FEN + flags + seed = identical counters) and is carried into D14 proof runs. The gate uses seeds 0, 1, 2, 3. `guidance-v1` is frozen by a **provari-hand census before any atomi stack run** (rule in plan3): ≥20 deduplicated cells from `core + sample20` and `wins.tsv` where provari hand proves inside the stated selection budget. Auxiliary guide work (simulation, settle movegens, threat replay) is reported as `sim_nodes`/`settle_nodes`; `child_evals` and `expansions` keep D11 meaning and stay main-search only |
 | D23 | CORE-RESET and item-3 closure (plan4, executed 2026-11-09) | Item 3 was re-scoped once, as the last attempt, to **CORE-RESET**: starting-number calibration (`global_scale`, `ef_weight`), settled-proof retention only when the parent value selects it, a `--proof-share` memory split, and a per-frame `max_sim`/`max_settle` auxiliary budget, all under D21. **G1:** `core` proved at 10 s and `easy-win` ≤ 145,046 on seeds 0–2. G1 **failed** on `core`; item 3 **closed**, no mechanism split into a further plan, no ledger row. The 120 s auxiliary-budget `core` proof is recorded as the M4-first pivot. Owner to confirm the closure wording. **Erratum (post-closure investigation):** plan3 §2 implemented quiet grouping as a starting-number statement, not the one-child merge, and `simulate.rs` is a greedy playout, not proof replay, so the closure covers **atomi's variant only**; the missing group is measured at 6.9 M `core` expansions at 200 M child evals with sim/closures off. See horizon 15 |
 | D24 | M4 parked; wall is the gate (plan session 7, 2026-11-09) | The drafted M4 plan is parked as [`planX`](planX.md); it resumes only after a configuration wins 3/3 at 10 s. The next plan is [`plan7`](plan7.md) (item 16). **Gates for search/guide work are wall-based** (same-session `atomi / provari --guide hand` wall, plus coverage), with `child_evals`, `expansions`, `sim_nodes` and `settle_nodes` recorded as diagnostics. A node-only gate is not sufficient evidence for the goal. Auxiliary budgets must stay **deterministic** (same binary + FEN + flags + seed = identical counters, D22); a wall-clock budget inside the search is not allowed. The kill review is due after plans 5–6 and is recorded in the status section |
+| D25 | Deterministic auxiliary budget (proposed by plan7; owner to confirm) | Auxiliary work (simulation moves + settle movegens) is bounded by a search-global deterministic work counter, never by wall time. `--guide-aux-budget N` (`0` = unlimited) is part of the deterministic flag set; the search reports `aux_nodes` and `aux_skipped`. Once exhausted, optional sim/settle work is skipped; the last admitted operation may overshoot by its own work. The budget changes the tree, never the meaning. **Status:** implemented behind the opt-in flag and measured in plan7; not adopted as a default. The plan's wall gate failed, so this decision awaits the D24 kill review |
 
 ## Backlog
 
@@ -219,7 +234,7 @@ single-mechanism plan that is independently meaningful.
 | 4 | ~~M3 static tactics + simulation~~ | **merged into item 3** (D21, 2026-11-09): per-child static tactics, one-ply explosion settle, sibling simulation, defender priors, history, null-move replay | — | merged |
 | 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | **parked (D24)** — probe [`plan5`](plan5.md) executed ([data](measurements/plan5/README.md): 19/24 cells at 10 s, scale case `easy-win` 3,527 positions / 65,179 entries / 293 KB, `deep-win` censored for search at 120 s); implementation [`planX`](planX.md). Plan6 re-check ([data](measurements/plan6/README.md)): `core` aux 120 s = 14,332 positions / 691,117 entries, `easy-win` aux = 3,527 / 65,179; both accepted. Resumes only after a 3/3 10 s win |
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
-| 16 | **Wall attribution + deterministic auxiliary budget** | same-session attribution of wall on `easy-win`/`core` (main search vs sim vs settle vs threat replay vs guide eval); a deterministic global auxiliary-work budget (not wall-clock) and cheaper aux paths; wall-gated measurement | **wall gate:** `easy-win` wall ≤ 0.5 s (factor ≤ 3.6) and `core` proved at 10 s / 192 MB on seeds 0–2, with no guidance-set refutations; `deep-win` attempted at 10 s and classified; counters recorded, never substituted for wall | **next: [`plan7`](plan7.md)** |
+| 16 | **Wall attribution + deterministic auxiliary budget** | same-session attribution of wall on `easy-win`/`core` (main search vs sim vs settle vs threat replay vs guide eval); a deterministic global auxiliary-work budget (not wall-clock) and cheaper aux paths; wall-gated measurement | **wall gate:** `easy-win` wall ≤ 0.5 s (factor ≤ 3.6) and `core` proved at 10 s / 192 MB on seeds 0–2, with no guidance-set refutations; `deep-win` attempted at 10 s and classified; counters recorded, never substituted for wall | **executed; G3 failed** — [plan7](plan7.md), [report8](report8.md), [data](measurements/plan7/README.md). Wall premise survives (no-sim 64 % share); best budgeted `easy-win` 3.7–4.2 s (26.7–29.9×), `core` censored at 10 s, `deep-win` censored for search. `--guide-aux-budget`/`--guide-sim-plies` behind flags; no default changed. Kill review (D24) decides continue / re-pin / close |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
 legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose
@@ -440,6 +455,19 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-09**: plan7 (item 16) executed. Phase A attribution (8 stacks,
+  easy-win/core seeds 0–2, deep-win seed 0, fixed 10 M evals and 10 s):
+  simulation is 64 % of the calibrated easy-win wall; the seed-0 decision
+  proxy is 0.275 but the three-seed median is 0.330. Phase B added the
+  deterministic global `--guide-aux-budget` (`aux_nodes`/`aux_skipped`) and
+  opt-in `--guide-sim-plies`; no default changed. The budget grid lowers
+  easy-win to ≈ 3.8–3.9 s but grows the tree ~8×; sim 2 plies gives 4.196 s,
+  no-sim 2.073 s. Phase C: chosen 100 k budget, easy-win 3.711–4.162 s
+  (26.7–29.9×), core censored at 10 s, deep-win censored for search. **G3
+  fails**; G1/G2/G4/G5 pass (0 refutations, 17 D14 proofs accepted by both
+  checkers). No ledger row; D25 recorded as proposed. Data:
+  [`measurements/plan7/`](measurements/plan7/README.md); report:
+  [`report8.md`](report8.md).
 - **2026-11-09**: plan session 7 (kill review). Parked the M4 plan as
   [`planX`](planX.md) and added D24: M4 resumes only after a 3/3 10 s win;
   search/guide gates are wall-based; auxiliary budgets stay deterministic.

@@ -23,6 +23,7 @@ fn print_help() {
          \x20                       [--guide-on LIST] [--guide-params PATH]\n\
          \x20                       [--guide-scale N] [--guide-ef-weight N]\n\
          \x20                       [--guide-max-sim N] [--guide-max-settle N]\n\
+         \x20                       [--guide-aux-budget N] [--guide-sim-plies N]\n\
          \x20                       [--guide-group] [--proof-share PERCENT]\n\
          \x20   atomi validate PROOF.jsonl...\n\
          \x20   atomi moves \"<FEN>\"\n\
@@ -69,6 +70,7 @@ fn prove(args: &[String]) -> ExitCode {
     println!(
         "{{\"found\":{},\"length\":{},\"exit\":\"{}\",\"child_evals\":{},\
          \"expansions\":{},\"seed\":{},\"sim_nodes\":{},\"settle_nodes\":{},\
+         \"aux_nodes\":{},\"aux_skipped\":{},\
          \"ms\":{},\"seconds\":{},\"memory_mb\":{},\
          \"evals_limit\":{},\"proof\":\"{}\",\"proof_positions\":{},\
          \"proof_length\":{},\"proof_entries\":{},\"proof_full\":{}}}",
@@ -80,6 +82,8 @@ fn prove(args: &[String]) -> ExitCode {
         opts.seed,
         result.sim_nodes,
         result.settle_nodes,
+        result.aux_nodes,
+        result.aux_skipped,
         result.ms,
         opts.seconds,
         opts.memory_mb,

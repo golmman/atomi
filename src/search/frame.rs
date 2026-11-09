@@ -195,9 +195,10 @@ pub enum Entered {
     /// The node is terminal; the value to store and return.
     Terminal(Value),
     /// An open node: the frame, the child evals spent, the settle work, the
-    /// simulation work and the exact settled children `(key, value)` that
+    /// simulation work, the optional operations skipped by the global
+    /// auxiliary budget, and the exact settled children `(key, value)` that
     /// `mid` must store.
-    Open(Frame, u64, u64, u64, Vec<(u64, Value)>),
+    Open(Frame, u64, u64, u64, u64, Vec<(u64, Value)>),
 }
 
 impl Frame {
@@ -213,6 +214,7 @@ impl Frame {
         guide: &Guide,
         history: &History,
         _seed: u64,
+        aux_left: u64,
     ) -> Entered {
         debug_assert_eq!(key, *line.last().unwrap());
         // Pass 0: the node's own exact status from the movegen it runs anyway.
@@ -265,6 +267,8 @@ impl Frame {
         let mut pending: Vec<(u64, Value)> = Vec::new();
         let mut settle_nodes = 0u64;
         let mut sim_nodes = 0u64;
+        let mut aux_skipped = 0u64;
+        let aux_available = |settle: u64, sim: u64| aux_left == u64::MAX || settle + sim < aux_left;
         for m in &moves {
             let e = mover_ctx.effect(board, m);
             let mut built: Option<Board> = None;
@@ -298,12 +302,15 @@ impl Frame {
             // A fresh child may allow an immediate explosion by its side to
             // move. The screen avoids a build for most non-built children;
             // every hit (and every already-built child) is verified exactly.
-            if matches!(value, Value::Open { .. })
+            let settle_wanted = matches!(value, Value::Open { .. })
                 && guide_on
                 && guide.config.static_closures
                 && (max_settle == 0 || settle_nodes < max_settle)
-                && (built.is_some() || threat::settle_screen(board, m, mover))
-            {
+                && (built.is_some() || threat::settle_screen(board, m, mover));
+            if settle_wanted && !aux_available(settle_nodes, sim_nodes) {
+                aux_skipped += 1;
+            }
+            if settle_wanted && aux_available(settle_nodes, sim_nodes) {
                 if built.is_none() {
                     let mut child = board.clone();
                     child.do_move(m, &mut StateInfo::new());
@@ -368,12 +375,16 @@ impl Frame {
                 (0, 0)
             };
             if let Some(child) = child_ref {
-                if matches!(value, Value::Open { .. })
+                let sim_wanted = matches!(value, Value::Open { .. })
                     && guide_on
                     && guide.config.sibling_sim
-                    && (max_sim == 0 || sim_nodes < max_sim)
-                {
-                    let (score, moves_made) = guide::simulate::playout(child, attacker);
+                    && (max_sim == 0 || sim_nodes < max_sim);
+                if sim_wanted && !aux_available(settle_nodes, sim_nodes) {
+                    aux_skipped += 1;
+                }
+                if sim_wanted && aux_available(settle_nodes, sim_nodes) {
+                    let plies = guide.params.sim_plies.clamp(1, 255) as u8;
+                    let (score, moves_made) = guide::simulate::playout_with(child, attacker, plies);
                     sim_nodes += moves_made;
                     start = guide.sim_adjust(start.0, start.1, score);
                 }
@@ -502,7 +513,7 @@ impl Frame {
             group,
         };
         let spent = moves.len() as u64;
-        Entered::Open(frame, spent, settle_nodes, sim_nodes, pending)
+        Entered::Open(frame, spent, settle_nodes, sim_nodes, aux_skipped, pending)
     }
 }
 
@@ -524,6 +535,7 @@ mod tests {
             &Guide::new(GuideConfig::none()),
             &History::new(),
             0,
+            u64::MAX,
         )
     }
 
@@ -583,7 +595,7 @@ mod tests {
                 continue;
             }
             let key = *line.last().unwrap();
-            let Entered::Open(frame, _, _, _, _) = enter(&board, key, attacker, &line, &tables)
+            let Entered::Open(frame, _, _, _, _, _) = enter(&board, key, attacker, &line, &tables)
             else {
                 panic!("open node was terminal");
             };
@@ -624,7 +636,8 @@ mod tests {
                 .unwrap();
         let key = rules::key(&b);
         let line = vec![key];
-        let Entered::Open(frame, _, _, _, pending) = enter(&b, key, Color::White, &line, &tables)
+        let Entered::Open(frame, _, _, _, _, pending) =
+            enter(&b, key, Color::White, &line, &tables)
         else {
             panic!("expected an open frame");
         };
@@ -765,7 +778,7 @@ mod tests {
         let mut config = GuideConfig::hand();
         config.group = true;
         let tables = Tables::new(4, true);
-        let Entered::Open(frame, _, _, _, _) = Frame::enter(
+        let Entered::Open(frame, _, _, _, _, _) = Frame::enter(
             &b,
             key,
             Color::White,
@@ -775,6 +788,7 @@ mod tests {
             &Guide::new(config),
             &History::new(),
             0,
+            u64::MAX,
         ) else {
             panic!("expected an open frame");
         };
@@ -807,7 +821,7 @@ mod tests {
             if rules::status_with(&board, attacker, &state, !moves.is_empty()) != Status::Open {
                 continue;
             }
-            let Entered::Open(frame, _, _, _, pending) = Frame::enter(
+            let Entered::Open(frame, _, _, _, _, pending) = Frame::enter(
                 &board,
                 key,
                 attacker,
@@ -817,6 +831,7 @@ mod tests {
                 &guide,
                 &History::new(),
                 0,
+                u64::MAX,
             ) else {
                 continue;
             };

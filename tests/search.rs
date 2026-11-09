@@ -322,7 +322,7 @@ fn cli_prove_output_contract() {
     assert_eq!(json["proof"], "not-requested");
     assert!(json["proof_entries"].is_number());
     assert!(json["proof_full"].is_boolean());
-    // All 14 keys in the contract order.
+    // All 16 keys in the contract order.
     let keys = [
         "\"found\"",
         "\"length\"",
@@ -332,6 +332,8 @@ fn cli_prove_output_contract() {
         "\"seed\"",
         "\"sim_nodes\"",
         "\"settle_nodes\"",
+        "\"aux_nodes\"",
+        "\"aux_skipped\"",
         "\"ms\"",
         "\"seconds\"",
         "\"memory_mb\"",
@@ -735,6 +737,8 @@ fn aux_budget_is_deterministic_and_caps_work() {
             j["child_evals"].as_u64().unwrap(),
             j["sim_nodes"].as_u64().unwrap(),
             j["settle_nodes"].as_u64().unwrap(),
+            j["aux_nodes"].as_u64().unwrap(),
+            j["aux_skipped"].as_u64().unwrap(),
         )
     };
     let full = run(&[]);
@@ -748,6 +752,22 @@ fn aux_budget_is_deterministic_and_caps_work() {
     // The auxiliary caps change the guide's starts (so the main tree may
     // differ), but they stay out of `child_evals`/`expansions` accounting.
     assert!(capped.0 > 0 && full.0 > 0);
+    assert_eq!(full.3, full.1 + full.2);
+    assert_eq!(full.4, 0, "unlimited work skips nothing");
+
+    // Plan7 D25: the global auxiliary budget is deterministic and counted
+    // in the same units as `sim_nodes + settle_nodes`; it changes the tree
+    // only (never `child_evals` accounting).
+    let budgeted = run(&["--guide-aux-budget", "1000"]);
+    assert_eq!(budgeted, run(&["--guide-aux-budget", "1000"]));
+    assert_eq!(budgeted.3, budgeted.1 + budgeted.2);
+    // The last admitted operation may overshoot the cap by its own work.
+    assert!(budgeted.3 <= 1000 + 16, "{budgeted:?}");
+    assert!(
+        budgeted.4 > 0,
+        "a small budget must skip work: {budgeted:?}"
+    );
+    assert_ne!(budgeted.0, full.0, "the budget changes the tree");
 }
 
 #[test]

@@ -4,8 +4,9 @@
 //!
 //! Output: exactly one JSON line in this field order:
 //! `{"found","length","exit","child_evals","expansions","seed","sim_nodes",
-//! "settle_nodes","ms","seconds","memory_mb","evals_limit","proof",
-//! "proof_positions","proof_length","proof_entries","proof_full"}`.
+//! "settle_nodes","aux_nodes","aux_skipped","ms","seconds","memory_mb",
+//! "evals_limit","proof","proof_positions","proof_length","proof_entries",
+//! "proof_full"}`.
 
 use crate::guide::{GuideConfig, GuideParams};
 use atomic_movegen::board::{Board, FenPolicy};
@@ -106,6 +107,14 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
                 }
                 "--guide-max-settle" => {
                     guide_params.max_settle = parse_zero_ok(arg, value)?;
+                }
+                "--guide-aux-budget" => {
+                    guide_params.aux_budget = value
+                        .parse()
+                        .map_err(|_| format!("bad value for {arg}: {value}"))?;
+                }
+                "--guide-sim-plies" => {
+                    guide_params.sim_plies = parse_num(arg, value)?;
                 }
                 "--proof-share" => {
                     let n: u8 = value

@@ -67,6 +67,15 @@ export does not move the wall geomean. The next plan is [`plan7`](plan7.md)
 (item 16): wall attribution, then a deterministic global auxiliary budget
 under a wall gate. No ledger row follows from this note.
 
+**Update (plan7 executed, 2026-11-09).** Item 16's wall gate **failed**, so
+no ledger row is appended. Measured same-host medians at 10 s: calibrated
+hand `easy-win` 5.829 s (42×), best auxiliary-budget point 3.891 s
+(28×), no-sim 2.096 s, bare 1.965 s; `core` and `deep-win` censored. The
+auxiliary wall premise survives (no-sim removes 64 % of easy-win wall), but
+no auxiliary lever reaches the 0.5 s gate. The absolute distance is now
+easy-win ≈ 27×, core ≥ 19× censored, deep-win censored, coverage 1/3. See
+[`report8.md`](report8.md) and [`measurements/plan7/`](measurements/plan7/README.md).
+
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
 ## Names and ids (read this first)
@@ -375,3 +384,9 @@ accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
   censored. The auxiliary-budget configuration proves `core` at 120 s
   (278.5 M child evals, both checkers accept the 14,332-position proof);
   no ledger row.
+- **2026-11-09** — plan7 (item 16) executed; **G3 wall gate failed**, so no
+  ledger row. Attribution: simulation is 64 % of the calibrated easy-win
+  wall. The deterministic `--guide-aux-budget` (best easy-win 3.891 s) and
+  opt-in `--guide-sim-plies` (2 plies 4.196 s) do not close the gap; no-sim
+  is 2.096 s and bare 1.965 s. `core`/`deep-win` censored at 10 s.
+  Coverage 1/3. Details in [`report8.md`](report8.md).

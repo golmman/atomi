@@ -169,6 +169,11 @@ pub struct GuideParams {
     pub max_settle: u32,
     /// Per-frame simulation budget in playout moves (`0` = unlimited).
     pub max_sim: u32,
+    /// Global auxiliary-work budget (settle movegens + playout moves,
+    /// `0` = unlimited). Deterministic, never wall-clock.
+    pub aux_budget: u64,
+    /// Maximum plies of one simulation playout (`6` = plan3 identity).
+    pub sim_plies: u32,
 }
 
 impl Default for GuideParams {
@@ -183,6 +188,8 @@ impl Default for GuideParams {
             ef_weight: 16,
             max_settle: 0,
             max_sim: 0,
+            aux_budget: 0,
+            sim_plies: u32::from(simulate::SIM_PLIES),
         }
     }
 }
@@ -211,32 +218,37 @@ impl GuideParams {
             let (key, value) = line
                 .split_once('=')
                 .ok_or_else(|| format!("params line {}: expected key=value", index + 1))?;
-            let v: u32 = value
+            let v: u64 = value
                 .trim()
                 .parse()
                 .map_err(|_| format!("params line {}: bad value {value}", index + 1))?;
-            let zero_ok = matches!(key.trim(), "ef_weight" | "max_sim" | "max_settle");
-            if (v == 0 && !zero_ok) || v > OPEN_MAX {
+            let zero_ok = matches!(
+                key.trim(),
+                "ef_weight" | "max_sim" | "max_settle" | "aux_budget" | "sim_plies"
+            );
+            if (v == 0 && !zero_ok) || v > u64::from(OPEN_MAX) {
                 return Err(format!("params line {}: {v} out of range", index + 1));
             }
-            let slot = match key.trim() {
-                "threat_pn" => &mut p.threat.pn,
-                "threat_dn" => &mut p.threat.dn,
-                "weak_pn" => &mut p.weak.pn,
-                "weak_dn" => &mut p.weak.dn,
-                "quiet_pn" => &mut p.quiet.pn,
-                "quiet_dn" => &mut p.quiet.dn,
-                "hanging_pn" => &mut p.hanging.pn,
-                "hanging_dn" => &mut p.hanging.dn,
-                "evasion_pn" => &mut p.evasion.pn,
-                "evasion_dn" => &mut p.evasion.dn,
-                "global_scale" => &mut p.global_scale,
-                "ef_weight" => &mut p.ef_weight,
-                "max_sim" => &mut p.max_sim,
-                "max_settle" => &mut p.max_settle,
+            let v32 = v as u32;
+            match key.trim() {
+                "threat_pn" => p.threat.pn = v32,
+                "threat_dn" => p.threat.dn = v32,
+                "weak_pn" => p.weak.pn = v32,
+                "weak_dn" => p.weak.dn = v32,
+                "quiet_pn" => p.quiet.pn = v32,
+                "quiet_dn" => p.quiet.dn = v32,
+                "hanging_pn" => p.hanging.pn = v32,
+                "hanging_dn" => p.hanging.dn = v32,
+                "evasion_pn" => p.evasion.pn = v32,
+                "evasion_dn" => p.evasion.dn = v32,
+                "global_scale" => p.global_scale = v32,
+                "ef_weight" => p.ef_weight = v32,
+                "max_sim" => p.max_sim = v32,
+                "max_settle" => p.max_settle = v32,
+                "aux_budget" => p.aux_budget = v,
+                "sim_plies" => p.sim_plies = v32,
                 other => return Err(format!("params: unknown key {other}")),
-            };
-            *slot = v;
+            }
         }
         Ok(p)
     }
@@ -255,8 +267,14 @@ impl GuideParams {
             out.push_str(&format!("{name}_pn={}\n{name}_dn={}\n", p.pn, p.dn));
         }
         out.push_str(&format!(
-            "global_scale={}\nef_weight={}\nmax_sim={}\nmax_settle={}\n",
-            self.global_scale, self.ef_weight, self.max_sim, self.max_settle
+            "global_scale={}\nef_weight={}\nmax_sim={}\nmax_settle={}\n\
+             aux_budget={}\nsim_plies={}\n",
+            self.global_scale,
+            self.ef_weight,
+            self.max_sim,
+            self.max_settle,
+            self.aux_budget,
+            self.sim_plies
         ));
         out
     }
@@ -590,6 +608,8 @@ mod tests {
         p.ef_weight = 0;
         p.max_sim = 7;
         p.max_settle = 0;
+        p.aux_budget = 123_456_789;
+        p.sim_plies = 2;
         let text = p.dump();
         assert_eq!(GuideParams::parse(&text).unwrap(), p);
         assert!(GuideParams::parse("threat_pn=0").is_err());
@@ -598,6 +618,13 @@ mod tests {
         // The new zero-allowed keys accept zero.
         assert_eq!(GuideParams::parse("ef_weight=0").unwrap().ef_weight, 0);
         assert_eq!(GuideParams::parse("max_sim=0").unwrap().max_sim, 0);
+        assert_eq!(
+            GuideParams::parse("aux_budget=123456789")
+                .unwrap()
+                .aux_budget,
+            123_456_789
+        );
+        assert_eq!(GuideParams::parse("sim_plies=2").unwrap().sim_plies, 2);
     }
 
     #[test]

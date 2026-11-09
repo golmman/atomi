@@ -20,9 +20,14 @@ pub const SIM_BRANCH: usize = 8;
 /// A greedy playout score from the attacker's perspective in `[-100, 100]`
 /// and the number of made moves (`sim_nodes`).
 pub fn playout(board: &Board, attacker: Color) -> (i32, u64) {
+    playout_with(board, attacker, SIM_PLIES)
+}
+
+/// A playout bounded by `plies` (the plan7 leave-one-out knob).
+pub fn playout_with(board: &Board, attacker: Color, plies: u8) -> (i32, u64) {
     let mut board = board.clone();
     let mut nodes = 0u64;
-    for ply in 0..SIM_PLIES {
+    for ply in 0..plies {
         match rules::status(&board, attacker) {
             rules::Status::Won => return (100 - i32::from(ply), nodes),
             rules::Status::Failed { .. } => return (-100 + i32::from(ply), nodes),
@@ -82,6 +87,15 @@ fn choose(board: &Board, moves: &MoveList, _attacker: Color) -> Move {
 mod tests {
     use super::*;
     use crate::testutil;
+
+    #[test]
+    fn short_playouts_are_bounded() {
+        let b = Board::from_fen("6rk/8/8/8/8/8/8/6QK w - - 0 1").unwrap();
+        for plies in [0, 1, 2, 3, 6] {
+            let (_, n) = playout_with(&b, Color::White, plies);
+            assert!(n <= u64::from(plies), "plies={plies} nodes={n}");
+        }
+    }
 
     #[test]
     fn playout_is_bounded_and_deterministic() {

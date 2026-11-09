@@ -104,6 +104,10 @@ pub struct SearchResult {
     pub settle_nodes: u64,
     /// Simulation expansions (not in `child_evals`/`expansions`).
     pub sim_nodes: u64,
+    /// Total auxiliary work units (settle + simulation) actually spent.
+    pub aux_nodes: u64,
+    /// Optional auxiliary operations skipped by the global budget.
+    pub aux_skipped: u64,
     /// Search time in milliseconds (allocation excluded).
     pub ms: u64,
     /// Live entries in the proof table at exit.
@@ -148,6 +152,8 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
                 expansions: 0,
                 settle_nodes: 0,
                 sim_nodes: 0,
+                aux_nodes: 0,
+                aux_skipped: 0,
                 stop: None,
                 sink,
                 guide,
@@ -179,6 +185,8 @@ struct Engine<S> {
     expansions: u64,
     settle_nodes: u64,
     sim_nodes: u64,
+    aux_nodes: u64,
+    aux_skipped: u64,
     stop: Option<Exit>,
     sink: S,
     guide: Guide,
@@ -198,6 +206,8 @@ impl<S: ProofSink> Engine<S> {
                 expansions: 0,
                 settle_nodes: 0,
                 sim_nodes: 0,
+                aux_nodes: 0,
+                aux_skipped: 0,
                 ms: 0,
                 proof_entries: 0,
                 proof_full: false,
@@ -224,6 +234,8 @@ impl<S: ProofSink> Engine<S> {
             expansions: self.expansions,
             settle_nodes: self.settle_nodes,
             sim_nodes: self.sim_nodes,
+            aux_nodes: self.aux_nodes,
+            aux_skipped: self.aux_skipped,
             ms: 0,
             proof_entries: 0,
             proof_full: false,
@@ -253,6 +265,11 @@ impl<S: ProofSink> Engine<S> {
         }
         debug_assert_eq!(key, rules::key(board));
         self.line.push(key);
+        let aux_left = if self.guide.params.aux_budget == 0 {
+            u64::MAX
+        } else {
+            self.guide.params.aux_budget.saturating_sub(self.aux_nodes)
+        };
         let mut frame = match Frame::enter(
             board,
             key,
@@ -263,6 +280,7 @@ impl<S: ProofSink> Engine<S> {
             &self.guide,
             &self.history,
             self.seed,
+            aux_left,
         ) {
             Entered::Terminal(v) => {
                 // The node is over: no children were initialized (the
@@ -272,10 +290,12 @@ impl<S: ProofSink> Engine<S> {
                 self.line.pop();
                 return v;
             }
-            Entered::Open(frame, spent, settle, sim, pending) => {
+            Entered::Open(frame, spent, settle, sim, skipped, pending) => {
                 self.child_evals += spent;
                 self.settle_nodes += settle;
                 self.sim_nodes += sim;
+                self.aux_nodes += settle + sim;
+                self.aux_skipped += skipped;
                 // Plan4 proof-table pressure: a settled refutation is still a
                 // path-independent TT refutation, but a settled proof is only
                 // installed when this node exits proved (and, at an OR node,
@@ -697,6 +717,8 @@ mod tests {
             expansions: 0,
             settle_nodes: 0,
             sim_nodes: 0,
+            aux_nodes: 0,
+            aux_skipped: 0,
             stop: None,
             sink: NullSink,
             guide: Guide::new(GuideConfig::none()),
@@ -705,7 +727,7 @@ mod tests {
         };
         let key = rules::key(&parent);
         engine.line.push(key);
-        let Entered::Open(frame, _, _, _, _) = Frame::enter(
+        let Entered::Open(frame, _, _, _, _, _) = Frame::enter(
             &parent,
             key,
             engine.attacker,
@@ -715,6 +737,7 @@ mod tests {
             &engine.guide,
             &engine.history,
             engine.seed,
+            u64::MAX,
         ) else {
             panic!("parent must be open");
         };
@@ -751,6 +774,8 @@ mod tests {
             expansions: 0,
             settle_nodes: 0,
             sim_nodes: 0,
+            aux_nodes: 0,
+            aux_skipped: 0,
             stop: None,
             sink: NullSink,
             guide: Guide::new(GuideConfig::none()),
