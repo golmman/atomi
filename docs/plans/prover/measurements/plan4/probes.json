@@ -82,7 +82,7 @@
   }
  ],
  "prior_art": {
-  "source": "docs/notes/retro.md appendix (2026-11-09 provari v0.1.0 ablation), re-read 2026-11-10",
+  "source": "docs/notes/retro.md appendix (2026-11-09 provari v0.1.0 ablation), re-read 2026-11-09",
   "facts": [
    "EF-PN removal: core 1.96x nodes, easy-win 0.44x (provari hand)",
    "move-class numbers are the largest single lever (core 2.30x, easy-win 4.29x)",

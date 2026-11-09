@@ -37,7 +37,7 @@ The initiative's success condition, quoted verbatim from
 
 ## Absolute distance to the goal (read this first)
 
-State on 2026-11-10, after plan4 CORE-RESET (item 3 closed):
+State on 2026-11-09, after plan4 CORE-RESET (item 3 closed):
 
 - **`easy-win` is now a 10 s win, with a 42× wall.** Calibration
   (`global_scale=64, ef_weight=0`) proves it on seeds 0–2 in
@@ -364,7 +364,7 @@ accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
   145,046) and `core` censored at 20 M child evals and at 10 s; coverage
   19/24. No ledger row. The stack is recorded for the D21 kill review;
   `--guide none --seed 0` remains counter-identical to m1.
-- **2026-11-10** — plan4 CORE-RESET executed; **G1 failed on `core` at
+- **2026-11-09** — plan4 CORE-RESET executed; **G1 failed on `core` at
   10 s**, item 3 closed. Calibration proves `easy-win` at 10 s on seeds
   0–2 (121,866 / 110,533 / 115,147, under 145,046) but `core` stays
   censored. The auxiliary-budget configuration proves `core` at 120 s

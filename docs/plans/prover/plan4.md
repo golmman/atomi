@@ -1,14 +1,14 @@
 # Prover Plan 4: item 3 re-scope — CORE-RESET (D21 kill review and last attempt)
 
 Initiative: [`prover`](initiative.md), backlog **item 3** (M2+M3), re-scoped
-by the D21 stop rule. Drafted 2026-11-10 in plan session 4, after
+by the D21 stop rule. Drafted 2026-11-09 in plan session 4, after
 [`report3.md`](report3.md), [`bench.md`](bench.md) and
 [`retro.md`](../../notes/retro.md). Baseline: the plan3 tree. This document
 does not implement. Item 3 stays open only for this plan: if G1 fails it
 closes and the report records the pivot options; there is no plan5 split into
 mechanism plans.
 
-## Absolute distance (read-only probes, 2026-11-10, plan3 binary)
+## Absolute distance (read-only probes, 2026-11-09, plan3 binary)
 
 Probes, not committed measurements; one process at a time. Goal: geomean wall
 `< 1.0` vs provari hand, coverage 3/3.

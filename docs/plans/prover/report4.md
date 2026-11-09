@@ -1,7 +1,7 @@
 # Prover Report 4: CORE-RESET — calibration, pressure, auxiliary budget
 
 Plan: [`plan4.md`](plan4.md) (initiative [`prover`](initiative.md), backlog
-item 3, re-scoped by the D21 kill review). Executed 2026-11-10. **G1 failed:
+item 3, re-scoped by the D21 kill review). Executed 2026-11-09. **G1 failed:
 `core` is not proved at 10 s.** Per the plan, item 3 closes; there is no
 plan5 split into mechanism plans. One new positive result is recorded for
 the pivot: the calibrated hand stack **with a per-frame auxiliary budget**

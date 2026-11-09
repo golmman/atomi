@@ -11,12 +11,16 @@ expansion limit and `core` is censored at 10 s / 20 M. That failure
 triggered the D21 kill review; there was no split into mechanism plans.
 Plan session 4 did the kill review and wrote [`plan4.md`](plan4.md): item 3 was
 re-scoped to **CORE-RESET** as the last attempt (D23). Execution
-([`report4.md`](report4.md), 2026-11-10) failed G1: the calibrated hand
+([`report4.md`](report4.md), 2026-11-09) failed G1: the calibrated hand
 stack proves `easy-win` at 10 s on seeds 0–2 (110,533–121,866 expansions,
 under the 145,046 limit) but `core` is censored at 10 s; a per-frame
 auxiliary budget (`max_sim=1, max_settle=1`) proves `core` at 120 s with a
 both-checker-accepted 14,332-position proof, not at 10 s. **Item 3 is
 closed**; no ledger row. The pivot options are in `report4.md` (M4 first).
+Plan session 6 (2026-11-09) kept M4 but split the pivot: [`plan5`](plan5.md)
+is the P0 probe (aux stack on `guidance-v1` at 10 s), [`plan6`](plan6.md) is
+item 15 (`GROUP` kill-test), and [`plan7`](plan7.md) is the M4
+implementation; item 15 runs before plan7's format freeze.
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -170,7 +174,7 @@ session added D21–D22.
 | D20 | `unsafe` in M1 (plan2) | Three sites, each with `// SAFETY:` comments and a measured keep rule: (1) the copied lazy zeroed allocator (`Zeroed<T>`, over-allocated with align 16 so calloc's lazy pages also serve the 64-byte-aligned clusters); (2) the x86-64 `_mm_prefetch` wrapper (kept: 3.3% on the final tree); (3) `madvise(MADV_HUGEPAGE)` via a 3-line `extern "C"` (Linux, x86-64/aarch64; kept: −18%) |
 | D21 | Stack-level gating and the hand-guide stack (owner decision 2026-11-09; replaces working agreement 2 for this initiative) | A plan may add a **named stack** of coupled mechanisms under **one gate**. The gate is judged on the whole stack; individual mechanisms are not pre-gated. After the stack passes, **both-direction ablations** (leave-one-out from the full stack, add-one-in to the bare skeleton) decide which mechanisms stay, over the same frozen ≥20-cell set and several seeds. The first stack is **M2+M3 "hand-guide stack"** (item 3): move classes, check evasions, quiet grouping, EF-PN hand-eval scaling, per-child static closures including the one-ply explosion settle on every child for both sides, defender priors (`UNLIKELY`, defence history), history tie-breaks, sibling simulation and the null-move threat replay. **Gate:** `easy-win` `expansions` ≤ 2 × provari hand's 72,523 = **145,046 nodes**; `core` **proved** at `--seconds 10 --memory 192`; no guidance-set refutations; measured on **≥20 frozen cells and ≥3 seeds**; wall and `child_evals` are recorded, never substituted for the node gate |
 | D22 | Guidance measurement and seeds (owner decision 2026-11-09) | `--seed N` perturbs **only tie-breaks after** the guide metric, class and history; seed 0 preserves movegen order. The seed is part of the deterministic flag set (same binary + FEN + flags + seed = identical counters) and is carried into D14 proof runs. The gate uses seeds 0, 1, 2, 3. `guidance-v1` is frozen by a **provari-hand census before any atomi stack run** (rule in plan3): ≥20 deduplicated cells from `core + sample20` and `wins.tsv` where provari hand proves inside the stated selection budget. Auxiliary guide work (simulation, settle movegens, threat replay) is reported as `sim_nodes`/`settle_nodes`; `child_evals` and `expansions` keep D11 meaning and stay main-search only |
-| D23 | CORE-RESET and item-3 closure (plan4, executed 2026-11-10) | Item 3 was re-scoped once, as the last attempt, to **CORE-RESET**: starting-number calibration (`global_scale`, `ef_weight`), settled-proof retention only when the parent value selects it, a `--proof-share` memory split, and a per-frame `max_sim`/`max_settle` auxiliary budget, all under D21. **G1:** `core` proved at 10 s and `easy-win` ≤ 145,046 on seeds 0–2. G1 **failed** on `core`; item 3 **closed**, no plan5 mechanism split, no ledger row. The 120 s auxiliary-budget `core` proof is recorded as the M4-first pivot. Owner to confirm the closure wording. **Erratum (post-closure investigation):** plan3 §2 implemented quiet grouping as a starting-number statement, not the one-child merge, and `simulate.rs` is a greedy playout, not proof replay, so the closure covers **atomi's variant only**; the missing group is measured at 6.9 M `core` expansions at 200 M child evals with sim/closures off. See horizon 15 |
+| D23 | CORE-RESET and item-3 closure (plan4, executed 2026-11-09) | Item 3 was re-scoped once, as the last attempt, to **CORE-RESET**: starting-number calibration (`global_scale`, `ef_weight`), settled-proof retention only when the parent value selects it, a `--proof-share` memory split, and a per-frame `max_sim`/`max_settle` auxiliary budget, all under D21. **G1:** `core` proved at 10 s and `easy-win` ≤ 145,046 on seeds 0–2. G1 **failed** on `core`; item 3 **closed**, no mechanism split into a further plan, no ledger row. The 120 s auxiliary-budget `core` proof is recorded as the M4-first pivot. Owner to confirm the closure wording. **Erratum (post-closure investigation):** plan3 §2 implemented quiet grouping as a starting-number statement, not the one-child merge, and `simulate.rs` is a greedy playout, not proof replay, so the closure covers **atomi's variant only**; the missing group is measured at 6.9 M `core` expansions at 200 M child evals with sim/closures off. See horizon 15 |
 
 ## Backlog
 
@@ -184,7 +188,7 @@ single-mechanism plan that is independently meaningful.
 | 2 | **M1** per-node cost | `Mover`/`Effect` per expanded node; no make/unmake for most children; incremental keys; TT clusters + prefetch + filter + lazy zeroed allocation (copy legacy `src/search/tt/alloc.rs`); in-search proof store with length/limit, inside the `--memory` label | wall per 1 M child evals ≤ the M0 baseline **and** ≤ the legacy front-end's (cross-repo, same session); a small reference win proved within a stated cap and checker-accepted; soundness fixtures green | **done: [`plan2`](plan2.md), [`report2`](report2.md)** — `core`/10 M/192 MB: **53.4** ms per 1 M child evals (m0 166.7, legacy front-end 137.3, same session) |
 | 3 | **M2+M3** hand-guide stack | move classes, check evasions, quiet grouping, EF-PN hand-eval scaling; per-child static closures including the one-ply explosion settle on every child (both sides); defender priors (`UNLIKELY`, defence history); history tie-breaks; sibling simulation; null-move threat replay; constants in one `GuideParams` table exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | **D21 stack gate:** `easy-win` expansions ≤ 145,046 (2 × provari hand's 72,523 nodes); `core` proved at 10 s / 192 MB; no guidance-set refutations; ≥20 frozen cells × seeds 0–3; both-direction ablations after the gate | **closed; G1 failed** — [plan3](plan3.md), [report3](report3.md), [plan4](plan4.md), [report4](report4.md). Plan3: frozen 24-cell `guidance-v1`; hand coverage 19/24; `easy-win` 211,254–631,763 expansions; `core` censored at 20 M and 10 s. Plan4 CORE-RESET (D23) last attempt: calibrated point scale 64 / EF weight 0 proves `easy-win` at 10 s on seeds 0–2 (**121,866 / 110,533 / 115,147**, all ≤ 145,046) but `core` is still censored at 10 s; auxiliary `max_sim=1/max_settle=1` proves `core` at 120 s (278.5 M evals, length 20, proof accepted by both checkers) but not at 10 s. No refutations, no ledger row. Pivot: M4 first |
 | 4 | ~~M3 static tactics + simulation~~ | **merged into item 3** (D21, 2026-11-09): per-child static tactics, one-ply explosion settle, sibling simulation, defender priors, history, null-move replay | — | merged |
-| 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | open |
+| 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | **open** — probe [`plan5`](plan5.md), implementation [`plan7`](plan7.md) |
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
@@ -205,7 +209,7 @@ ablations, and take the continue/re-scope/close decision at a kill review.
 | 12 | Durable proof corpus | own plan and schema; legacy `docs/spec/global_proof_store.md` as reference |
 | 13 | Optional external tablebases (D7) | provari's path is external and optional too |
 | 14 | `--guide model` stretch column (D8) | recorded only |
-| 15 | Hand-guide conformance (item-3 erratum) | **Not** an item-3 restart: attacker plain-move group as **one** child (`GROUP`; `pn=9`, `dn=#plain`), plus event-driven sibling-proof replay, behind one flag. Gate: `core` < 1 M expansions at 20 M child evals (≥5× cut) and no `easy-win` regression; otherwise close the hand-guide line. **Trigger:** before M4 freezes the proof format, or at an M4 stall. No optimizer/ablation sweep |
+| 15 | Hand-guide conformance (item-3 erratum) | **Not** an item-3 restart: attacker plain-move group as **one** child (`GROUP`; `pn=9`, `dn=#plain`), plus event-driven sibling-proof replay, behind one flag. Gate: `core` < 1 M expansions at 20 M child evals (≥5× cut) and no `easy-win` regression; otherwise close the hand-guide line. **Trigger:** before M4 freezes the proof format, or at an M4 stall. No optimizer/ablation sweep. **Planned: [`plan6`](plan6.md).** |
 
 **Item 15 evidence (investigation only, no code).** A conformance read of
 provari's hand guide against the measured plan3 stack found five semantic
@@ -214,7 +218,7 @@ starting number; sibling simulation and null-threat replay are exact proof
 replays, not playouts/priors; EF-PN scales by the parent's 0/1/2 band, not the
 child's continuous eval; fresh disproof numbers are 1, not invented
 complementary bases; a check's proof number is its surviving evasions capped
-at 8, not the parent's legal-move count. Same-session probes on the plan5
+at 8, not the parent's legal-move count. Same-session probes on the current
 tree: `easy-win` 190,464 expansions (censored) → 166,847 with `dn=1`
 (proved) → 110,339 with `dn=1` and EF-PN off (proved); `core` 149,504 →
 143,360 (censored); `core` with `--guide-off sim,closures` still needs
@@ -406,6 +410,11 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-09**: plan session 6 relabelled the drafted M4 plan as
+  [`plan7`](plan7.md); P0 is now [`plan5`](plan5.md) and item 15 is
+  [`plan6`](plan6.md). Order: plan5 (probe) → plan6 (GROUP kill-test) →
+  plan7 (M4, `.pvr` freeze provisional until plan6 closes). No code, no
+  measurements.
 - **2026-11-06**: initiative opened in plan session 1. Read the legacy handoff
   (rev. 2026-11-06), `report5.md`, `bench.md`, `movegen/report_update_2.4.0.md`
   and the pinned provari source (scratch clone, not committed). Decided
@@ -459,7 +468,7 @@ premise are the recorded starting point for the D21 kill review.
   run, extended to `deep-win`); put the absolute distance at the top of
   `bench.md`; added the plan/AGENTS size caps and the kill-review prompt to
   `AGENTS.md`; trimmed `AGENTS.md` to the cap. No engine code changed.
-- **2026-11-10** — plan4 (CORE-RESET) executed; D23 G1 **failed** on
+- **2026-11-09** — plan4 (CORE-RESET) executed; D23 G1 **failed** on
   `core` at 10 s, so **item 3 is closed**. Calibration (25-point
   `scale × ef_weight` sweep) proved `easy-win` at 10 s on seeds 0–2
   (121,866 / 110,533 / 115,147 expansions, limit 145,046) but left `core`
@@ -468,7 +477,7 @@ premise are the recorded starting point for the D21 kill review.
   (`max_sim=1, max_settle=1`) is the first configuration to prove `core`
   (120 s, 278.5 M evals, length 20); both checkers accepted the 14,332
   position proof. No ledger row. Recorded M4-first as the pivot.
-- **2026-11-10** — plan session 4: D21 kill review plus new read-only probes
+- **2026-11-09** — plan session 4: D21 kill review plus new read-only probes
   (bare `core` proves at 268 M evals / 9.27 M expansions / 16.8 s; hand
   `core` times out at 180 s after 2.92 M expansions and fills the proof table
   at 2.83 M entries). Wrote [`plan4.md`](plan4.md): item 3 re-scoped to

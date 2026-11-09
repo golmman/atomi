@@ -1,146 +1,102 @@
-# Prover Plan 5: item 5 (M4) — scaled proof output
+# Prover Plan 5: item 5 (M4) — P0 probe (aux stack at the product budget)
 
-Initiative: [`prover`](initiative.md), backlog **item 5 (M4)**. Drafted
-2026-11-10 in plan session 5 after [`report4.md`](report4.md), on the plan4
-tree. No impl. Item 3 is closed; M4-first is the recorded pivot;
-M5 waits for M4's proof path.
+Initiative: [`prover`](initiative.md), backlog **item 5 (M4)**, probe phase
+P0 split out of [`plan7`](plan7.md). Drafted 2026-11-09 in plan session 6
+after [`report4.md`](report4.md) and the item-15 erratum. This document does
+not implement. Measurement only; no product or speed claim.
 
-## Absolute distance (probes, 2026-11-10)
+## Why this plan
 
-Goal: geomean wall `< 1.0` vs provari hand, coverage 3/3. `easy-win` proves at
-10 s (42× wall), `core` only at 120 s with the auxiliary budget, `deep-win`
-not proved.
+`report4.md` §Next steps asks for the auxiliary-budget stack on the frozen
+`guidance-v1` set at the product budget; it has only been run on the two
+canonical cells. Plan7 (M4) needs three facts before it can size anything:
 
-| Case | Search result | Proof output today |
-| --- | --- | --- |
-| `easy-win`, chosen 10 s | 121,866 expansions, 6.04 s, length 18 | 2,493 positions, 10,550 proof entries, 210 KB JSONL |
-| `core`, aux 120 s (report4) | 278.5 M evals, 59.9 s, length 20 | 14,332 positions, ≈691 k entries; both checkers accept |
-| `deep-win`, aux 120 s | censored: 562.7 M evals, 20.3 M expansions, 1.22 M entries | no proof |
+1. What the aux stack proves at 10 s on the 24 frozen cells (coverage and
+   which cell is the largest proved proof).
+2. Whether `--proof-out` is trajectory-neutral **at 10 s** with the aux
+   stack (the only determinism evidence today is the untimed 120 s run).
+3. Whether `deep-win` has any proof at 120 s, or is censored for search, not
+   output.
 
-No `deep-win` proof exists, so `core` (14,332 positions) is the scale case
-and `deep-win` stays a censored stretch cell. The exporter is still the D18
-proof table: its 25% `--memory` share refuses inserts at 90% load, and export
-then fails `store-full`; that is the M4 stop to remove. `.pvr` does not exist;
-`provari check` reads our JSONL.
+## Inputs (pinned, no re-measurement)
 
-## Scope
+| Item | Value |
+| --- | --- |
+| Binary | release build of the current tree (`cargo build --release`); record sha256 |
+| Guidance set | `measurements/plan3/guidance-v1.tsv`, 24 cells, sha256 `2da2a65b…8c7d` |
+| Corpus | `bench/corpus.json`, sha256 `9cd0169a…47d0e` |
+| Aux stack | `--guide hand --guide-scale 64 --guide-ef-weight 0 --guide-max-sim 1 --guide-max-settle 1` |
+| Budget | `--seconds 10 --memory 192`, seeds 0, 1, 2 |
+| Reference | plan4 same-session provari medians (`core` 0.533 s, `easy-win` 0.137 s, `deep-win` 6.567 s); no new oracle run unless the host differs |
 
-**In:** an event-fed, disk-spooled proof worker with bounded memory and no
-proof-table cap; a replay protocol that keeps `--proof-out` trajectory-neutral;
-JSONL from the worker; `.pvr` export; tests, measurements and docs.
-
-**Out:** guide/search/value/key/validator changes, default-flag changes,
-restarts, portfolio, tablebases, model guide, a goal claim, and any use of
-provari code or binaries in the repo.
-
-## Proposed D24
-
-**Proof output is replay-fed; the proof table is not the export source.** A
-proved run is followed by a deterministic replay (same FEN, seed, guide
-config/params, memory; no wall deadline; `--evals = recorded child_evals +
-1`) feeding a bounded worker. The replay must reproduce `child_evals`,
-`expansions`, `exit` and `length`, else `replay-mismatch`. The worker's disk
-budget (`--proof-budget`, default 256 MiB) is the only output cap;
-proof-table refusal does not block export. JSONL stays default; `.pvr` is
-opt-in. Owner to confirm.
-
-## Design
-
-1. **Worker (`strategy/worker.rs`).** `WorkerSink` appends 16-byte records
-   `(key, mv bits, length, limit)` to a 16 MiB run buffer. A full buffer is
-   sorted by `(key, length, limit, mv)`, compacted with the D18 non-dominated
-   rule, and written as a run file. At end a k-way merge produces one
-   fixed-record file with the same rule (ties by move bits, so any input
-   order gives the same file). Peak memory is the run buffer plus one record
-   per run, independent of the proof table.
-2. **Source.** `FileSource` implements `ProofSource` by binary-searching the
-   fixed-record file for `key`. It uses `Mutex<File>` to keep the writer's
-   `Sync` contract. `is_full` means the worker budget was exhausted
-   (`worker-full`), reported as `proof_worker_bytes` / `proof_worker_runs`.
-3. **Replay.** The proving run keeps `NullSink`, so timed trajectories are
-   untouched. On `--proof-out` + proved, rerun `search::prove` with the same
-   flags and `WorkerSink`, no deadline, and an eval cap one above the
-   recorded count. The replay reaches root proof before any cap; assert equal
-   counters/exit/length, else fail closed. The proof run cannot change the
-   proving run's outcome, even at a wall budget.
-4. **Writer.** The existing DFS, cycle check, per-`(position, counter)`
-   choice and fail-closed rules stay; it reads `FileSource` when the worker
-   is used. `--proof-out` still writes `PATH.tmp` then renames.
-5. **`.pvr` (`strategy/pvr.rs`, opt-in `--proof-format pvr`).** Walk with the
-   format's settled and "already proven at this counter" rules, so a position
-   proven earlier at a counter ≥ the current one writes no move. Header:
-   version 1, variant atomic, root FEN, tablebases 0, length, positions; no
-   `attacker` field. Move index: checks first, then `(from, to, promotion)`
-   by square; unsigned LEB128. Frame is zstd with checksum; `positions`
-   equals the numbers written. Add `zstd` only if the licence gate stays
-   green; otherwise stop and defer `.pvr` (JSONL is the veto path).
+All flags above are the plan4 aux point; this plan adds no new flag and
+changes no default.
 
 ## Measurement
 
-- **P0.** Run the plan4 aux point (`scale 64 / ef 0 / max_sim 1 /
-  max_settle 1`) on `guidance-v1` at 10 s × seeds 0–2 with and without
-  `--proof-out`; record wins, counters, positions, worker bytes and wall.
-  `deep-win` gets one 120 s proof attempt; a censor is recorded.
-- **A.** Worker tests: random event streams, multiple runs, domination, byte
-  cap, deterministic bytes, binary-search source, table-refusal export.
-- **B.** Replay tests: proved timed run vs replay counters identical;
-  injected mismatch fails `replay-mismatch`; no-guide counters unchanged;
-  non-proved `--proof-out` writes nothing.
-- **C.** `core` aux 120 s and `easy-win` chosen 10 s JSONL, both accepted by
-  `atomi validate` and `provari check`, D14 counters identical.
-- **D.** `.pvr` for both cases, checker-accepted, JSONL as control; then
-  `make test-full`/`lint`/licence gate; update docs and `report5.md`.
+- **P0-a (coverage).** 24 cells × seeds 0–2 at 10 s, aux stack. Record
+  `proved`/`censored`, `expansions`, `child_evals`, `sim_nodes`,
+  `settle_nodes`, `proof_full`, wall. One row per `(cell, seed)`; 72 rows.
+- **P0-b (determinism).** For `core` seed 0 and `easy-win` seed 0, repeat
+  P0-a with `--proof-out` at the same 10 s budget and compare `child_evals`,
+  `expansions` and `exit` exactly. A censored run must write no proof.
+- **P0-c (scale case).** For the largest cell proved in P0-a, run the D14
+  proof protocol (`--seconds 600`, no eval cap) and record positions, proof
+  entries, JSONL bytes, `child_evals` equality and both checkers' verdicts.
+  `easy-win` may cite the plan4 chosen proof; `core` may cite
+  `measurements/plan4/pressure.json` only if the flags and tree match
+  exactly, otherwise re-run.
+- **P0-d (`deep-win`).** One 120 s aux attempt with `--proof-out`; classify
+  the censor (search / `proof_full` / deadline) and record counters. No
+  proof is expected; a proof would move the plan7 scale case.
 
-## Gates
+Driver: `measurements/plan5/run_p0.py`, stdlib only, subprocess + JSON-line
+parsing, one process at a time. No captures of stdout beyond the parsed
+fields.
 
-- **G1 scale.** `core` aux 120 s exports a JSONL proof accepted by both
-  checkers, with `proof_full` allowed and `worker-full` false; `easy-win`
-  10 s exports the same. Worker peak memory and disk are within
-  `--proof-budget`; a table-refusal run still exports.
-- **G2 `.pvr`.** `easy-win` and `core` `.pvr` files are accepted by
-  `provari check`; corrupted-frame and wrong-index controls are `valid:
-  false`; JSONL controls still accepted. If the licence gate rejects zstd,
-  G2 is reported deferred, not passed.
-- **G3 determinism.** The proving run's counters/exit/length are identical
-  with and without `--proof-out`; replay counters equal the proving run;
-  no-guide counters unchanged from m1. Any mismatch is `replay-mismatch`.
-- **G4 soundness.** No refutation/never-prove; every claimed proof accepted
-  by both checkers; `--proof-out` writes nothing on non-proved runs.
-- **G5 build/docs.** `make test`, `make lint`, `make test-full` green; no
-  GPL-family licence; parsed data and README under `measurements/plan5/`;
-  no raw transcripts, provari artifacts or `__pycache__`.
+## Gate (data, not product)
 
-## Tasks (stop only at a phase boundary)
+- **G1 data.** 72 P0-a rows present, each with a verdict; P0-c and P0-d
+  classified. Missing rows are a failure, not a skip.
+- **G2 determinism.** P0-b counters identical; any difference is a finding
+  and plan7 does not start until it is explained.
+- **G3 soundness.** No guidance-set refutation. Any proved cell's proof is
+  accepted by `atomi validate` and `provari check` (or cited as in P0-c).
+- **G4 artefacts.** `measurements/plan5/{run_p0.py,probes.json,coverage.json,
+  determinism.json,env.json,README.md}`; no raw transcripts, provari
+  artifacts or `__pycache__`. `make test`/`make lint` green (no code change
+  expected).
 
-- **P0** probes and `measurements/plan5/{probes.json,README.md,env.json}`;
-  `run_m4.py` (stdlib only) for the guidance runs.
-- **A** `strategy/worker.rs`, CLI `--proof-budget`, `FileSource`, tests.
-- **B** replay path in `main.rs`/`cli.rs`, failure classes, D14 tests.
-- **C** scaled JSONL gate on `core`/`easy-win`, table-refusal control.
-- **D** `.pvr` writer + zstd licence check, checker controls; then docs and
-  `report5.md`. If G1 fails, stop before `.pvr` and report the pivot.
+A censor is a recorded result. This plan has no speed gate and appends no
+ledger row.
+
+## Output the next plans consume
+
+- Coverage table at 10 s per cell (proved / censored) and the aux wall
+  distribution on proved cells — expected to be near 10 s, because the aux
+  budget spends its time in simulation/settle.
+- The scale case for plan7: largest proved proof (positions, entries, bytes)
+  and whether `deep-win` stays censored.
+- The `--proof-out` neutrality answer at 10 s (plan7 G3 assumes it).
+- Whether `easy-win`'s aux inflation (918,551 expansions at 10 s in report4,
+  proved but 6.3× the D21 limit) reproduces on seeds 1–2; this is a coverage
+  datum, not a gate.
+
+## Tasks
+
+- **T1** build, pin sha256, write `env.json` and `run_p0.py`.
+- **T2** P0-a (72 runs), `coverage.json`.
+- **T3** P0-b (4 runs), `determinism.json`.
+- **T4** P0-c (1–2 D14 runs), P0-d (1 run), `probes.json`.
+- **T5** README with commands and parsed tables; docs status line; then stop
+  (report5 only if the owner asks for one; this is a probe).
 
 ## Risks
 
 | Risk | Mitigation |
 | --- | --- |
-| Replay changes trajectory or doubles a hot run | Replay only on `--proof-out` + proved; eval guard; counter equality gate |
-| Worker spill is slow or disk-bound | Bounded runs, k-way merge, `--proof-budget`; measure bytes and wall |
-| `.pvr` walk differs from the checker's settled rule | Dedicated walk state, `positions` count, checker controls |
-| zstd brings a GPL-family transitive dependency | Licence gate first; defer `.pvr` rather than weaken the gate |
-| Proof table full during a proving search | Worker gets all events; table-refusal export test |
-| `deep-win` scale unavailable | `core` is the scale case; record the censor |
-
-## Report and deliverables
-
-`report5.md`: headline, provenance, commands, probe/coverage table, worker
-bytes, replay evidence, JSONL/`.pvr` verdicts, gates, not measured, problems,
-missing tests, next steps and a closure block. State whether M4 is done and
-whether M5 can start.
-
-- **Engine:** `src/strategy/{worker.rs,pvr.rs,mod.rs,write.rs}`,
-  `src/{cli.rs,main.rs}`, `Cargo.toml`/`Cargo.lock`, tests.
-- **Measurements:** `measurements/plan5/{run_m4.py,README.md,env.json,
-  probes.json,coverage.json,proofs.json,worker.json}`.
-- **Docs:** `initiative.md` (D24, status, history), `bench.md` (M4 row; no
-  goal claim), `gotchas.md`/`AGENTS.md` if needed, `report5.md`.
+| Aux runs are slow (sim/settle), 72 × 10 s plus proof runs | Bound by `--seconds 10`; P0-c only on the largest proved cell |
+| 10 s walls are host-sensitive | One process at a time; same-session reference; record host in `env.json` |
+| `--proof-out` at 10 s hits `proof_full` and changes the run | That is the finding; record it, do not raise `--proof-share` in this plan |
+| `deep-win` 120 s attempt is inconclusive | Record the censor class; plan7 keeps `core` as scale case |
+| P0-c proof run exceeds 600 s | D14 allows the cap; a cap hit is recorded, proof not claimed |
