@@ -170,7 +170,7 @@ session added D21–D22.
 | D20 | `unsafe` in M1 (plan2) | Three sites, each with `// SAFETY:` comments and a measured keep rule: (1) the copied lazy zeroed allocator (`Zeroed<T>`, over-allocated with align 16 so calloc's lazy pages also serve the 64-byte-aligned clusters); (2) the x86-64 `_mm_prefetch` wrapper (kept: 3.3% on the final tree); (3) `madvise(MADV_HUGEPAGE)` via a 3-line `extern "C"` (Linux, x86-64/aarch64; kept: −18%) |
 | D21 | Stack-level gating and the hand-guide stack (owner decision 2026-11-09; replaces working agreement 2 for this initiative) | A plan may add a **named stack** of coupled mechanisms under **one gate**. The gate is judged on the whole stack; individual mechanisms are not pre-gated. After the stack passes, **both-direction ablations** (leave-one-out from the full stack, add-one-in to the bare skeleton) decide which mechanisms stay, over the same frozen ≥20-cell set and several seeds. The first stack is **M2+M3 "hand-guide stack"** (item 3): move classes, check evasions, quiet grouping, EF-PN hand-eval scaling, per-child static closures including the one-ply explosion settle on every child for both sides, defender priors (`UNLIKELY`, defence history), history tie-breaks, sibling simulation and the null-move threat replay. **Gate:** `easy-win` `expansions` ≤ 2 × provari hand's 72,523 = **145,046 nodes**; `core` **proved** at `--seconds 10 --memory 192`; no guidance-set refutations; measured on **≥20 frozen cells and ≥3 seeds**; wall and `child_evals` are recorded, never substituted for the node gate |
 | D22 | Guidance measurement and seeds (owner decision 2026-11-09) | `--seed N` perturbs **only tie-breaks after** the guide metric, class and history; seed 0 preserves movegen order. The seed is part of the deterministic flag set (same binary + FEN + flags + seed = identical counters) and is carried into D14 proof runs. The gate uses seeds 0, 1, 2, 3. `guidance-v1` is frozen by a **provari-hand census before any atomi stack run** (rule in plan3): ≥20 deduplicated cells from `core + sample20` and `wins.tsv` where provari hand proves inside the stated selection budget. Auxiliary guide work (simulation, settle movegens, threat replay) is reported as `sim_nodes`/`settle_nodes`; `child_evals` and `expansions` keep D11 meaning and stay main-search only |
-| D23 | CORE-RESET and item-3 closure (plan4, executed 2026-11-10) | Item 3 was re-scoped once, as the last attempt, to **CORE-RESET**: starting-number calibration (`global_scale`, `ef_weight`), settled-proof retention only when the parent value selects it, a `--proof-share` memory split, and a per-frame `max_sim`/`max_settle` auxiliary budget, all under D21. **G1:** `core` proved at 10 s and `easy-win` ≤ 145,046 on seeds 0–2. G1 **failed** on `core`; item 3 **closed**, no plan5 mechanism split, no ledger row. The 120 s auxiliary-budget `core` proof is recorded as the M4-first pivot. Owner to confirm the closure wording |
+| D23 | CORE-RESET and item-3 closure (plan4, executed 2026-11-10) | Item 3 was re-scoped once, as the last attempt, to **CORE-RESET**: starting-number calibration (`global_scale`, `ef_weight`), settled-proof retention only when the parent value selects it, a `--proof-share` memory split, and a per-frame `max_sim`/`max_settle` auxiliary budget, all under D21. **G1:** `core` proved at 10 s and `easy-win` ≤ 145,046 on seeds 0–2. G1 **failed** on `core`; item 3 **closed**, no plan5 mechanism split, no ledger row. The 120 s auxiliary-budget `core` proof is recorded as the M4-first pivot. Owner to confirm the closure wording. **Erratum (post-closure investigation):** plan3 §2 implemented quiet grouping as a starting-number statement, not the one-child merge, and `simulate.rs` is a greedy playout, not proof replay, so the closure covers **atomi's variant only**; the missing group is measured at 6.9 M `core` expansions at 200 M child evals with sim/closures off. See horizon 15 |
 
 ## Backlog
 
@@ -193,7 +193,7 @@ before the M2+M3 stack. If the hand-guide stack cannot meet D21, do not split
 it back into mechanism plans: record the stack, its census and both-direction
 ablations, and take the continue/re-scope/close decision at a kill review.
 
-**Horizon (unranked, after M5; carries `winprover` item 8):**
+**Horizon (unranked, after M5 unless a row names an earlier trigger; carries `winprover` item 8):**
 
 | # | Item | Note |
 | --- | --- | --- |
@@ -205,6 +205,23 @@ ablations, and take the continue/re-scope/close decision at a kill review.
 | 12 | Durable proof corpus | own plan and schema; legacy `docs/spec/global_proof_store.md` as reference |
 | 13 | Optional external tablebases (D7) | provari's path is external and optional too |
 | 14 | `--guide model` stretch column (D8) | recorded only |
+| 15 | Hand-guide conformance (item-3 erratum) | **Not** an item-3 restart: attacker plain-move group as **one** child (`GROUP`; `pn=9`, `dn=#plain`), plus event-driven sibling-proof replay, behind one flag. Gate: `core` < 1 M expansions at 20 M child evals (≥5× cut) and no `easy-win` regression; otherwise close the hand-guide line. **Trigger:** before M4 freezes the proof format, or at an M4 stall. No optimizer/ablation sweep |
+
+**Item 15 evidence (investigation only, no code).** A conformance read of
+provari's hand guide against the measured plan3 stack found five semantic
+divergences: quiet moves are one deferred `GROUP` child, not a per-child
+starting number; sibling simulation and null-threat replay are exact proof
+replays, not playouts/priors; EF-PN scales by the parent's 0/1/2 band, not the
+child's continuous eval; fresh disproof numbers are 1, not invented
+complementary bases; a check's proof number is its surviving evasions capped
+at 8, not the parent's legal-move count. Same-session probes on the plan5
+tree: `easy-win` 190,464 expansions (censored) → 166,847 with `dn=1`
+(proved) → 110,339 with `dn=1` and EF-PN off (proved); `core` 149,504 →
+143,360 (censored); `core` with `--guide-off sim,closures` still needs
+>6.9 M expansions at 200 M child evals, against provari's 342,289 nodes. The
+blocker is the tree, not only per-node cost. Cheapest decisive test: the
+`GROUP` child alone behind one flag, `core` and `easy-win` at 20 M child
+evals; a <5× `core` cut kills the hand-guide line.
 
 Cannot-win material is part of the M2+M3 stack. Compact `.pvr` is M4. Root-`Loss`
 coverage needs a defender-side mode (a new item if ever wanted). `winprover`
