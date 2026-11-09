@@ -76,6 +76,13 @@ no auxiliary lever reaches the 0.5 s gate. The absolute distance is now
 easy-win ≈ 27×, core ≥ 19× censored, deep-win censored, coverage 1/3. See
 [`report7.md`](report7.md) and [`measurements/plan7/`](measurements/plan7/README.md).
 
+**Update (plan session 8, 2026-11-09).** Item 16 is closed negative; the
+hand-guide/auxiliary line is not continued. The next plan is
+[`plan8`](plan8.md) (item 17): a same-session per-expansion re-diagnosis
+against provari's per-node wall plus a 60 s coverage bracket. It either opens
+item 18 (restarts + core throughput) or recommends the item-19 owner re-pin.
+No ledger row.
+
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
 ## Names and ids (read this first)
