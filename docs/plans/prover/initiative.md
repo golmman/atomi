@@ -19,8 +19,8 @@ both-checker-accepted 14,332-position proof, not at 10 s. **Item 3 is
 closed**; no ledger row. The pivot options are in `report4.md` (M4 first).
 Plan session 6 (2026-11-09) kept M4 but split the pivot: [`plan5`](plan5.md)
 is the P0 probe (aux stack on `guidance-v1` at 10 s), [`plan6`](plan6.md) is
-item 15 (`GROUP` kill-test), and [`plan7`](plan7.md) is the M4
-implementation; item 15 runs before plan7's format freeze. **Plan5 probe
+item 15 (`GROUP` kill-test), and the M4 implementation was drafted as plan7
+(now [`planX`](planX.md), parked; see below). **Plan5 probe
 executed (2026-11-09):** the auxiliary stack proves 19/24 frozen cells at
 10 s (57/72 rows, all seeds; `easy-win` included), while `core`,
 `deep-win`, `b9a7ed7eb368`, `3004d09cef79` and `dd3f89766a40` are censored;
@@ -31,11 +31,24 @@ See [`measurements/plan5/`](measurements/plan5/README.md) and
 flag; it does **not** cut `core` (681,518 vs 648,828 flag-off expansions at
 20 M evals, 0.96×) and regresses `easy-win` (1.15–2.31×), so **G2 and the
 item-15 ≥ 5× G1 clause fail**. The stop rule closes the hand-guide line; no
-replay phase was implemented. The plan7 scale case is unchanged: on the
+replay phase was implemented. The planX scale case is unchanged: on the
 current tree `core` aux 120 s = 14,332 positions / 691,117 entries,
 `easy-win` aux = 3,527 / 65,179, both checker-accepted. See
 [`measurements/plan6/`](measurements/plan6/README.md) and
 [`report6.md`](report6.md).
+
+**Plan session 7 (2026-11-09) — kill review and re-aim.** The absolute
+distance to the goal is not closing: the best product configuration is
+`easy-win` at ≈ 5.8 s versus provari hand 0.137 s (**≈ 42× wall**), `core`
+censored at 10 s (needs 120 s), and `deep-win` censored at 120 s; coverage
+at the product budget is **1/3**. Per-node cost is competitive (M1 53.4 ms
+per 1 M child evals), so the gap is auxiliary guide work and tree size, not
+movegen. The D21 gate measured expansions, which let a 42× wall regression
+pass. **M4 is parked as [`planX`](planX.md)** because proof export does not
+move the wall geomean (D14 times runs without `--proof-out`). The next plan
+is [`plan7`](plan7.md) (item 16): wall attribution, then a deterministic
+global auxiliary budget under a **wall** gate. D24 records the decision;
+plan7 proposes D25 for the budget's deterministic semantics.
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -190,6 +203,7 @@ session added D21–D22.
 | D21 | Stack-level gating and the hand-guide stack (owner decision 2026-11-09; replaces working agreement 2 for this initiative) | A plan may add a **named stack** of coupled mechanisms under **one gate**. The gate is judged on the whole stack; individual mechanisms are not pre-gated. After the stack passes, **both-direction ablations** (leave-one-out from the full stack, add-one-in to the bare skeleton) decide which mechanisms stay, over the same frozen ≥20-cell set and several seeds. The first stack is **M2+M3 "hand-guide stack"** (item 3): move classes, check evasions, quiet grouping, EF-PN hand-eval scaling, per-child static closures including the one-ply explosion settle on every child for both sides, defender priors (`UNLIKELY`, defence history), history tie-breaks, sibling simulation and the null-move threat replay. **Gate:** `easy-win` `expansions` ≤ 2 × provari hand's 72,523 = **145,046 nodes**; `core` **proved** at `--seconds 10 --memory 192`; no guidance-set refutations; measured on **≥20 frozen cells and ≥3 seeds**; wall and `child_evals` are recorded, never substituted for the node gate |
 | D22 | Guidance measurement and seeds (owner decision 2026-11-09) | `--seed N` perturbs **only tie-breaks after** the guide metric, class and history; seed 0 preserves movegen order. The seed is part of the deterministic flag set (same binary + FEN + flags + seed = identical counters) and is carried into D14 proof runs. The gate uses seeds 0, 1, 2, 3. `guidance-v1` is frozen by a **provari-hand census before any atomi stack run** (rule in plan3): ≥20 deduplicated cells from `core + sample20` and `wins.tsv` where provari hand proves inside the stated selection budget. Auxiliary guide work (simulation, settle movegens, threat replay) is reported as `sim_nodes`/`settle_nodes`; `child_evals` and `expansions` keep D11 meaning and stay main-search only |
 | D23 | CORE-RESET and item-3 closure (plan4, executed 2026-11-09) | Item 3 was re-scoped once, as the last attempt, to **CORE-RESET**: starting-number calibration (`global_scale`, `ef_weight`), settled-proof retention only when the parent value selects it, a `--proof-share` memory split, and a per-frame `max_sim`/`max_settle` auxiliary budget, all under D21. **G1:** `core` proved at 10 s and `easy-win` ≤ 145,046 on seeds 0–2. G1 **failed** on `core`; item 3 **closed**, no mechanism split into a further plan, no ledger row. The 120 s auxiliary-budget `core` proof is recorded as the M4-first pivot. Owner to confirm the closure wording. **Erratum (post-closure investigation):** plan3 §2 implemented quiet grouping as a starting-number statement, not the one-child merge, and `simulate.rs` is a greedy playout, not proof replay, so the closure covers **atomi's variant only**; the missing group is measured at 6.9 M `core` expansions at 200 M child evals with sim/closures off. See horizon 15 |
+| D24 | M4 parked; wall is the gate (plan session 7, 2026-11-09) | The drafted M4 plan is parked as [`planX`](planX.md); it resumes only after a configuration wins 3/3 at 10 s. The next plan is [`plan7`](plan7.md) (item 16). **Gates for search/guide work are wall-based** (same-session `atomi / provari --guide hand` wall, plus coverage), with `child_evals`, `expansions`, `sim_nodes` and `settle_nodes` recorded as diagnostics. A node-only gate is not sufficient evidence for the goal. Auxiliary budgets must stay **deterministic** (same binary + FEN + flags + seed = identical counters, D22); a wall-clock budget inside the search is not allowed. The kill review is due after plans 5–6 and is recorded in the status section |
 
 ## Backlog
 
@@ -203,8 +217,9 @@ single-mechanism plan that is independently meaningful.
 | 2 | **M1** per-node cost | `Mover`/`Effect` per expanded node; no make/unmake for most children; incremental keys; TT clusters + prefetch + filter + lazy zeroed allocation (copy legacy `src/search/tt/alloc.rs`); in-search proof store with length/limit, inside the `--memory` label | wall per 1 M child evals ≤ the M0 baseline **and** ≤ the legacy front-end's (cross-repo, same session); a small reference win proved within a stated cap and checker-accepted; soundness fixtures green | **done: [`plan2`](plan2.md), [`report2`](report2.md)** — `core`/10 M/192 MB: **53.4** ms per 1 M child evals (m0 166.7, legacy front-end 137.3, same session) |
 | 3 | **M2+M3** hand-guide stack | move classes, check evasions, quiet grouping, EF-PN hand-eval scaling; per-child static closures including the one-ply explosion settle on every child (both sides); defender priors (`UNLIKELY`, defence history); history tie-breaks; sibling simulation; null-move threat replay; constants in one `GuideParams` table exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | **D21 stack gate:** `easy-win` expansions ≤ 145,046 (2 × provari hand's 72,523 nodes); `core` proved at 10 s / 192 MB; no guidance-set refutations; ≥20 frozen cells × seeds 0–3; both-direction ablations after the gate | **closed; G1 failed** — [plan3](plan3.md), [report3](report3.md), [plan4](plan4.md), [report4](report4.md). Plan3: frozen 24-cell `guidance-v1`; hand coverage 19/24; `easy-win` 211,254–631,763 expansions; `core` censored at 20 M and 10 s. Plan4 CORE-RESET (D23) last attempt: calibrated point scale 64 / EF weight 0 proves `easy-win` at 10 s on seeds 0–2 (**121,866 / 110,533 / 115,147**, all ≤ 145,046) but `core` is still censored at 10 s; auxiliary `max_sim=1/max_settle=1` proves `core` at 120 s (278.5 M evals, length 20, proof accepted by both checkers) but not at 10 s. No refutations, no ledger row. Pivot: M4 first |
 | 4 | ~~M3 static tactics + simulation~~ | **merged into item 3** (D21, 2026-11-09): per-child static tactics, one-ply explosion settle, sibling simulation, defender priors, history, null-move replay | — | merged |
-| 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | **open** — probe [`plan5`](plan5.md) executed ([data](measurements/plan5/README.md): 19/24 cells at 10 s, scale case `easy-win` 3,527 positions / 65,179 entries / 293 KB, `deep-win` censored for search at 120 s), implementation [`plan7`](plan7.md). Plan6 re-check ([data](measurements/plan6/README.md)): `core` aux 120 s = 14,332 positions / 691,117 entries, `easy-win` aux = 3,527 / 65,179; both accepted. Plan7 phase A keeps `core` as the conservative scale case |
+| 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | **parked (D24)** — probe [`plan5`](plan5.md) executed ([data](measurements/plan5/README.md): 19/24 cells at 10 s, scale case `easy-win` 3,527 positions / 65,179 entries / 293 KB, `deep-win` censored for search at 120 s); implementation [`planX`](planX.md). Plan6 re-check ([data](measurements/plan6/README.md)): `core` aux 120 s = 14,332 positions / 691,117 entries, `easy-win` aux = 3,527 / 65,179; both accepted. Resumes only after a 3/3 10 s win |
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
+| 16 | **Wall attribution + deterministic auxiliary budget** | same-session attribution of wall on `easy-win`/`core` (main search vs sim vs settle vs threat replay vs guide eval); a deterministic global auxiliary-work budget (not wall-clock) and cheaper aux paths; wall-gated measurement | **wall gate:** `easy-win` wall ≤ 0.5 s (factor ≤ 3.6) and `core` proved at 10 s / 192 MB on seeds 0–2, with no guidance-set refutations; `deep-win` attempted at 10 s and classified; counters recorded, never substituted for wall | **next: [`plan7`](plan7.md)** |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
 legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose
@@ -425,6 +440,11 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-09**: plan session 7 (kill review). Parked the M4 plan as
+  [`planX`](planX.md) and added D24: M4 resumes only after a 3/3 10 s win;
+  search/guide gates are wall-based; auxiliary budgets stay deterministic.
+  Wrote [`plan7`](plan7.md) (item 16): wall attribution, then a deterministic
+  global auxiliary budget under a wall gate. No code, no measurements.
 - **2026-11-09**: plan6 (item 15 `GROUP` kill-test) executed. `--guide-group`
   (default off) implements the plain-move `GROUP` pseudo-child, value
   algebra, descent and proof mapping with unit/property/crafted tests.
@@ -448,11 +468,11 @@ premise are the recorded starting point for the D21 kill review.
   Measurement only: no ledger row, no code change. Data:
   [`measurements/plan5/`](measurements/plan5/README.md); report:
   [`report5.md`](report5.md).
-- **2026-11-09**: plan session 6 relabelled the drafted M4 plan as
-  [`plan7`](plan7.md); P0 is now [`plan5`](plan5.md) and item 15 is
-  [`plan6`](plan6.md). Order: plan5 (probe) → plan6 (GROUP kill-test) →
-  plan7 (M4, `.pvr` freeze provisional until plan6 closes). No code, no
-  measurements.
+- **2026-11-09**: plan session 6 relabelled the drafted M4 plan as plan7
+  (later parked as [`planX`](planX.md)); P0 is now [`plan5`](plan5.md) and
+  item 15 is [`plan6`](plan6.md). Order: plan5 (probe) → plan6 (GROUP
+  kill-test) → plan7 (M4, `.pvr` freeze provisional until plan6 closes).
+  No code, no measurements.
 - **2026-11-06**: initiative opened in plan session 1. Read the legacy handoff
   (rev. 2026-11-06), `report5.md`, `bench.md`, `movegen/report_update_2.4.0.md`
   and the pinned provari source (scratch clone, not committed). Decided

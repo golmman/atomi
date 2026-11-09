@@ -62,6 +62,11 @@ Implication: the next step is the M4-first pivot recorded in `report4.md`
 per-node work is indicated. This section is the absolute number; the rows
 below are relative history.
 
+**Update (plan session 7, D24).** M4 is parked as [`planX`](planX.md): proof
+export does not move the wall geomean. The next plan is [`plan7`](plan7.md)
+(item 16): wall attribution, then a deterministic global auxiliary budget
+under a wall gate. No ledger row follows from this note.
+
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
 ## Names and ids (read this first)

@@ -6,7 +6,7 @@ Phases
 env        pin host/toolchain/binary and the frozen input hashes
 group      core/easy-win x seeds 0-2, flag off/on, --evals 20M (12 runs + repeats)
 soundness  guidance-v1 seed 0 with GROUP: refutations, D14 proofs and both checkers
-scale      core/easy-win auxiliary D14 proofs (the plan7 scale-case re-check)
+scale      core/easy-win auxiliary D14 proofs (the planX scale-case re-check)
 all        env, group, soundness, scale
 
 One atomi process at a time. Only parsed JSON-line fields are stored; no raw

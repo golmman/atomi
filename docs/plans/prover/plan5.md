@@ -1,7 +1,7 @@
 # Prover Plan 5: item 5 (M4) — P0 probe (aux stack at the product budget)
 
 Initiative: [`prover`](initiative.md), backlog **item 5 (M4)**, probe phase
-P0 split out of [`plan7`](plan7.md). Drafted 2026-11-09 in plan session 6
+P0 split out of [`planX`](planX.md). Drafted 2026-11-09 in plan session 6
 after [`report4.md`](report4.md) and the item-15 erratum. This document does
 not implement. Measurement only; no product or speed claim.
 
@@ -48,7 +48,7 @@ changes no default.
   exactly, otherwise re-run.
 - **P0-d (`deep-win`).** One 120 s aux attempt with `--proof-out`; classify
   the censor (search / `proof_full` / deadline) and record counters. No
-  proof is expected; a proof would move the plan7 scale case.
+  proof is expected; a proof would move the planX scale case.
 
 Driver: `measurements/plan5/run_p0.py`, stdlib only, subprocess + JSON-line
 parsing, one process at a time. No captures of stdout beyond the parsed
@@ -59,7 +59,7 @@ fields.
 - **G1 data.** 72 P0-a rows present, each with a verdict; P0-c and P0-d
   classified. Missing rows are a failure, not a skip.
 - **G2 determinism.** P0-b counters identical; any difference is a finding
-  and plan7 does not start until it is explained.
+  and planX does not start until it is explained.
 - **G3 soundness.** No guidance-set refutation. Any proved cell's proof is
   accepted by `atomi validate` and `provari check` (or cited as in P0-c).
 - **G4 artefacts.** `measurements/plan5/{run_p0.py,probes.json,coverage.json,
@@ -75,9 +75,9 @@ ledger row.
 - Coverage table at 10 s per cell (proved / censored) and the aux wall
   distribution on proved cells — expected to be near 10 s, because the aux
   budget spends its time in simulation/settle.
-- The scale case for plan7: largest proved proof (positions, entries, bytes)
+- The scale case for planX: largest proved proof (positions, entries, bytes)
   and whether `deep-win` stays censored.
-- The `--proof-out` neutrality answer at 10 s (plan7 G3 assumes it).
+- The `--proof-out` neutrality answer at 10 s (planX G3 assumes it).
 - Whether `easy-win`'s aux inflation (918,551 expansions at 10 s in report4,
   proved but 6.3× the D21 limit) reproduces on seeds 1–2; this is a coverage
   datum, not a gate.
@@ -98,5 +98,5 @@ ledger row.
 | Aux runs are slow (sim/settle), 72 × 10 s plus proof runs | Bound by `--seconds 10`; P0-c only on the largest proved cell |
 | 10 s walls are host-sensitive | One process at a time; same-session reference; record host in `env.json` |
 | `--proof-out` at 10 s hits `proof_full` and changes the run | That is the finding; record it, do not raise `--proof-share` in this plan |
-| `deep-win` 120 s attempt is inconclusive | Record the censor class; plan7 keeps `core` as scale case |
+| `deep-win` 120 s attempt is inconclusive | Record the censor class; planX keeps `core` as scale case |
 | P0-c proof run exceeds 600 s | D14 allows the cap; a cap hit is recorded, proof not claimed |

@@ -4,7 +4,7 @@ Plan: [`plan6.md`](plan6.md) (item 15, `GROUP` child). Executed 2026-11-09.
 Implementation is behind the default-off `--guide-group` flag; no default
 changed and no ledger row was appended. The plan's stop rule fired: **G2
 fails, and G1 fails its substantive ≥ 5× clause, so the hand-guide line is
-closed.** The plan7 scale case is re-checked and unchanged.
+closed.** The planX scale case is re-checked and unchanged.
 
 ## Headline
 
@@ -129,7 +129,7 @@ are green.
 
 ### Scale-case re-check (`scale.json`)
 
-The plan7 phase-A dependency was “if `GROUP` cuts `core` below 1 M
+The planX phase-A dependency was “if `GROUP` cuts `core` below 1 M
 expansions, the 691 k-entry case no longer exists”. It did not:
 
 | Cell | budget | positions | entries | checkers |
@@ -137,7 +137,7 @@ expansions, the 691 k-entry case no longer exists”. It did not:
 | `core` aux | 120 s | 14,332 | 691,117 | both accepted |
 | `easy-win` aux | 600 s | 3,527 | 65,179 | both accepted |
 
-So plan7 phase A keeps `core` (14,332 positions / ≈ 691 k entries) as the
+So planX phase A keeps `core` (14,332 positions / ≈ 691 k entries) as the
 conservative worker-sizing case and may use `easy-win` aux (3,527 / 65,179)
 for the smaller proof. The `.pvr` freeze is unaffected by the group (the
 flag adds no key and stays off).
@@ -158,7 +158,7 @@ flag adds no key and stays off).
    child.
 4. **The scale case was re-derived from both prior sources, not cited.**
    Re-running `core` aux reproduced report4's 14,332 / 691,117 exactly;
-   `easy-win` aux reproduced plan5's 3,527 / 65,179. The plan7 dependency is
+   `easy-win` aux reproduced plan5's 3,527 / 65,179. The planX dependency is
    therefore satisfied on the current tree.
 
 ## Problems, open parts, missing tests
@@ -206,7 +206,7 @@ Follow-up options:
 
 1. **Kickoff (recommended):** "Read `docs/plans/prover/report6.md`,
    `plan6.md`, `measurements/plan6/` and `initiative.md`. Item 15 is closed.
-   Execute plan7 phase A against the re-checked scale case (`core` aux
+   Execute planX phase A against the re-checked scale case (`core` aux
    14,332 positions / 691,117 entries; `easy-win` aux 3,527 / 65,179)."
 2. Draft the D5 restart / wall-budget plan instead of M4; the hand-guide line
    is closed and the next search plan must be a wall lever.

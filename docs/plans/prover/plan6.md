@@ -2,7 +2,7 @@
 
 Initiative: [`prover`](initiative.md), horizon **item 15**. Drafted
 2026-11-09 in plan session 6 after the D23 erratum in
-[`initiative.md`](initiative.md) §Backlog. Runs before [`plan7`](plan7.md)
+[`initiative.md`](initiative.md) §Backlog. Runs before [`planX`](planX.md)
 phase D (the `.pvr` freeze), per item 15's trigger. No impl in this document.
 
 ## Why this plan, and what it is not
@@ -14,7 +14,7 @@ as one deferred child. This plan tests that single divergence. It is a
 **kill-test for the hand-guide line**, not a stack adoption: item 15's gate is
 narrow (two cells), and a pass only keeps the line alive.
 
-Recorded evidence (item 15, same-session probes, plan4/plan7 tree):
+Recorded evidence (item 15, same-session probes, plan4/planX tree):
 
 | Probe | `core` | `easy-win` |
 | --- | ---: | ---: |

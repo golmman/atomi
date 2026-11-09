@@ -12,7 +12,7 @@ checked, then deleted by the driver.
 | `env.json` | host, toolchain, git head, binary/corpus/guidance sha256, oracle version |
 | `group.json` | core + easy-win, seeds 0–2, flag off/on at 20 M child evals; seed-0 repeats; gate evaluation |
 | `soundness.json` | guidance-v1 seed 0 with `--guide-group`: refutation sweep, 17 D14 proofs, both checkers |
-| `scale.json` | plan7 scale-case re-check: core aux 120 s and easy-win aux D14 proofs |
+| `scale.json` | planX scale-case re-check: core aux 120 s and easy-win aux D14 proofs |
 | `run_group.py` | stdlib-only driver (`env`, `group`, `soundness`, `scale`, `all`) |
 
 ## Commands
@@ -68,9 +68,9 @@ proofs is accepted by `atomi validate` **and** `provari check`, with equal
 position counts. The group unit/property tests, the crafted plain-win
 (`MATE_IN_2`) and all-plain-lose (`dec40`) integration tests are green.
 
-## Scale-case re-check (plan7 phase-A dependency)
+## Scale-case re-check (planX phase-A dependency)
 
-The group did not cut `core`, so the plan7 scale case is unchanged. Re-run on
+The group did not cut `core`, so the planX scale case is unchanged. Re-run on
 the current tree with the plan5 auxiliary stack:
 
 | Cell | budget | result | positions | entries | checkers |
@@ -93,5 +93,5 @@ positions, ≈691 k entries) as the conservative scale case and `easy-win` aux
 | G4 determinism | **pass**: seed-0 repeats identical; flag-off counts reproduce the pre-change tree |
 | G5 build/docs | **pass**: `make test-full` (incl. veto) and `make lint` green; no GPL-family dependency |
 
-The kill verdict and the plan7 scale-case handoff are in
+The kill verdict and the planX scale-case handoff are in
 [`../../report6.md`](../../report6.md).

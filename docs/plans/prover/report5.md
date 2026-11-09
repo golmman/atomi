@@ -124,7 +124,7 @@ same stack, seed 0, 600 s:
 120 s, same stack, seed 0, `--proof-out`: censored **`deadline`**
 (`exit=timeout`, no proof file); 559,984,639 child evals, 20,167,680
 expansions, 1,211,031 proof entries, `proof_full=false`. This reproduces
-plan7's recorded 562.7 M / 20.3 M / 1.22 M within session noise.
+planX's recorded 562.7 M / 20.3 M / 1.22 M within session noise.
 
 ## Surprises and findings
 
@@ -144,11 +144,11 @@ plan7's recorded 562.7 M / 20.3 M / 1.22 M within session noise.
    avoids this with no deadline and `--evals = recorded + 1`; plan5 supplies
    the empirical justification.
 5. **The aux proof is larger than the chosen-stack proof.** `easy-win` aux:
-   3,527 positions / 65,179 entries / 293 KB, versus plan7's chosen-point
+   3,527 positions / 65,179 entries / 293 KB, versus planX's chosen-point
    record of 2,493 / 10,550 / 210 KB. If the aux stack is the M4 scale case,
    the worker sizing must use the larger numbers.
 6. **`deep-win` remains a search censor, not a `proof_full` censor** at
-   120 s. The plan7 scale case stays `core` (14,332 positions, ≈691 k
+   120 s. The planX scale case stays `core` (14,332 positions, ≈691 k
    entries from report4).
 
 ## Gates
@@ -211,8 +211,8 @@ Follow-up options:
 1. **Kickoff (recommended):** "Read `docs/plans/prover/report5.md`,
    `plan5.md`, `measurements/plan5/`, `plan6.md` and `initiative.md`.
    Execute plan6 (item 15 `GROUP` kill-test); then re-check the scale case
-   from the plan5/report4 data before plan7 phase A."
-2. Proceed to plan7 with `easy-win` aux (3,527 positions / 65,179 entries /
+   from the plan5/report4 data before planX phase A."
+2. Proceed to planX with `easy-win` aux (3,527 positions / 65,179 entries /
    293 KB) as the scale case and `core` 120 s as the conservative case.
 3. Run the optional P0-c extension: export and `provari check` every proved
    `guidance-v1` cell at 10 s.
