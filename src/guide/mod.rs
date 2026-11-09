@@ -70,6 +70,9 @@ pub struct GuideConfig {
     pub sibling_sim: bool,
     /// Null-side threat replay.
     pub null_replay: bool,
+    /// The item-15 attacker plain-move `GROUP` child (`--guide-group`,
+    /// default off; the kill-test flag).
+    pub group: bool,
 }
 
 impl GuideConfig {
@@ -91,6 +94,7 @@ impl GuideConfig {
             history_ties: true,
             sibling_sim: true,
             null_replay: true,
+            group: false,
         }
     }
 
@@ -117,6 +121,7 @@ impl GuideConfig {
             "history" => self.history_ties = on,
             "sim" => self.sibling_sim = on,
             "replay" => self.null_replay = on,
+            "group" => self.group = on,
             _ => return Err(format!("unknown guide mechanism: {name}")),
         }
         Ok(())
@@ -565,6 +570,7 @@ mod tests {
             ("history", |c| c.history_ties),
             ("sim", |c| c.sibling_sim),
             ("replay", |c| c.null_replay),
+            ("group", |c| c.group),
         ] {
             let base = GuideConfig::hand();
             let mut off = base;

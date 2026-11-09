@@ -44,5 +44,10 @@ Referenced from `AGENTS.md` §Correctness.
   parent proof whose child was never expanded.
 - `settle_nodes` and `sim_nodes` are auxiliary; `child_evals` and `expansions`
   keep D11 meaning and stay main-search only.
+- **The item-15 `GROUP` child is virtual.** It is never keyed, looked up or
+  stored under its synthetic slot; its members keep the real child keys. A
+  group-proved parent event must carry the selected member's move, and the
+  pending-proof retention must use that member's key, or the writer fails.
+  The flag is default off; item 15 is closed ([`report6`](report6.md)).
 - The null-side threat signature is a pure function of the board; no null
   position is ever keyed, searched, stored, put on `line` or emitted.

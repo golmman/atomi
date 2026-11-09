@@ -1,0 +1,108 @@
+{
+ "phase": "scale",
+ "aux_stack": [
+  "--guide",
+  "hand",
+  "--guide-scale",
+  "64",
+  "--guide-ef-weight",
+  "0",
+  "--guide-max-sim",
+  "1",
+  "--guide-max-settle",
+  "1"
+ ],
+ "memory_mb": 192,
+ "cases": [
+  {
+   "cell": "core",
+   "run": {
+    "cell": "core",
+    "seed": 0,
+    "flags": [
+     "--guide",
+     "hand",
+     "--guide-scale",
+     "64",
+     "--guide-ef-weight",
+     "0",
+     "--guide-max-sim",
+     "1",
+     "--guide-max-settle",
+     "1"
+    ],
+    "seconds": 120.0,
+    "evals_limit": null,
+    "proved": true,
+    "exit": "proved",
+    "length": 20,
+    "child_evals": 278497676,
+    "expansions": 9667450,
+    "sim_nodes": 52119931,
+    "settle_nodes": 18519011,
+    "proof_full": false,
+    "proof": "written",
+    "proof_positions": 14332,
+    "proof_length": 20,
+    "proof_entries": 691117,
+    "ms": 62334,
+    "wall_s": 62.369,
+    "returncode": 0,
+    "proof_file_exists": true,
+    "proof_file_bytes": 1161407
+   },
+   "check": {
+    "atomi_valid": true,
+    "atomi_positions": 14332,
+    "provari_valid": true,
+    "provari_won_positions": 14332,
+    "verdict": "accepted"
+   }
+  },
+  {
+   "cell": "easy-win",
+   "run": {
+    "cell": "easy-win",
+    "seed": 0,
+    "flags": [
+     "--guide",
+     "hand",
+     "--guide-scale",
+     "64",
+     "--guide-ef-weight",
+     "0",
+     "--guide-max-sim",
+     "1",
+     "--guide-max-settle",
+     "1"
+    ],
+    "seconds": 600.0,
+    "evals_limit": null,
+    "proved": true,
+    "exit": "proved",
+    "length": 19,
+    "child_evals": 27242967,
+    "expansions": 918551,
+    "sim_nodes": 4760663,
+    "settle_nodes": 1814141,
+    "proof_full": false,
+    "proof": "written",
+    "proof_positions": 3527,
+    "proof_length": 19,
+    "proof_entries": 65179,
+    "ms": 5658,
+    "wall_s": 5.669,
+    "returncode": 0,
+    "proof_file_exists": true,
+    "proof_file_bytes": 293459
+   },
+   "check": {
+    "atomi_valid": true,
+    "atomi_positions": 3527,
+    "provari_valid": true,
+    "provari_won_positions": 3527,
+    "verdict": "accepted"
+   }
+  }
+ ]
+}

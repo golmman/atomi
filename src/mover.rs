@@ -157,6 +157,20 @@ impl Mover {
             || !(bishop_attacks(ksq, occ) & self.bq & not_from).is_empty()
     }
 
+    /// Whether `m` is a **plain** move (item 15 / plan6): legal, not a
+    /// capture or explosion, not a promotion, en passant or castling, not a
+    /// commoner move and not a check. This is the class the `GROUP` child
+    /// defers; it is exact for the move classes where `gives_check` is exact
+    /// and conservative (never groups a check) for the rest.
+    pub fn is_plain(&self, board: &Board, m: Move) -> bool {
+        !board.is_capture(m)
+            && !m.is_promotion()
+            && !m.is_en_passant()
+            && !m.is_castling()
+            && board.piece_on(m.from_sq()).type_of() != Some(PieceType::Commoner)
+            && !self.gives_check(board, m)
+    }
+
     /// Whether an enemy pawn attacks the square a double push passes over.
     fn enemy_pawn_attacks_passed(&self, m: Move) -> bool {
         // The passed square sits halfway between from and to on the same
@@ -289,6 +303,33 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn plain_predicate_differential() {
+        // Plain = non-capture, non-promotion, non-ep, non-castle,
+        // non-commoner and non-check. The made child supplies the check bit.
+        let mut plain = 0usize;
+        for (board, _line, _attacker) in testutil::positions() {
+            let mover = Mover::new(&board);
+            let mut moves = MoveList::new();
+            generate_legal(&board, &mut moves);
+            for m in &moves {
+                let mut child = board.clone();
+                child.do_move(m, &mut StateInfo::new());
+                let want = !board.is_capture(m)
+                    && !m.is_promotion()
+                    && !m.is_en_passant()
+                    && !m.is_castling()
+                    && board.piece_on(m.from_sq()).type_of() != Some(PieceType::Commoner)
+                    && child.checkers().is_empty();
+                assert_eq!(mover.is_plain(&board, m), want, "{m} on {board:?}");
+                if want {
+                    plain += 1;
+                }
+            }
+        }
+        assert!(plain > 1000, "only {plain} plain moves seen");
     }
 
     #[test]

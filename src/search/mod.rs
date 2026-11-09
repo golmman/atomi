@@ -34,7 +34,7 @@ use crate::rules;
 use crate::table::Tables;
 use atomic_movegen::board::{Board, StateInfo};
 use atomic_movegen::types::Color;
-use frame::{Entered, Frame};
+use frame::{Entered, Frame, Group};
 use std::time::{Duration, Instant};
 use value::{Child, INFINITY, Value, and_value, exit_value, or_value, pn_dn};
 
@@ -307,6 +307,44 @@ impl<S: ProofSink> Engine<S> {
             }
             let (best, second) = select(&frame, &self.history, self.seed);
             let (ctpn, ctdn) = child_thresholds(&frame, best, second, tpn, tdn, pn, dn);
+            if frame.group.as_ref().is_some_and(|g| g.index == best) {
+                // Item-15 GROUP: install one plain member. The group is a
+                // virtual OR node, so its member thresholds use the same
+                // algebra with the group's own numbers as the node values.
+                let group = frame.group.as_mut().expect("group index");
+                let Some((mi, second_member)) =
+                    select_member(group, frame.mover, &self.history, self.seed, frame.key)
+                else {
+                    // Every member is decided; a sync makes the child exact.
+                    group.touched = true;
+                    let child = &mut frame.children[best];
+                    let key = &mut frame.keys[best];
+                    group.sync(child, key);
+                    continue;
+                };
+                let (gpn, gdn) = pn_dn(&frame.children[best].value);
+                let (mpn, mdn) = pn_dn(&group.members[mi].child.value);
+                let (mtpn, mtdn) = thresholds(true, mpn, mdn, second_member, ctpn, ctdn, gpn, gdn);
+                let mv = group.members[mi].child.mv;
+                let mkey = group.members[mi].key;
+                let mut next = board.clone();
+                next.do_move(mv, &mut StateInfo::new());
+                let cv = self.mid(&next, mkey, ply + 1, mtpn, mtdn);
+                if self.stop.is_some() {
+                    self.line.pop();
+                    return Value::Open { pn: 0, dn: 0 };
+                }
+                if self.guide.config.enabled {
+                    let good = frame.attacker_node && matches!(cv, Value::Proved { .. });
+                    self.history.observe(frame.mover, mv, good);
+                }
+                group.members[mi].child.value = cv;
+                group.touched = true;
+                let child = &mut frame.children[best];
+                let key = &mut frame.keys[best];
+                group.sync(child, key);
+                continue;
+            }
             let mut next = board.clone();
             next.do_move(frame.children[best].mv, &mut StateInfo::new());
             let cv = self.mid(&next, frame.keys[best], ply + 1, ctpn, ctdn);
@@ -491,7 +529,23 @@ fn child_thresholds(
 ) -> (u32, u32) {
     let c = &frame.children[best];
     let (cpn, cdn) = pn_dn(&c.value);
-    let (ctpn, ctdn) = if frame.attacker_node {
+    thresholds(frame.attacker_node, cpn, cdn, second, tpn, tdn, pn, dn)
+}
+
+/// The 1+ε child thresholds at a node kind (used by the frame and by the
+/// virtual GROUP OR node).
+#[allow(clippy::too_many_arguments)]
+fn thresholds(
+    attacker_node: bool,
+    cpn: u32,
+    cdn: u32,
+    second: u32,
+    tpn: u32,
+    tdn: u32,
+    pn: u32,
+    dn: u32,
+) -> (u32, u32) {
+    let (ctpn, ctdn) = if attacker_node {
         (
             u64::from(tpn).min(widen(second)),
             u64::from(tdn) - u64::from(dn) + u64::from(cdn),
@@ -506,6 +560,54 @@ fn child_thresholds(
         ctpn.min(u64::from(INFINITY)) as u32,
         ctdn.min(u64::from(INFINITY)) as u32,
     )
+}
+
+/// Select the next open GROUP member and return its index plus the
+/// second-best metric (the group is an OR, so the metric is `pn`). Ties use
+/// the same class/history/seed path as [`select`].
+fn select_member(
+    group: &Group,
+    mover: Color,
+    history: &History,
+    seed: u64,
+    node_key: u64,
+) -> Option<(usize, u32)> {
+    let mut best = usize::MAX;
+    let mut best_m = INFINITY;
+    let mut best_tie = (u8::MAX, u16::MAX, u64::MAX);
+    let mut second = INFINITY;
+    for (i, m) in group.members.iter().enumerate() {
+        if !matches!(m.child.value, Value::Open { .. }) {
+            continue;
+        }
+        let metric = pn_dn(&m.child.value).0;
+        let tie = (
+            m.child.class.rank(),
+            u16::MAX - history.score(mover, m.child.mv),
+            if seed != 0 {
+                History::seeded(seed, node_key, m.child.mv)
+            } else {
+                0
+            },
+        );
+        if metric < best_m {
+            second = best_m;
+            best_m = metric;
+            best = i;
+            best_tie = tie;
+        } else if metric == best_m {
+            if tie < best_tie {
+                best = i;
+                best_tie = tie;
+            }
+            if metric < second {
+                second = metric;
+            }
+        } else if metric < second {
+            second = metric;
+        }
+    }
+    (best != usize::MAX).then_some((best, second))
 }
 
 #[cfg(test)]
@@ -556,6 +658,7 @@ mod tests {
             mover: Color::White,
             order_classes: false,
             order_history: false,
+            group: None,
         };
         assert_eq!(
             selected_proved_child(&make(vec![child(4, 90), child(3, 50), child(3, 80)])),

@@ -63,3 +63,7 @@ Do not implement.
 ---
 
 Read docs/plans/prover/report5.md, plan5.md, measurements/plan5/, plan6.md and initiative.md. Execute plan6 (item 15 GROUP kill-test); then re-check the scale case from the plan5/report4 data before plan7 phase A.
+
+---
+
+Are we still on track to beat provari? If not, how should we change the plan?

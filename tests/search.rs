@@ -114,6 +114,58 @@ fn never_prove_rows_are_never_found() {
 }
 
 #[test]
+fn group_plain_child_proves_and_is_deterministic() {
+    // MATE_IN_2's key move Qd7 is plain (quiet, non-capturing, non-checking);
+    // the GROUP child must still find the same mate. Seeds are deterministic.
+    let root = board(MATE_IN_2);
+    for seed in 0..3u64 {
+        let mut lim = limits();
+        lim.evals = Some(2_000_000);
+        lim.seed = seed;
+        lim.guide = atomi::guide::GuideConfig::hand();
+        lim.guide.group = true;
+        let a = search::prove(&root, &lim, NullSink);
+        let b = search::prove(&root, &lim, NullSink);
+        assert_eq!(a.result.exit, Exit::Proved, "seed {seed}");
+        assert!(a.result.length.is_some_and(|l| l >= 2));
+        assert_eq!(
+            (
+                a.result.exit,
+                a.result.length,
+                a.result.child_evals,
+                a.result.expansions
+            ),
+            (
+                b.result.exit,
+                b.result.length,
+                b.result.child_evals,
+                b.result.expansions
+            ),
+            "seed {seed}"
+        );
+        // The proof through a GROUP child still resolves to real positions.
+        let path =
+            std::env::temp_dir().join(format!("atomi-group-{}-{seed}.jsonl", std::process::id()));
+        let stats = atomi::strategy::write_proof(&root, &a.proofs, &path).unwrap();
+        assert!(stats.positions >= 2);
+        assert!(atomi::validate::validate_file(&path).valid, "seed {seed}");
+        let _ = std::fs::remove_file(path);
+    }
+}
+
+#[test]
+fn group_never_proves_a_lost_position() {
+    // dec40 is a legacy side-to-move loss: every plain move loses too.
+    let root = board("2kr4/p1pb1p2/3p3p/3Pp3/8/7P/P2QK3/6R1 b - - 0 24");
+    let mut lim = limits();
+    lim.evals = Some(200_000);
+    lim.guide = atomi::guide::GuideConfig::hand();
+    lim.guide.group = true;
+    let out = search::prove(&root, &lim, NullSink);
+    assert_ne!(out.result.exit, Exit::Proved);
+}
+
+#[test]
 fn determinism_and_sink_events() {
     let lim = limits();
     let root = board(MATE_IN_2);

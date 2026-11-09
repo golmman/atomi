@@ -23,7 +23,7 @@ fn print_help() {
          \x20                       [--guide-on LIST] [--guide-params PATH]\n\
          \x20                       [--guide-scale N] [--guide-ef-weight N]\n\
          \x20                       [--guide-max-sim N] [--guide-max-settle N]\n\
-         \x20                       [--proof-share PERCENT]\n\
+         \x20                       [--guide-group] [--proof-share PERCENT]\n\
          \x20   atomi validate PROOF.jsonl...\n\
          \x20   atomi moves \"<FEN>\"\n\
          \x20   atomi --help | --version"

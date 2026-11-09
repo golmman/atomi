@@ -26,7 +26,16 @@ executed (2026-11-09):** the auxiliary stack proves 19/24 frozen cells at
 `deep-win`, `b9a7ed7eb368`, `3004d09cef79` and `dd3f89766a40` are censored;
 `deep-win` is censored for search at 120 s, not by `proof_full`.
 See [`measurements/plan5/`](measurements/plan5/README.md) and
-[`report5.md`](report5.md).
+[`report5.md`](report5.md). **Plan6 (item 15 `GROUP` kill-test) executed
+(2026-11-09):** the `GROUP` child is behind the default-off `--guide-group`
+flag; it does **not** cut `core` (681,518 vs 648,828 flag-off expansions at
+20 M evals, 0.96×) and regresses `easy-win` (1.15–2.31×), so **G2 and the
+item-15 ≥ 5× G1 clause fail**. The stop rule closes the hand-guide line; no
+replay phase was implemented. The plan7 scale case is unchanged: on the
+current tree `core` aux 120 s = 14,332 positions / 691,117 entries,
+`easy-win` aux = 3,527 / 65,179, both checker-accepted. See
+[`measurements/plan6/`](measurements/plan6/README.md) and
+[`report6.md`](report6.md).
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -194,7 +203,7 @@ single-mechanism plan that is independently meaningful.
 | 2 | **M1** per-node cost | `Mover`/`Effect` per expanded node; no make/unmake for most children; incremental keys; TT clusters + prefetch + filter + lazy zeroed allocation (copy legacy `src/search/tt/alloc.rs`); in-search proof store with length/limit, inside the `--memory` label | wall per 1 M child evals ≤ the M0 baseline **and** ≤ the legacy front-end's (cross-repo, same session); a small reference win proved within a stated cap and checker-accepted; soundness fixtures green | **done: [`plan2`](plan2.md), [`report2`](report2.md)** — `core`/10 M/192 MB: **53.4** ms per 1 M child evals (m0 166.7, legacy front-end 137.3, same session) |
 | 3 | **M2+M3** hand-guide stack | move classes, check evasions, quiet grouping, EF-PN hand-eval scaling; per-child static closures including the one-ply explosion settle on every child (both sides); defender priors (`UNLIKELY`, defence history); history tie-breaks; sibling simulation; null-move threat replay; constants in one `GuideParams` table exposed for an external optimizer (legacy `docs/spec/optimizer_interface.md` contract as spec) | **D21 stack gate:** `easy-win` expansions ≤ 145,046 (2 × provari hand's 72,523 nodes); `core` proved at 10 s / 192 MB; no guidance-set refutations; ≥20 frozen cells × seeds 0–3; both-direction ablations after the gate | **closed; G1 failed** — [plan3](plan3.md), [report3](report3.md), [plan4](plan4.md), [report4](report4.md). Plan3: frozen 24-cell `guidance-v1`; hand coverage 19/24; `easy-win` 211,254–631,763 expansions; `core` censored at 20 M and 10 s. Plan4 CORE-RESET (D23) last attempt: calibrated point scale 64 / EF weight 0 proves `easy-win` at 10 s on seeds 0–2 (**121,866 / 110,533 / 115,147**, all ≤ 145,046) but `core` is still censored at 10 s; auxiliary `max_sim=1/max_settle=1` proves `core` at 120 s (278.5 M evals, length 20, proof accepted by both checkers) but not at 10 s. No refutations, no ledger row. Pivot: M4 first |
 | 4 | ~~M3 static tactics + simulation~~ | **merged into item 3** (D21, 2026-11-09): per-child static tactics, one-ply explosion settle, sibling simulation, defender priors, history, null-move replay | — | merged |
-| 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | **open** — probe [`plan5`](plan5.md) executed ([data](measurements/plan5/README.md): 19/24 cells at 10 s, scale case `easy-win` 3,527 positions / 65,179 entries / 293 KB, `deep-win` censored for search at 120 s), implementation [`plan7`](plan7.md) |
+| 5 | **M4** scaled proof output | event-fed bounded strategy worker (no proof-memory stop), `.pvr` export | every claimed win replay-validated and checker-accepted at `deep-win` scale; the worker budget is honoured | **open** — probe [`plan5`](plan5.md) executed ([data](measurements/plan5/README.md): 19/24 cells at 10 s, scale case `easy-win` 3,527 positions / 65,179 entries / 293 KB, `deep-win` censored for search at 120 s), implementation [`plan7`](plan7.md). Plan6 re-check ([data](measurements/plan6/README.md)): `core` aux 120 s = 14,332 positions / 691,117 entries, `easy-win` aux = 3,527 / 65,179; both accepted. Plan7 phase A keeps `core` as the conservative scale case |
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
@@ -215,7 +224,7 @@ ablations, and take the continue/re-scope/close decision at a kill review.
 | 12 | Durable proof corpus | own plan and schema; legacy `docs/spec/global_proof_store.md` as reference |
 | 13 | Optional external tablebases (D7) | provari's path is external and optional too |
 | 14 | `--guide model` stretch column (D8) | recorded only |
-| 15 | Hand-guide conformance (item-3 erratum) | **Not** an item-3 restart: attacker plain-move group as **one** child (`GROUP`; `pn=9`, `dn=#plain`), plus event-driven sibling-proof replay, behind one flag. Gate: `core` < 1 M expansions at 20 M child evals (≥5× cut) and no `easy-win` regression; otherwise close the hand-guide line. **Trigger:** before M4 freezes the proof format, or at an M4 stall. No optimizer/ablation sweep. **Planned: [`plan6`](plan6.md).** |
+| 15 | Hand-guide conformance (item-3 erratum) | **Not** an item-3 restart: attacker plain-move group as **one** child (`GROUP`; `pn=9`, `dn=#plain`), plus event-driven sibling-proof replay, behind one flag. Gate: `core` < 1 M expansions at 20 M child evals (≥5× cut) and no `easy-win` regression; otherwise close the hand-guide line. **Trigger:** before M4 freezes the proof format, or at an M4 stall. No optimizer/ablation sweep. **Closed (2026-11-09) — negative.** [`plan6`](plan6.md), [`report6`](report6.md): `core` 681,518 vs 648,828 flag-off expansions (0.96×, no 5× cut); `easy-win` 1.15–2.31× regressions. The hand-guide line is closed; no replay phase. |
 
 **Item 15 evidence (investigation only, no code).** A conformance read of
 provari's hand guide against the measured plan3 stack found five semantic
@@ -416,6 +425,18 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-09**: plan6 (item 15 `GROUP` kill-test) executed. `--guide-group`
+  (default off) implements the plain-move `GROUP` pseudo-child, value
+  algebra, descent and proof mapping with unit/property/crafted tests.
+  `core` at 20 M evals: 681,518 vs 648,828 flag-off expansions on seed 0
+  (0.96×, censored both ways); `easy-win` regresses 1.15–2.31× and lengthens
+  (18/18/17 → 28/28/21). No refutations on the seed-0 guidance sweep; all 17
+  proved group proofs accepted by both checkers. Scale case re-checked:
+  `core` aux 120 s 14,332 positions / 691,117 entries, `easy-win` aux 3,527 /
+  65,179, both accepted. G2 and the substantive G1 fail → hand-guide line
+  **closed** by the stop rule; no replay phase. Data:
+  [`measurements/plan6/`](measurements/plan6/README.md); report:
+  [`report6.md`](report6.md).
 - **2026-11-09**: plan5 (P0 probe) executed. The auxiliary stack on the
   frozen `guidance-v1` set at 10 s proves 19/24 cells on seeds 0–2 (57/72
   rows); `easy-win` reproduces the plan4 inflation exactly (918,551 /

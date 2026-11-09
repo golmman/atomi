@@ -47,6 +47,12 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
+        if arg == "--guide-group" {
+            // Item-15 kill-test switch: a value-less flag, default off.
+            guide.group = true;
+            i += 1;
+            continue;
+        }
         if arg.starts_with('-') {
             let value = args
                 .get(i + 1)
