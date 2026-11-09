@@ -59,3 +59,7 @@ I explicitly want this sort of push back and ideation process though, i thought 
 
 Plan session for atomi. Read docs/notes/retro.md , docs/plans/prover/initiative.md , report2.md and bench.md . Record an owner decision replacing "one mechanism per plan" with stack-level gating. Merge M2+M3 into one "hand-guide stack" item: move classes, check evasions, quiet grouping, EF-PN, per-child static closures including the one-ply explosion settle, defender priors ( UNLIKELY , defence history), history tie-breaks, sibling simulation and the null-move threat replay. Gate it on the whole stack: easy-win ≤ 2× provari hand nodes, core proved at 10 s, measured over ≥ 20 cells and several seeds, with ablations in both directions afterwards. Write plan3.md .
 Do not implement.
+
+---
+
+Read docs/plans/prover/report5.md, plan5.md, measurements/plan5/, plan6.md and initiative.md. Execute plan6 (item 15 GROUP kill-test); then re-check the scale case from the plan5/report4 data before plan7 phase A.

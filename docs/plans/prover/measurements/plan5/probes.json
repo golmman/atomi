@@ -1,0 +1,70 @@
+{
+ "phase": "probes",
+ "scale_case": {
+  "cell": "easy-win",
+  "chosen_by": "largest ref_nodes proved",
+  "run": {
+   "cell": "easy-win",
+   "seed": 0,
+   "seconds": 600.0,
+   "evals_limit": null,
+   "proof_out": "/workspace/atomi/docs/plans/prover/measurements/plan5/proofs/easy-win-s0-d14.jsonl",
+   "proved": true,
+   "exit": "proved",
+   "length": 19,
+   "child_evals": 27242967,
+   "expansions": 918551,
+   "sim_nodes": 4760663,
+   "settle_nodes": 1814141,
+   "proof_full": false,
+   "proof": "written",
+   "proof_positions": 3527,
+   "proof_length": 19,
+   "proof_entries": 65179,
+   "ms": 5337,
+   "wall_s": 5.348,
+   "returncode": 0,
+   "proof_file_exists": true,
+   "proof_file_bytes": 293459
+  },
+  "coverage_child_evals": 27242967,
+  "child_evals_equal": true,
+  "jsonl_bytes": 293459,
+  "checkers": {
+   "atomi_valid": true,
+   "atomi_positions": 3527,
+   "provari_valid": true,
+   "provari_won_positions": 3527,
+   "verdict": "accepted"
+  }
+ },
+ "deep_win": {
+  "cell": "deep-win",
+  "run": {
+   "cell": "deep-win",
+   "seed": 0,
+   "seconds": 120.0,
+   "evals_limit": null,
+   "proof_out": "/workspace/atomi/docs/plans/prover/measurements/plan5/proofs/deep-win-s0-120s.jsonl",
+   "proved": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 559984639,
+   "expansions": 20167680,
+   "sim_nodes": 109987751,
+   "settle_nodes": 39250387,
+   "proof_full": false,
+   "proof": "not-found",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 1211031,
+   "ms": 120005,
+   "wall_s": 120.008,
+   "returncode": 0,
+   "proof_file_exists": false,
+   "proof_file_bytes": null
+  },
+  "censor": "deadline",
+  "jsonl_bytes": null
+ }
+}
