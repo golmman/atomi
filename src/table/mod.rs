@@ -88,6 +88,15 @@ pub(crate) fn prefetch<T>(r: &T) {
     let _ = r;
 }
 
+/// Which table served a [`Tables::lookup_with_source`] hit.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum EntrySource {
+    /// The full-key proof table (an exact proof).
+    Proof,
+    /// The TT (an `Open` pair or a path-independent refutation).
+    Tt,
+}
+
 /// The TT + proof table + filter of one `prove` run.
 pub struct Tables {
     tt: Tt,
@@ -148,18 +157,31 @@ impl Tables {
     /// The usable stored value for `key` at `counter`: a usable proof-table
     /// entry first, then a usable TT entry; `None` = fresh.
     pub fn lookup(&self, key: u64, counter: u16) -> Option<Value> {
+        self.lookup_with_source(key, counter).map(|(v, _)| v)
+    }
+
+    /// Like [`Tables::lookup`], but also reports which table served the hit
+    /// (the plan-12 attribution counters).
+    pub(crate) fn lookup_with_source(
+        &self,
+        key: u64,
+        counter: u16,
+    ) -> Option<(Value, EntrySource)> {
         if let Some(e) = self.proofs.get(key, counter) {
-            return Some(Value::Proved {
-                length: e.length,
-                limit: e.limit,
-                mv: if e.mv == 0 {
-                    None
-                } else {
-                    Some(Move::from_bits(e.mv).expect("stored move bits decode"))
+            return Some((
+                Value::Proved {
+                    length: e.length,
+                    limit: e.limit,
+                    mv: if e.mv == 0 {
+                        None
+                    } else {
+                        Some(Move::from_bits(e.mv).expect("stored move bits decode"))
+                    },
                 },
-            });
+                EntrySource::Proof,
+            ));
         }
-        self.tt.probe(key, counter)
+        self.tt.probe(key, counter).map(|v| (v, EntrySource::Tt))
     }
 
     /// Route `value` under `key` (see the module docs). `work` is the

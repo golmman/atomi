@@ -33,6 +33,7 @@ fn wins_oracle() {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     };
     let dir = Path::new(env!("CARGO_TARGET_TMPDIR"));
     let (mut proved, mut censored, mut refuted, mut multi, mut fails) = (0, 0, 0, 0, 0);
@@ -82,6 +83,7 @@ fn never_prove_oracle() {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     };
     for r in rows("never_prove.tsv") {
         let (name, fen) = (&r[0], &r[1]);
@@ -110,6 +112,7 @@ fn pawn_ending_proved() {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     };
     let out = search::prove(&b, &lim, NullSink);
     assert_eq!(out.result.exit, Exit::Proved, "{:?}", out.result.exit);
@@ -144,6 +147,7 @@ fn false_refutation_regressions() {
             guide_params: atomi::guide::GuideParams::default(),
             proof_share_percent: 25,
             seed: 0,
+            stats: false,
         };
         let out = search::prove(&b, &lim, NullSink);
         assert_eq!(
@@ -170,6 +174,7 @@ fn wins_oracle_hand() {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     };
     let dir = Path::new(env!("CARGO_TARGET_TMPDIR"));
     let (mut proved, mut censored, mut refuted) = (0, 0, 0);

@@ -6,7 +6,8 @@
 //! `{"found","length","exit","child_evals","expansions","seed","sim_nodes",
 //! "settle_nodes","aux_nodes","aux_skipped","ms","seconds","memory_mb",
 //! "evals_limit","proof","proof_positions","proof_length","proof_entries",
-//! "proof_full"}`.
+//! "proof_full"}`, plus an optional `"stats"` object (the plan-12
+//! attribution counters) when `--stats` is given.
 
 use crate::guide::{GuideConfig, GuideParams};
 use atomic_movegen::board::{Board, FenPolicy};
@@ -31,6 +32,8 @@ pub struct ProveOptions {
     pub proof_share_percent: u8,
     /// Tie-break seed (0 = movegen order).
     pub seed: u64,
+    /// Collect the plan-12 attribution counters.
+    pub stats: bool,
 }
 
 /// Parse `prove` arguments (everything after the `prove` subcommand).
@@ -44,6 +47,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
     let mut guide_params = GuideParams::default();
     let mut proof_share_percent = 25u8;
     let mut seed = 0u64;
+    let mut stats = false;
 
     let mut i = 0;
     while i < args.len() {
@@ -51,6 +55,11 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
         if arg == "--guide-group" {
             // Item-15 kill-test switch: a value-less flag, default off.
             guide.group = true;
+            i += 1;
+            continue;
+        }
+        if arg == "--stats" {
+            stats = true;
             i += 1;
             continue;
         }
@@ -147,6 +156,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
         guide_params,
         proof_share_percent,
         seed,
+        stats,
     })
 }
 

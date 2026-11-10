@@ -51,3 +51,12 @@ Referenced from `AGENTS.md` §Correctness.
   The flag is default off; item 15 is closed ([`report6`](report6.md)).
 - The null-side threat signature is a pure function of the board; no null
   position is ever keyed, searched, stored, put on `line` or emitted.
+
+## Tree size
+
+- **A node-entry stored-value check is redundant with the parent's child
+  classification.** `Frame::enter` already looks each child up in the tables;
+  a second check at `mid` entry can only fire when the parent's incoming
+  thresholds are lower than the stored pair. Measured on `deep-win` at 20 M:
+  53 of 668,608 expansions (0.0079 %, plan12). Do not re-propose entry reuse
+  without new data.

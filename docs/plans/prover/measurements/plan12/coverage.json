@@ -1,0 +1,7 @@
+{
+ "phase": "coverage",
+ "status": "not-run",
+ "reason": "Phase A stop rule fired: entry_would_return is below 10 % of expansions at 20 M on deep-win, so Phase B (ENTRY-REUSE) and Phase C (120 s matrix + D14) were not implemented or run.",
+ "rows": [],
+ "d14": []
+}

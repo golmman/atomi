@@ -25,6 +25,7 @@ fn print_help() {
          \x20                       [--guide-max-sim N] [--guide-max-settle N]\n\
          \x20                       [--guide-aux-budget N] [--guide-sim-plies N]\n\
          \x20                       [--guide-group] [--proof-share PERCENT]\n\
+         \x20                       [--stats]\n\
          \x20   atomi validate PROOF.jsonl...\n\
          \x20   atomi moves \"<FEN>\"\n\
          \x20   atomi --help | --version"
@@ -51,6 +52,7 @@ fn prove(args: &[String]) -> ExitCode {
         guide_params: opts.guide_params,
         proof_share_percent: opts.proof_share_percent,
         seed: opts.seed,
+        stats: opts.stats,
     };
     let output = search::prove(&root, &limits, NullSink);
     let result = output.result;
@@ -67,13 +69,36 @@ fn prove(args: &[String]) -> ExitCode {
     let positions = positions.map_or("null".to_string(), |n| n.to_string());
     let proof_length = proof_length.map_or("null".to_string(), |n| n.to_string());
     let found = result.exit == search::Exit::Proved;
+    let stats = if opts.stats {
+        let depth: Vec<String> = result.depth_histogram.iter().map(u64::to_string).collect();
+        let class: Vec<String> = result.selected_class.iter().map(u64::to_string).collect();
+        format!(
+            ",\"stats\":{{\"unique_keys\":{},\"unique_keys_capped\":{},\
+             \"re_expansions\":{},\"entry_proof_hits\":{},\"entry_tt_hits\":{},\
+             \"entry_would_return\":{},\
+             \"attacker_expansions\":{},\"defender_expansions\":{},\
+             \"depth_histogram\":[{}],\"selected_class\":[{}]}}",
+            result.unique_keys,
+            result.unique_keys_capped,
+            result.re_expansions,
+            result.entry_proof_hits,
+            result.entry_tt_hits,
+            result.entry_would_return,
+            result.attacker_expansions,
+            result.defender_expansions,
+            depth.join(","),
+            class.join(","),
+        )
+    } else {
+        String::new()
+    };
     println!(
         "{{\"found\":{},\"length\":{},\"exit\":\"{}\",\"child_evals\":{},\
          \"expansions\":{},\"seed\":{},\"sim_nodes\":{},\"settle_nodes\":{},\
          \"aux_nodes\":{},\"aux_skipped\":{},\
          \"ms\":{},\"seconds\":{},\"memory_mb\":{},\
          \"evals_limit\":{},\"proof\":\"{}\",\"proof_positions\":{},\
-         \"proof_length\":{},\"proof_entries\":{},\"proof_full\":{}}}",
+         \"proof_length\":{},\"proof_entries\":{},\"proof_full\":{}{}}}",
         found,
         length,
         result.exit.as_str(),
@@ -93,6 +118,7 @@ fn prove(args: &[String]) -> ExitCode {
         proof_length,
         result.proof_entries,
         result.proof_full,
+        stats,
     );
     if opts.proof_out.is_some() && found && !proof_written {
         return ExitCode::from(3);

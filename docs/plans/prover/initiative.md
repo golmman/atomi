@@ -125,6 +125,21 @@ next lever is a `deep-win` tree-size mechanism, which needs a new plan. See
 [`report11.md`](report11.md) and
 [`measurements/plan11/`](measurements/plan11/README.md).
 
+**Plan12 (item 21) executed (2026-11-10) — Phase A stop rule fired.** The
+plan tested the ENTRY-REUSE hypothesis (a node-entry stored-value check) on
+`deep-win` at `--evals 20000000 --memory 192 --seed 0`. At the 20 M point the
+tree is 92.75 % unique keys (7.25 % re-expansions), and only **53 of 668,608**
+expansions (0.0079 %) would have a stored value crossing the incoming
+thresholds — far below the plan's 10 % stop rule. At 120 s the `--stats` row
+is still 15,849 of 49.73 M expansions (0.0319 %); its distinct-key count caps
+at 1.47 M under the 192 MB label. The parent's frame already uses each child's
+stored value, so the proposed entry check is structurally redundant. **Phase B
+(ENTRY-REUSE) was not implemented and Phase C was not run**; no coverage
+claim, no proof, no ledger row. Tier 1 remains 2/3 (report11). The `--stats`
+counters are default-off and observation-only; `--guide none --seed 0` is
+still counter-identical to m1. See [`report12.md`](report12.md) and
+[`measurements/plan12/`](measurements/plan12/README.md).
+
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -301,17 +316,19 @@ Items are stable semantic identities. Plans are numbered sequentially and
 independently of items. Plans use stack-level gating (D21), except a
 single-mechanism plan that is independently meaningful.
 
-**Priority after plan11 (2026-11-10):** the bare tree is the best measured
+**Priority after plan12 (2026-11-10):** the bare tree is the best measured
 configuration: 2/3 cells at 120 s (`core` 3/3 17.390 s / 35.3×, `easy-win`
 3/3 2.008 s / 19.1×) and it dominates the hand product on every bench cell.
 `deep-win` is the only blocker (1/3 seeds; seed 1 proves at 111.218 s, seeds
 0/2 censor). The portfolio is rejected as dominated, the 120 s budget is not
-raised, and the hand-guide/auxiliary line stays closed. The next step is an
-owner decision to adopt bare as the product configuration and a new plan for
-a `deep-win` tree-size mechanism (attribute the 52 M expansions against
-provari's 4.57 M nodes first). Then item 5 (M4, parked; Tier 2 or a recorded
-decision is still required) → item 6 (M5). Items 3, 15, 16, 17, 18 and 19 are
-closed; item 20 is executed (Tier 1 2/3).
+raised, and the hand-guide/auxiliary line stays closed. Plan12's ENTRY-REUSE
+stop rule fired: the 20 M tree is 92.75 % unique and re-expansion is not the
+lever, so entry reuse is not implemented. The next step is a new plan for the
+plan-12 ideation option B (move-limit iterative deepening), starting with a
+read-only depth/move-limit probe; then an owner decision on adopting bare as
+the product; then item 5 (M4, parked; Tier 2 or a recorded decision is still
+required) → item 6 (M5). Items 3, 15, 16, 17, 18 and 19 are closed; item 20 is
+executed (Tier 1 2/3); item 21 is executed (stop rule fired, no mechanism).
 
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
@@ -326,6 +343,7 @@ closed; item 20 is executed (Tier 1 2/3).
 | 18 | **Restarts + core throughput stack** | D5 restart schedule + generation-aware replacement; core per-node work only if item 17 prices it first-order; one named stack (D21) | **wall gate:** `core` proved at 10 s / 192 MB, `easy-win` ≤ 2 s interim (the 0.5 s gate was below the bare tree's 1.97 s; the goal geomean is decided at M5), `deep-win` classified at 10 s; no guidance-set refutations; ≥ 20 frozen cells × seeds 0–2 | **negative; Phase A stop rule fired** — [`plan10`](plan10.md), [`report10`](report10.md), [data](measurements/plan10/README.md). Fixed 20 M evals: product 41.781 s (`core`) / 38.560 s (`deep-win`); both-off (sim+closures) 3.160 s / 2.533 s; auxiliary share **92.44% / 93.43%**. `RESTART-GEN` not implemented, Phase C/D not run, no coverage claim, no ledger row. Recommendation: close item 18 and take the portfolio formulation decision |
 | 19 | **Goal re-pin (owner decision)** | tiered goal: coverage-first (3/3 at a stated budget), then wall on shared cells; or a node/`child_evals` score; the reference is re-pinned only via D17 at M5 | owner accepts; `bench.md`, the success condition and the ledger updated together | **executed; Tier 1 failed 1/3** — [`plan9`](plan9.md), [`report9`](report9.md), [data](measurements/plan9/README.md). Product at 120 s / 192 MB: `easy-win` 3/3 (5.765 s, 54.9×, D14 accepted on all seeds), `core` 0/3 (≥ 240.0×), `deep-win` 0/3 (≥ 18.2×). Tier 2 not claimed; no ledger row. `REPLAY-BOUND` not started (Tier 1 red, wall target not retained). Recommendation: owner decision on reopening item 18 |
 | 20 | **Bare-tree coverage probe + product decision** | kill review of plans 9–10; bare tree (`--guide none`) at 120 s / 192 MB on the 3 cells × seeds 0–2; same-session provari hand references; D14 for every proved cell; `guidance-v1` seed-0 diagnostic; product-configuration decision. No portfolio, no budget raise, no engine change | **coverage gate:** Tier 1 3/3 at 120 s with 3/3 D14-accepted proofs; a censored cell is reported, never converted; exactly one recommendation | **executed; Tier 1 2/3** — [`plan11`](plan11.md), [`report11`](report11.md), [data](measurements/plan11/README.md). Bare: `core` 3/3 17.390 s (35.3×), `easy-win` 3/3 2.008 s (19.1×), `deep-win` 1/3 (seed 1 111.218 s, seeds 0/2 censor at 120 s, ≥ 18.6×). 7/7 D14 proofs accepted; guidance-v1 20/24. Bare dominates hand on every cell; portfolio rejected. No ledger row. Recommendation: adopt bare (owner) and open a `deep-win` tree-size plan |
+| 21 | **`deep-win` tree size: entry reuse** | Phase A attribution counters (`--stats`: distinct keys, re-expansions, entry proof/TT hits, crossing stored values, attacker/defender, depth and selected-class histograms); Phase B ENTRY-REUSE behind `--entry-reuse`; Phase C 120 s matrix + D14. Stop rule: no Phase B if `entry_would_return` < 10 % of expansions at 20 M on `deep-win` | **stop rule:** entry reuse starts only if the 20 M attribution supports it; **mechanism gate** (if started): `deep-win` 3/3 at 120 s with 3/3 D14 proofs, `core`/`easy-win` not > 10 % worse | **executed; stop rule fired** — [`plan12`](plan12.md), [`report12`](report12.md), [data](measurements/plan12/README.md). `deep-win` 20 M: 668,608 expansions, 620,162 unique (7.25 % re-expansions), **53 would_return (0.0079 %)**; 120 s: 51.7 M expansions, 2.75 M proof entries, 15,849 would_return (0.0319 %). Phase B/C not implemented or run; no proof, no coverage claim, no ledger row. Tier 1 remains 2/3. Recommendation: option B (move-limit iterative deepening) with a read-only depth/move-limit probe |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
 legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose

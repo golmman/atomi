@@ -39,6 +39,7 @@ fn limits() -> Limits {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     }
 }
 
@@ -94,6 +95,7 @@ fn never_prove_rows_are_never_found() {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     };
     let mut rows = 0;
     for line in text.lines() {
@@ -216,6 +218,7 @@ fn filter_on_off_identical() {
             guide_params: atomi::guide::GuideParams::default(),
             proof_share_percent: 25,
             seed: 0,
+            stats: false,
         };
         let on = search::prove(&root, &lim, NullSink).result;
         lim.filter = false;
@@ -240,6 +243,7 @@ fn evals_cap_is_honoured() {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     };
     let out = search::prove(
         &board("r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1"),
@@ -397,6 +401,7 @@ fn prove(fen: &str, evals: Option<u64>) -> search::Output<NullSink> {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     };
     search::prove(&board(fen), &lim, NullSink)
 }
@@ -462,6 +467,7 @@ fn writer_differential_veto_rows() {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     };
     let mut rows = 0;
     for line in text.lines() {
@@ -645,6 +651,70 @@ fn no_guide_seed_zero_is_m1_identical() {
 }
 
 #[test]
+fn stats_are_observation_only() {
+    // Plan 12 Phase A: the attribution counters may not change the search.
+    let root = board(MATE_IN_2);
+    let mut off = limits();
+    let mut on = limits();
+    on.stats = true;
+    let a = search::prove(&root, &off, NullSink).result;
+    let b = search::prove(&root, &on, NullSink).result;
+    assert_eq!(
+        (a.exit, a.length, a.child_evals, a.expansions),
+        (b.exit, b.length, b.child_evals, b.expansions)
+    );
+    // Off: every counter is zero.
+    assert_eq!(a.unique_keys, 0);
+    assert_eq!(a.re_expansions, 0);
+    assert_eq!(a.entry_would_return, 0);
+    // On: the counters are internally consistent.
+    assert!(b.unique_keys <= b.expansions);
+    assert_eq!(b.re_expansions, b.expansions - b.unique_keys);
+    assert!(b.entry_proof_hits + b.entry_tt_hits >= b.entry_would_return);
+    assert_eq!(b.attacker_expansions + b.defender_expansions, b.expansions);
+    assert_eq!(b.depth_histogram.iter().sum::<u64>(), b.expansions);
+    assert!(b.selected_class.iter().sum::<u64>() > 0);
+    off.stats = true;
+    assert_eq!(
+        search::prove(&root, &off, NullSink).result.unique_keys,
+        b.unique_keys,
+        "the distinct-key count must be deterministic"
+    );
+}
+
+#[test]
+fn cli_stats_object_is_emitted() {
+    let out = atomi(&[
+        "prove",
+        MATE_IN_1_CHECKMATE,
+        "--seconds",
+        "30",
+        "--memory",
+        "16",
+        "--stats",
+    ]);
+    assert_eq!(out.status.code(), Some(0));
+    let line = String::from_utf8_lossy(&out.stdout);
+    let json: serde_json::Value = serde_json::from_str(line.trim()).unwrap();
+    assert!(json["stats"].is_object(), "{json}");
+    assert!(json["stats"]["unique_keys"].is_number());
+    assert!(json["stats"]["depth_histogram"].is_array());
+    assert!(json["stats"]["selected_class"].is_array());
+    // Without the flag the default contract is unchanged.
+    let plain = atomi(&[
+        "prove",
+        MATE_IN_1_CHECKMATE,
+        "--seconds",
+        "30",
+        "--memory",
+        "16",
+    ]);
+    let plain: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&plain.stdout).trim()).unwrap();
+    assert!(plain.get("stats").is_none());
+}
+
+#[test]
 fn same_seed_is_repeatable() {
     let fen = "rnbq1b1r/pp1p1kpp/2p1pp1n/8/3PP1P1/2N2N2/PPP2P1P/R1BQKB1R w KQ - 0 1";
     let run = || {
@@ -785,6 +855,7 @@ fn settled_child_proof_round_trip() {
         guide_params: atomi::guide::GuideParams::default(),
         proof_share_percent: 25,
         seed: 0,
+        stats: false,
     };
     let out = search::prove(&root, &lim, ProofStore::new(64));
     assert_eq!(out.result.exit, Exit::Proved);

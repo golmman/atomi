@@ -483,3 +483,12 @@ accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
   93.43%**. The only material lever is the closed auxiliary line, so
   `RESTART-GEN` was not implemented and Phase C/D were not run. No coverage
   claim, no ledger row. Details in [`report10.md`](report10.md).
+- **2026-11-10** — plan12 (item 21) executed; **Phase A stop rule fired**.
+  Bare tree, `deep-win` seed 0: at 20 M evals 668,608 expansions / 620,162
+  distinct keys (7.25 % re-expansions) and only **53 stored values
+  (0.0079 %)** crossing the incoming node thresholds; at 120 s 51.7 M
+  expansions / 2.75 M proof entries, 15,849 crossing values (0.0319 % of the
+  `--stats` run). ENTRY-REUSE was not implemented and the 120 s matrix/D14
+  were not run; Tier 1 stays 2/3 (plan11) and no ledger row is appended.
+  The `--stats` counters are default-off and observation-only. Details in
+  [`report12.md`](report12.md).

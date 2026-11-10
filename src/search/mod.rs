@@ -26,15 +26,17 @@
 //! claimed win.
 
 mod frame;
+mod keyset;
 pub mod value;
 
 use crate::events::{ProofEvent, ProofSink};
 use crate::guide::{Guide, GuideConfig, GuideParams, History};
 use crate::rules;
-use crate::table::Tables;
+use crate::table::{EntrySource, Tables};
 use atomic_movegen::board::{Board, StateInfo};
 use atomic_movegen::types::Color;
 use frame::{Entered, Frame, Group};
+use keyset::KeySet;
 use std::time::{Duration, Instant};
 use value::{Child, INFINITY, Value, and_value, exit_value, or_value, pn_dn};
 
@@ -58,6 +60,8 @@ pub struct Limits {
     pub proof_share_percent: u8,
     /// The tie-break seed (0 = movegen order).
     pub seed: u64,
+    /// Collect the plan-12 attribution counters (`--stats`).
+    pub stats: bool,
 }
 
 /// How the search ended.
@@ -114,6 +118,28 @@ pub struct SearchResult {
     pub proof_entries: u64,
     /// The proof table refused an insert at its 90% load bound.
     pub proof_full: bool,
+    /// Distinct keys expanded (`--stats`; a lower bound when
+    /// `unique_keys_capped`).
+    pub unique_keys: u64,
+    /// Whether the distinct-key set hit its load bound.
+    pub unique_keys_capped: bool,
+    /// `expansions - unique_keys` (an upper bound when capped).
+    pub re_expansions: u64,
+    /// Node-entry lookups served by the proof table (`--stats`).
+    pub entry_proof_hits: u64,
+    /// Node-entry lookups served by the TT (`--stats`).
+    pub entry_tt_hits: u64,
+    /// Node-entry stored values that already crossed `(tpn, tdn)`.
+    pub entry_would_return: u64,
+    /// Expansions at attacker (OR) nodes (`--stats`).
+    pub attacker_expansions: u64,
+    /// Expansions at defender (AND) nodes (`--stats`).
+    pub defender_expansions: u64,
+    /// Expansions by ply, bucket `min(ply, 63)` (`--stats`).
+    pub depth_histogram: [u64; 64],
+    /// Selected-child class histogram, indexed by `MoveClass::rank()`
+    /// (`--stats`).
+    pub selected_class: [u64; 16],
 }
 
 /// What `prove` hands back: the result, the proof table and the sink.
@@ -159,6 +185,14 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
                 guide,
                 history: History::new(),
                 seed: limits.seed,
+                unique: limits.stats.then(|| KeySet::new(1 << 21)),
+                entry_proof_hits: 0,
+                entry_tt_hits: 0,
+                entry_would_return: 0,
+                attacker_expansions: 0,
+                defender_expansions: 0,
+                depth_histogram: [0; 64],
+                selected_class: [0; 16],
             };
             let mut result = engine.run(&root);
             result.ms = start.elapsed().as_millis() as u64;
@@ -192,6 +226,15 @@ struct Engine<S> {
     guide: Guide,
     history: History,
     seed: u64,
+    /// The distinct-key set (`--stats` only).
+    unique: Option<KeySet>,
+    entry_proof_hits: u64,
+    entry_tt_hits: u64,
+    entry_would_return: u64,
+    attacker_expansions: u64,
+    defender_expansions: u64,
+    depth_histogram: [u64; 64],
+    selected_class: [u64; 16],
 }
 
 impl<S: ProofSink> Engine<S> {
@@ -199,19 +242,7 @@ impl<S: ProofSink> Engine<S> {
         if rules::status(root, self.attacker) != rules::Status::Open {
             // An already-over root (mate, stalemate, material draw, the
             // clock) is refuted with no work done.
-            return SearchResult {
-                exit: Exit::Refuted,
-                length: None,
-                child_evals: 0,
-                expansions: 0,
-                settle_nodes: 0,
-                sim_nodes: 0,
-                aux_nodes: 0,
-                aux_skipped: 0,
-                ms: 0,
-                proof_entries: 0,
-                proof_full: false,
-            };
+            return self.result(Exit::Refuted, None);
         }
         let root_key = rules::key(root);
         let mut value = self.mid(root, root_key, 0, INFINITY, INFINITY);
@@ -227,6 +258,13 @@ impl<S: ProofSink> Engine<S> {
             (None, Value::Refuted { .. }) => (Exit::Refuted, None),
             (None, Value::Open { .. }) => unreachable!("Open root without a stop"),
         };
+        self.result(exit, length)
+    }
+
+    /// The result record, with the plan-12 counters (zero when `--stats` is
+    /// off).
+    fn result(&self, exit: Exit, length: Option<u16>) -> SearchResult {
+        let unique_keys = self.unique.as_ref().map_or(0, |s| s.len());
         SearchResult {
             exit,
             length,
@@ -239,6 +277,20 @@ impl<S: ProofSink> Engine<S> {
             ms: 0,
             proof_entries: 0,
             proof_full: false,
+            unique_keys,
+            unique_keys_capped: self.unique.as_ref().is_some_and(|s| s.capped()),
+            re_expansions: if self.unique.is_some() {
+                self.expansions.saturating_sub(unique_keys)
+            } else {
+                0
+            },
+            entry_proof_hits: self.entry_proof_hits,
+            entry_tt_hits: self.entry_tt_hits,
+            entry_would_return: self.entry_would_return,
+            attacker_expansions: self.attacker_expansions,
+            defender_expansions: self.defender_expansions,
+            depth_histogram: self.depth_histogram,
+            selected_class: self.selected_class,
         }
     }
 
@@ -262,6 +314,32 @@ impl<S: ProofSink> Engine<S> {
         {
             self.stop = Some(Exit::Timeout);
             return Value::Open { pn: 0, dn: 0 };
+        }
+        // Plan-12 attribution (measurement only): consult the node's own
+        // stored value before the frame is built and count whether it would
+        // already cross the incoming thresholds. The check never writes the
+        // tables and never changes the search.
+        if self.unique.is_some() {
+            let counter = board.rule50();
+            if let Some((stored, source)) = self.tables.lookup_with_source(key, counter) {
+                let (pn, dn) = pn_dn(&stored);
+                match source {
+                    EntrySource::Proof => self.entry_proof_hits += 1,
+                    EntrySource::Tt => self.entry_tt_hits += 1,
+                }
+                if pn >= tpn || dn >= tdn {
+                    self.entry_would_return += 1;
+                }
+            }
+        }
+        if let Some(set) = self.unique.as_mut() {
+            set.insert(key);
+            if board.side_to_move() == self.attacker {
+                self.attacker_expansions += 1;
+            } else {
+                self.defender_expansions += 1;
+            }
+            self.depth_histogram[usize::from(ply.min(63))] += 1;
         }
         debug_assert_eq!(key, rules::key(board));
         self.line.push(key);
@@ -326,6 +404,9 @@ impl<S: ProofSink> Engine<S> {
                 break;
             }
             let (best, second) = select(&frame, &self.history, self.seed);
+            if self.unique.is_some() {
+                self.selected_class[usize::from(frame.children[best].class.rank())] += 1;
+            }
             let (ctpn, ctdn) = child_thresholds(&frame, best, second, tpn, tdn, pn, dn);
             if frame.group.as_ref().is_some_and(|g| g.index == best) {
                 // Item-15 GROUP: install one plain member. The group is a
@@ -724,6 +805,14 @@ mod tests {
             guide: Guide::new(GuideConfig::none()),
             history: History::new(),
             seed: 0,
+            unique: None,
+            entry_proof_hits: 0,
+            entry_tt_hits: 0,
+            entry_would_return: 0,
+            attacker_expansions: 0,
+            defender_expansions: 0,
+            depth_histogram: [0; 64],
+            selected_class: [0; 16],
         };
         let key = rules::key(&parent);
         engine.line.push(key);
@@ -781,6 +870,14 @@ mod tests {
             guide: Guide::new(GuideConfig::none()),
             history: History::new(),
             seed: 0,
+            unique: None,
+            entry_proof_hits: 0,
+            entry_tt_hits: 0,
+            entry_would_return: 0,
+            attacker_expansions: 0,
+            defender_expansions: 0,
+            depth_histogram: [0; 64],
+            selected_class: [0; 16],
         };
         let r = engine.run(&parent);
         assert_eq!(r.exit, Exit::Proved);
