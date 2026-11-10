@@ -79,6 +79,6 @@ How come we have not a single improvement in the last 10 plans? Why do the prova
 We didn't improve wall times in the last 10 plans, no additions to the bench ledger.
 What is holding us back? Are there any constraints we should rethink?
 
-Addressing the "All-or-nothing stack gate": we could add provari features even if they fail there individual gates with cli feature flags. Gate fails => default off, gate succeeds => default on. Then we could test feature interaction properly.
+Addressing the "All-or-nothing stack gate"-problem: we could add provari ideas even if they fail their individual gates with cli feature flags. Gate fails => default off, gate succeeds => default on. Then we could test feature interaction properly.
 
 Read docs/plans/prover/report13.md and measurements/plan13/. The three cheap probes failed: no proof-share is 3/3 on deep-win, no ply cap passes, and the conformance stack cuts core by only 1.22×. The hand-guide line is closed. Run the kill review and write a plan for a deep-win tree mechanism outside the hand-guide family, or an owner decision on the formulation (proof limit / budget). Do not reopen the hand-guide/auxiliary line, do not raise the 120 s budget, and do not build a portfolio.
