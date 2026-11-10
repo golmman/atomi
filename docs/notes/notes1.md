@@ -72,3 +72,11 @@ Are we still on track to beat provari? If not, how should we change the plan?
 
 Read report8.md, measurements/plan8/ and the plan6/item-15 erratum in initiative.md. Run the plans 7–8 kill review with the fixed prompt. Then, unless the review overturns it, write plan9.md for item 19: the coverage-first tier, plus (if the owner wants the wall) one bounded proof-replay stack with the pre-registered stop rule. Update bench.md, the success condition, the ledger and D26 status together.
 
+---
+
+How come we have not a single improvement in the last 10 plans? Why do the provari ideas work there but not here?
+
+We didn't improve wall times in the last 10 plans, no additions to the bench ledger.
+What is holding us back? Are there any constraints we should rethink?
+
+Addressing the "All-or-nothing stack gate": we could add provari features even if they fail there individual gates with cli feature flags. Gate fails => default off, gate succeeds => default on. Then we could test feature interaction properly.
