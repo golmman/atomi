@@ -108,10 +108,15 @@ Would this be a valid approach?
 
 ---
 
-I want the `prover` initiative file is shortened and organized.
+I want the `prover` initiative file shortened and organized.
 
 Some ideas to make it shorter:
 * status -> reduce to one line plus the summary table, everything else is redundant with decisions, milestones and history, see below
 * decisions -> shorten significantly, outsource details to dedicated file.
 * milestones -> shorten significantly, details live in the plan-files.
 * history -> outsource to dedicated file, then shorten: details live in the report-files.
+
+---
+
+We identified the current search tree size to be the main culprit for not reaching the initiatives goals.
+So a sub-goal would be to get search tree parity with provari
