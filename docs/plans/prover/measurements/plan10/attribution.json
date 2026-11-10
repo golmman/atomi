@@ -1,0 +1,1182 @@
+{
+ "plan": "plan10",
+ "phase": "A",
+ "product_flags": [
+  "--guide",
+  "hand",
+  "--guide-scale",
+  "64",
+  "--guide-ef-weight",
+  "0"
+ ],
+ "evals": 20000000,
+ "memory_mb": 192,
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "cells": [
+  "core",
+  "deep-win"
+ ],
+ "ablations": [
+  "sim",
+  "closures",
+  "sim,closures"
+ ],
+ "product": [
+  {
+   "cell": "core",
+   "seed": 0,
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 41637,
+   "wall_s": 41.71,
+   "expansions": 625483,
+   "child_evals": 20000001,
+   "sim_nodes": 101495984,
+   "settle_nodes": 35554421,
+   "aux_nodes": 137050405,
+   "proof_entries": 24201,
+   "symbols": [
+    {
+     "symbol": "atomic_movegen::movegen::generate_legal_with_state",
+     "percent": 26.84
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal",
+     "percent": 20.61
+    },
+    {
+     "symbol": "<atomi::search::frame::Frame>::enter",
+     "percent": 13.16
+    },
+    {
+     "symbol": "atomi::guide::eval::hand_eval",
+     "percent": 7.2
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::do_move",
+     "percent": 5.91
+    },
+    {
+     "symbol": "atomic_movegen::attacks::attacks_from",
+     "percent": 5.21
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::attackers_to_color",
+     "percent": 4.99
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::compute_checkers",
+     "percent": 4.4
+    },
+    {
+     "symbol": "atomi::guide::threat::immediate_explosion",
+     "percent": 2.26
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::populate_state",
+     "percent": 1.9
+    },
+    {
+     "symbol": "atomic_movegen::movegen::has_legal_move_with_state",
+     "percent": 1.83
+    },
+    {
+     "symbol": "__memset_avx2_unaligned_erms",
+     "percent": 1.09
+    },
+    {
+     "symbol": "atomi::guide::threat::signature_for",
+     "percent": 0.94
+    },
+    {
+     "symbol": "atomic_movegen::board::castling_rights_after",
+     "percent": 0.64
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal_ep_square",
+     "percent": 0.61
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::outcome",
+     "percent": 0.57
+    },
+    {
+     "symbol": "__memmove_avx_unaligned_erms",
+     "percent": 0.53
+    },
+    {
+     "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid",
+     "percent": 0.27
+    },
+    {
+     "symbol": "atomi::rules::insufficient_material",
+     "percent": 0.21
+    },
+    {
+     "symbol": "atomi::search::node_value",
+     "percent": 0.2
+    }
+   ],
+   "categories": {
+    "movegen": 67.6,
+    "frame_entry": 23.56,
+    "mid_descent": 6.44,
+    "select": 0.0,
+    "table": 0.17,
+    "other": 2.07
+   }
+  },
+  {
+   "cell": "core",
+   "seed": 1,
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 42152,
+   "wall_s": 42.234,
+   "expansions": 623640,
+   "child_evals": 20000023,
+   "sim_nodes": 101497776,
+   "settle_nodes": 35592090,
+   "aux_nodes": 137089866,
+   "proof_entries": 24611,
+   "symbols": [
+    {
+     "symbol": "atomic_movegen::movegen::generate_legal_with_state",
+     "percent": 26.84
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal",
+     "percent": 20.19
+    },
+    {
+     "symbol": "<atomi::search::frame::Frame>::enter",
+     "percent": 13.31
+    },
+    {
+     "symbol": "atomi::guide::eval::hand_eval",
+     "percent": 7.24
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::do_move",
+     "percent": 5.93
+    },
+    {
+     "symbol": "atomic_movegen::attacks::attacks_from",
+     "percent": 5.52
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::attackers_to_color",
+     "percent": 4.99
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::compute_checkers",
+     "percent": 4.41
+    },
+    {
+     "symbol": "atomi::guide::threat::immediate_explosion",
+     "percent": 2.25
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::populate_state",
+     "percent": 1.96
+    },
+    {
+     "symbol": "atomic_movegen::movegen::has_legal_move_with_state",
+     "percent": 1.84
+    },
+    {
+     "symbol": "__memset_avx2_unaligned_erms",
+     "percent": 1.0
+    },
+    {
+     "symbol": "atomi::guide::threat::signature_for",
+     "percent": 0.92
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal_ep_square",
+     "percent": 0.6
+    },
+    {
+     "symbol": "atomic_movegen::board::castling_rights_after",
+     "percent": 0.59
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::outcome",
+     "percent": 0.59
+    },
+    {
+     "symbol": "__memmove_avx_unaligned_erms",
+     "percent": 0.51
+    },
+    {
+     "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid",
+     "percent": 0.31
+    },
+    {
+     "symbol": "atomi::rules::insufficient_material",
+     "percent": 0.21
+    },
+    {
+     "symbol": "atomi::search::node_value",
+     "percent": 0.2
+    }
+   ],
+   "categories": {
+    "movegen": 67.53,
+    "frame_entry": 23.72,
+    "mid_descent": 6.44,
+    "select": 0.0,
+    "table": 0.18,
+    "other": 2.01
+   }
+  },
+  {
+   "cell": "core",
+   "seed": 2,
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 41781,
+   "wall_s": 41.848,
+   "expansions": 624286,
+   "child_evals": 20000030,
+   "sim_nodes": 101429728,
+   "settle_nodes": 35533017,
+   "aux_nodes": 136962745,
+   "proof_entries": 23523,
+   "symbols": [
+    {
+     "symbol": "atomic_movegen::movegen::generate_legal_with_state",
+     "percent": 26.77
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal",
+     "percent": 20.38
+    },
+    {
+     "symbol": "<atomi::search::frame::Frame>::enter",
+     "percent": 13.44
+    },
+    {
+     "symbol": "atomi::guide::eval::hand_eval",
+     "percent": 7.3
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::do_move",
+     "percent": 5.87
+    },
+    {
+     "symbol": "atomic_movegen::attacks::attacks_from",
+     "percent": 5.27
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::attackers_to_color",
+     "percent": 4.89
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::compute_checkers",
+     "percent": 4.41
+    },
+    {
+     "symbol": "atomi::guide::threat::immediate_explosion",
+     "percent": 2.28
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::populate_state",
+     "percent": 1.92
+    },
+    {
+     "symbol": "atomic_movegen::movegen::has_legal_move_with_state",
+     "percent": 1.84
+    },
+    {
+     "symbol": "__memset_avx2_unaligned_erms",
+     "percent": 1.05
+    },
+    {
+     "symbol": "atomi::guide::threat::signature_for",
+     "percent": 0.98
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal_ep_square",
+     "percent": 0.62
+    },
+    {
+     "symbol": "atomic_movegen::board::castling_rights_after",
+     "percent": 0.6
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::outcome",
+     "percent": 0.57
+    },
+    {
+     "symbol": "__memmove_avx_unaligned_erms",
+     "percent": 0.5
+    },
+    {
+     "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid",
+     "percent": 0.3
+    },
+    {
+     "symbol": "atomi::rules::insufficient_material",
+     "percent": 0.21
+    },
+    {
+     "symbol": "<atomi::table::Tables>::store",
+     "percent": 0.19
+    }
+   ],
+   "categories": {
+    "movegen": 67.27,
+    "frame_entry": 24.0,
+    "mid_descent": 6.37,
+    "select": 0.0,
+    "table": 0.19,
+    "other": 2.03
+   }
+  },
+  {
+   "cell": "deep-win",
+   "seed": 0,
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 38524,
+   "wall_s": 38.603,
+   "expansions": 650059,
+   "child_evals": 20000018,
+   "sim_nodes": 99812858,
+   "settle_nodes": 38118887,
+   "aux_nodes": 137931745,
+   "proof_entries": 21401,
+   "symbols": [
+    {
+     "symbol": "atomic_movegen::movegen::generate_legal_with_state",
+     "percent": 27.67
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal",
+     "percent": 17.12
+    },
+    {
+     "symbol": "<atomi::search::frame::Frame>::enter",
+     "percent": 12.91
+    },
+    {
+     "symbol": "atomi::guide::eval::hand_eval",
+     "percent": 7.78
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::do_move",
+     "percent": 6.01
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::attackers_to_color",
+     "percent": 5.93
+    },
+    {
+     "symbol": "atomic_movegen::attacks::attacks_from",
+     "percent": 5.82
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::compute_checkers",
+     "percent": 5.05
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::populate_state",
+     "percent": 2.26
+    },
+    {
+     "symbol": "atomi::guide::threat::immediate_explosion",
+     "percent": 2.18
+    },
+    {
+     "symbol": "atomic_movegen::movegen::has_legal_move_with_state",
+     "percent": 1.68
+    },
+    {
+     "symbol": "__memset_avx2_unaligned_erms",
+     "percent": 0.94
+    },
+    {
+     "symbol": "atomi::guide::threat::signature_for",
+     "percent": 0.91
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal_ep_square",
+     "percent": 0.65
+    },
+    {
+     "symbol": "atomic_movegen::board::castling_rights_after",
+     "percent": 0.61
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::outcome",
+     "percent": 0.58
+    },
+    {
+     "symbol": "__memmove_avx_unaligned_erms",
+     "percent": 0.51
+    },
+    {
+     "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid",
+     "percent": 0.28
+    },
+    {
+     "symbol": "<atomi::table::Tables>::store",
+     "percent": 0.24
+    },
+    {
+     "symbol": "atomi::search::node_value",
+     "percent": 0.2
+    }
+   ],
+   "categories": {
+    "movegen": 67.37,
+    "frame_entry": 23.78,
+    "mid_descent": 6.52,
+    "select": 0.0,
+    "table": 0.24,
+    "other": 1.96
+   }
+  },
+  {
+   "cell": "deep-win",
+   "seed": 1,
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 38737,
+   "wall_s": 38.809,
+   "expansions": 648698,
+   "child_evals": 20000021,
+   "sim_nodes": 99968751,
+   "settle_nodes": 38067965,
+   "aux_nodes": 138036716,
+   "proof_entries": 22567,
+   "symbols": [
+    {
+     "symbol": "atomic_movegen::movegen::generate_legal_with_state",
+     "percent": 28.05
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal",
+     "percent": 17.06
+    },
+    {
+     "symbol": "<atomi::search::frame::Frame>::enter",
+     "percent": 13.08
+    },
+    {
+     "symbol": "atomi::guide::eval::hand_eval",
+     "percent": 7.82
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::do_move",
+     "percent": 5.99
+    },
+    {
+     "symbol": "atomic_movegen::attacks::attacks_from",
+     "percent": 5.8
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::attackers_to_color",
+     "percent": 5.64
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::compute_checkers",
+     "percent": 4.8
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::populate_state",
+     "percent": 2.15
+    },
+    {
+     "symbol": "atomi::guide::threat::immediate_explosion",
+     "percent": 2.13
+    },
+    {
+     "symbol": "atomic_movegen::movegen::has_legal_move_with_state",
+     "percent": 1.78
+    },
+    {
+     "symbol": "__memset_avx2_unaligned_erms",
+     "percent": 0.94
+    },
+    {
+     "symbol": "atomi::guide::threat::signature_for",
+     "percent": 0.93
+    },
+    {
+     "symbol": "atomic_movegen::board::castling_rights_after",
+     "percent": 0.65
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal_ep_square",
+     "percent": 0.6
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::outcome",
+     "percent": 0.59
+    },
+    {
+     "symbol": "__memmove_avx_unaligned_erms",
+     "percent": 0.53
+    },
+    {
+     "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid",
+     "percent": 0.33
+    },
+    {
+     "symbol": "<atomi::table::Tables>::store",
+     "percent": 0.23
+    },
+    {
+     "symbol": "atomi::rules::insufficient_material",
+     "percent": 0.21
+    }
+   ],
+   "categories": {
+    "movegen": 67.12,
+    "frame_entry": 23.96,
+    "mid_descent": 6.52,
+    "select": 0.0,
+    "table": 0.23,
+    "other": 2.0
+   }
+  },
+  {
+   "cell": "deep-win",
+   "seed": 2,
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 38560,
+   "wall_s": 38.626,
+   "expansions": 650910,
+   "child_evals": 20000038,
+   "sim_nodes": 100096632,
+   "settle_nodes": 38058458,
+   "aux_nodes": 138155090,
+   "proof_entries": 23237,
+   "symbols": [
+    {
+     "symbol": "atomic_movegen::movegen::generate_legal_with_state",
+     "percent": 27.83
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal",
+     "percent": 17.03
+    },
+    {
+     "symbol": "<atomi::search::frame::Frame>::enter",
+     "percent": 13.1
+    },
+    {
+     "symbol": "atomi::guide::eval::hand_eval",
+     "percent": 7.93
+    },
+    {
+     "symbol": "atomic_movegen::attacks::attacks_from",
+     "percent": 5.82
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::do_move",
+     "percent": 5.81
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::attackers_to_color",
+     "percent": 5.81
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::compute_checkers",
+     "percent": 4.84
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::populate_state",
+     "percent": 2.16
+    },
+    {
+     "symbol": "atomi::guide::threat::immediate_explosion",
+     "percent": 2.11
+    },
+    {
+     "symbol": "atomic_movegen::movegen::has_legal_move_with_state",
+     "percent": 1.83
+    },
+    {
+     "symbol": "atomi::guide::threat::signature_for",
+     "percent": 0.99
+    },
+    {
+     "symbol": "__memset_avx2_unaligned_erms",
+     "percent": 0.93
+    },
+    {
+     "symbol": "atomic_movegen::board::castling_rights_after",
+     "percent": 0.68
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::legal_ep_square",
+     "percent": 0.62
+    },
+    {
+     "symbol": "<atomic_movegen::board::Board>::outcome",
+     "percent": 0.59
+    },
+    {
+     "symbol": "__memmove_avx_unaligned_erms",
+     "percent": 0.54
+    },
+    {
+     "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid",
+     "percent": 0.31
+    },
+    {
+     "symbol": "atomi::rules::insufficient_material",
+     "percent": 0.22
+    },
+    {
+     "symbol": "<atomi::table::Tables>::store",
+     "percent": 0.22
+    }
+   ],
+   "categories": {
+    "movegen": 67.21,
+    "frame_entry": 24.13,
+    "mid_descent": 6.35,
+    "select": 0.0,
+    "table": 0.22,
+    "other": 1.99
+   }
+  }
+ ],
+ "ablation_rows": [
+  {
+   "cell": "core",
+   "seed": 0,
+   "off": "sim",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 12679,
+   "wall_s": 12.683,
+   "expansions": 617803,
+   "child_evals": 20000028,
+   "sim_nodes": 0,
+   "settle_nodes": 35430541,
+   "aux_nodes": 35430541,
+   "proof_entries": 21216
+  },
+  {
+   "cell": "core",
+   "seed": 0,
+   "off": "closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 10951,
+   "wall_s": 10.954,
+   "expansions": 640107,
+   "child_evals": 20000006,
+   "sim_nodes": 27651859,
+   "settle_nodes": 0,
+   "aux_nodes": 27651859,
+   "proof_entries": 34534
+  },
+  {
+   "cell": "core",
+   "seed": 0,
+   "off": "sim,closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim,closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 3139,
+   "wall_s": 3.142,
+   "expansions": 634202,
+   "child_evals": 20000025,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_entries": 31810
+  },
+  {
+   "cell": "core",
+   "seed": 1,
+   "off": "sim",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 13010,
+   "wall_s": 13.013,
+   "expansions": 614747,
+   "child_evals": 20000013,
+   "sim_nodes": 0,
+   "settle_nodes": 35491691,
+   "aux_nodes": 35491691,
+   "proof_entries": 20874
+  },
+  {
+   "cell": "core",
+   "seed": 1,
+   "off": "closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 11249,
+   "wall_s": 11.252,
+   "expansions": 632492,
+   "child_evals": 20000014,
+   "sim_nodes": 27881330,
+   "settle_nodes": 0,
+   "aux_nodes": 27881330,
+   "proof_entries": 32051
+  },
+  {
+   "cell": "core",
+   "seed": 1,
+   "off": "sim,closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim,closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 3160,
+   "wall_s": 3.163,
+   "expansions": 634228,
+   "child_evals": 20000016,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_entries": 31673
+  },
+  {
+   "cell": "core",
+   "seed": 2,
+   "off": "sim",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 12881,
+   "wall_s": 12.884,
+   "expansions": 617862,
+   "child_evals": 20000019,
+   "sim_nodes": 0,
+   "settle_nodes": 35556758,
+   "aux_nodes": 35556758,
+   "proof_entries": 24376
+  },
+  {
+   "cell": "core",
+   "seed": 2,
+   "off": "closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 11179,
+   "wall_s": 11.182,
+   "expansions": 631402,
+   "child_evals": 20000008,
+   "sim_nodes": 27914040,
+   "settle_nodes": 0,
+   "aux_nodes": 27914040,
+   "proof_entries": 32947
+  },
+  {
+   "cell": "core",
+   "seed": 2,
+   "off": "sim,closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim,closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 3195,
+   "wall_s": 3.199,
+   "expansions": 630661,
+   "child_evals": 20000004,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_entries": 31152
+  },
+  {
+   "cell": "deep-win",
+   "seed": 0,
+   "off": "sim",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 12066,
+   "wall_s": 12.069,
+   "expansions": 650275,
+   "child_evals": 20000005,
+   "sim_nodes": 0,
+   "settle_nodes": 38068331,
+   "aux_nodes": 38068331,
+   "proof_entries": 20089
+  },
+  {
+   "cell": "deep-win",
+   "seed": 0,
+   "off": "closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 7557,
+   "wall_s": 7.561,
+   "expansions": 663434,
+   "child_evals": 20000017,
+   "sim_nodes": 18163449,
+   "settle_nodes": 0,
+   "aux_nodes": 18163449,
+   "proof_entries": 45429
+  },
+  {
+   "cell": "deep-win",
+   "seed": 0,
+   "off": "sim,closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim,closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 2533,
+   "wall_s": 2.536,
+   "expansions": 667446,
+   "child_evals": 20000012,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_entries": 45115
+  },
+  {
+   "cell": "deep-win",
+   "seed": 1,
+   "off": "sim",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 12174,
+   "wall_s": 12.177,
+   "expansions": 649719,
+   "child_evals": 20000024,
+   "sim_nodes": 0,
+   "settle_nodes": 38057731,
+   "aux_nodes": 38057731,
+   "proof_entries": 20762
+  },
+  {
+   "cell": "deep-win",
+   "seed": 1,
+   "off": "closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 7404,
+   "wall_s": 7.407,
+   "expansions": 664484,
+   "child_evals": 20000000,
+   "sim_nodes": 17830971,
+   "settle_nodes": 0,
+   "aux_nodes": 17830971,
+   "proof_entries": 44973
+  },
+  {
+   "cell": "deep-win",
+   "seed": 1,
+   "off": "sim,closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim,closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 2548,
+   "wall_s": 2.552,
+   "expansions": 666390,
+   "child_evals": 20000016,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_entries": 45283
+  },
+  {
+   "cell": "deep-win",
+   "seed": 2,
+   "off": "sim",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 12076,
+   "wall_s": 12.079,
+   "expansions": 651283,
+   "child_evals": 20000036,
+   "sim_nodes": 0,
+   "settle_nodes": 38050092,
+   "aux_nodes": 38050092,
+   "proof_entries": 20830
+  },
+  {
+   "cell": "deep-win",
+   "seed": 2,
+   "off": "closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 7442,
+   "wall_s": 7.445,
+   "expansions": 664400,
+   "child_evals": 20000011,
+   "sim_nodes": 17943902,
+   "settle_nodes": 0,
+   "aux_nodes": 17943902,
+   "proof_entries": 46614
+  },
+  {
+   "cell": "deep-win",
+   "seed": 2,
+   "off": "sim,closures",
+   "flags": [
+    "--guide",
+    "hand",
+    "--guide-scale",
+    "64",
+    "--guide-ef-weight",
+    "0",
+    "--guide-off",
+    "sim,closures"
+   ],
+   "proved": false,
+   "exit": "evals",
+   "ms": 2531,
+   "wall_s": 2.534,
+   "expansions": 665783,
+   "child_evals": 20000009,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_entries": 45979
+  }
+ ],
+ "summary": {
+  "core": {
+   "product_ms_median": 41781,
+   "sim_off_ms_median": 12881,
+   "closures_off_ms_median": 11179,
+   "both_off_ms_median": 3160,
+   "aux_share": 0.9244,
+   "non_aux_share": 0.0756,
+   "product_expansions_median": 624286,
+   "both_off_expansions_median": 634202
+  },
+  "deep-win": {
+   "product_ms_median": 38560,
+   "sim_off_ms_median": 12076,
+   "closures_off_ms_median": 7442,
+   "both_off_ms_median": 2533,
+   "aux_share": 0.9343,
+   "non_aux_share": 0.0657,
+   "product_expansions_median": 650059,
+   "both_off_expansions_median": 666390
+  }
+ },
+ "stop_rule": {
+  "fired": true,
+  "rule": "Phase A stop rule: if the only material lever is auxiliary work (sim/settle), stop and report.",
+  "evidence": "The both-off (sim+closures) fixed-20M wall is 2.55-3.21 s versus 38.2-41.8 s for the product; auxiliary work is 92-94% of the product wall on both cells and all seeds.",
+  "consequence": "RESTART-GEN (Phase B), the Phase C work item and the Phase D checkpoints were not implemented or run."
+ }
+}

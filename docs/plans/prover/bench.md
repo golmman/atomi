@@ -114,6 +114,17 @@ core 500 ms / 342,289 nodes, deep-win 6,590 ms / 4,574,912 nodes. Tier 2 is
 not claimed; `REPLAY-BOUND` was not started. See
 [`report9.md`](report9.md) and [`measurements/plan9/`](measurements/plan9/README.md).
 
+**Update (plan10 executed, 2026-11-10).** Item 18's Phase A stop rule fired.
+At fixed 20 M child evals the product wall is 41.781 s (`core`) and 38.560 s
+(`deep-win`); with simulation and the one-ply settle disabled the same search
+is 3.160 s and 2.533 s. Auxiliary work is **92.44% / 93.43%** of the product
+wall on both cells and all seeds, so the only material lever is the closed
+auxiliary line. `RESTART-GEN` was not implemented, the Phase C work item and
+the Phase D checkpoints were not run, and no coverage or wall claim is made.
+Tier 1 remains 1/3 from plan9; no ledger row. See
+[`report10.md`](report10.md) and
+[`measurements/plan10/`](measurements/plan10/README.md).
+
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
 ## Names and ids (read this first)
@@ -453,3 +464,9 @@ accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
   0–2); `core` 0/3 (≥ 240.0×) and `deep-win` 0/3 (≥ 18.2×) censored. Tier 2
   not claimed; `REPLAY-BOUND` not started. No ledger row. Details in
   [`report9.md`](report9.md).
+- **2026-11-10** — plan10 (item 18) executed; **Phase A stop rule fired**.
+  Fixed 20 M evals, product point: `core` 41.781 s, `deep-win` 38.560 s;
+  both-off (sim+closures) 3.160 s / 2.533 s; auxiliary share **92.44% /
+  93.43%**. The only material lever is the closed auxiliary line, so
+  `RESTART-GEN` was not implemented and Phase C/D were not run. No coverage
+  claim, no ledger row. Details in [`report10.md`](report10.md).
