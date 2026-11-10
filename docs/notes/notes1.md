@@ -67,3 +67,8 @@ Read docs/plans/prover/report5.md, plan5.md, measurements/plan5/, plan6.md and i
 ---
 
 Are we still on track to beat provari? If not, how should we change the plan?
+
+---
+
+Read report8.md, measurements/plan8/ and the plan6/item-15 erratum in initiative.md. Run the plans 7–8 kill review with the fixed prompt. Then, unless the review overturns it, write plan9.md for item 19: the coverage-first tier, plus (if the owner wants the wall) one bounded proof-replay stack with the pre-registered stop rule. Update bench.md, the success condition, the ledger and D26 status together.
+

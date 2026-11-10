@@ -86,6 +86,19 @@ the product still censors `core` and `deep-win` at 60 s (≥ 121.5× and
 recommendation is **item 19 (owner re-pin)**; no engine change, no ledger
 row. See [`report8.md`](report8.md) and
 [`measurements/plan8/`](measurements/plan8/README.md).
+
+**Plan session 9 (2026-11-09) — item 19 accepted, coverage first.** The
+plans 7–8 kill review does not overturn plan8: the wall goal is not near-term
+(`easy-win` 58.4× at 60 s, `core`/`deep-win` censored), even the bare `core`
+floor is 34.6×, and further auxiliary tuning is cancelled. The owner accepts
+the re-pin. **D27** makes **Tier 1 coverage** (3/3 at `--seconds 120 --memory
+192`, every claim D14-accepted) the next goal and keeps the original wall
+geomean as **Tier 2** on the same cells at 10 s. [`plan9`](plan9.md) measures
+the coverage tier and authorises one opt-in bounded sibling-proof-replay stack
+with a pre-registered stop rule if the wall is retained. `bench.md`, the
+success condition, the ledger and D26's status are updated together; no
+engine change yet.
+
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -111,18 +124,29 @@ initiative. Its starting point is the legacy handoff
 corpus, with every claimed win checked by our own replay validator and by an
 independent second rules implementation.**
 
-Success condition (from the handoff §2; do not silently change it):
+Success condition (from the handoff §2; amended by D27, plan9, 2026-11-09 —
+the original wall-only wording is retained as Tier 2, not silently changed):
 
-- on the shared-win set, the geometric mean of `atomi / provari --guide hand`
-  wall time is `< 1.0`;
-- coverage is at least provari hand's (currently 3/3 on the bench cells);
+**Tier 1 — coverage (new first goal).** On the frozen shared-win set
+(`core`, `easy-win`, `deep-win`), prove **3/3** with the product configuration
+at `--seconds 120 --memory 192`; every claimed win passes D14 (equal
+`child_evals` on a `--seconds 600 --proof-out` run, accepted by `atomi
+validate` and the pinned `provari check`); no fixture-oracle regression. A
+censored cell is never converted and a longer run is never substituted.
+
+**Tier 2 — wall (after Tier 1).** On the same three cells at the canonical
+10 s budget, the geometric mean of `atomi / provari --guide hand` wall time is
+`< 1.0`; coverage stays 3/3.
+
 - every claimed win is accepted by this repo's own replay validator **and** by
-  the pinned `provari check`;
+  the pinned `provari check` (both tiers);
 - this repo's gates are green, and there are no outcome regressions on the
   copied fixture oracle (§Corpus and fixtures). The legacy solver's gates are
   not this repo's gates.
+- the reference is re-pinned only via D17 at M5; the node/`child_evals` score
+  option is not chosen.
 
-Three legs, one goal:
+Three legs, one tiered goal:
 
 1. **Search:** an attacker-only DF-PN prover. It is built around
    provari-style per-node precomputation and search guidance from the start,
@@ -242,7 +266,8 @@ session added D21–D22.
 | D23 | CORE-RESET and item-3 closure (plan4, executed 2026-11-09) | Item 3 was re-scoped once, as the last attempt, to **CORE-RESET**: starting-number calibration (`global_scale`, `ef_weight`), settled-proof retention only when the parent value selects it, a `--proof-share` memory split, and a per-frame `max_sim`/`max_settle` auxiliary budget, all under D21. **G1:** `core` proved at 10 s and `easy-win` ≤ 145,046 on seeds 0–2. G1 **failed** on `core`; item 3 **closed**, no mechanism split into a further plan, no ledger row. The 120 s auxiliary-budget `core` proof is recorded as the M4-first pivot. Owner to confirm the closure wording. **Erratum (post-closure investigation):** plan3 §2 implemented quiet grouping as a starting-number statement, not the one-child merge, and `simulate.rs` is a greedy playout, not proof replay, so the closure covers **atomi's variant only**; the missing group is measured at 6.9 M `core` expansions at 200 M child evals with sim/closures off. See horizon 15 |
 | D24 | M4 parked; wall is the gate (plan session 7, 2026-11-09) | The drafted M4 plan is parked as [`planX`](planX.md); it resumes only after a configuration wins 3/3 at 10 s. The next plan is [`plan7`](plan7.md) (item 16). **Gates for search/guide work are wall-based** (same-session `atomi / provari --guide hand` wall, plus coverage), with `child_evals`, `expansions`, `sim_nodes` and `settle_nodes` recorded as diagnostics. A node-only gate is not sufficient evidence for the goal. Auxiliary budgets must stay **deterministic** (same binary + FEN + flags + seed = identical counters, D22); a wall-clock budget inside the search is not allowed. The kill review is due after plans 5–6 and is recorded in the status section |
 | D25 | Deterministic auxiliary budget (proposed by plan7; owner to confirm) | Auxiliary work (simulation moves + settle movegens) is bounded by a search-global deterministic work counter, never by wall time. `--guide-aux-budget N` (`0` = unlimited) is part of the deterministic flag set; the search reports `aux_nodes` and `aux_skipped`. Once exhausted, optional sim/settle work is skipped; the last admitted operation may overshoot by its own work. The budget changes the tree, never the meaning. **Status:** implemented behind the opt-in flag and measured in plan7; not adopted as a default. Item 16 closed negative in the plan-session-8 kill review; the flag stays opt-in only |
-| D26 | Per-expansion diagnosis and goal decision (proposed by plan8; owner to confirm) | Per-node cost is judged per **expansion** and per node, never `child_evals` against provari nodes (the M1 unit mismatch). `easy-win`/`core` are re-measured same-session at fixed 10 M evals and 10 s. `R = (ns/expansion) / (provari wall/node) > 2` makes core throughput part of item 18; `R ≤ 2` leaves item 18 as tree/restarts only. If the 60 s bracket censors `core` or `deep-win`, or their factors exceed 3×, item 19 (re-pin: coverage-first tier or node/`child_evals` score) is recommended to the owner. Re-pin is never silent. **Status:** executed in plan8 (2026-11-09): `neither` `R` = 2.83/3.44, product 60 s censors core/deep-win; the rule recommends item 19 |
+| D26 | Per-expansion diagnosis and goal decision (proposed by plan8; owner to confirm) | Per-node cost is judged per **expansion** and per node, never `child_evals` against provari nodes (the M1 unit mismatch). `easy-win`/`core` are re-measured same-session at fixed 10 M evals and 10 s. `R = (ns/expansion) / (provari wall/node) > 2` makes core throughput part of item 18; `R ≤ 2` leaves item 18 as tree/restarts only. If the 60 s bracket censors `core` or `deep-win`, or their factors exceed 3×, item 19 (re-pin: coverage-first tier or node/`child_evals` score) is recommended to the owner. Re-pin is never silent. **Status:** executed in plan8 (2026-11-09): `neither` `R` = 2.83/3.44, product 60 s censors core/deep-win; the rule recommends item 19. The owner accepted in plan session 9; re-pin recorded as D27 and written as [`plan9`](plan9.md) |
+| D27 | Coverage-first goal re-pin (plan9, owner decision 2026-11-09) | The single wall-geomean goal is superseded by a tiered goal. **Tier 1:** 3/3 on `core`/`easy-win`/`deep-win` at `--seconds 120 --memory 192`, every claim D14-accepted, no fixture regression; a censored cell is not converted and the budget is not raised. **Tier 2:** after Tier 1, the original same-session geomean `< 1.0` at the canonical 10 s on the same cells. The node/`child_evals` score is not chosen; the reference is re-pinned only via D17 at M5. `bench.md`, the success condition, the ledger and D26's status are updated together. Plan9 may run one opt-in bounded sibling-proof-replay stack under a pre-registered stop rule; no second replay stack and no further auxiliary tuning |
 
 ## Backlog
 
@@ -250,9 +275,11 @@ Items are stable semantic identities. Plans are numbered sequentially and
 independently of items. Plans use stack-level gating (D21), except a
 single-mechanism plan that is independently meaningful.
 
-**Priority after plan8 (2026-11-09):** item 19 (owner decision, recommended) →
-item 18 (only if the owner rejects re-pin; core throughput is now in scope)
-→ item 5 (M4, parked) → item 6 (M5). Items 3, 15, 16 and 17 are closed.
+**Priority after plan9 (2026-11-09):** item 19 (owner accepted; execute
+[`plan9`](plan9.md): coverage tier first, one bounded replay only if the wall
+is retained) → item 5 (M4, parked; Tier 2 or a recorded decision is still
+required) → item 6 (M5). Item 18 stays parked unless the owner reopens it;
+items 3, 15, 16 and 17 are closed.
 
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
@@ -264,8 +291,8 @@ item 18 (only if the owner rejects re-pin; core throughput is now in scope)
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
 | 16 | **Wall attribution + deterministic auxiliary budget** | same-session attribution of wall on `easy-win`/`core` (main search vs sim vs settle vs threat replay vs guide eval); a deterministic global auxiliary-work budget (not wall-clock) and cheaper aux paths; wall-gated measurement | **wall gate:** `easy-win` wall ≤ 0.5 s (factor ≤ 3.6) and `core` proved at 10 s / 192 MB on seeds 0–2, with no guidance-set refutations; `deep-win` attempted at 10 s and classified; counters recorded, never substituted for wall | **executed; G3 failed** — [plan7](plan7.md), [report7](report7.md), [data](measurements/plan7/README.md). Wall premise survives (no-sim 64 % share); best budgeted `easy-win` 3.7–4.2 s (26.7–29.9×), `core` censored at 10 s, `deep-win` censored for search. `--guide-aux-budget`/`--guide-sim-plies` behind flags; no default changed. **Closed (negative)** by the plan-session-8 kill review; no further auxiliary/guide plan |
 | 17 | **Comparable per-node re-diagnosis + wall-goal bracket** | `easy-win`/`core` per-expansion wall vs provari's per-node wall, same session (fixed 10 M evals and 10 s, bare/no-sim/hand); 60 s coverage/factor bracket on `core`/`deep-win`; pre-registered decision rule. No engine change | **decision gate:** `R = (ns/exp) / (provari wall/node)` and the 60 s coverage/factor recorded; exactly one recommendation, continue (item 18) or re-pin (item 19); no cell dropped, no metric changed | **done; recommends item 19** — [`plan8`](plan8.md), [`report8`](report8.md), [data](measurements/plan8/README.md). `neither` `R` = 2.828/3.444 (core throughput first-order); product 60 s: core 0/3 (≥ 121.5×), deep-win 0/3 (≥ 9.36×), easy-win 6.013 s (58.4×); bare core 60 s 3/3 at 17.1 s (34.6×), D14 accepted. No engine change |
-| 18 | **Restarts + core throughput stack** | D5 restart schedule + generation-aware replacement; core per-node work only if item 17 prices it first-order; one named stack (D21) | **wall gate:** `core` proved at 10 s / 192 MB, `easy-win` ≤ 2 s interim (the 0.5 s gate was below the bare tree's 1.97 s; the goal geomean is decided at M5), `deep-win` classified at 10 s; no guidance-set refutations; ≥ 20 frozen cells × seeds 0–2 | **blocked by plan8's recommendation**: item 19 first; if the owner rejects re-pin, item 18 gains core throughput (`neither` `R` = 2.83/3.44) plus D5 restarts under this gate |
-| 19 | **Goal re-pin (owner decision)** | tiered goal: coverage-first (3/3 at a stated budget), then wall on shared cells; or a node/`child_evals` score; the reference is re-pinned only via D17 at M5 | owner accepts; `bench.md`, the success condition and the ledger updated together | **trigger fired (plan8):** the product censors core/deep-win at 60 s. Recommendation to the owner: choose the coverage-first tier or the node/`child_evals` score; not implemented |
+| 18 | **Restarts + core throughput stack** | D5 restart schedule + generation-aware replacement; core per-node work only if item 17 prices it first-order; one named stack (D21) | **wall gate:** `core` proved at 10 s / 192 MB, `easy-win` ≤ 2 s interim (the 0.5 s gate was below the bare tree's 1.97 s; the goal geomean is decided at M5), `deep-win` classified at 10 s; no guidance-set refutations; ≥ 20 frozen cells × seeds 0–2 | **parked by D27**: the owner accepted the coverage-first re-pin; item 18 reopens only by a new owner decision, with core throughput (`neither` `R` = 2.83/3.44) plus D5 restarts under this gate |
+| 19 | **Goal re-pin (owner decision)** | tiered goal: coverage-first (3/3 at a stated budget), then wall on shared cells; or a node/`child_evals` score; the reference is re-pinned only via D17 at M5 | owner accepts; `bench.md`, the success condition and the ledger updated together | **accepted (plan session 9, D27):** coverage-first tier is 3/3 at 120 s / 192 MB, D14 per claim; Tier 2 is the original 10 s geomean on shared cells. Written as [`plan9`](plan9.md); `bench.md`, the success condition, the ledger and D26 status updated together. Not yet executed |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
 legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose
@@ -486,6 +513,15 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-09**: plan session 9 (plans 7–8 kill review). The review confirmed
+  the absolute distance (easy-win 58.4× at 60 s, core ≥ 121.5× and deep-win
+  ≥ 9.36× censored, bare core floor 34.6×, coverage 1/3) and cancelled further
+  hand-guide/auxiliary tuning. The owner accepted item 19: **D27** re-pins the
+  goal to Tier 1 coverage (3/3 at 120 s, D14-accepted) and retains the wall
+  geomean as Tier 2. Wrote [`plan9`](plan9.md): coverage baseline plus **one**
+  opt-in bounded sibling-proof-replay stack with a pre-registered stop rule.
+  Updated `bench.md`, the success condition, the ledger and D26 status
+  together. No code, no measurements, no ledger row.
 - **2026-11-09**: plan8 (item 17) executed. Phase A: same-session provari
   repeats (easy-win 106 ms / 72,523 nodes; core 499 ms / 342,289) and four
   stacks × easy-win/core × seeds 0–2 × {fixed 10 M, 10 s}. `R` (fixed): bare

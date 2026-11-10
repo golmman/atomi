@@ -23,17 +23,30 @@ sections below stay untouched:
 
 ## The goal this ledger measures
 
-The initiative's success condition, quoted verbatim from
-[`initiative.md`](initiative.md):
+The initiative's success condition, amended by **D27** (plan9, 2026-11-09),
+quoted from [`initiative.md`](initiative.md):
 
-- on the shared-win set, the geometric mean of `atomi / provari --guide hand`
-  wall time is `< 1.0`;
-- coverage is at least provari hand's (currently 3/3 on the bench cells);
+**Tier 1 — coverage (new first goal).** On the frozen shared-win set
+(`core`, `easy-win`, `deep-win`), prove **3/3** with the product configuration
+at `--seconds 120 --memory 192`; every claimed win passes D14 (equal
+`child_evals` on a `--seconds 600 --proof-out` run, accepted by `atomi
+validate` and the pinned `provari check`); no fixture-oracle regression. A
+censored cell is never converted and a longer run is never substituted.
+
+**Tier 2 — wall (after Tier 1).** On the same three cells at the canonical
+10 s budget, the geometric mean of `atomi / provari --guide hand` wall time is
+`< 1.0`; coverage stays 3/3.
+
 - every claimed win is accepted by this repo's own replay validator **and** by
-  the pinned `provari check`;
+  the pinned `provari check` (both tiers);
 - this repo's gates are green, and there are no outcome regressions on the
-  copied fixture oracle (§Corpus and fixtures). The legacy solver's gates are
-  not this repo's gates.
+  copied fixture oracle (§Corpus and fixtures);
+- the reference is re-pinned only via D17 at M5; the node/`child_evals` score
+  option is not chosen.
+
+The original handoff §2 wall-only condition (geomean `< 1.0`; coverage at
+least provari hand's) is retained as **Tier 2**, not deleted and not silently
+changed.
 
 ## Absolute distance to the goal (read this first)
 
@@ -82,6 +95,15 @@ hand-guide/auxiliary line is not continued. The next plan is
 against provari's per-node wall plus a 60 s coverage bracket. It either opens
 item 18 (restarts + core throughput) or recommends the item-19 owner re-pin.
 No ledger row.
+
+**Update (plan session 9, D27, 2026-11-09).** The owner accepts the re-pin.
+The absolute distance is unchanged: `easy-win` 58.4× at 60 s (6.013 s vs
+0.103 s), `core` and `deep-win` censored at 60 s (≥ 121.5× and ≥ 9.36×),
+coverage 1/3; the guide-free `core` floor is 17.1 s (34.6×), and `neither`
+costs 2.83×/3.44× provari's ns per node. From [`plan9`](plan9.md), Tier 1 is
+**3/3 at 120 s / 192 MB** with D14 per claim; Tier 2 is the original 10 s
+geomean on the same cells. No performance row is appended by the re-pin; the
+next row must state coverage before wall.
 
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
@@ -142,6 +164,10 @@ factor(cell) = median candidate wall [s] / median provari --guide hand wall [s]
   reported as `censored`, and where a bound is meaningful it is printed as
   `≥ budget / reference_wall` (a *lower* bound on the factor, never a factor).
   A censored cell is never dropped and never silently converted into a win.
+- **Tier order (D27).** From plan9, coverage is reported first at the Tier 1
+  budget (120 s); Tier 2 wall factors at 10 s are claimed only on shared
+  cells after Tier 1 is green. Existing rows keep their own session and are
+  not rewritten.
 - **Deterministic accompaniment.** Wall time is the product metric but noisy;
   every row also records `child_evals` (ours, deterministic per stack) and
   provari's `nodes` for the same cell. They are **not** comparable
@@ -257,9 +283,20 @@ ledger row is appended: plan1 does not touch the win path. Details in
    after the item-2 checker accepted the exported proof.
 6. **Coverage is a first-class target.** A geomean below 1.0 on two cells
    while the third stays censored does not meet the goal. State coverage in
-   every row.
+   every row. From D27, Tier 1 coverage at 120 s precedes any Tier 2 wall
+   claim.
 
 ## Ledger
+
+**D27 ledger convention (plan9, 2026-11-09).** The ledger reports both tiers:
+Tier 1 coverage at 120 s, then Tier 2 wall at 10 s on shared cells. Existing
+rows are not rewritten; their own-session factors remain. The re-pin itself
+appends no performance row. The first plan9 row appears only after the
+coverage measurement and states coverage before factors.
+
+**D27 status (not a performance claim):** Tier 1 3/3 at 120 s is pending;
+the last recorded coverage is 1/3 at 10 s (plan8). No factor is published
+until Tier 1 passes.
 
 **Pins.** `atomi@0c5a882+d` = atomi built from HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
 on a dirty tree (uncommitted work-in-progress) · `atomi@a4c135d+d` = atomi
@@ -397,3 +434,8 @@ accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
   opt-in `--guide-sim-plies` (2 plies 4.196 s) do not close the gap; no-sim
   is 2.096 s and bare 1.965 s. `core`/`deep-win` censored at 10 s.
   Coverage 1/3. Details in [`report7.md`](report7.md).
+- **2026-11-09** — plan session 9 / D27: goal re-pinned coverage-first
+  (Tier 1 3/3 at 120 s with D14; Tier 2 original 10 s geomean on shared
+  cells). Plan8's measured distance (easy-win 58.4×, core ≥ 121.5×, deep-win
+  ≥ 9.36×, coverage 1/3) stands; no ledger row, no factor published until
+  Tier 1 passes. Plan: [`plan9.md`](plan9.md).
