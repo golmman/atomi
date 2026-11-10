@@ -111,6 +111,20 @@ checkpoints were **not implemented or run**; no coverage claim and no ledger
 row. See [`report10.md`](report10.md) and
 [`measurements/plan10/`](measurements/plan10/README.md).
 
+**Plan11 (item 20) executed (2026-11-10) — bare tree is 2/3; `deep-win`
+censors.** The plan's kill review rejected the portfolio as dominated and
+measured the bare tree (`--guide none`) at 120 s / 192 MB, seeds 0–2. `core`
+is 3/3 at 17.390 s (35.3×) and `easy-win` 3/3 at 2.008 s (19.1×), both far
+better than the hand product (0/3 and 5.765 s / 54.9×). `deep-win` is **1/3**:
+seed 1 proves at 111.218 s (1.399 G child evals, length 25, D14 accepted),
+seeds 0 and 2 censor at 120 s. Tier 1 is **2/3 cells, fail**; the censor
+branch fires, so no portfolio, no budget raise and no auxiliary reopen. All
+seven D14 proofs are accepted by both checkers. The bare tree dominates hand
+on every measured cell; adopting it as the product is an owner decision. The
+next lever is a `deep-win` tree-size mechanism, which needs a new plan. See
+[`report11.md`](report11.md) and
+[`measurements/plan11/`](measurements/plan11/README.md).
+
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -287,17 +301,17 @@ Items are stable semantic identities. Plans are numbered sequentially and
 independently of items. Plans use stack-level gating (D21), except a
 single-mechanism plan that is independently meaningful.
 
-**Priority after plan10 (2026-11-10):** plan10's Phase A stop rule fired:
-auxiliary work (simulation + one-ply settle) is 92–94% of the product wall on
-`core`/`deep-win`, and the non-auxiliary floor is 6.6–7.6%. `RESTART-GEN` was
-not implemented and item 18 is **negative**. The recommended next step is an
-owner decision on the portfolio formulation (bare + hand, first proof), with
-the cheapest decisive experiment one bare-tree 120 s run on `deep-win`; this
-is a goal/formulation decision, not a re-scope of item 18. Do not raise the
-120 s budget, do not start `REPLAY-BOUND`, and do not reopen the closed
-hand-guide/auxiliary line without a new owner decision. Then item 5 (M4,
-parked; Tier 2 or a recorded decision is still required) → item 6 (M5).
-Items 3, 15, 16, 17 and 19 are closed; item 18 is negative.
+**Priority after plan11 (2026-11-10):** the bare tree is the best measured
+configuration: 2/3 cells at 120 s (`core` 3/3 17.390 s / 35.3×, `easy-win`
+3/3 2.008 s / 19.1×) and it dominates the hand product on every bench cell.
+`deep-win` is the only blocker (1/3 seeds; seed 1 proves at 111.218 s, seeds
+0/2 censor). The portfolio is rejected as dominated, the 120 s budget is not
+raised, and the hand-guide/auxiliary line stays closed. The next step is an
+owner decision to adopt bare as the product configuration and a new plan for
+a `deep-win` tree-size mechanism (attribute the 52 M expansions against
+provari's 4.57 M nodes first). Then item 5 (M4, parked; Tier 2 or a recorded
+decision is still required) → item 6 (M5). Items 3, 15, 16, 17, 18 and 19 are
+closed; item 20 is executed (Tier 1 2/3).
 
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
@@ -311,6 +325,7 @@ Items 3, 15, 16, 17 and 19 are closed; item 18 is negative.
 | 17 | **Comparable per-node re-diagnosis + wall-goal bracket** | `easy-win`/`core` per-expansion wall vs provari's per-node wall, same session (fixed 10 M evals and 10 s, bare/no-sim/hand); 60 s coverage/factor bracket on `core`/`deep-win`; pre-registered decision rule. No engine change | **decision gate:** `R = (ns/exp) / (provari wall/node)` and the 60 s coverage/factor recorded; exactly one recommendation, continue (item 18) or re-pin (item 19); no cell dropped, no metric changed | **done; recommends item 19** — [`plan8`](plan8.md), [`report8`](report8.md), [data](measurements/plan8/README.md). `neither` `R` = 2.828/3.444 (core throughput first-order); product 60 s: core 0/3 (≥ 121.5×), deep-win 0/3 (≥ 9.36×), easy-win 6.013 s (58.4×); bare core 60 s 3/3 at 17.1 s (34.6×), D14 accepted. No engine change |
 | 18 | **Restarts + core throughput stack** | D5 restart schedule + generation-aware replacement; core per-node work only if item 17 prices it first-order; one named stack (D21) | **wall gate:** `core` proved at 10 s / 192 MB, `easy-win` ≤ 2 s interim (the 0.5 s gate was below the bare tree's 1.97 s; the goal geomean is decided at M5), `deep-win` classified at 10 s; no guidance-set refutations; ≥ 20 frozen cells × seeds 0–2 | **negative; Phase A stop rule fired** — [`plan10`](plan10.md), [`report10`](report10.md), [data](measurements/plan10/README.md). Fixed 20 M evals: product 41.781 s (`core`) / 38.560 s (`deep-win`); both-off (sim+closures) 3.160 s / 2.533 s; auxiliary share **92.44% / 93.43%**. `RESTART-GEN` not implemented, Phase C/D not run, no coverage claim, no ledger row. Recommendation: close item 18 and take the portfolio formulation decision |
 | 19 | **Goal re-pin (owner decision)** | tiered goal: coverage-first (3/3 at a stated budget), then wall on shared cells; or a node/`child_evals` score; the reference is re-pinned only via D17 at M5 | owner accepts; `bench.md`, the success condition and the ledger updated together | **executed; Tier 1 failed 1/3** — [`plan9`](plan9.md), [`report9`](report9.md), [data](measurements/plan9/README.md). Product at 120 s / 192 MB: `easy-win` 3/3 (5.765 s, 54.9×, D14 accepted on all seeds), `core` 0/3 (≥ 240.0×), `deep-win` 0/3 (≥ 18.2×). Tier 2 not claimed; no ledger row. `REPLAY-BOUND` not started (Tier 1 red, wall target not retained). Recommendation: owner decision on reopening item 18 |
+| 20 | **Bare-tree coverage probe + product decision** | kill review of plans 9–10; bare tree (`--guide none`) at 120 s / 192 MB on the 3 cells × seeds 0–2; same-session provari hand references; D14 for every proved cell; `guidance-v1` seed-0 diagnostic; product-configuration decision. No portfolio, no budget raise, no engine change | **coverage gate:** Tier 1 3/3 at 120 s with 3/3 D14-accepted proofs; a censored cell is reported, never converted; exactly one recommendation | **executed; Tier 1 2/3** — [`plan11`](plan11.md), [`report11`](report11.md), [data](measurements/plan11/README.md). Bare: `core` 3/3 17.390 s (35.3×), `easy-win` 3/3 2.008 s (19.1×), `deep-win` 1/3 (seed 1 111.218 s, seeds 0/2 censor at 120 s, ≥ 18.6×). 7/7 D14 proofs accepted; guidance-v1 20/24. Bare dominates hand on every cell; portfolio rejected. No ledger row. Recommendation: adopt bare (owner) and open a `deep-win` tree-size plan |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
 legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose

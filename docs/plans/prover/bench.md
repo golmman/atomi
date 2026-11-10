@@ -125,6 +125,19 @@ Tier 1 remains 1/3 from plan9; no ledger row. See
 [`report10.md`](report10.md) and
 [`measurements/plan10/`](measurements/plan10/README.md).
 
+**Update (plan11 executed, 2026-11-10).** The bare tree (`--guide none`) is
+**2/3 cells** at 120 s / 192 MB: `core` 3/3 at 17.390 s (35.3× the
+same-session provari 492 ms) and `easy-win` 3/3 at 2.008 s (19.1×), both far
+better than the hand product (0/3 and 5.765 s / 54.9×). `deep-win` is **1/3**:
+seed 1 proves at 111.218 s (1.399 G child evals, length 25), seeds 0 and 2
+censor at 120 s (≥ 18.6×). All seven D14 proofs are accepted by both
+checkers. The bare tree dominates hand on every measured cell, so the
+portfolio is rejected as dominated; Tier 1 is **2/3, fail**, the 120 s budget
+is not raised, and no ledger row is appended. The `guidance-v1` seed-0
+diagnostic is 20/24 (hand was 19/24 at 10 s). The next lever is a `deep-win`
+tree-size mechanism. See [`report11.md`](report11.md) and
+[`measurements/plan11/`](measurements/plan11/README.md).
+
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
 ## Names and ids (read this first)
