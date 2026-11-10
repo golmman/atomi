@@ -1,0 +1,516 @@
+{
+ "phase": "tier2",
+ "seconds": 10.0,
+ "memory_mb": 192,
+ "seed": 0,
+ "repeats": 3,
+ "cells": [
+  "core",
+  "easy-win",
+  "deep-win"
+ ],
+ "flags": [
+  "--guide",
+  "none"
+ ],
+ "rows": [
+  {
+   "cell": "core",
+   "seed": 0,
+   "budget": "tier2",
+   "flags": [
+    "--guide",
+    "none"
+   ],
+   "seconds": 10.0,
+   "proved": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 162503033,
+   "expansions": 5440512,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_full": false,
+   "proof": "not-requested",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 314063,
+   "ms": 10001,
+   "external_wall_s": 10.004,
+   "returncode": 0,
+   "stderr": null,
+   "proof_file_exists": false,
+   "proof_file_bytes": null,
+   "repeat": 0
+  },
+  {
+   "cell": "core",
+   "seed": 0,
+   "budget": "tier2",
+   "flags": [
+    "--guide",
+    "none"
+   ],
+   "seconds": 10.0,
+   "proved": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 161354917,
+   "expansions": 5400576,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_full": false,
+   "proof": "not-requested",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 311296,
+   "ms": 10000,
+   "external_wall_s": 10.004,
+   "returncode": 0,
+   "stderr": null,
+   "proof_file_exists": false,
+   "proof_file_bytes": null,
+   "repeat": 1
+  },
+  {
+   "cell": "core",
+   "seed": 0,
+   "budget": "tier2",
+   "flags": [
+    "--guide",
+    "none"
+   ],
+   "seconds": 10.0,
+   "proved": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 159940241,
+   "expansions": 5352448,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_full": false,
+   "proof": "not-requested",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 307963,
+   "ms": 10000,
+   "external_wall_s": 10.003,
+   "returncode": 0,
+   "stderr": null,
+   "proof_file_exists": false,
+   "proof_file_bytes": null,
+   "repeat": 2
+  },
+  {
+   "cell": "easy-win",
+   "seed": 0,
+   "budget": "tier2",
+   "flags": [
+    "--guide",
+    "none"
+   ],
+   "seconds": 10.0,
+   "proved": true,
+   "exit": "proved",
+   "length": 17,
+   "child_evals": 30335618,
+   "expansions": 1047370,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_full": false,
+   "proof": "not-requested",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 69772,
+   "ms": 1689,
+   "external_wall_s": 1.693,
+   "returncode": 0,
+   "stderr": null,
+   "proof_file_exists": false,
+   "proof_file_bytes": null,
+   "repeat": 0
+  },
+  {
+   "cell": "easy-win",
+   "seed": 0,
+   "budget": "tier2",
+   "flags": [
+    "--guide",
+    "none"
+   ],
+   "seconds": 10.0,
+   "proved": true,
+   "exit": "proved",
+   "length": 17,
+   "child_evals": 30335618,
+   "expansions": 1047370,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_full": false,
+   "proof": "not-requested",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 69772,
+   "ms": 1680,
+   "external_wall_s": 1.683,
+   "returncode": 0,
+   "stderr": null,
+   "proof_file_exists": false,
+   "proof_file_bytes": null,
+   "repeat": 1
+  },
+  {
+   "cell": "easy-win",
+   "seed": 0,
+   "budget": "tier2",
+   "flags": [
+    "--guide",
+    "none"
+   ],
+   "seconds": 10.0,
+   "proved": true,
+   "exit": "proved",
+   "length": 17,
+   "child_evals": 30335618,
+   "expansions": 1047370,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_full": false,
+   "proof": "not-requested",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 69772,
+   "ms": 1686,
+   "external_wall_s": 1.689,
+   "returncode": 0,
+   "stderr": null,
+   "proof_file_exists": false,
+   "proof_file_bytes": null,
+   "repeat": 2
+  },
+  {
+   "cell": "deep-win",
+   "seed": 0,
+   "budget": "tier2",
+   "flags": [
+    "--guide",
+    "none"
+   ],
+   "seconds": 10.0,
+   "proved": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 168642642,
+   "expansions": 5857280,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_full": false,
+   "proof": "not-requested",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 358423,
+   "ms": 10000,
+   "external_wall_s": 10.003,
+   "returncode": 0,
+   "stderr": null,
+   "proof_file_exists": false,
+   "proof_file_bytes": null,
+   "repeat": 0
+  },
+  {
+   "cell": "deep-win",
+   "seed": 0,
+   "budget": "tier2",
+   "flags": [
+    "--guide",
+    "none"
+   ],
+   "seconds": 10.0,
+   "proved": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 168554336,
+   "expansions": 5854208,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_full": false,
+   "proof": "not-requested",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 358297,
+   "ms": 10001,
+   "external_wall_s": 10.004,
+   "returncode": 0,
+   "stderr": null,
+   "proof_file_exists": false,
+   "proof_file_bytes": null,
+   "repeat": 1
+  },
+  {
+   "cell": "deep-win",
+   "seed": 0,
+   "budget": "tier2",
+   "flags": [
+    "--guide",
+    "none"
+   ],
+   "seconds": 10.0,
+   "proved": false,
+   "exit": "timeout",
+   "length": null,
+   "child_evals": 168612497,
+   "expansions": 5856256,
+   "sim_nodes": 0,
+   "settle_nodes": 0,
+   "aux_nodes": 0,
+   "proof_full": false,
+   "proof": "not-requested",
+   "proof_positions": null,
+   "proof_length": null,
+   "proof_entries": 358351,
+   "ms": 10000,
+   "external_wall_s": 10.004,
+   "returncode": 0,
+   "stderr": null,
+   "proof_file_exists": false,
+   "proof_file_bytes": null,
+   "repeat": 2
+  }
+ ],
+ "provari": {
+  "core": {
+   "repeats": [
+    {
+     "cell": "core",
+     "repeat": 0,
+     "proved": true,
+     "nodes": 342289,
+     "ms": 488,
+     "external_wall_s": 0.517,
+     "nodes_per_s": 701411.9,
+     "ns_per_node": 1425.7,
+     "returncode": 0,
+     "stderr": null
+    },
+    {
+     "cell": "core",
+     "repeat": 1,
+     "proved": true,
+     "nodes": 342289,
+     "ms": 493,
+     "external_wall_s": 0.521,
+     "nodes_per_s": 694298.2,
+     "ns_per_node": 1440.3,
+     "returncode": 0,
+     "stderr": null
+    },
+    {
+     "cell": "core",
+     "repeat": 2,
+     "proved": true,
+     "nodes": 342289,
+     "ms": 484,
+     "external_wall_s": 0.513,
+     "nodes_per_s": 707208.7,
+     "ns_per_node": 1414.0,
+     "returncode": 0,
+     "stderr": null
+    }
+   ],
+   "median_ms": 488,
+   "median_nodes": 342289,
+   "median_ns_per_node": 1425.7
+  },
+  "easy-win": {
+   "repeats": [
+    {
+     "cell": "easy-win",
+     "repeat": 0,
+     "proved": true,
+     "nodes": 72523,
+     "ms": 107,
+     "external_wall_s": 0.136,
+     "nodes_per_s": 677785.0,
+     "ns_per_node": 1475.4,
+     "returncode": 0,
+     "stderr": null
+    },
+    {
+     "cell": "easy-win",
+     "repeat": 1,
+     "proved": true,
+     "nodes": 72523,
+     "ms": 104,
+     "external_wall_s": 0.133,
+     "nodes_per_s": 697336.5,
+     "ns_per_node": 1434.0,
+     "returncode": 0,
+     "stderr": null
+    },
+    {
+     "cell": "easy-win",
+     "repeat": 2,
+     "proved": true,
+     "nodes": 72523,
+     "ms": 111,
+     "external_wall_s": 0.139,
+     "nodes_per_s": 653360.4,
+     "ns_per_node": 1530.5,
+     "returncode": 0,
+     "stderr": null
+    }
+   ],
+   "median_ms": 107,
+   "median_nodes": 72523,
+   "median_ns_per_node": 1475.4
+  },
+  "deep-win": {
+   "repeats": [
+    {
+     "cell": "deep-win",
+     "repeat": 0,
+     "proved": true,
+     "nodes": 4574912,
+     "ms": 6452,
+     "external_wall_s": 6.48,
+     "nodes_per_s": 709068.8,
+     "ns_per_node": 1410.3,
+     "returncode": 0,
+     "stderr": null
+    },
+    {
+     "cell": "deep-win",
+     "repeat": 1,
+     "proved": true,
+     "nodes": 4574912,
+     "ms": 6455,
+     "external_wall_s": 6.484,
+     "nodes_per_s": 708739.3,
+     "ns_per_node": 1411.0,
+     "returncode": 0,
+     "stderr": null
+    },
+    {
+     "cell": "deep-win",
+     "repeat": 2,
+     "proved": true,
+     "nodes": 4574912,
+     "ms": 6550,
+     "external_wall_s": 6.579,
+     "nodes_per_s": 698459.8,
+     "ns_per_node": 1431.7,
+     "returncode": 0,
+     "stderr": null
+    }
+   ],
+   "median_ms": 6455,
+   "median_nodes": 4574912,
+   "median_ns_per_node": 1411.0
+  }
+ },
+ "controls": {
+  "provari-v0.2.0-hand": "unavailable",
+  "legacy-default": "unavailable",
+  "legacy-opt": "unavailable"
+ },
+ "factors": {
+  "core": {
+   "atomi_ms": 10000,
+   "provari_ms": 488,
+   "factor": null,
+   "proved_all": false,
+   "censored": true,
+   "lower_bound": 20.492
+  },
+  "easy-win": {
+   "atomi_ms": 1686,
+   "provari_ms": 107,
+   "factor": 15.757,
+   "proved_all": true,
+   "censored": false,
+   "lower_bound": null
+  },
+  "deep-win": {
+   "atomi_ms": 10000,
+   "provari_ms": 6455,
+   "factor": null,
+   "proved_all": false,
+   "censored": true,
+   "lower_bound": 1.549
+  }
+ },
+ "shared_cells": [
+  "easy-win"
+ ],
+ "coverage": "1/3",
+ "geomean_shared": 15.757,
+ "tier2_pass": false,
+ "d14": [
+  {
+   "cell": "easy-win",
+   "repeat": 0,
+   "seed": 0,
+   "timed_child_evals": 30335618,
+   "proof_child_evals": 30335618,
+   "same_child_evals": true,
+   "proof_positions": 2048,
+   "proof_entries": 69772,
+   "proof_file_bytes": 172521,
+   "check": {
+    "atomi_valid": true,
+    "atomi_positions": 2048,
+    "provari_valid": true,
+    "provari_won_positions": 2048,
+    "verdict": "accepted"
+   },
+   "verdict": "accepted"
+  },
+  {
+   "cell": "easy-win",
+   "repeat": 1,
+   "seed": 0,
+   "timed_child_evals": 30335618,
+   "proof_child_evals": 30335618,
+   "same_child_evals": true,
+   "proof_positions": 2048,
+   "proof_entries": 69772,
+   "proof_file_bytes": 172521,
+   "check": {
+    "atomi_valid": true,
+    "atomi_positions": 2048,
+    "provari_valid": true,
+    "provari_won_positions": 2048,
+    "verdict": "accepted"
+   },
+   "verdict": "accepted"
+  },
+  {
+   "cell": "easy-win",
+   "repeat": 2,
+   "seed": 0,
+   "timed_child_evals": 30335618,
+   "proof_child_evals": 30335618,
+   "same_child_evals": true,
+   "proof_positions": 2048,
+   "proof_entries": 69772,
+   "proof_file_bytes": 172521,
+   "check": {
+    "atomi_valid": true,
+    "atomi_positions": 2048,
+    "provari_valid": true,
+    "provari_won_positions": 2048,
+    "verdict": "accepted"
+   },
+   "verdict": "accepted"
+  }
+ ],
+ "d14_all_accepted": true
+}

@@ -152,6 +152,16 @@ not a pass condition. The 120 s budget is not raised, the hand-guide/auxiliary
 line stays closed, no portfolio is built, and the bare tree is the product
 candidate. No ledger row, no engine change. See [`plan14`](plan14.md).
 
+**Update (plan15 executed, 2026-11-10).** The final head-to-head confirms
+Tier 1 **2/3** at 120 s (`core` 3/3 17.471 s / 35.8×, `easy-win` 3/3
+2.023 s / 18.9×, `deep-win` 1/3 seed 1 113.458 s; 7/7 D14 accepted) and
+records a **Tier 2 failure** at 10 s: coverage **1/3**, shared-cell geomean
+**15.757** (`easy-win` 1.686 s vs 0.107 s), `core` ≥ 20.49× and `deep-win`
+≥ 1.549× censored. The absolute distance is unchanged from plan11. The
+initiative goal is not met; the recommendation is to close with the negative
+Tier 2 result or take an owner decision for a new speed mechanism. See
+[`report15.md`](report15.md).
+
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
 ## Names and ids (read this first)
@@ -350,6 +360,14 @@ until Tier 1 passes.
 condition. The last recorded coverage is 2/3 (plan11, bare tree). No ledger
 row is appended by the decision; Tier 2 is unchanged.
 
+**Plan15 status (2026-11-10):** Tier 1 is confirmed **2/3** at 120 s
+(`core` 3/3 17.471 s, `easy-win` 3/3 2.023 s, `deep-win` 1/3 seed 1
+113.458 s; 7/7 D14 accepted). Tier 2 at 10 s is **1/3 shared** with a
+shared-cell geomean of **15.757** (`easy-win` 1.686 s vs 0.107 s); `core`
+(≥ 20.49×) and `deep-win` (≥ 1.549×) are censored. Tier 2 **fails** on both
+the geomean and the stale 3/3 coverage clause. The first ledger row since
+plan2 is appended below.
+
 **Pins.** `atomi@0c5a882+d` = atomi built from HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
 on a dirty tree (uncommitted work-in-progress) · `atomi@a4c135d+d` = atomi
 built from HEAD `a4c135d6ee1956588e01733bd101f6373e7d2e72` on a dirty tree
@@ -365,10 +383,18 @@ built from HEAD `a4c135d6ee1956588e01733bd101f6373e7d2e72` on a dirty tree
 | `plan1` (stretch) | 2026-11-06 | `ae54d05b36f8` · `provari-v0.2.0@224ce85` | v0.2.0 **hand** | 0.987× | 1.007× | 1.010× | **1.001** (3 cells, stretch block only) | 3/3 |
 | `plan2` | 2026-11-06 | `ae54d05b36f8` · `atomi@a4c135d+d` | atomi **m1** | censored (≥ 18.9) 10.003 s / 181.8 M | **10.897** (1.482 s / 30.3 M) | censored (≥ 1.48) 10.003 s / 186.6 M | **10.897** (1 cell) | 1/3 |
 | `plan2` (stretch) | 2026-11-06 | `ae54d05b36f8` · `provari-v0.2.0@224ce85` | v0.2.0 **hand** | 1.040× | 0.985× | 1.001× | **1.008** (3 cells, stretch block only) | 3/3 |
+| `plan15` | 2026-11-10 | `e10de197da58` · `atomi@8953596+d` | atomi **bare** (Tier 2, 10 s) | censored (≥ 20.49) 10.000 s / 162.5 M | **15.757** (1.686 s / 30.3 M) | censored (≥ 1.549) 10.000 s / 168.6 M | **15.757** (1 cell) | 1/3 |
 
 Cell syntax: `factor (candidate wall / candidate evals)`; legacy evals are
 its `evals:` counter, atomi's are `child_evals`. Reference
 (`provari-v0.1.0 --guide hand`) is **1.000** everywhere.
+
+**plan15 Tier 1 (120 s, not a wall row):** `core` 3/3 at 17.471 s (35.8×),
+`easy-win` 3/3 at 2.023 s (18.9×), `deep-win` 1/3 (seed 1 113.458 s, seeds
+0/2 censor at 120 s); 7/7 D14 proofs accepted. Tier 1 is **2/3, pass** under
+D28. The row above is the Tier 2 10 s head-to-head; its coverage is 1/3 and
+its geomean 15.757, so Tier 2 **fails**. Legacy `default`/`opt` and provari
+v0.2.0 controls were **unavailable** and not substituted.
 
 Session reference line (v0.1.0 hand medians, 3 repeats): `core` 0.533 s ·
 342,289 nodes · mate 17; `easy-win` (`1eb80b92f92c`) 0.137 s · 72,523
@@ -459,6 +485,15 @@ accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
 
 ## History
 
+- **2026-11-10** — plan15 (items 5 and 6) executed. Item 5 (M4) closed as
+  superseded. Item 6 (M5) appends the first ledger row since plan2: Tier 1
+  **2/3 pass** at 120 s (`core` 3/3 17.471 s / 35.8×, `easy-win` 3/3 2.023 s
+  / 18.9×, `deep-win` 1/3 seed 1 113.458 s; 7/7 D14 accepted); Tier 2
+  **fail** at 10 s (coverage 1/3, shared-cell geomean 15.757; `core`
+  ≥ 20.49×, `deep-win` ≥ 1.549× censored). Default stays `--guide none`;
+  legacy/v0.2.0 controls unavailable. The stale Tier 2 coverage clause is
+  recorded as an open goal-definition issue. Details in
+  [`report15.md`](report15.md).
 - **2026-11-06** — `bench.md` opened for the `prover` initiative: the
   verbatim sections above are inherited from the closed `winprover`
   ledger (provenance comments inline), the successor notes translate its
