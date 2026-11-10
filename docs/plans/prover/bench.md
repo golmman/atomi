@@ -23,34 +23,40 @@ sections below stay untouched:
 
 ## The goal this ledger measures
 
-The initiative's success condition, amended by **D27** (plan9, 2026-11-09),
-**D28** (plan14, 2026-11-10) and **D29** (plan session 16, 2026-11-10),
-quoted from [`initiative.md`](initiative.md):
+The initiative's success condition, reformulated as a necessary-condition
+staircase by **D30** (plan session 17, 2026-11-10), superseding the tier
+clauses of D27/D28/D29, quoted from [`initiative.md`](initiative.md):
 
-**Tier 1 — coverage (new first goal).** On the frozen shared-win set
-(`core`, `easy-win`, `deep-win`), prove **2/3** with the product configuration
-at `--seconds 120 --memory 192`; every claimed win passes D14 (equal
-`child_evals` on a `--seconds 600 --proof-out` run, accepted by `atomi
-validate` and the pinned `provari check`); no fixture-oracle regression. A
-censored cell is never converted and a longer run is never substituted.
-`deep-win` is recorded as **1/3** (seed 1 proves at 111.218 s; seeds 0/2
-censor at 120 s) and is not part of the Tier 1 pass condition (D28).
+T_5 (goal): all three cells proved at 10 s, geomean wall < 1.0 vs provari --guide hand, every claim D14-accepted.
 
-**Tier 2 — wall (after Tier 1).** On the same three cells at the canonical
-10 s budget, the geometric mean of `atomi / provari --guide hand` wall time is
-`< 1.0`; coverage is at the Tier 1 level (**2/3**, `core`/`easy-win`) and the
-geomean is taken over the shared cells (D29; the original "coverage stays
-3/3" wording is superseded because it was already inconsistent with D28).
+The goal is the top rung of a chain of **necessary conditions**, each a subset
+of the next (`T_5 ⊆ T_4 ⊆ … ⊆ T_1`), so `goal ⇒ every rung` and a failed rung
+is a hard "not yet":
+
+| Rung | Requirement | Implied by the next |
+| --- | --- | --- |
+| `T_1` | `core` proved at 120 s | yes |
+| `T_2` | `core` + `easy-win` at 120 s | yes (more cells) |
+| `T_3` | all three at 120 s | yes (more cells) |
+| `T_4` | all three at 10 s | yes (tighter budget) |
+| `T_5` | all three at 10 s **and** geomean `< 1.0` | — (the goal) |
+
+Nesting is sound because the search is deterministic (D22) and `--seconds`
+only stops it, so proving at 10 s implies proving at 120 s; more cells is
+monotone by definition. The wall clause lives only at `T_5` because
+`geomean < 1` does not imply each cell `< 1`. A lower rung is necessary, never
+sufficient; a censored cell is never converted and a longer run is never
+substituted. Current position: `T_2` (plan15).
 
 - every claimed win is accepted by this repo's own replay validator **and** by
-  the pinned `provari check` (both tiers);
+  the pinned `provari check` (every rung);
 - this repo's gates are green, and there are no outcome regressions on the
   copied fixture oracle (§Corpus and fixtures);
 - the reference is re-pinned only via D17 at M5; the node/`child_evals` score
   option is not chosen.
 
 The original handoff §2 wall-only condition (geomean `< 1.0`; coverage at
-least provari hand's) is retained as **Tier 2**, not deleted and not silently
+least provari hand's) is the `T_5` wall clause, not deleted and not silently
 changed.
 
 ## Absolute distance to the goal (read this first)
@@ -223,10 +229,10 @@ factor(cell) = median candidate wall [s] / median provari --guide hand wall [s]
   reported as `censored`, and where a bound is meaningful it is printed as
   `≥ budget / reference_wall` (a *lower* bound on the factor, never a factor).
   A censored cell is never dropped and never silently converted into a win.
-- **Tier order (D27).** From plan9, coverage is reported first at the Tier 1
-  budget (120 s); Tier 2 wall factors at 10 s are claimed only on shared
-  cells after Tier 1 is green. Existing rows keep their own session and are
-  not rewritten.
+- **Rung order (D30).** Report the highest rung reached, then the next rung's
+  gap. Coverage rungs (`T_1`–`T_4`) are necessary conditions; wall factors at
+  10 s are claimed only at `T_5` on shared cells. Existing rows keep their own
+  session and are not rewritten.
 - **Deterministic accompaniment.** Wall time is the product metric but noisy;
   every row also records `child_evals` (ours, deterministic per stack) and
   provari's `nodes` for the same cell. They are **not** comparable
@@ -342,25 +348,33 @@ ledger row is appended: plan1 does not touch the win path. Details in
    after the item-2 checker accepted the exported proof.
 6. **Coverage is a first-class target.** A geomean below 1.0 on two cells
    while the third stays censored does not meet the goal. State coverage in
-   every row. From D27, Tier 1 coverage at 120 s precedes any Tier 2 wall
-   claim.
+   every row. From D30, report the highest rung reached; wall factors are
+   claimed only at `T_5`.
 
 ## Ledger
 
-**D27 ledger convention (plan9, 2026-11-09).** The ledger reports both tiers:
-Tier 1 coverage at 120 s, then Tier 2 wall at 10 s on shared cells. Existing
-rows are not rewritten; their own-session factors remain. The re-pin itself
-appends no performance row. The first plan9 row appears only after the
-coverage measurement and states coverage before factors.
+**D30 ledger convention (plan session 17, 2026-11-10).** The ledger reports
+the highest rung reached on the D30 staircase, then the next rung's gap.
+`T_1`–`T_4` are coverage rungs (necessary conditions); `T_5` is the goal and
+the only rung that carries wall factors. The tier clauses of D27/D28/D29 are
+superseded; their measurements stand. Existing rows are not rewritten.
 
-**D27 status (not a performance claim):** Tier 1 3/3 at 120 s is pending;
-the last recorded coverage is 1/3 at 10 s (plan8). No factor is published
-until Tier 1 passes.
+**D27 ledger convention (plan9, 2026-11-09; tier structure superseded by
+D30).** The ledger reports both tiers: Tier 1 coverage at 120 s, then Tier 2
+wall at 10 s on shared cells. Existing rows are not rewritten; their
+own-session factors remain. The re-pin itself appends no performance row. The
+first plan9 row appears only after the coverage measurement and states
+coverage before factors.
 
-**D28 status (plan14, 2026-11-10):** Tier 1 is amended to **2/3** at 120 s /
-192 MB (`core`, `easy-win`); `deep-win` is recorded as 1/3 and is not a pass
-condition. The last recorded coverage is 2/3 (plan11, bare tree). No ledger
-row is appended by the decision; Tier 2 is unchanged.
+**D27 status (not a performance claim; tier structure superseded by D30):**
+Tier 1 3/3 at 120 s is pending; the last recorded coverage is 1/3 at 10 s
+(plan8). No factor is published until Tier 1 passes.
+
+**D28 status (plan14, 2026-11-10; goal clause superseded by D30):** Tier 1 is
+amended to **2/3** at 120 s / 192 MB (`core`, `easy-win`); `deep-win` is
+recorded as 1/3 and is not a pass condition. The last recorded coverage is 2/3
+(plan11, bare tree). No ledger row is appended by the decision; Tier 2 is
+unchanged. The `deep-win` 1/3 measurement stands as evidence.
 
 **Plan15 status (2026-11-10):** Tier 1 is confirmed **2/3** at 120 s
 (`core` 3/3 17.471 s, `easy-win` 3/3 2.023 s, `deep-win` 1/3 seed 1
@@ -376,7 +390,8 @@ clause is fixed to the Tier 1 level (2/3) with the geomean over shared cells,
 and **item 24 (conformance line)** is authorised: a read-only differential,
 then exact proof replay, exact `pn`/`dn` and restarts, each gated on tree size
 at fixed evals before any wall claim. No ledger row is appended by the
-decision; the plan15 row stands as the last measured head-to-head.
+decision; the plan15 row stands as the last measured head-to-head. **Tier 2
+coverage clause superseded by D30; the item 24 authorisation stands.**
 
 **Pins.** `atomi@0c5a882+d` = atomi built from HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
 on a dirty tree (uncommitted work-in-progress) · `atomi@a4c135d+d` = atomi

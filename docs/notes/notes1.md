@@ -121,3 +121,12 @@ Some ideas to make it shorter:
 We identified the current search tree size to be the main culprit for not reaching the initiatives goals.
 So a sub-goal would be to get close to search tree parity with provari.
 Are we working on this? What are the ideas to get there?
+
+---
+
+Decisions that touched tier formulation should be re-formulated or deprecated then.
+
+---
+
+Read `https://www.schadd.com/Papers/2011PNeval.pdf`.
+Can we adopt something for the `prover` initiative?

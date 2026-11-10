@@ -2,12 +2,14 @@
 
 ## Goal
 
-`atomi` is a from-scratch **attacker-only atomic chess win prover** in Rust on
-`atomic-movegen` 2.4.x (MIT): prove the side to move can force a win, and write
-a proof that this repo's validator **and** external `provari check` accept.
-Target: beat provari `--guide hand` on the shared-win bench (geomean wall
-`< 1.0`, coverage ≥ provari). Initiative: `docs/plans/prover/` (read
-`initiative.md` first); predecessor: the closed `winprover` initiative.
+`atomi` is a from-scratch **attacker-only atomic win prover** (Rust,
+`atomic-movegen` 2.4.x, MIT): prove the side to move can force a win, with a
+proof this repo's validator **and** external `provari check` accept. Target:
+beat provari `--guide hand` on the shared-win bench. The goal is the top rung
+`T_5` of the necessary-condition staircase in D30. T_5 (goal): all three
+cells proved at 10 s, geomean wall < 1.0 vs provari --guide hand, every claim
+D14-accepted. Initiative: `docs/plans/prover/` (read `initiative.md`);
+predecessor: closed `winprover`.
 
 ## Collaboration
 
@@ -15,8 +17,7 @@ Target: beat provari `--guide hand` on the shared-win bench (geomean wall
   (milestones, working agreement, decisions) is a means; challenge it.
 - Push back first when a plan, decision or request conflicts with the goal or
   rests on an untested assumption.
-- Ideation: include ≥ 1 option that changes the problem formulation (what is
-  computed, what counts as output, which constraint is dropped), plus an
+- Ideation: include ≥ 1 option that changes the problem formulation, plus an
   estimated gain and the cheapest experiment.
 - "Should we X?": yes/no first, strongest case each way, cheapest decisive
   experiment.
@@ -33,7 +34,7 @@ Target: beat provari `--guide hand` on the shared-win bench (geomean wall
 ## Commands
 
 - `make test` — licence gate + `cargo test --release` (every change, ≈ 12 s);
-  `make lint` — fmt, clippy `-D warnings`, doc.
+  `make lint` — fmt, clippy `-D warnings`, doc, goal check.
 - `make test-full` — slow tier + `make veto`; required for search, table,
   proof-output and validator changes.
 - `atomi prove "<FEN>" [--seconds --memory --evals --seed --guide --guide-off
@@ -72,8 +73,7 @@ Target: beat provari `--guide hand` on the shared-win bench (geomean wall
 - `atomic_solver` (pin in `initiative.md`) is a **read-only** sibling clone
   (`../atomic_solver`): never a submodule/dependency, never edited here; its
   binary is only an external process (bench controls).
-- Legacy conventions (Win/Loss/Draw search, GHI, refinement, "RAM = TT only",
-  its ~30 KB `AGENTS.md`) do **not** apply here.
+- Legacy conventions (Win/Loss/Draw search, GHI, refinement) do **not** apply.
 
 ## Correctness
 

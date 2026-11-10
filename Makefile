@@ -15,6 +15,7 @@ test-lite:
 	cargo test
 
 lint:
+	python3 scripts/check_goal.py
 	cargo fmt --check
 	cargo clippy --all-targets -- -D warnings
 	cargo doc --no-deps

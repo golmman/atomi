@@ -2,7 +2,7 @@
 
 ## Status
 
-**Open (2026-11-10).** Tier 1 is **2/3** (D28); Tier 2 **fails** (1/3, geomean 15.757); the bare tree is the product candidate; item 24 (conformance line) is open (D29). Full record: [`history.md`](history.md); decision rationale: [`decisions.md`](decisions.md).
+**Open (2026-11-10).** On the D30 staircase the engine is at **`T_2`** (`core`+`easy-win` at 120 s); `T_3` (`deep-win` at 120 s) is the next rung; `T_5` (the goal) is not met. The bare tree is the product candidate; item 24 (conformance line) is open (D29). Full record: [`history.md`](history.md); decision rationale: [`decisions.md`](decisions.md).
 
 ## Reference
 
@@ -23,17 +23,27 @@ This initiative is the successor to `atomic_solver`'s closed `winprover` initiat
 
 **Be the fastest atomic win prover on the fair, reproducible shared-win corpus, with every claimed win checked by our own replay validator and by an independent second rules implementation.**
 
-Success condition (from the handoff §2; amended by D27, D28 and D29 — the original wall-only wording is retained as Tier 2, not silently changed):
+Success condition (from the handoff §2; reformulated as a necessary-condition staircase by D30, superseding the tier clauses of D27/D28/D29):
 
-**Tier 1 — coverage (first goal).** On the frozen shared-win set (`core`, `easy-win`, `deep-win`), prove **2/3** with the product configuration at `--seconds 120 --memory 192`; every claimed win passes D14 (equal `child_evals` on a `--seconds 600 --proof-out` run, accepted by `atomi validate` and the pinned `provari check`); no fixture-oracle regression. A censored cell is never converted and a longer run is never substituted. `deep-win` is recorded as **1/3** (seed 1 proves at 111.218 s; seeds 0/2 censor at 120 s) and is not part of the Tier 1 pass condition (D28).
+T_5 (goal): all three cells proved at 10 s, geomean wall < 1.0 vs provari --guide hand, every claim D14-accepted.
 
-**Tier 2 — wall (after Tier 1).** On the same three cells at the canonical 10 s budget, the geometric mean of `atomi / provari --guide hand` wall time is `< 1.0`; coverage is at the Tier 1 level (**2/3**, `core`/`easy-win`) and the geomean is taken over the shared cells (D29; the original "coverage stays 3/3" wording is superseded because it was already inconsistent with D28).
+The goal is the top rung of a chain of **necessary conditions**, each a subset of the next (`T_5 ⊆ T_4 ⊆ … ⊆ T_1`), so `goal ⇒ every rung` and a failed rung is a hard "not yet":
 
-- every claimed win is accepted by this repo's own replay validator **and** by the pinned `provari check` (both tiers);
+| Rung | Requirement | Implied by the next |
+| --- | --- | --- |
+| `T_1` | `core` proved at 120 s | yes |
+| `T_2` | `core` + `easy-win` at 120 s | yes (more cells) |
+| `T_3` | all three at 120 s | yes (more cells) |
+| `T_4` | all three at 10 s | yes (tighter budget) |
+| `T_5` | all three at 10 s **and** geomean `< 1.0` | — (the goal) |
+
+Nesting is sound because the search is deterministic (D22) and `--seconds` only stops it, so proving at 10 s implies proving at 120 s; more cells is monotone by definition. The wall clause lives only at `T_5` because `geomean < 1` does not imply each cell `< 1`. A lower rung is necessary, never sufficient; a censored cell is never converted and a longer run is never substituted. Current position: `T_2` (plan15: `core` 3/3 at 17.5 s, `easy-win` 3/3 at 2.0 s, `deep-win` 1/3 at 120 s); the next rung is `T_3`, `deep-win` 3/3 at 120 s.
+
+- every claimed win is accepted by this repo's own replay validator **and** by the pinned `provari check` (every rung);
 - this repo's gates are green, and there are no outcome regressions on the copied fixture oracle (§Corpus and fixtures). The legacy solver's gates are not this repo's gates.
 - the reference is re-pinned only via D17 at M5; the node/`child_evals` score option is not chosen.
 
-Three legs, one tiered goal:
+Three legs, one staircase goal:
 
 1. **Search:** an attacker-only DF-PN prover. It is built around provari-style per-node precomputation and search guidance from the start, not bolted onto a general Win/Loss/Draw solver.
 2. **Evidence:** a proof file for every claimed win, accepted by our validator and by the external checker. A checker disagreement is a veto.
@@ -99,15 +109,16 @@ One-line resolutions; full text, rationale, source take-list and legacy measured
 | D24 | M4 parked; wall is the gate | M4 resumes only after a 3/3 10 s win; search/guide gates are wall-based; auxiliary budgets stay deterministic |
 | D25 | Deterministic auxiliary budget | `--guide-aux-budget` bounds aux work by a deterministic counter; opt-in only, not adopted |
 | D26 | Per-expansion diagnosis | Judge per expansion and per node, never `child_evals` against provari nodes; `R > 2` makes core throughput first-order |
-| D27 | Coverage-first goal re-pin | Tier 1 coverage (3/3 at 120 s, D14-accepted), then Tier 2 wall geomean `< 1.0` at 10 s |
-| D28 | Tier 1 amended to 2/3 | Tier 1 is 2/3 (`core`, `easy-win`); `deep-win` recorded 1/3 and not a pass condition; budget not raised |
-| D29 | Conformance line and Tier 2 coverage | Do not close; Tier 2 coverage is 2/3 on shared cells; item 24 authorised (differential, exact replay, exact `pn`/`dn`, restarts) |
+| D27 | Coverage-first goal re-pin | **Superseded by D30** (tier structure); coverage-before-wall ordering retained as the staircase |
+| D28 | Tier 1 amended to 2/3 | **Goal clause superseded by D30**; the `deep-win` 1/3 measurement stands as evidence |
+| D29 | Conformance line and Tier 2 coverage | **Tier 2 coverage clause superseded by D30**; item 24 authorised (differential, exact replay, exact `pn`/`dn`, restarts) |
+| D30 | Goal staircase (necessary conditions) | `T_1`…`T_5`, each a subset of the next; `T_5` is the goal; supersedes the tier clauses of D27/D28/D29 |
 
 ## Backlog
 
 Items are stable semantic identities. Plans are numbered sequentially and independently of items. Plans use stack-level gating (D21), except a single-mechanism plan that is independently meaningful.
 
-**Priority after plan session 16 (2026-11-10):** the bare tree is the product and Tier 1 is **2/3** by D28. **Tier 2 fails** at 10 s (coverage 1/3, shared-cell geomean 15.757). The initiative is **not closed**: D29 rejects the plan15 close recommendation and authorises **item 24, the conformance line**. The diagnosis is search-tree directedness, not per-node cost; the untested levers are exact proof replay, exact `pn`/`dn`, quiet grouping as one child, and restarts. Item 24 runs a read-only differential first, then each exact mechanism behind a flag, gated on tree size at fixed evals. The 120 s budget is not raised, the hand-guide/auxiliary line stays closed, and no portfolio is built.
+**Priority after plan session 16 (2026-11-10):** the bare tree is the product. On the D30 staircase the engine is at **`T_2`**; the next rung is **`T_3`** (`deep-win` 3/3 at 120 s), a coverage problem, not a wall problem. The initiative is **not closed**: D29 authorises **item 24, the conformance line**. The diagnosis is search-tree directedness, not per-node cost; the untested levers are exact proof replay, exact `pn`/`dn`, quiet grouping as one child, and restarts. Item 24 runs a read-only differential first, then each exact mechanism behind a flag, gated on tree size at fixed evals. The 120 s budget is not raised, the hand-guide/auxiliary line stays closed, and no portfolio is built.
 
 | # | Milestone | Gate | Status |
 | --- | --- | --- | --- |
