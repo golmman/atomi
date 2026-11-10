@@ -87,12 +87,21 @@ Read docs/plans/prover/report13.md and measurements/plan13/. The three cheap pro
 
 ---
 
-goal and non-goals are unchanged: atomic chess win prover which is faster than provari.
+Brainstorming session. No code.
 
-implementation strategy changes:
-* clean-room design
-* write high level specification about provari features
-* re-implement but use atomic-movegen as move generator
-* tune parameters
-* get wall time parity with provari
-* adopt ideas from atomic_solver for further improvements
+For the prover initiative i want back to the initial goal (non-goals unchanged):
+
+**Be the fastest atomic win prover on the fair, reproducible shared-win
+corpus, with every claimed win checked by our own replay validator and by an
+independent second rules implementation.**
+
+But i propose the following implementation strategy changes:
+
+1. clean-room design
+2. write high level specification about provari ideas/features
+3. re-implement but use atomic-movegen as move generator
+4. tune parameters
+5. get wall time parity with provari
+6. adopt ideas from atomic_solver for further improvements
+
+Would this be a valid approach?
