@@ -23,9 +23,9 @@ sections below stay untouched:
 
 ## The goal this ledger measures
 
-The initiative's success condition, amended by **D27** (plan9, 2026-11-09)
-and **D28** (plan14, 2026-11-10), quoted from
-[`initiative.md`](initiative.md):
+The initiative's success condition, amended by **D27** (plan9, 2026-11-09),
+**D28** (plan14, 2026-11-10) and **D29** (plan session 16, 2026-11-10),
+quoted from [`initiative.md`](initiative.md):
 
 **Tier 1 — coverage (new first goal).** On the frozen shared-win set
 (`core`, `easy-win`, `deep-win`), prove **2/3** with the product configuration
@@ -38,7 +38,9 @@ censor at 120 s) and is not part of the Tier 1 pass condition (D28).
 
 **Tier 2 — wall (after Tier 1).** On the same three cells at the canonical
 10 s budget, the geometric mean of `atomi / provari --guide hand` wall time is
-`< 1.0`; coverage stays 3/3.
+`< 1.0`; coverage is at the Tier 1 level (**2/3**, `core`/`easy-win`) and the
+geomean is taken over the shared cells (D29; the original "coverage stays
+3/3" wording is superseded because it was already inconsistent with D28).
 
 - every claimed win is accepted by this repo's own replay validator **and** by
   the pinned `provari check` (both tiers);
@@ -367,6 +369,14 @@ shared-cell geomean of **15.757** (`easy-win` 1.686 s vs 0.107 s); `core`
 (≥ 20.49×) and `deep-win` (≥ 1.549×) are censored. Tier 2 **fails** on both
 the geomean and the stale 3/3 coverage clause. The first ledger row since
 plan2 is appended below.
+
+**D29 status (plan session 16, 2026-11-10):** the initiative is **not
+closed**. The plan15 close recommendation is rejected; the Tier 2 coverage
+clause is fixed to the Tier 1 level (2/3) with the geomean over shared cells,
+and **item 24 (conformance line)** is authorised: a read-only differential,
+then exact proof replay, exact `pn`/`dn` and restarts, each gated on tree size
+at fixed evals before any wall claim. No ledger row is appended by the
+decision; the plan15 row stands as the last measured head-to-head.
 
 **Pins.** `atomi@0c5a882+d` = atomi built from HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
 on a dirty tree (uncommitted work-in-progress) · `atomi@a4c135d+d` = atomi
