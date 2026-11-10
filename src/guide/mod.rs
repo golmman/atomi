@@ -12,6 +12,7 @@
 pub mod class;
 pub mod eval;
 pub mod history;
+pub mod replay;
 pub mod simulate;
 pub mod threat;
 
@@ -73,6 +74,12 @@ pub struct GuideConfig {
     /// The item-15 attacker plain-move `GROUP` child (`--guide-group`,
     /// default off; the kill-test flag).
     pub group: bool,
+    /// Plan-13 conformance probe: fresh disproof numbers are 1
+    /// (`--guide-fresh-dn`, default off).
+    pub fresh_dn: bool,
+    /// Plan-13 conformance probe: exact sibling proof replay
+    /// (`--guide-replay-exact`, default off).
+    pub replay_exact: bool,
 }
 
 impl GuideConfig {
@@ -95,6 +102,8 @@ impl GuideConfig {
             sibling_sim: true,
             null_replay: true,
             group: false,
+            fresh_dn: false,
+            replay_exact: false,
         }
     }
 
@@ -122,6 +131,8 @@ impl GuideConfig {
             "sim" => self.sibling_sim = on,
             "replay" => self.null_replay = on,
             "group" => self.group = on,
+            "fresh-dn" => self.fresh_dn = on,
+            "replay-exact" => self.replay_exact = on,
             _ => return Err(format!("unknown guide mechanism: {name}")),
         }
         Ok(())
@@ -391,6 +402,11 @@ impl Guide {
         } else {
             (base.dn, base.pn)
         };
+        // Plan-13 conformance probe: a fresh disproof number is 1, not the
+        // invented complementary base.
+        if self.config.fresh_dn {
+            dn = 1;
+        }
         // Calibration (plan4): the fresh base magnitude only. Decided values
         // never pass through here.
         let scale = u64::from(self.params.global_scale);
@@ -589,6 +605,8 @@ mod tests {
             ("sim", |c| c.sibling_sim),
             ("replay", |c| c.null_replay),
             ("group", |c| c.group),
+            ("fresh-dn", |c| c.fresh_dn),
+            ("replay-exact", |c| c.replay_exact),
         ] {
             let base = GuideConfig::hand();
             let mut off = base;

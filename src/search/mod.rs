@@ -62,6 +62,9 @@ pub struct Limits {
     pub seed: u64,
     /// Collect the plan-12 attribution counters (`--stats`).
     pub stats: bool,
+    /// Opt-in ply cap (`--max-depth`, default off). A node at this ply
+    /// censors the run with `Exit::Depth`; measurement only.
+    pub max_depth: Option<u16>,
 }
 
 /// How the search ended.
@@ -185,6 +188,7 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
                 guide,
                 history: History::new(),
                 seed: limits.seed,
+                max_depth: limits.max_depth,
                 unique: limits.stats.then(|| KeySet::new(1 << 21)),
                 entry_proof_hits: 0,
                 entry_tt_hits: 0,
@@ -226,6 +230,8 @@ struct Engine<S> {
     guide: Guide,
     history: History,
     seed: u64,
+    /// The opt-in ply cap (`--max-depth`; `None` = `MAX_PLY`).
+    max_depth: Option<u16>,
     /// The distinct-key set (`--stats` only).
     unique: Option<KeySet>,
     entry_proof_hits: u64,
@@ -302,7 +308,7 @@ impl<S: ProofSink> Engine<S> {
         if self.stop.is_some() {
             return Value::Open { pn: 0, dn: 0 };
         }
-        if ply >= MAX_PLY {
+        if ply >= self.max_depth.unwrap_or(MAX_PLY) {
             self.stop = Some(Exit::Depth);
             return Value::Open { pn: 0, dn: 0 };
         }
@@ -460,6 +466,16 @@ impl<S: ProofSink> Engine<S> {
                     .observe(frame.mover, frame.children[best].mv, good);
             }
             frame.children[best].value = cv;
+            // Plan-13 conformance probe: a proved defence may prove its
+            // siblings by replaying its proof (exact, default off).
+            if !frame.attacker_node
+                && self.guide.config.enabled
+                && self.guide.config.replay_exact
+                && let Value::Proved { length, .. } = cv
+                && length > 0
+            {
+                self.replay_siblings(&mut frame, best, board, &next, length);
+            }
         }
         // Frame exit.
         let v = exit_value(node_value(&frame), ply);
@@ -510,6 +526,67 @@ impl<S: ProofSink> Engine<S> {
         debug_assert!(value_invariant(&v, board.rule50()));
         self.line.pop();
         v
+    }
+}
+
+impl<S: ProofSink> Engine<S> {
+    /// Replay the proved child `best`'s proof on the frame's other open
+    /// children (plan-13 `--guide-replay-exact`). `guide` is the proved
+    /// child's board; `remaining` is its proof length.
+    fn replay_siblings(
+        &mut self,
+        frame: &mut Frame,
+        best: usize,
+        board: &Board,
+        guide: &Board,
+        remaining: u16,
+    ) {
+        for j in 0..frame.children.len() {
+            if j == best || !matches!(frame.children[j].value, Value::Open { .. }) {
+                continue;
+            }
+            let mut sibling = board.clone();
+            sibling.do_move(frame.children[j].mv, &mut StateInfo::new());
+            let mut budget = crate::guide::replay::REPLAY_BUDGET;
+            let mut line = Vec::new();
+            let Some(proof) = crate::guide::replay::simulate(
+                &sibling,
+                guide,
+                self.attacker,
+                remaining,
+                &mut budget,
+                &mut line,
+                &self.line,
+                &self.tables,
+            ) else {
+                continue;
+            };
+            let spent = u64::from(crate::guide::replay::REPLAY_BUDGET - budget);
+            self.sim_nodes += spent;
+            self.aux_nodes += spent;
+            for (key, entry) in &proof.proofs {
+                let Some(mv) = atomic_movegen::types::Move::from_bits(entry.mv) else {
+                    continue;
+                };
+                let value = Value::Proved {
+                    length: entry.length,
+                    limit: entry.limit,
+                    mv: Some(mv),
+                };
+                self.tables.store(*key, &value, 0);
+                self.sink.proven(ProofEvent::AttackerProven {
+                    key: *key,
+                    mv,
+                    length: entry.length,
+                    limit: entry.limit,
+                });
+            }
+            frame.children[j].value = Value::Proved {
+                length: proof.length,
+                limit: proof.limit,
+                mv: Some(proof.mv),
+            };
+        }
     }
 }
 
@@ -805,6 +882,7 @@ mod tests {
             guide: Guide::new(GuideConfig::none()),
             history: History::new(),
             seed: 0,
+            max_depth: None,
             unique: None,
             entry_proof_hits: 0,
             entry_tt_hits: 0,
@@ -870,6 +948,7 @@ mod tests {
             guide: Guide::new(GuideConfig::none()),
             history: History::new(),
             seed: 0,
+            max_depth: None,
             unique: None,
             entry_proof_hits: 0,
             entry_tt_hits: 0,

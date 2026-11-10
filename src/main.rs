@@ -25,7 +25,8 @@ fn print_help() {
          \x20                       [--guide-max-sim N] [--guide-max-settle N]\n\
          \x20                       [--guide-aux-budget N] [--guide-sim-plies N]\n\
          \x20                       [--guide-group] [--proof-share PERCENT]\n\
-         \x20                       [--stats]\n\
+         \x20                       [--stats] [--max-depth N]\n\
+         \x20                       [--guide-fresh-dn] [--guide-replay-exact]\n\
          \x20   atomi validate PROOF.jsonl...\n\
          \x20   atomi moves \"<FEN>\"\n\
          \x20   atomi --help | --version"
@@ -53,6 +54,7 @@ fn prove(args: &[String]) -> ExitCode {
         proof_share_percent: opts.proof_share_percent,
         seed: opts.seed,
         stats: opts.stats,
+        max_depth: opts.max_depth,
     };
     let output = search::prove(&root, &limits, NullSink);
     let result = output.result;

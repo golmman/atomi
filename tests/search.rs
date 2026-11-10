@@ -40,6 +40,7 @@ fn limits() -> Limits {
         proof_share_percent: 25,
         seed: 0,
         stats: false,
+        max_depth: None,
     }
 }
 
@@ -96,6 +97,7 @@ fn never_prove_rows_are_never_found() {
         proof_share_percent: 25,
         seed: 0,
         stats: false,
+        max_depth: None,
     };
     let mut rows = 0;
     for line in text.lines() {
@@ -219,6 +221,7 @@ fn filter_on_off_identical() {
             proof_share_percent: 25,
             seed: 0,
             stats: false,
+            max_depth: None,
         };
         let on = search::prove(&root, &lim, NullSink).result;
         lim.filter = false;
@@ -244,6 +247,7 @@ fn evals_cap_is_honoured() {
         proof_share_percent: 25,
         seed: 0,
         stats: false,
+        max_depth: None,
     };
     let out = search::prove(
         &board("r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1"),
@@ -402,6 +406,7 @@ fn prove(fen: &str, evals: Option<u64>) -> search::Output<NullSink> {
         proof_share_percent: 25,
         seed: 0,
         stats: false,
+        max_depth: None,
     };
     search::prove(&board(fen), &lim, NullSink)
 }
@@ -468,6 +473,7 @@ fn writer_differential_veto_rows() {
         proof_share_percent: 25,
         seed: 0,
         stats: false,
+        max_depth: None,
     };
     let mut rows = 0;
     for line in text.lines() {
@@ -683,6 +689,107 @@ fn stats_are_observation_only() {
 }
 
 #[test]
+fn max_depth_default_off_is_trajectory_neutral() {
+    // Plan 13 Phase B: `--max-depth` is opt-in and measurement only. Off
+    // (`None`) must equal the old 4096-ply cap exactly.
+    let root = board(MATE_IN_2);
+    let off = limits();
+    let mut explicit = limits();
+    explicit.max_depth = Some(4096);
+    let a = search::prove(&root, &off, NullSink).result;
+    let b = search::prove(&root, &explicit, NullSink).result;
+    assert_eq!(
+        (a.exit, a.length, a.child_evals, a.expansions),
+        (b.exit, b.length, b.child_evals, b.expansions)
+    );
+    // The CLI default is the same trajectory as the explicit 4096 cap.
+    let plain = atomi(&["prove", MATE_IN_2, "--seconds", "30", "--memory", "16"]);
+    let capped = atomi(&[
+        "prove",
+        MATE_IN_2,
+        "--seconds",
+        "30",
+        "--memory",
+        "16",
+        "--max-depth",
+        "4096",
+    ]);
+    let plain: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&plain.stdout).trim()).unwrap();
+    let capped: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&capped.stdout).trim()).unwrap();
+    assert_eq!(plain["child_evals"], capped["child_evals"]);
+    assert_eq!(plain["expansions"], capped["expansions"]);
+}
+
+#[test]
+fn max_depth_censors_at_the_cap() {
+    // A cap below the proof depth censors with `Exit::Depth`; it never
+    // invents a win or a refutation.
+    let root = board(MATE_IN_2);
+    let mut lim = limits();
+    lim.max_depth = Some(1);
+    let out = search::prove(&root, &lim, NullSink).result;
+    assert_eq!(out.exit, Exit::Depth);
+    assert_eq!(out.length, None);
+    // A cap above the proof depth still proves.
+    lim.max_depth = Some(8);
+    let out = search::prove(&root, &lim, NullSink).result;
+    assert_eq!(out.exit, Exit::Proved);
+    assert_eq!(out.length, Some(2));
+}
+
+#[test]
+fn guide_conformance_flags_are_default_off() {
+    // Plan 13 Phase C: `--guide-fresh-dn` and `--guide-replay-exact` are
+    // opt-in. With `--guide none` they are inert and the trajectory is the
+    // bare tree.
+    let plain = atomi(&["prove", MATE_IN_2, "--seconds", "30", "--memory", "16"]);
+    let flagged = atomi(&[
+        "prove",
+        MATE_IN_2,
+        "--seconds",
+        "30",
+        "--memory",
+        "16",
+        "--guide",
+        "none",
+        "--guide-fresh-dn",
+        "--guide-replay-exact",
+    ]);
+    let plain: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&plain.stdout).trim()).unwrap();
+    let flagged: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&flagged.stdout).trim()).unwrap();
+    assert_eq!(plain["child_evals"], flagged["child_evals"]);
+    assert_eq!(plain["expansions"], flagged["expansions"]);
+    assert_eq!(plain["exit"], flagged["exit"]);
+}
+
+#[test]
+fn guide_conformance_flags_prove_a_small_position() {
+    // The assembled probe must stay sound on a small win: the replay only
+    // stores proofs it verified, and the result is still a proof.
+    let out = atomi(&[
+        "prove",
+        MATE_IN_2,
+        "--seconds",
+        "30",
+        "--memory",
+        "16",
+        "--guide",
+        "hand",
+        "--guide-fresh-dn",
+        "--guide-replay-exact",
+    ]);
+    assert_eq!(out.status.code(), Some(0));
+    let json: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&out.stdout).trim()).unwrap();
+    assert_eq!(json["exit"], "proved");
+    assert_eq!(json["length"], 2);
+}
+
+#[test]
 fn cli_stats_object_is_emitted() {
     let out = atomi(&[
         "prove",
@@ -856,6 +963,7 @@ fn settled_child_proof_round_trip() {
         proof_share_percent: 25,
         seed: 0,
         stats: false,
+        max_depth: None,
     };
     let out = search::prove(&root, &lim, ProofStore::new(64));
     assert_eq!(out.result.exit, Exit::Proved);

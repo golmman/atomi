@@ -140,6 +140,24 @@ counters are default-off and observation-only; `--guide none --seed 0` is
 still counter-identical to m1. See [`report12.md`](report12.md) and
 [`measurements/plan12/`](measurements/plan12/README.md).
 
+**Plan13 (item 22) executed (2026-11-10) — all three cheap probes fail; the
+hand-guide line closes.** Phase A (proof-share 25/40/50/60, seeds 0–2) does
+not prove `deep-win` 3/3 on any share: share 25 is 1/3 (seed 1, 116.052 s,
+length 25), share 50 is 1/3 (seed 2, 114.920 s, length 27), shares 40/60 are
+0/3; `core`/`easy-win` stay 3/3 and the 10 % wall guard passes, but the 3/3
+clause does not. Phase B (`--max-depth` 16/20/24/28/32 at 20 M) has no
+passing cap: 20–32 are inert (the eval cap fires first), cap 16 cuts
+`deep-win` unique keys 2.18× but censors at depth with no proof. Phase C
+assembles the documented divergences (`--guide-group`, EF-PN off,
+`--guide-fresh-dn`, `--guide-replay-exact`) and cuts `core` unique
+expansions by at most **1.22×** (`lo_fresh` 480,962 vs bare 586,075), not
+2×; the full stack is 1.11×. The full stack does cut `easy-win` 3.2×
+(146,276 vs hand 468,301), but `core` stays censored. **The hand-guide line
+is closed for good**; no coverage claim, no ledger row. Tier 1 remains 2/3.
+The new flags are default off and trajectory-neutral when off; 26/26 D14
+proofs accepted. See [`report13.md`](report13.md) and
+[`measurements/plan13/`](measurements/plan13/README.md).
+
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -328,7 +346,8 @@ plan-12 ideation option B (move-limit iterative deepening), starting with a
 read-only depth/move-limit probe; then an owner decision on adopting bare as
 the product; then item 5 (M4, parked; Tier 2 or a recorded decision is still
 required) → item 6 (M5). Items 3, 15, 16, 17, 18 and 19 are closed; item 20 is
-executed (Tier 1 2/3); item 21 is executed (stop rule fired, no mechanism).
+executed (Tier 1 2/3); item 21 is executed (stop rule fired, no mechanism);
+item 22 is executed (all three probes fail, hand-guide line closed).
 
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
@@ -344,6 +363,7 @@ executed (Tier 1 2/3); item 21 is executed (stop rule fired, no mechanism).
 | 19 | **Goal re-pin (owner decision)** | tiered goal: coverage-first (3/3 at a stated budget), then wall on shared cells; or a node/`child_evals` score; the reference is re-pinned only via D17 at M5 | owner accepts; `bench.md`, the success condition and the ledger updated together | **executed; Tier 1 failed 1/3** — [`plan9`](plan9.md), [`report9`](report9.md), [data](measurements/plan9/README.md). Product at 120 s / 192 MB: `easy-win` 3/3 (5.765 s, 54.9×, D14 accepted on all seeds), `core` 0/3 (≥ 240.0×), `deep-win` 0/3 (≥ 18.2×). Tier 2 not claimed; no ledger row. `REPLAY-BOUND` not started (Tier 1 red, wall target not retained). Recommendation: owner decision on reopening item 18 |
 | 20 | **Bare-tree coverage probe + product decision** | kill review of plans 9–10; bare tree (`--guide none`) at 120 s / 192 MB on the 3 cells × seeds 0–2; same-session provari hand references; D14 for every proved cell; `guidance-v1` seed-0 diagnostic; product-configuration decision. No portfolio, no budget raise, no engine change | **coverage gate:** Tier 1 3/3 at 120 s with 3/3 D14-accepted proofs; a censored cell is reported, never converted; exactly one recommendation | **executed; Tier 1 2/3** — [`plan11`](plan11.md), [`report11`](report11.md), [data](measurements/plan11/README.md). Bare: `core` 3/3 17.390 s (35.3×), `easy-win` 3/3 2.008 s (19.1×), `deep-win` 1/3 (seed 1 111.218 s, seeds 0/2 censor at 120 s, ≥ 18.6×). 7/7 D14 proofs accepted; guidance-v1 20/24. Bare dominates hand on every cell; portfolio rejected. No ledger row. Recommendation: adopt bare (owner) and open a `deep-win` tree-size plan |
 | 21 | **`deep-win` tree size: entry reuse** | Phase A attribution counters (`--stats`: distinct keys, re-expansions, entry proof/TT hits, crossing stored values, attacker/defender, depth and selected-class histograms); Phase B ENTRY-REUSE behind `--entry-reuse`; Phase C 120 s matrix + D14. Stop rule: no Phase B if `entry_would_return` < 10 % of expansions at 20 M on `deep-win` | **stop rule:** entry reuse starts only if the 20 M attribution supports it; **mechanism gate** (if started): `deep-win` 3/3 at 120 s with 3/3 D14 proofs, `core`/`easy-win` not > 10 % worse | **executed; stop rule fired** — [`plan12`](plan12.md), [`report12`](report12.md), [data](measurements/plan12/README.md). `deep-win` 20 M: 668,608 expansions, 620,162 unique (7.25 % re-expansions), **53 would_return (0.0079 %)**; 120 s: 51.7 M expansions, 2.75 M proof entries, 15,849 would_return (0.0319 %). Phase B/C not implemented or run; no proof, no coverage claim, no ledger row. Tier 1 remains 2/3. Recommendation: option B (move-limit iterative deepening) with a read-only depth/move-limit probe |
+| 22 | **Cheap probes before any conformance stack** | Phase A proof-share sweep (25/40/50/60, seeds 0–2, 120 s); Phase B measurement-only `--max-depth` ply cap at 20 M; Phase C conformance probe (`--guide-group`, EF-PN off, `--guide-fresh-dn`, exact sibling proof replay behind `--guide-replay-exact`). Stop rules: A 3/3 `deep-win` + 10 % wall guard; B a cap reaches the bare proof length with ≥ 2× fewer unique expansions; C a stack cuts `core` unique expansions ≥ 2× vs bare at 20 M | **A:** Tier 1 green + ledger row; **B:** otherwise drop the `remaining` key dimension; **C:** otherwise close the hand-guide line for good | **executed; all three fail** — [`plan13`](plan13.md), [`report13`](report13.md), [data](measurements/plan13/README.md). A: no share is 3/3 (`deep-win` 1/3 at 25 and 50, 0/3 at 40/60); 26/26 D14 accepted. B: caps 20–32 inert, cap 16 cuts 2.18× but censors at depth with no proof. C: best `core` cut 1.22× (`lo_fresh`), full stack 1.11×; `easy-win` full 146,276 (3.2× better than hand) but `core` censored. Hand-guide line closed; no coverage claim, no ledger row. Tier 1 remains 2/3 |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
 legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose

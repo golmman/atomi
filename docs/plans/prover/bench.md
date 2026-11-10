@@ -492,3 +492,14 @@ accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
   were not run; Tier 1 stays 2/3 (plan11) and no ledger row is appended.
   The `--stats` counters are default-off and observation-only. Details in
   [`report12.md`](report12.md).
+- **2026-11-10** — plan13 (item 22) executed; **all three cheap probes
+  fail**. Phase A proof-share 25/40/50/60 at 120 s: no share proves
+  `deep-win` 3/3 (1/3 at 25 and 50, 0/3 at 40/60); `core`/`easy-win` stay
+  3/3 and the 10 % wall guard passes, but the 3/3 clause does not. Phase B
+  `--max-depth` 16/20/24/28/32 at 20 M: 20–32 are inert, cap 16 cuts
+  `deep-win` unique keys 2.18× but censors at depth with no proof. Phase C
+  conformance stack: best `core` cut **1.22×** (`lo_fresh` 480,962 vs bare
+  586,075), full stack 1.11×; the full stack cuts `easy-win` 3.2× (146,276
+  vs hand 468,301) but `core` stays censored. The hand-guide line is closed
+  for good; Tier 1 stays 2/3 and no ledger row is appended. Details in
+  [`report13.md`](report13.md).

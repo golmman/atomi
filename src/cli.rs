@@ -34,6 +34,8 @@ pub struct ProveOptions {
     pub seed: u64,
     /// Collect the plan-12 attribution counters.
     pub stats: bool,
+    /// Opt-in ply cap (`--max-depth`, default off; measurement only).
+    pub max_depth: Option<u16>,
 }
 
 /// Parse `prove` arguments (everything after the `prove` subcommand).
@@ -48,6 +50,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
     let mut proof_share_percent = 25u8;
     let mut seed = 0u64;
     let mut stats = false;
+    let mut max_depth = None;
 
     let mut i = 0;
     while i < args.len() {
@@ -60,6 +63,16 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
         }
         if arg == "--stats" {
             stats = true;
+            i += 1;
+            continue;
+        }
+        if arg == "--guide-fresh-dn" {
+            guide.fresh_dn = true;
+            i += 1;
+            continue;
+        }
+        if arg == "--guide-replay-exact" {
+            guide.replay_exact = true;
             i += 1;
             continue;
         }
@@ -125,6 +138,15 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
                 "--guide-sim-plies" => {
                     guide_params.sim_plies = parse_num(arg, value)?;
                 }
+                "--max-depth" => {
+                    let n: u16 = value
+                        .parse()
+                        .map_err(|_| format!("bad value for {arg}: {value}"))?;
+                    if n == 0 {
+                        return Err(format!("bad value for {arg}: {value}"));
+                    }
+                    max_depth = Some(n);
+                }
                 "--proof-share" => {
                     let n: u8 = value
                         .parse()
@@ -157,6 +179,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
         proof_share_percent,
         seed,
         stats,
+        max_depth,
     })
 }
 
