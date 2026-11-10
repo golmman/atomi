@@ -105,6 +105,15 @@ costs 2.83×/3.44× provari's ns per node. From [`plan9`](plan9.md), Tier 1 is
 geomean on the same cells. No performance row is appended by the re-pin; the
 next row must state coverage before wall.
 
+**Update (plan9 executed, 2026-11-10).** Tier 1 coverage at 120 s / 192 MB is
+**1/3**, so Tier 1 **fails** and no ledger row is appended. `easy-win` is
+3/3 at 5.765 s median (54.9× the same-session provari 105 ms; D14 accepted on
+seeds 0–2). `core` is 0/3 (≥ 240.0×, 1.96 M expansions at the 120 s censor)
+and `deep-win` is 0/3 (≥ 18.2×, 2.03 M expansions). Same-session provari hand:
+core 500 ms / 342,289 nodes, deep-win 6,590 ms / 4,574,912 nodes. Tier 2 is
+not claimed; `REPLAY-BOUND` was not started. See
+[`report9.md`](report9.md) and [`measurements/plan9/`](measurements/plan9/README.md).
+
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
 ## Names and ids (read this first)
@@ -439,3 +448,8 @@ accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
   cells). Plan8's measured distance (easy-win 58.4×, core ≥ 121.5×, deep-win
   ≥ 9.36×, coverage 1/3) stands; no ledger row, no factor published until
   Tier 1 passes. Plan: [`plan9.md`](plan9.md).
+- **2026-11-10** — plan9 (item 19) executed; **Tier 1 failed at 1/3** at
+  120 s / 192 MB. `easy-win` 3/3 (5.765 s, 54.9×, D14 accepted on seeds
+  0–2); `core` 0/3 (≥ 240.0×) and `deep-win` 0/3 (≥ 18.2×) censored. Tier 2
+  not claimed; `REPLAY-BOUND` not started. No ledger row. Details in
+  [`report9.md`](report9.md).

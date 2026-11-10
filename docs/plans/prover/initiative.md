@@ -267,7 +267,7 @@ session added D21–D22.
 | D24 | M4 parked; wall is the gate (plan session 7, 2026-11-09) | The drafted M4 plan is parked as [`planX`](planX.md); it resumes only after a configuration wins 3/3 at 10 s. The next plan is [`plan7`](plan7.md) (item 16). **Gates for search/guide work are wall-based** (same-session `atomi / provari --guide hand` wall, plus coverage), with `child_evals`, `expansions`, `sim_nodes` and `settle_nodes` recorded as diagnostics. A node-only gate is not sufficient evidence for the goal. Auxiliary budgets must stay **deterministic** (same binary + FEN + flags + seed = identical counters, D22); a wall-clock budget inside the search is not allowed. The kill review is due after plans 5–6 and is recorded in the status section |
 | D25 | Deterministic auxiliary budget (proposed by plan7; owner to confirm) | Auxiliary work (simulation moves + settle movegens) is bounded by a search-global deterministic work counter, never by wall time. `--guide-aux-budget N` (`0` = unlimited) is part of the deterministic flag set; the search reports `aux_nodes` and `aux_skipped`. Once exhausted, optional sim/settle work is skipped; the last admitted operation may overshoot by its own work. The budget changes the tree, never the meaning. **Status:** implemented behind the opt-in flag and measured in plan7; not adopted as a default. Item 16 closed negative in the plan-session-8 kill review; the flag stays opt-in only |
 | D26 | Per-expansion diagnosis and goal decision (proposed by plan8; owner to confirm) | Per-node cost is judged per **expansion** and per node, never `child_evals` against provari nodes (the M1 unit mismatch). `easy-win`/`core` are re-measured same-session at fixed 10 M evals and 10 s. `R = (ns/expansion) / (provari wall/node) > 2` makes core throughput part of item 18; `R ≤ 2` leaves item 18 as tree/restarts only. If the 60 s bracket censors `core` or `deep-win`, or their factors exceed 3×, item 19 (re-pin: coverage-first tier or node/`child_evals` score) is recommended to the owner. Re-pin is never silent. **Status:** executed in plan8 (2026-11-09): `neither` `R` = 2.83/3.44, product 60 s censors core/deep-win; the rule recommends item 19. The owner accepted in plan session 9; re-pin recorded as D27 and written as [`plan9`](plan9.md) |
-| D27 | Coverage-first goal re-pin (plan9, owner decision 2026-11-09) | The single wall-geomean goal is superseded by a tiered goal. **Tier 1:** 3/3 on `core`/`easy-win`/`deep-win` at `--seconds 120 --memory 192`, every claim D14-accepted, no fixture regression; a censored cell is not converted and the budget is not raised. **Tier 2:** after Tier 1, the original same-session geomean `< 1.0` at the canonical 10 s on the same cells. The node/`child_evals` score is not chosen; the reference is re-pinned only via D17 at M5. `bench.md`, the success condition, the ledger and D26's status are updated together. Plan9 may run one opt-in bounded sibling-proof-replay stack under a pre-registered stop rule; no second replay stack and no further auxiliary tuning |
+| D27 | Coverage-first goal re-pin (plan9, owner decision 2026-11-09) | The single wall-geomean goal is superseded by a tiered goal. **Tier 1:** 3/3 on `core`/`easy-win`/`deep-win` at `--seconds 120 --memory 192`, every claim D14-accepted, no fixture regression; a censored cell is not converted and the budget is not raised. **Tier 2:** after Tier 1, the original same-session geomean `< 1.0` at the canonical 10 s on the same cells. The node/`child_evals` score is not chosen; the reference is re-pinned only via D17 at M5. `bench.md`, the success condition, the ledger and D26's status are updated together. Plan9 may run one opt-in bounded sibling-proof-replay stack under a pre-registered stop rule; no second replay stack and no further auxiliary tuning. **Status:** executed in plan9 (2026-11-10): Tier 1 **fails at 1/3** (`easy-win` 3/3, `core`/`deep-win` censored at 120 s); Tier 2 not claimed; `REPLAY-BOUND` not started |
 
 ## Backlog
 
@@ -275,11 +275,14 @@ Items are stable semantic identities. Plans are numbered sequentially and
 independently of items. Plans use stack-level gating (D21), except a
 single-mechanism plan that is independently meaningful.
 
-**Priority after plan9 (2026-11-09):** item 19 (owner accepted; execute
-[`plan9`](plan9.md): coverage tier first, one bounded replay only if the wall
-is retained) → item 5 (M4, parked; Tier 2 or a recorded decision is still
-required) → item 6 (M5). Item 18 stays parked unless the owner reopens it;
-items 3, 15, 16 and 17 are closed.
+**Priority after plan9 (2026-11-10):** item 19 is executed and **Tier 1
+failed at 1/3** (`easy-win` 3/3, `core`/`deep-win` censored at 120 s). The
+single recommendation is an owner decision to reopen item 18 (restarts + core
+throughput) with Tier 1 coverage at 120 s as the first checkpoint; do not
+raise the budget and do not start `REPLAY-BOUND` without a new owner
+decision. Then item 5 (M4, parked; Tier 2 or a recorded decision is still
+required) → item 6 (M5). Item 18 stays parked until that decision; items 3,
+15, 16 and 17 are closed.
 
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
@@ -292,7 +295,7 @@ items 3, 15, 16 and 17 are closed.
 | 16 | **Wall attribution + deterministic auxiliary budget** | same-session attribution of wall on `easy-win`/`core` (main search vs sim vs settle vs threat replay vs guide eval); a deterministic global auxiliary-work budget (not wall-clock) and cheaper aux paths; wall-gated measurement | **wall gate:** `easy-win` wall ≤ 0.5 s (factor ≤ 3.6) and `core` proved at 10 s / 192 MB on seeds 0–2, with no guidance-set refutations; `deep-win` attempted at 10 s and classified; counters recorded, never substituted for wall | **executed; G3 failed** — [plan7](plan7.md), [report7](report7.md), [data](measurements/plan7/README.md). Wall premise survives (no-sim 64 % share); best budgeted `easy-win` 3.7–4.2 s (26.7–29.9×), `core` censored at 10 s, `deep-win` censored for search. `--guide-aux-budget`/`--guide-sim-plies` behind flags; no default changed. **Closed (negative)** by the plan-session-8 kill review; no further auxiliary/guide plan |
 | 17 | **Comparable per-node re-diagnosis + wall-goal bracket** | `easy-win`/`core` per-expansion wall vs provari's per-node wall, same session (fixed 10 M evals and 10 s, bare/no-sim/hand); 60 s coverage/factor bracket on `core`/`deep-win`; pre-registered decision rule. No engine change | **decision gate:** `R = (ns/exp) / (provari wall/node)` and the 60 s coverage/factor recorded; exactly one recommendation, continue (item 18) or re-pin (item 19); no cell dropped, no metric changed | **done; recommends item 19** — [`plan8`](plan8.md), [`report8`](report8.md), [data](measurements/plan8/README.md). `neither` `R` = 2.828/3.444 (core throughput first-order); product 60 s: core 0/3 (≥ 121.5×), deep-win 0/3 (≥ 9.36×), easy-win 6.013 s (58.4×); bare core 60 s 3/3 at 17.1 s (34.6×), D14 accepted. No engine change |
 | 18 | **Restarts + core throughput stack** | D5 restart schedule + generation-aware replacement; core per-node work only if item 17 prices it first-order; one named stack (D21) | **wall gate:** `core` proved at 10 s / 192 MB, `easy-win` ≤ 2 s interim (the 0.5 s gate was below the bare tree's 1.97 s; the goal geomean is decided at M5), `deep-win` classified at 10 s; no guidance-set refutations; ≥ 20 frozen cells × seeds 0–2 | **parked by D27**: the owner accepted the coverage-first re-pin; item 18 reopens only by a new owner decision, with core throughput (`neither` `R` = 2.83/3.44) plus D5 restarts under this gate |
-| 19 | **Goal re-pin (owner decision)** | tiered goal: coverage-first (3/3 at a stated budget), then wall on shared cells; or a node/`child_evals` score; the reference is re-pinned only via D17 at M5 | owner accepts; `bench.md`, the success condition and the ledger updated together | **accepted (plan session 9, D27):** coverage-first tier is 3/3 at 120 s / 192 MB, D14 per claim; Tier 2 is the original 10 s geomean on shared cells. Written as [`plan9`](plan9.md); `bench.md`, the success condition, the ledger and D26 status updated together. Not yet executed |
+| 19 | **Goal re-pin (owner decision)** | tiered goal: coverage-first (3/3 at a stated budget), then wall on shared cells; or a node/`child_evals` score; the reference is re-pinned only via D17 at M5 | owner accepts; `bench.md`, the success condition and the ledger updated together | **executed; Tier 1 failed 1/3** — [`plan9`](plan9.md), [`report9`](report9.md), [data](measurements/plan9/README.md). Product at 120 s / 192 MB: `easy-win` 3/3 (5.765 s, 54.9×, D14 accepted on all seeds), `core` 0/3 (≥ 240.0×), `deep-win` 0/3 (≥ 18.2×). Tier 2 not claimed; no ledger row. `REPLAY-BOUND` not started (Tier 1 red, wall target not retained). Recommendation: owner decision on reopening item 18 |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
 legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose
@@ -513,6 +516,16 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-10**: plan9 (item 19) executed. Tier 1 coverage at 120 s / 192 MB:
+  `easy-win` 3/3 (5.765 s median, 54.9×, D14 accepted on seeds 0–2),
+  `core` 0/3 (≥ 240.0×) and `deep-win` 0/3 (≥ 18.2×) censored. Coverage is
+  **1/3**, so Tier 1 fails; Tier 2 is not claimed and no ledger row is
+  appended. `REPLAY-BOUND` was not started (Tier 1 red, wall target not
+  retained). `make test` and `make lint` green. Data:
+  [`measurements/plan9/`](measurements/plan9/README.md); report:
+  [`report9.md`](report9.md). Recommendation: owner decision on reopening
+  item 18 (restarts + core throughput) with Tier 1 at 120 s as the first
+  checkpoint.
 - **2026-11-09**: plan session 9 (plans 7–8 kill review). The review confirmed
   the absolute distance (easy-win 58.4× at 60 s, core ≥ 121.5× and deep-win
   ≥ 9.36× censored, bare core floor 34.6×, coverage 1/3) and cancelled further
