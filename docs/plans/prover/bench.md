@@ -23,15 +23,18 @@ sections below stay untouched:
 
 ## The goal this ledger measures
 
-The initiative's success condition, amended by **D27** (plan9, 2026-11-09),
-quoted from [`initiative.md`](initiative.md):
+The initiative's success condition, amended by **D27** (plan9, 2026-11-09)
+and **D28** (plan14, 2026-11-10), quoted from
+[`initiative.md`](initiative.md):
 
 **Tier 1 — coverage (new first goal).** On the frozen shared-win set
-(`core`, `easy-win`, `deep-win`), prove **3/3** with the product configuration
+(`core`, `easy-win`, `deep-win`), prove **2/3** with the product configuration
 at `--seconds 120 --memory 192`; every claimed win passes D14 (equal
 `child_evals` on a `--seconds 600 --proof-out` run, accepted by `atomi
 validate` and the pinned `provari check`); no fixture-oracle regression. A
 censored cell is never converted and a longer run is never substituted.
+`deep-win` is recorded as **1/3** (seed 1 proves at 111.218 s; seeds 0/2
+censor at 120 s) and is not part of the Tier 1 pass condition (D28).
 
 **Tier 2 — wall (after Tier 1).** On the same three cells at the canonical
 10 s budget, the geometric mean of `atomi / provari --guide hand` wall time is
@@ -137,6 +140,17 @@ is not raised, and no ledger row is appended. The `guidance-v1` seed-0
 diagnostic is 20/24 (hand was 19/24 at 10 s). The next lever is a `deep-win`
 tree-size mechanism. See [`report11.md`](report11.md) and
 [`measurements/plan11/`](measurements/plan11/README.md).
+
+**Update (plan14 executed, 2026-11-10).** The kill review found no non-hand
+mechanism with a credible 2× case: the 120 s `deep-win` tree is 50,016,256
+expansions / 40,708,534 unique keys (18.6 % re-expansions, 2,661,718 proof
+entries, `proof_full: false`), ~8.9× provari's 4.57 M nodes, so the gap is
+unique positions, not memory, re-expansion, proof pressure or per-node cost.
+The owner accepted **option A**: **D28** amends D27 so Tier 1 is **2/3**
+(`core`, `easy-win`) at 120 s / 192 MB; `deep-win` is recorded as 1/3 and is
+not a pass condition. The 120 s budget is not raised, the hand-guide/auxiliary
+line stays closed, no portfolio is built, and the bare tree is the product
+candidate. No ledger row, no engine change. See [`plan14`](plan14.md).
 
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
@@ -331,6 +345,11 @@ coverage measurement and states coverage before factors.
 the last recorded coverage is 1/3 at 10 s (plan8). No factor is published
 until Tier 1 passes.
 
+**D28 status (plan14, 2026-11-10):** Tier 1 is amended to **2/3** at 120 s /
+192 MB (`core`, `easy-win`); `deep-win` is recorded as 1/3 and is not a pass
+condition. The last recorded coverage is 2/3 (plan11, bare tree). No ledger
+row is appended by the decision; Tier 2 is unchanged.
+
 **Pins.** `atomi@0c5a882+d` = atomi built from HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
 on a dirty tree (uncommitted work-in-progress) · `atomi@a4c135d+d` = atomi
 built from HEAD `a4c135d6ee1956588e01733bd101f6373e7d2e72` on a dirty tree
@@ -503,3 +522,12 @@ accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
   vs hand 468,301) but `core` stays censored. The hand-guide line is closed
   for good; Tier 1 stays 2/3 and no ledger row is appended. Details in
   [`report13.md`](report13.md).
+- **2026-11-10** — plan14 (item 23) executed; **owner accepts option A**.
+  The kill review found no non-hand mechanism with a credible 2× case (120 s
+  `deep-win` tree: 50.0 M expansions / 40.7 M unique keys, 18.6 %
+  re-expansions, `proof_full: false`, ~8.9× provari's 4.57 M nodes). **D28**
+  amends D27: Tier 1 is **2/3** (`core`, `easy-win`) at 120 s / 192 MB;
+  `deep-win` is recorded as 1/3 and is not a pass condition. The 120 s budget
+  is not raised, the hand-guide/auxiliary line stays closed, no portfolio is
+  built, and the bare tree is the product candidate. No ledger row, no engine
+  change. Details in [`plan14.md`](plan14.md).

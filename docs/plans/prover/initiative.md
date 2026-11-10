@@ -158,6 +158,19 @@ The new flags are default off and trajectory-neutral when off; 26/26 D14
 proofs accepted. See [`report13.md`](report13.md) and
 [`measurements/plan13/`](measurements/plan13/README.md).
 
+**Plan14 (item 23) executed (2026-11-10) — owner accepts 2/3 as Tier 1.**
+The plan-session kill review found no remaining non-hand tree mechanism with
+a credible 2× case: the 120 s `deep-win` tree is 50,016,256 expansions /
+40,708,534 unique keys (18.6 % re-expansions, 2,661,718 proof entries,
+`proof_full: false`), so the gap is ~8.9× more unique positions than
+provari's 4.57 M nodes, not memory, re-expansion, proof pressure or per-node
+cost. The owner chose **option A**: **D28** amends D27 so Tier 1 is **2/3**
+(`core`, `easy-win`) at `--seconds 120 --memory 192`, with `deep-win`
+recorded as 1/3 (seed 1 proves at 111.218 s; seeds 0/2 censor at 120 s). The
+120 s budget is not raised, the hand-guide/auxiliary line stays closed, no
+portfolio is built, and the bare tree is the product candidate. No ledger
+row; no engine change. See [`plan14`](plan14.md).
+
 The stack-level ablation premise and atomi's reduced both-direction run are
 recorded in [§Findings](#findings).
 This initiative is the successor to `atomic_solver`'s closed `winprover`
@@ -183,15 +196,18 @@ initiative. Its starting point is the legacy handoff
 corpus, with every claimed win checked by our own replay validator and by an
 independent second rules implementation.**
 
-Success condition (from the handoff §2; amended by D27, plan9, 2026-11-09 —
-the original wall-only wording is retained as Tier 2, not silently changed):
+Success condition (from the handoff §2; amended by D27, plan9, 2026-11-09,
+and D28, plan14, 2026-11-10 — the original wall-only wording is retained as
+Tier 2, not silently changed):
 
 **Tier 1 — coverage (new first goal).** On the frozen shared-win set
-(`core`, `easy-win`, `deep-win`), prove **3/3** with the product configuration
+(`core`, `easy-win`, `deep-win`), prove **2/3** with the product configuration
 at `--seconds 120 --memory 192`; every claimed win passes D14 (equal
 `child_evals` on a `--seconds 600 --proof-out` run, accepted by `atomi
 validate` and the pinned `provari check`); no fixture-oracle regression. A
 censored cell is never converted and a longer run is never substituted.
+`deep-win` is recorded as **1/3** (seed 1 proves at 111.218 s; seeds 0/2
+censor at 120 s) and is not part of the Tier 1 pass condition (D28).
 
 **Tier 2 — wall (after Tier 1).** On the same three cells at the canonical
 10 s budget, the geometric mean of `atomi / provari --guide hand` wall time is
@@ -327,6 +343,7 @@ session added D21–D22.
 | D25 | Deterministic auxiliary budget (proposed by plan7; owner to confirm) | Auxiliary work (simulation moves + settle movegens) is bounded by a search-global deterministic work counter, never by wall time. `--guide-aux-budget N` (`0` = unlimited) is part of the deterministic flag set; the search reports `aux_nodes` and `aux_skipped`. Once exhausted, optional sim/settle work is skipped; the last admitted operation may overshoot by its own work. The budget changes the tree, never the meaning. **Status:** implemented behind the opt-in flag and measured in plan7; not adopted as a default. Item 16 closed negative in the plan-session-8 kill review; the flag stays opt-in only |
 | D26 | Per-expansion diagnosis and goal decision (proposed by plan8; owner to confirm) | Per-node cost is judged per **expansion** and per node, never `child_evals` against provari nodes (the M1 unit mismatch). `easy-win`/`core` are re-measured same-session at fixed 10 M evals and 10 s. `R = (ns/expansion) / (provari wall/node) > 2` makes core throughput part of item 18; `R ≤ 2` leaves item 18 as tree/restarts only. If the 60 s bracket censors `core` or `deep-win`, or their factors exceed 3×, item 19 (re-pin: coverage-first tier or node/`child_evals` score) is recommended to the owner. Re-pin is never silent. **Status:** executed in plan8 (2026-11-09): `neither` `R` = 2.83/3.44, product 60 s censors core/deep-win; the rule recommends item 19. The owner accepted in plan session 9; re-pin recorded as D27 and written as [`plan9`](plan9.md) |
 | D27 | Coverage-first goal re-pin (plan9, owner decision 2026-11-09) | The single wall-geomean goal is superseded by a tiered goal. **Tier 1:** 3/3 on `core`/`easy-win`/`deep-win` at `--seconds 120 --memory 192`, every claim D14-accepted, no fixture regression; a censored cell is not converted and the budget is not raised. **Tier 2:** after Tier 1, the original same-session geomean `< 1.0` at the canonical 10 s on the same cells. The node/`child_evals` score is not chosen; the reference is re-pinned only via D17 at M5. `bench.md`, the success condition, the ledger and D26's status are updated together. Plan9 may run one opt-in bounded sibling-proof-replay stack under a pre-registered stop rule; no second replay stack and no further auxiliary tuning. **Status:** executed in plan9 (2026-11-10): Tier 1 **fails at 1/3** (`easy-win` 3/3, `core`/`deep-win` censored at 120 s); Tier 2 not claimed; `REPLAY-BOUND` not started |
+| D28 | Tier 1 amended to 2/3 (plan14, owner decision 2026-11-10) | Amends D27. **Tier 1** is **2/3** on `core`/`easy-win` at `--seconds 120 --memory 192`, every claim D14-accepted, no fixture regression; `deep-win` is recorded as **1/3** (seed 1 111.218 s, seeds 0/2 censor at 120 s) and is not a Tier 1 pass condition. The 120 s budget is not raised, the hand-guide/auxiliary line stays closed, no portfolio is built, and the bare tree (`--guide none`) is the product candidate. Tier 2 is unchanged (same-session 10 s geomean `< 1.0` on shared cells). The kill review found no non-hand mechanism with a credible 2× case: the 120 s `deep-win` tree is 50,016,256 expansions / 40,708,534 unique keys (18.6 % re-expansions, 2,661,718 proof entries, `proof_full: false`), ~8.9× provari's 4.57 M nodes. No ledger row; no engine change. **Status:** accepted in plan14 (2026-11-10) |
 
 ## Backlog
 
@@ -334,20 +351,17 @@ Items are stable semantic identities. Plans are numbered sequentially and
 independently of items. Plans use stack-level gating (D21), except a
 single-mechanism plan that is independently meaningful.
 
-**Priority after plan12 (2026-11-10):** the bare tree is the best measured
-configuration: 2/3 cells at 120 s (`core` 3/3 17.390 s / 35.3×, `easy-win`
-3/3 2.008 s / 19.1×) and it dominates the hand product on every bench cell.
-`deep-win` is the only blocker (1/3 seeds; seed 1 proves at 111.218 s, seeds
-0/2 censor). The portfolio is rejected as dominated, the 120 s budget is not
-raised, and the hand-guide/auxiliary line stays closed. Plan12's ENTRY-REUSE
-stop rule fired: the 20 M tree is 92.75 % unique and re-expansion is not the
-lever, so entry reuse is not implemented. The next step is a new plan for the
-plan-12 ideation option B (move-limit iterative deepening), starting with a
-read-only depth/move-limit probe; then an owner decision on adopting bare as
-the product; then item 5 (M4, parked; Tier 2 or a recorded decision is still
-required) → item 6 (M5). Items 3, 15, 16, 17, 18 and 19 are closed; item 20 is
-executed (Tier 1 2/3); item 21 is executed (stop rule fired, no mechanism);
-item 22 is executed (all three probes fail, hand-guide line closed).
+**Priority after plan14 (2026-11-10):** the bare tree is the product
+candidate and Tier 1 is **2/3** by D28 (`core` 3/3 17.390 s / 35.3×,
+`easy-win` 3/3 2.008 s / 19.1×); `deep-win` is recorded as 1/3 (seed 1
+111.218 s, seeds 0/2 censor at 120 s) and is not a Tier 1 pass condition.
+The 120 s budget is not raised, the hand-guide/auxiliary line stays closed,
+and no portfolio is built. The kill review found no non-hand mechanism with
+a credible 2× case (the 120 s `deep-win` tree is 40.7 M unique keys, ~8.9×
+provari's 4.57 M nodes). Next: item 5 (M4, parked; Tier 2 or a recorded
+decision is still required) → item 6 (M5). Items 3, 15, 16, 17, 18, 19 and 22
+are closed; item 20 is executed (Tier 1 2/3); item 21 is executed (stop rule
+fired, no mechanism); item 23 is executed (D28, Tier 1 2/3).
 
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
@@ -364,6 +378,7 @@ item 22 is executed (all three probes fail, hand-guide line closed).
 | 20 | **Bare-tree coverage probe + product decision** | kill review of plans 9–10; bare tree (`--guide none`) at 120 s / 192 MB on the 3 cells × seeds 0–2; same-session provari hand references; D14 for every proved cell; `guidance-v1` seed-0 diagnostic; product-configuration decision. No portfolio, no budget raise, no engine change | **coverage gate:** Tier 1 3/3 at 120 s with 3/3 D14-accepted proofs; a censored cell is reported, never converted; exactly one recommendation | **executed; Tier 1 2/3** — [`plan11`](plan11.md), [`report11`](report11.md), [data](measurements/plan11/README.md). Bare: `core` 3/3 17.390 s (35.3×), `easy-win` 3/3 2.008 s (19.1×), `deep-win` 1/3 (seed 1 111.218 s, seeds 0/2 censor at 120 s, ≥ 18.6×). 7/7 D14 proofs accepted; guidance-v1 20/24. Bare dominates hand on every cell; portfolio rejected. No ledger row. Recommendation: adopt bare (owner) and open a `deep-win` tree-size plan |
 | 21 | **`deep-win` tree size: entry reuse** | Phase A attribution counters (`--stats`: distinct keys, re-expansions, entry proof/TT hits, crossing stored values, attacker/defender, depth and selected-class histograms); Phase B ENTRY-REUSE behind `--entry-reuse`; Phase C 120 s matrix + D14. Stop rule: no Phase B if `entry_would_return` < 10 % of expansions at 20 M on `deep-win` | **stop rule:** entry reuse starts only if the 20 M attribution supports it; **mechanism gate** (if started): `deep-win` 3/3 at 120 s with 3/3 D14 proofs, `core`/`easy-win` not > 10 % worse | **executed; stop rule fired** — [`plan12`](plan12.md), [`report12`](report12.md), [data](measurements/plan12/README.md). `deep-win` 20 M: 668,608 expansions, 620,162 unique (7.25 % re-expansions), **53 would_return (0.0079 %)**; 120 s: 51.7 M expansions, 2.75 M proof entries, 15,849 would_return (0.0319 %). Phase B/C not implemented or run; no proof, no coverage claim, no ledger row. Tier 1 remains 2/3. Recommendation: option B (move-limit iterative deepening) with a read-only depth/move-limit probe |
 | 22 | **Cheap probes before any conformance stack** | Phase A proof-share sweep (25/40/50/60, seeds 0–2, 120 s); Phase B measurement-only `--max-depth` ply cap at 20 M; Phase C conformance probe (`--guide-group`, EF-PN off, `--guide-fresh-dn`, exact sibling proof replay behind `--guide-replay-exact`). Stop rules: A 3/3 `deep-win` + 10 % wall guard; B a cap reaches the bare proof length with ≥ 2× fewer unique expansions; C a stack cuts `core` unique expansions ≥ 2× vs bare at 20 M | **A:** Tier 1 green + ledger row; **B:** otherwise drop the `remaining` key dimension; **C:** otherwise close the hand-guide line for good | **executed; all three fail** — [`plan13`](plan13.md), [`report13`](report13.md), [data](measurements/plan13/README.md). A: no share is 3/3 (`deep-win` 1/3 at 25 and 50, 0/3 at 40/60); 26/26 D14 accepted. B: caps 20–32 inert, cap 16 cuts 2.18× but censors at depth with no proof. C: best `core` cut 1.22× (`lo_fresh`), full stack 1.11×; `easy-win` full 146,276 (3.2× better than hand) but `core` censored. Hand-guide line closed; no coverage claim, no ledger row. Tier 1 remains 2/3 |
+| 23 | **`deep-win` formulation decision (kill review)** | kill review of plans 11–13; re-run prior-art search; owner decision A (2/3 as Tier 1), B (proof-limit/graded output) or C (new search algorithm). No implementation, no budget raise, no hand-guide/auxiliary reopen, no portfolio | **decision gate:** the owner records A, B or C in `initiative.md` (D28) and `bench.md`; no silent goal change | **executed; option A accepted** — [`plan14`](plan14.md). D28 amends D27: Tier 1 is **2/3** (`core`, `easy-win`) at 120 s / 192 MB; `deep-win` recorded 1/3 (seed 1 111.218 s, seeds 0/2 censor). 120 s budget fixed, hand-guide line closed, no portfolio, bare tree is the product candidate. No ledger row, no engine change |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
 legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose
@@ -584,6 +599,15 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-10**: plan14 (item 23) executed. The kill review found no
+  non-hand mechanism with a credible 2× case (120 s `deep-win` tree: 50.0 M
+  expansions / 40.7 M unique keys, 18.6 % re-expansions, `proof_full: false`,
+  ~8.9× provari's 4.57 M nodes). The owner accepted **option A**: **D28**
+  amends D27 so Tier 1 is **2/3** (`core`, `easy-win`) at 120 s / 192 MB;
+  `deep-win` is recorded as 1/3 and is not a pass condition. The 120 s budget
+  is not raised, the hand-guide/auxiliary line stays closed, no portfolio is
+  built, and the bare tree is the product candidate. No ledger row, no engine
+  change. See [`plan14`](plan14.md).
 - **2026-11-10**: plan session 10. The owner takes report9's recommendation
   and reopens **item 18** (restarts + core throughput) as
   [`plan10`](plan10.md). The plan stages Tier 1 coverage at 120 s as
