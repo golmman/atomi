@@ -245,7 +245,7 @@ session added D21–D22.
 | D2 | Board | **`atomic_movegen::Board` 2.4.x**. M0 uses plain legal movegen and make-move. M1 adds the own `Mover`/`Effect` layer on the 2.4.0 primitives (`hash_after_with`, `hash_and_rule50_after`, `is_legal`, `outcome_with`, `has_legal_move_with_state`, `blast_zone`, `attackers_to_color`). A new board only if M1 shows make/unmake cannot leave the hot path; first ask upstream for the missing primitive (legacy `movegen/feedback2.md` pattern). Any new board is differential-tested against `atomic-movegen` and, through proofs, the external checker (no shakmaty linkage, D12) |
 | D3 | Proof format | **provari JSON lines first (M0)**. Header `{"root":FEN,"moves":L}`, which must have no `provari` field: that field routes the checker to its compact reader. Then one `{"fen":FEN,"move":UCI}` line per attacker (position, 50-move counter) pair. Compact `.pvr` comes in M4 (zstd + the format's move order). No `proof_tree.bin` and no native format |
 | D4 | Key / rule50 / repetition | **Board-only key + proof length/limit from M0.** The key is `Board::hash_with(EnPassantMode::Legal)`; `atomic-movegen`'s hash already excludes the halfmove clock. **Correction to the handoff:** the `Legal` mode is a *correctness requirement*, not an M1 A/B. The checker treats positions as repeated using the legal-en-passant identity, so an `Always` key would let the search accept lines the checker rejects as repetitions. M1 may A/B the *cost* of computing the key (an effect-level flag), never its meaning |
-| D5 | Restarts | A/B after the M2+M3 stack (D21), paired with generation-aware replacement (legacy `RestartSchedule::SHIPPED` idea). Not a default before measured |
+| D5 | Restarts | A/B after the M2+M3 stack (D21), paired with generation-aware replacement (legacy `RestartSchedule::SHIPPED` idea). Not a default before measured. **Status:** reopened under item 18/[`plan10`](plan10.md) (2026-11-10) as part of the `RESTART-GEN` stack, behind opt-in flags |
 | D6 | Portfolio | A separate driver outside the search core, after M5 (horizon) |
 | D7 | Tablebases | None through M5. Proofs carry no tablebase verdicts, and `provari check` runs without `--tablebases`. An external optional path is a horizon item |
 | D8 | Model / NNUE | Hand guide only. `--guide model` may be recorded as a stretch column and is never mixed into the primary one |
@@ -275,14 +275,13 @@ Items are stable semantic identities. Plans are numbered sequentially and
 independently of items. Plans use stack-level gating (D21), except a
 single-mechanism plan that is independently meaningful.
 
-**Priority after plan9 (2026-11-10):** item 19 is executed and **Tier 1
-failed at 1/3** (`easy-win` 3/3, `core`/`deep-win` censored at 120 s). The
-single recommendation is an owner decision to reopen item 18 (restarts + core
-throughput) with Tier 1 coverage at 120 s as the first checkpoint; do not
-raise the budget and do not start `REPLAY-BOUND` without a new owner
-decision. Then item 5 (M4, parked; Tier 2 or a recorded decision is still
-required) → item 6 (M5). Item 18 stays parked until that decision; items 3,
-15, 16 and 17 are closed.
+**Priority after plan10 (2026-11-10):** the owner takes report9's
+recommendation and **reopens item 18** (restarts + core throughput) as
+[`plan10`](plan10.md), with Tier 1 coverage at 120 s as **Checkpoint 1** and
+item 18's existing wall gate at 10 s as **Checkpoint 2**. Do not raise the
+120 s budget and do not start `REPLAY-BOUND` without a new owner decision.
+Then item 5 (M4, parked; Tier 2 or a recorded decision is still required) →
+item 6 (M5). Items 3, 15, 16, 17 and 19 are closed.
 
 | # | Milestone | Scope | Gate | Status |
 | --- | --- | --- | --- | --- |
@@ -294,7 +293,7 @@ required) → item 6 (M5). Item 18 stays parked until that decision; items 3,
 | 6 | **M5** head-to-head | 3 cells × 3 repeats, same-session provari hand reference + legacy control rows; default-flag decision | geomean < 1.0, coverage 3/3, no fixture-oracle regressions; otherwise record and decide | open |
 | 16 | **Wall attribution + deterministic auxiliary budget** | same-session attribution of wall on `easy-win`/`core` (main search vs sim vs settle vs threat replay vs guide eval); a deterministic global auxiliary-work budget (not wall-clock) and cheaper aux paths; wall-gated measurement | **wall gate:** `easy-win` wall ≤ 0.5 s (factor ≤ 3.6) and `core` proved at 10 s / 192 MB on seeds 0–2, with no guidance-set refutations; `deep-win` attempted at 10 s and classified; counters recorded, never substituted for wall | **executed; G3 failed** — [plan7](plan7.md), [report7](report7.md), [data](measurements/plan7/README.md). Wall premise survives (no-sim 64 % share); best budgeted `easy-win` 3.7–4.2 s (26.7–29.9×), `core` censored at 10 s, `deep-win` censored for search. `--guide-aux-budget`/`--guide-sim-plies` behind flags; no default changed. **Closed (negative)** by the plan-session-8 kill review; no further auxiliary/guide plan |
 | 17 | **Comparable per-node re-diagnosis + wall-goal bracket** | `easy-win`/`core` per-expansion wall vs provari's per-node wall, same session (fixed 10 M evals and 10 s, bare/no-sim/hand); 60 s coverage/factor bracket on `core`/`deep-win`; pre-registered decision rule. No engine change | **decision gate:** `R = (ns/exp) / (provari wall/node)` and the 60 s coverage/factor recorded; exactly one recommendation, continue (item 18) or re-pin (item 19); no cell dropped, no metric changed | **done; recommends item 19** — [`plan8`](plan8.md), [`report8`](report8.md), [data](measurements/plan8/README.md). `neither` `R` = 2.828/3.444 (core throughput first-order); product 60 s: core 0/3 (≥ 121.5×), deep-win 0/3 (≥ 9.36×), easy-win 6.013 s (58.4×); bare core 60 s 3/3 at 17.1 s (34.6×), D14 accepted. No engine change |
-| 18 | **Restarts + core throughput stack** | D5 restart schedule + generation-aware replacement; core per-node work only if item 17 prices it first-order; one named stack (D21) | **wall gate:** `core` proved at 10 s / 192 MB, `easy-win` ≤ 2 s interim (the 0.5 s gate was below the bare tree's 1.97 s; the goal geomean is decided at M5), `deep-win` classified at 10 s; no guidance-set refutations; ≥ 20 frozen cells × seeds 0–2 | **parked by D27**: the owner accepted the coverage-first re-pin; item 18 reopens only by a new owner decision, with core throughput (`neither` `R` = 2.83/3.44) plus D5 restarts under this gate |
+| 18 | **Restarts + core throughput stack** | D5 restart schedule + generation-aware replacement; core per-node work only if item 17 prices it first-order; one named stack (D21) | **wall gate:** `core` proved at 10 s / 192 MB, `easy-win` ≤ 2 s interim (the 0.5 s gate was below the bare tree's 1.97 s; the goal geomean is decided at M5), `deep-win` classified at 10 s; no guidance-set refutations; ≥ 20 frozen cells × seeds 0–2 | **reopened by plan10** (owner decision 2026-11-10): [`plan10`](plan10.md) stages Tier 1 coverage at 120 s as Checkpoint 1, then this wall gate as Checkpoint 2, under the named `RESTART-GEN` stack (D21). Core throughput (`neither` `R` = 2.83/3.44) plus D5 restarts are in scope; no `REPLAY-BOUND`, no auxiliary tuning |
 | 19 | **Goal re-pin (owner decision)** | tiered goal: coverage-first (3/3 at a stated budget), then wall on shared cells; or a node/`child_evals` score; the reference is re-pinned only via D17 at M5 | owner accepts; `bench.md`, the success condition and the ledger updated together | **executed; Tier 1 failed 1/3** — [`plan9`](plan9.md), [`report9`](report9.md), [data](measurements/plan9/README.md). Product at 120 s / 192 MB: `easy-win` 3/3 (5.765 s, 54.9×, D14 accepted on all seeds), `core` 0/3 (≥ 240.0×), `deep-win` 0/3 (≥ 18.2×). Tier 2 not claimed; no ledger row. `REPLAY-BOUND` not started (Tier 1 red, wall target not retained). Recommendation: owner decision on reopening item 18 |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the
@@ -516,6 +515,15 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-10**: plan session 10. The owner takes report9's recommendation
+  and reopens **item 18** (restarts + core throughput) as
+  [`plan10`](plan10.md). The plan stages Tier 1 coverage at 120 s as
+  Checkpoint 1 and item 18's existing 10 s wall gate as Checkpoint 2, under
+  the named `RESTART-GEN` stack (D21): a deterministic restart schedule,
+  generation-aware TT replacement, and one Phase-A-selected per-expansion
+  work item. `REPLAY-BOUND` stays unstarted; the hand-guide/auxiliary line
+  stays closed; the 120 s budget is not raised. No code, no measurements, no
+  ledger row.
 - **2026-11-10**: plan9 (item 19) executed. Tier 1 coverage at 120 s / 192 MB:
   `easy-win` 3/3 (5.765 s median, 54.9×, D14 accepted on seeds 0–2),
   `core` 0/3 (≥ 240.0×) and `deep-win` 0/3 (≥ 18.2×) censored. Coverage is
