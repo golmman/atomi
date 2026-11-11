@@ -1,0 +1,12 @@
+# plan19 Phase A/B: the analysis-1 §4 "every class dn=1" parameter file.
+# Only dn moves: the class pn column keeps the product table.
+threat_pn=4
+threat_dn=1
+weak_pn=8
+weak_dn=1
+quiet_pn=9
+quiet_dn=1
+hanging_pn=15
+hanging_dn=1
+evasion_pn=1
+evasion_dn=1

@@ -37,7 +37,7 @@
 //! settle: their `rules::status` already decides every immediate explosion.
 
 use crate::guide::threat::{self, Settle};
-use crate::guide::{self, Guide, History, MoveClass};
+use crate::guide::{self, Guide, History, MoveClass, StartInput};
 use crate::mover::Mover;
 use crate::rules::{self, Status};
 use crate::search::value::{ANY, Child, INFINITY, OPEN_MAX, Value, pn_dn};
@@ -259,10 +259,14 @@ impl Frame {
         } else {
             Vec::new()
         };
-        let mut starts: Vec<(u32, u32)> = if guide_on {
+        let mut inputs: Vec<StartInput> = if guide_on {
             Vec::with_capacity(moves.len())
         } else {
             Vec::new()
+        };
+        let exact = guide::class::Exact {
+            threat_count: guide.config.threat_count,
+            hanging_quiet: guide.config.hanging_quiet,
         };
         let mut pending: Vec<(u64, Value)> = Vec::new();
         let mut settle_nodes = 0u64;
@@ -336,8 +340,10 @@ impl Frame {
                 }
             }
 
-            let class = if guide_on {
-                guide::class::classify(
+            let (class, or_number) = if guide_on {
+                guide::class::classify_exact(
+                    &exact,
+                    &mover_ctx,
                     board,
                     m,
                     &e,
@@ -345,7 +351,18 @@ impl Frame {
                     ctx.in_check && guide.config.check_evasions,
                 )
             } else {
-                MoveClass::Quiet
+                (MoveClass::Quiet, None)
+            };
+            // Plan-19 R1/R6: the AND class is 2 for a defence unlikely to
+            // refute (not a check, no blast capture of an attacker piece, no
+            // king contact), else 1.
+            let and_number = if guide_on
+                && !attacker_node
+                && !guide::class::defence_likely_to_refute(board, m, built.as_ref(), attacker)
+            {
+                2
+            } else {
+                1
             };
             if group_enabled {
                 plain_flags.push(
@@ -369,11 +386,8 @@ impl Frame {
             } else {
                 -ctx.eval
             };
-            let mut start = if matches!(value, Value::Open { .. }) {
-                guide.start_numbers(&ctx, class, attacker_node, mover, m, history, child_eval)
-            } else {
-                (0, 0)
-            };
+            let mut sim = 0i32;
+            let mut unlikely_prior = false;
             if let Some(child) = child_ref {
                 let sim_wanted = matches!(value, Value::Open { .. })
                     && guide_on
@@ -387,16 +401,15 @@ impl Frame {
                     let plies = guide.params.sim_plies.clamp(1, 255) as u8;
                     let (score, moves_made) = guide::simulate::playout_with(child, attacker, plies);
                     sim_nodes += moves_made;
-                    start = guide.sim_adjust(start.0, start.1, score);
+                    sim = score;
                 }
-                if matches!(value, Value::Open { .. })
+                // Plan-19 R6 replaces the product prior outright.
+                unlikely_prior = matches!(value, Value::Open { .. })
                     && !attacker_node
                     && guide.config.defender_priors
+                    && !guide.config.unlikely_exact
                     && !guide.config.null_exact
-                    && matches!(guide.replay(&ctx, child, attacker), Some((false, false)))
-                {
-                    start = guide.unlikely(start.0, start.1);
-                }
+                    && matches!(guide.replay(&ctx, child, attacker), Some((false, false)));
             }
             children.push(Child {
                 mv: m,
@@ -406,7 +419,15 @@ impl Frame {
             });
             keys.push(child_key);
             if guide_on {
-                starts.push(start);
+                inputs.push(StartInput {
+                    class,
+                    or_number,
+                    and_number,
+                    evasions: ctx.legal,
+                    child_eval,
+                    sim,
+                    unlikely_prior,
+                });
             }
             if matches!(value, Value::Open { .. }) {
                 if filtering {
@@ -430,7 +451,9 @@ impl Frame {
             }
         }
 
-        // Pass 3: repetition + lookup + fresh guide numbers.
+        // Pass 3: repetition + lookup, then the fresh guide numbers.
+        let mut starts: Vec<(u32, u32)> = vec![(1, 1); children.len()];
+        let mut fresh: Vec<bool> = vec![false; children.len()];
         for (i, c) in children.iter_mut().enumerate() {
             if !matches!(c.value, Value::Open { .. }) {
                 continue;
@@ -446,8 +469,29 @@ impl Frame {
             {
                 c.value = v;
             } else {
-                let (pn, dn) = if guide_on { starts[i] } else { (1, 1) };
-                c.value = Value::Open { pn, dn };
+                fresh[i] = true;
+                c.value = Value::Open { pn: 1, dn: 1 };
+            }
+        }
+        if guide_on {
+            // Plan-19 R3: the check number is the evasions still `Open` after
+            // pass 1 (a decided or settled evasion does not survive), capped
+            // at 8 — a post-pass, no second build and no movegen.
+            if guide.config.evasions_count && ctx.in_check {
+                let survived = guide::class::surviving_evasions(&children);
+                for input in inputs.iter_mut() {
+                    if input.class == MoveClass::Evasion {
+                        input.evasions = survived;
+                    }
+                }
+            }
+            for (i, c) in children.iter_mut().enumerate() {
+                if fresh[i] {
+                    let (pn, dn) =
+                        guide.start_numbers(&ctx, &inputs[i], attacker_node, mover, c.mv, history);
+                    c.value = Value::Open { pn, dn };
+                    starts[i] = (pn, dn);
+                }
             }
         }
         // Item-15 GROUP: partition the plain moves out of the OR children and

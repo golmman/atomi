@@ -8,6 +8,14 @@ comparable history. It is not a plan and not a report: plans live in
 
 ## Successor reading notes
 
+- **The product hand guide was a net loss on the tree** (analysis1 §1.2,
+  re-measured in plan19): `--guide hand` cost 0.97× of `--guide none` on
+  `core` at 20 M child evals (648,828 vs 630,056 expansions) and 12.79 M vs
+  9.27 M expansions tree-only at 120 s. Item 26 replaced its starting-number
+  algebra (report19): `--guide hand` is now R1+R3+R6 and cuts the tree
+  2.8–4.7× against the old product stack. Rows before plan19 measure the old
+  product stack; the `Stack` column says which.
+
 Differences from the predecessor ledger, stated once so the verbatim
 sections below stay untouched:
 
@@ -407,7 +415,9 @@ coverage clause superseded by D30; the item 24 authorisation stands.**
 **Pins.** `atomi@0c5a882+d` = atomi built from HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
 on a dirty tree (uncommitted work-in-progress) · `atomi@a4c135d+d` = atomi
 built from HEAD `a4c135d6ee1956588e01733bd101f6373e7d2e72` on a dirty tree
-(plan2 work uncommitted) · `solver@5f85133` =
+(plan2 work uncommitted) · `atomi@e71289b+d` = atomi built from HEAD
+`e71289b630f87137774810403492eedba10d22be` on a dirty tree (plan19 work
+uncommitted; binary sha256 `bf98c6df…`) · `solver@5f85133` =
 `5f85133ea9d751368a682e53e354bd3fc0016d00` · `provari-v0.1.0` =
 `48686bc6c786d6ea70568f0b2ad4002cf0520206` (the 1.000 side of every factor).
 
@@ -420,6 +430,7 @@ built from HEAD `a4c135d6ee1956588e01733bd101f6373e7d2e72` on a dirty tree
 | `plan2` | 2026-11-06 | `ae54d05b36f8` · `atomi@a4c135d+d` | atomi **m1** | censored (≥ 18.9) 10.003 s / 181.8 M | **10.897** (1.482 s / 30.3 M) | censored (≥ 1.48) 10.003 s / 186.6 M | **10.897** (1 cell) | 1/3 |
 | `plan2` (stretch) | 2026-11-06 | `ae54d05b36f8` · `provari-v0.2.0@224ce85` | v0.2.0 **hand** | 1.040× | 0.985× | 1.001× | **1.008** (3 cells, stretch block only) | 3/3 |
 | `plan15` | 2026-11-10 | `e10de197da58` · `atomi@8953596+d` | atomi **bare** (Tier 2, 10 s) | censored (≥ 20.49) 10.000 s / 162.5 M | **15.757** (1.686 s / 30.3 M) | censored (≥ 1.549) 10.000 s / 168.6 M | **15.757** (1 cell) | 1/3 |
+| `plan19` | 2026-11-11 | `e10de197da58` · `atomi@e71289b+d` | atomi **default** (NUMBERS-V1 R1+R3+R6, Tier 2, 10 s) | censored (≥ 19.31) 10.000 s | **57.0** (7.582 s) | censored (≥ 1.533) 10.000 s | **57.0** (1 cell) | 1/3 |
 
 Cell syntax: `factor (candidate wall / candidate evals)`; legacy evals are
 its `evals:` counter, atomi's are `child_evals`. Reference
@@ -442,6 +453,17 @@ with identical `child_evals` (30,245,030), `proof` written (2,083
 positions, length 17), `atomi validate` valid, `provari check` valid and
 positions == won_positions: `proof_verdict = accepted`. Censored cells
 needed no proof run.
+
+**plan19 status (2026-11-11, item 26; not a wall row):** the default's 120 s
+coverage is `core` **2/3** (118.0 / 115.1 s, seed 2 censored), `easy-win`
+**3/3** (7.6 / 16.8 / 10.4 s) and `deep-win` **0/3**; the product hand was
+`core` 0/3, `easy-win` 3/3 (22.0 / 29.8 / 10.6 s), `deep-win` 0/3. Tree-only
+the default cuts `core` 4.74×, `easy-win` 3.34× and `deep-win` 2.80× against
+the product hand (medians of seeds 0–2, 2 G child evals). The wall is now
+auxiliary-bound: `core` needs 84.8 M child evals tree-only (14 s) and ~115 s
+with the passes on. D14 16/16 accepted. No rung change; `T_2` still rests on
+the bare tree's `core` 3/3. Numbers:
+[`measurements/plan19/`](measurements/plan19/README.md).
 
 ### plan1 summary
 

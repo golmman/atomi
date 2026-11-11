@@ -18,6 +18,7 @@
 //! turns an `Open` value into `Proved`/`Refuted`.
 
 use crate::guide::threat;
+use crate::search::value::OPEN_MAX;
 use atomic_movegen::board::Board;
 use atomic_movegen::types::{Bitboard, Color, PieceType};
 
@@ -121,6 +122,46 @@ pub fn scale_weighted(pn: u32, dn: u32, eval: i32, weight: u32) -> (u32, u32) {
     let pn = (u64::from(pn) * 16 / f).max(1) as u32;
     let dn = (u64::from(dn) * f / 16).max(1) as u32;
     (pn, dn)
+}
+
+/// The EF-PN band step (plan-19 R2): `2` when the attacker is clearly ahead,
+/// `0` when clearly behind, `1` between. `edge` is in our own `hand_eval`
+/// units (`[-256, 256]`), not centipawns.
+pub fn band_step(attacker_eval: i32, edge: u32) -> u8 {
+    let edge = edge as i32;
+    if attacker_eval >= edge {
+        2
+    } else if attacker_eval <= -edge {
+        0
+    } else {
+        1
+    }
+}
+
+/// The banded, asymmetric EF-PN scaling of an attacker-oriented `(pn, dn)`
+/// pair (plan-19 R2).
+///
+/// The factors are EF-PN's at its own weighting (a = 10, b = 5): at an OR
+/// node the proof number — the deciding one there — takes `x{11, 6, 1}` and
+/// the disproof number `x{1, 11, 21}`; at an AND node the deciding disproof
+/// number takes `x{1, 6, 11}` and the summed proof number `x{21, 11, 1}`.
+/// A favourable attacker eval therefore makes the mover's deciding number
+/// cheaper at the OR node and dearer at the AND node. Rows are `step`
+/// 0 (defender ahead), 1 (even), 2 (attacker ahead).
+pub fn scale_banded(pn: u32, dn: u32, step: u8, attacker_node: bool) -> (u32, u32) {
+    const OR_PN: [u64; 3] = [11, 6, 1];
+    const OR_DN: [u64; 3] = [1, 11, 21];
+    const AND_PN: [u64; 3] = [21, 11, 1];
+    const AND_DN: [u64; 3] = [1, 6, 11];
+    let i = usize::from(step.min(2));
+    let (fp, fd) = if attacker_node {
+        (OR_PN[i], OR_DN[i])
+    } else {
+        (AND_PN[i], AND_DN[i])
+    };
+    let pn = (u64::from(pn) * fp).min(u64::from(OPEN_MAX)) as u32;
+    let dn = (u64::from(dn) * fd).min(u64::from(OPEN_MAX)) as u32;
+    (pn.max(1), dn.max(1))
 }
 
 #[cfg(test)]

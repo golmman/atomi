@@ -38,25 +38,21 @@ pub struct Options {
 /// Parse `classify` arguments (everything after the subcommand).
 pub fn parse(args: &[String]) -> Result<Options, String> {
     let mut fen: Option<String> = None;
-    let mut guide = GuideConfig::none();
+    let mut guide_args = crate::cli::GuideArgs::new();
     let mut guide_params = GuideParams::default();
     let mut seed = 0u64;
     let mut attacker = None;
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--guide-group" {
-            guide.group = true;
-            i += 1;
-            continue;
-        }
-        if arg == "--guide-fresh-dn" {
-            guide.fresh_dn = true;
-            i += 1;
-            continue;
-        }
-        if arg == "--guide-replay-exact" {
-            guide.replay_exact = true;
+        // Value-less guide switches are deferred with the rest (D33).
+        if let Some(name) = arg.strip_prefix("--guide-").filter(|n| {
+            matches!(
+                *n,
+                "group" | "fresh-dn" | "replay-exact" | "sim-exact" | "null-exact"
+            )
+        }) {
+            guide_args.flag(name)?;
             i += 1;
             continue;
         }
@@ -65,23 +61,9 @@ pub fn parse(args: &[String]) -> Result<Options, String> {
                 .get(i + 1)
                 .ok_or_else(|| format!("missing value for {arg}"))?;
             match arg.as_str() {
-                "--guide" => {
-                    guide = match value.as_str() {
-                        "none" => GuideConfig::none(),
-                        "hand" => GuideConfig::hand(),
-                        other => return Err(format!("bad value for {arg}: {other}")),
-                    }
-                }
-                "--guide-off" => {
-                    for name in value.split(',').filter(|s| !s.is_empty()) {
-                        guide.set_off(name)?;
-                    }
-                }
-                "--guide-on" => {
-                    for name in value.split(',').filter(|s| !s.is_empty()) {
-                        guide.set_on(name)?;
-                    }
-                }
+                "--guide" => guide_args.base(value)?,
+                "--guide-off" => guide_args.switches(value, false)?,
+                "--guide-on" => guide_args.switches(value, true)?,
                 "--guide-params" => {
                     let text = std::fs::read_to_string(value)
                         .map_err(|e| format!("bad value for {arg}: {e}"))?;
@@ -129,7 +111,7 @@ pub fn parse(args: &[String]) -> Result<Options, String> {
     Board::from_fen_with(&fen, FenPolicy::Strict).map_err(|_| format!("bad FEN: {fen}"))?;
     Ok(Options {
         fen,
-        guide,
+        guide: guide_args.resolve(),
         guide_params,
         seed,
         attacker,
@@ -156,37 +138,13 @@ where
 }
 
 /// The class pair before `fresh_dn`, `global_scale` and EF-PN, oriented for
-/// the node kind. This is the pair the item-15 predicates name.
-fn base_pair(
-    guide: &Guide,
-    ctx: &guide::NodeContext,
-    class: MoveClass,
-    attacker_node: bool,
-) -> (u32, u32) {
+/// the node kind: the guide's base pair for a fresh child. This is the pair
+/// the item-15 predicates name.
+fn base_pair(guide: &Guide, input: &guide::StartInput, attacker_node: bool) -> (u32, u32) {
     if !guide.config.enabled {
         return (1, 1);
     }
-    let base = if class == MoveClass::Evasion && guide.config.check_evasions {
-        guide::Pair {
-            pn: ctx.legal.max(1),
-            dn: ctx.legal.max(1),
-        }
-    } else if class == MoveClass::Quiet {
-        if guide.config.quiet_grouping {
-            guide.params.quiet
-        } else {
-            guide::Pair { pn: 1, dn: 1 }
-        }
-    } else if guide.config.move_classes {
-        guide.params.pair(class)
-    } else {
-        guide::Pair { pn: 1, dn: 1 }
-    };
-    if attacker_node {
-        (base.pn, base.dn)
-    } else {
-        (base.dn, base.pn)
-    }
+    guide.base_pair(input, attacker_node)
 }
 
 /// Run the diagnostic and return the JSON line.
@@ -222,8 +180,14 @@ pub fn run(opts: &Options) -> Result<String, String> {
             child.do_move(m, &mut StateInfo::new());
             built = Some(child);
         }
-        let class = if guide.config.enabled {
-            guide::class::classify(
+        let exact = guide::class::Exact {
+            threat_count: guide.config.threat_count,
+            hanging_quiet: guide.config.hanging_quiet,
+        };
+        let (class, or_number) = if guide.config.enabled {
+            guide::class::classify_exact(
+                &exact,
+                &mover_ctx,
                 &board,
                 m,
                 &effect,
@@ -231,7 +195,24 @@ pub fn run(opts: &Options) -> Result<String, String> {
                 in_check && guide.config.check_evasions,
             )
         } else {
-            MoveClass::Quiet
+            (MoveClass::Quiet, None)
+        };
+        let and_number = if guide.config.enabled
+            && !attacker_node
+            && !guide::class::defence_likely_to_refute(&board, m, built.as_ref(), attacker)
+        {
+            2
+        } else {
+            1
+        };
+        let input = guide::StartInput {
+            class,
+            or_number,
+            and_number,
+            evasions: legal.max(1),
+            child_eval: 0,
+            sim: 0,
+            unlikely_prior: false,
         };
         let child_eval = if !guide.config.enabled {
             0
@@ -247,15 +228,18 @@ pub fn run(opts: &Options) -> Result<String, String> {
         } else {
             -ctx.eval
         };
-        let (base_pn, base_dn) = base_pair(&guide, &ctx, class, attacker_node);
+        let input = guide::StartInput {
+            child_eval,
+            ..input
+        };
+        let (base_pn, base_dn) = base_pair(&guide, &input, attacker_node);
         let (pn, dn) = guide.start_numbers(
             &ctx,
-            class,
+            &input,
             attacker_node,
             board.side_to_move(),
             m,
             &history,
-            child_eval,
         );
         let metric = if attacker_node { pn } else { dn };
         let class_rank = if order_classes { class.rank() } else { 0 };
@@ -337,7 +321,7 @@ mod tests {
         // Qxg8 explodes the black commoner on h8; EF-PN is neutralised so
         // the fresh class pair is visible.
         let fen = "6rk/8/8/8/8/8/8/6QK w - - 0 1";
-        let mut o = opts(fen, GuideConfig::hand());
+        let mut o = opts(fen, GuideConfig::product());
         o.guide_params.ef_weight = 0;
         let v = parse_line(&run(&o).unwrap());
         let qxg8 = v["moves"]
@@ -356,7 +340,7 @@ mod tests {
     #[test]
     fn check_node_uses_the_legal_count() {
         let fen = "4k3/8/8/8/8/8/8/4K2r w - - 0 1";
-        let v = parse_line(&run(&opts(fen, GuideConfig::hand())).unwrap());
+        let v = parse_line(&run(&opts(fen, GuideConfig::product())).unwrap());
         assert_eq!(v["in_check"], true);
         let legal = v["legal"].as_u64().unwrap();
         for m in v["moves"].as_array().unwrap() {

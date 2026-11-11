@@ -49,6 +49,32 @@ impl EfPnMode {
     }
 }
 
+/// The mechanism names `--guide-on` / `--guide-off` accept (D33: parsing
+/// defers them, so the list lives here next to `GuideConfig::set_switch`.
+pub const MECHANISMS: [&str; 21] = [
+    "classes",
+    "evasions",
+    "quiet",
+    "efpn",
+    "closures",
+    "priors",
+    "history",
+    "sim",
+    "replay",
+    "group",
+    "fresh-dn",
+    "replay-exact",
+    "sim-exact",
+    "null-exact",
+    "fresh-class",
+    "efpn-banded",
+    "evasions-count",
+    "threat-count",
+    "hanging-quiet",
+    "unlikely-exact",
+    "numbers",
+];
+
 /// One runtime switch per mechanism, so the ablations are flags.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct GuideConfig {
@@ -88,6 +114,24 @@ pub struct GuideConfig {
     /// verified replay of a null-position proof (`--guide-null-exact`,
     /// default off).
     pub null_exact: bool,
+    /// Plan-19 R1 `fresh-class`: a fresh child's deciding number is its
+    /// class and the other number is 1 (`--guide-on fresh-class`).
+    pub fresh_class: bool,
+    /// Plan-19 R2 `efpn-banded`: EF-PN as a three-step band from the
+    /// parent's eval (`--guide-on efpn-banded`).
+    pub efpn_banded: bool,
+    /// Plan-19 R3 `evasions-count`: the check number is the surviving
+    /// evasions, capped (`--guide-on evasions-count`).
+    pub evasions_count: bool,
+    /// Plan-19 R4 `threat-count`: the OR number comes from the child's
+    /// explosion-target count (`--guide-on threat-count`).
+    pub threat_count: bool,
+    /// Plan-19 R5 `hanging-quiet`: hanging means a quiet move whose piece
+    /// the defender blasts cheaply (`--guide-on hanging-quiet`).
+    pub hanging_quiet: bool,
+    /// Plan-19 R6 `unlikely-exact`: the `UNLIKELY` prior sets the pair
+    /// outright (`--guide-on unlikely-exact`).
+    pub unlikely_exact: bool,
 }
 
 impl GuideConfig {
@@ -96,8 +140,21 @@ impl GuideConfig {
         GuideConfig::default()
     }
 
-    /// The full hand-guide stack (`--guide hand`).
+    /// The shipped hand guide (`--guide hand`): the product stack plus the
+    /// plan-19 starting-number algebra R1, R3 and R6 (report19 §5). R2
+    /// (`efpn_banded`) and R4/R5 (`threat_count`, `hanging_quiet`) are
+    /// rejected by the post-gate ablations and stay opt-in.
     pub fn hand() -> GuideConfig {
+        let mut c = GuideConfig::product();
+        c.r1_r3();
+        c.unlikely_exact = true;
+        c
+    }
+
+    /// The hand guide before plan19 (the ablations' control). `--guide hand
+    /// --guide-off fresh-class,evasions-count,unlikely-exact` spells this
+    /// configuration on the shipped binary.
+    pub fn product() -> GuideConfig {
         GuideConfig {
             enabled: true,
             move_classes: true,
@@ -114,22 +171,55 @@ impl GuideConfig {
             replay_exact: false,
             sim_exact: false,
             null_exact: false,
+            fresh_class: false,
+            efpn_banded: false,
+            evasions_count: false,
+            threat_count: false,
+            hanging_quiet: false,
+            unlikely_exact: false,
         }
+    }
+
+    /// The plan-19 NUMBERS-V1 stack (R1-R6) on top of the bare skeleton.
+    pub fn numbers() -> GuideConfig {
+        let mut c = GuideConfig::none();
+        c.set_on("numbers").expect("numbers is a mechanism");
+        c
+    }
+
+    /// Plan-19's adopted pair mechanism (R1+R3) without R6, used by
+    /// [`GuideConfig::hand`].
+    fn r1_r3(&mut self) {
+        self.fresh_class = true;
+        self.evasions_count = true;
+        self.enabled = true;
+    }
+
+    /// Turn the six NUMBERS-V1 mechanisms on or off together.
+    fn numbers_switches(&mut self, on: bool) {
+        self.fresh_class = on;
+        self.efpn_banded = on;
+        self.evasions_count = on;
+        self.threat_count = on;
+        self.hanging_quiet = on;
+        self.unlikely_exact = on;
     }
 
     /// Switch one named mechanism off (`--guide-off`).
     pub fn set_off(&mut self, name: &str) -> Result<(), String> {
-        self.set(name, false)
+        self.set_switch(name, false)
     }
 
-    /// Switch one named mechanism on (`--guide-on`).
+    /// Switch one named mechanism on (`--guide-on`), enabling the guide.
     pub fn set_on(&mut self, name: &str) -> Result<(), String> {
-        self.set(name, true)?;
+        self.set_switch(name, true)?;
         self.enabled = true;
         Ok(())
     }
 
-    fn set(&mut self, name: &str, on: bool) -> Result<(), String> {
+    /// Switch one named mechanism without changing `enabled`: a value-less
+    /// switch such as `--guide-group` on a `--guide none` base stays inert.
+    pub(crate) fn set_switch(&mut self, name: &str, on: bool) -> Result<(), String> {
         match name {
             "classes" => self.move_classes = on,
             "evasions" => self.check_evasions = on,
@@ -145,6 +235,13 @@ impl GuideConfig {
             "replay-exact" => self.replay_exact = on,
             "sim-exact" => self.sim_exact = on,
             "null-exact" => self.null_exact = on,
+            "fresh-class" => self.fresh_class = on,
+            "efpn-banded" => self.efpn_banded = on,
+            "evasions-count" => self.evasions_count = on,
+            "threat-count" => self.threat_count = on,
+            "hanging-quiet" => self.hanging_quiet = on,
+            "unlikely-exact" => self.unlikely_exact = on,
+            "numbers" => self.numbers_switches(on),
             _ => return Err(format!("unknown guide mechanism: {name}")),
         }
         Ok(())
@@ -188,6 +285,9 @@ pub struct GuideParams {
     pub global_scale: u32,
     /// EF-PN weight (`16` = plan3 identity; `0` neutralises the eval).
     pub ef_weight: u32,
+    /// Plan-19 R2: the EF-PN band edge in `hand_eval` units (`[-256, 256]`);
+    /// `0` puts every parent in the middle step.
+    pub ef_band: u32,
     /// Per-frame settle budget in settle work units (`0` = unlimited).
     pub max_settle: u32,
     /// Per-frame simulation budget in playout moves (`0` = unlimited).
@@ -209,6 +309,7 @@ impl Default for GuideParams {
             evasion: Pair { pn: 1, dn: 1 },
             global_scale: 1,
             ef_weight: 16,
+            ef_band: 128,
             max_settle: 0,
             max_sim: 0,
             aux_budget: 0,
@@ -247,7 +348,7 @@ impl GuideParams {
                 .map_err(|_| format!("params line {}: bad value {value}", index + 1))?;
             let zero_ok = matches!(
                 key.trim(),
-                "ef_weight" | "max_sim" | "max_settle" | "aux_budget" | "sim_plies"
+                "ef_weight" | "ef_band" | "max_sim" | "max_settle" | "aux_budget" | "sim_plies"
             );
             if (v == 0 && !zero_ok) || v > u64::from(OPEN_MAX) {
                 return Err(format!("params line {}: {v} out of range", index + 1));
@@ -266,6 +367,7 @@ impl GuideParams {
                 "evasion_dn" => p.evasion.dn = v32,
                 "global_scale" => p.global_scale = v32,
                 "ef_weight" => p.ef_weight = v32,
+                "ef_band" => p.ef_band = v32,
                 "max_sim" => p.max_sim = v32,
                 "max_settle" => p.max_settle = v32,
                 "aux_budget" => p.aux_budget = v,
@@ -290,10 +392,11 @@ impl GuideParams {
             out.push_str(&format!("{name}_pn={}\n{name}_dn={}\n", p.pn, p.dn));
         }
         out.push_str(&format!(
-            "global_scale={}\nef_weight={}\nmax_sim={}\nmax_settle={}\n\
+            "global_scale={}\nef_weight={}\nef_band={}\nmax_sim={}\nmax_settle={}\n\
              aux_budget={}\nsim_plies={}\n",
             self.global_scale,
             self.ef_weight,
+            self.ef_band,
             self.max_sim,
             self.max_settle,
             self.aux_budget,
@@ -301,6 +404,27 @@ impl GuideParams {
         ));
         out
     }
+}
+
+/// The per-child inputs of a fresh pair (plan-19 R1/R3/R4/R6).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct StartInput {
+    /// The move's class.
+    pub class: MoveClass,
+    /// R4/R5's exact OR number, when they decide one.
+    pub or_number: Option<u32>,
+    /// The AND class: `2` when the defence is unlikely to refute (R1's
+    /// class and R6's previous pair), else `1`.
+    pub and_number: u32,
+    /// The surviving evasions (R3), else the parent's legal move count.
+    pub evasions: u32,
+    /// The child's eval, attacker-oriented (legacy EF-PN only).
+    pub child_eval: i32,
+    /// The sibling simulation's score for this child (0 = none).
+    pub sim: i32,
+    /// The legacy signature prior applies to this defence (pre-plan-19
+    /// `UNLIKELY`; off once R6 sets the pair outright).
+    pub unlikely_prior: bool,
 }
 
 /// Per-node guide context (computed once per frame).
@@ -356,7 +480,7 @@ impl Guide {
                 null_sig: None,
             };
         }
-        let eval = if self.config.ef_pn != EfPnMode::Off {
+        let eval = if self.config.ef_pn != EfPnMode::Off || self.config.efpn_banded {
             eval::hand_eval(board)
         } else {
             0
@@ -380,68 +504,118 @@ impl Guide {
     }
 
     /// The starting `(pn, dn)` pair for a fresh child, attacker-oriented.
-    #[allow(clippy::too_many_arguments)]
+    ///
+    /// Order: the base pair (R1's class-only pair, or the product table),
+    /// `global_scale`, the exact `UNLIKELY` pair (R6), the history prior, the
+    /// parent-eval band (R2), the legacy per-child EF-PN and the sibling
+    /// simulation. Every step only reorders `Open` numbers; none decides a
+    /// value.
     pub fn start_numbers(
         &self,
         ctx: &NodeContext,
-        class: MoveClass,
+        input: &StartInput,
         attacker_node: bool,
         side: Color,
         mv: Move,
         history: &History,
-        child_eval: i32,
     ) -> (u32, u32) {
         if !self.config.enabled {
             return (1, 1);
         }
-        let base = if class == MoveClass::Evasion && self.config.check_evasions {
-            Pair {
-                pn: ctx.legal.max(1),
-                dn: ctx.legal.max(1),
-            }
-        } else if class == MoveClass::Quiet {
-            if self.config.quiet_grouping {
-                self.params.quiet
-            } else {
-                Pair { pn: 1, dn: 1 }
-            }
-        } else if self.config.move_classes {
-            self.params.pair(class)
-        } else {
-            Pair { pn: 1, dn: 1 }
-        };
-        let (mut pn, mut dn) = if attacker_node {
-            (base.pn, base.dn)
-        } else {
-            (base.dn, base.pn)
-        };
-        // Plan-13 conformance probe: a fresh disproof number is 1, not the
-        // invented complementary base.
-        if self.config.fresh_dn {
-            dn = 1;
-        }
-        // Calibration (plan4): the fresh base magnitude only. Decided values
-        // never pass through here.
+        let c = &self.config;
+        let (mut pn, mut dn) = self.base_pair(input, attacker_node);
+        // Calibration (plan4): the fresh base magnitude only.
         let scale = u64::from(self.params.global_scale);
         if scale != 1 {
             pn = (u64::from(pn) * scale).min(u64::from(OPEN_MAX)) as u32;
             dn = (u64::from(dn) * scale).min(u64::from(OPEN_MAX)) as u32;
         }
+        // R6: a defence unlikely to refute starts as `(1, 2)` outright.
+        if c.unlikely_exact && !attacker_node && input.and_number == 2 {
+            (pn, dn) = (1, 2);
+        }
         // Defence/attacker history: good for the mover is good for the
         // mover's orientation, so at AND nodes the attacker numbers invert.
-        if self.config.defender_priors {
+        if c.defender_priors {
             let h = i32::from(history.score(side, mv));
             if h > 0 {
                 let e = if attacker_node { h } else { -h };
                 (pn, dn) = eval::scale(pn, dn, e);
             }
         }
-        if self.config.ef_pn != EfPnMode::Off
-            && (attacker_node || self.config.ef_pn == EfPnMode::Both)
-        {
-            (pn, dn) = eval::scale_weighted(pn, dn, child_eval, self.params.ef_weight);
+        // R2: the three-step band from the parent's eval, both node kinds.
+        if c.efpn_banded {
+            let oriented = if attacker_node { ctx.eval } else { -ctx.eval };
+            let step = eval::band_step(oriented, self.params.ef_band);
+            (pn, dn) = eval::scale_banded(pn, dn, step, attacker_node);
+        }
+        if c.ef_pn != EfPnMode::Off && (attacker_node || c.ef_pn == EfPnMode::Both) {
+            (pn, dn) = eval::scale_weighted(pn, dn, input.child_eval, self.params.ef_weight);
+        }
+        if c.sibling_sim && input.sim != 0 {
+            (pn, dn) = self.sim_adjust(pn, dn, input.sim);
+        }
+        // The product `UNLIKELY` prior (the null-signature replay), kept for
+        // the pre-plan-19 configurations.
+        if input.unlikely_prior {
+            (pn, dn) = self.unlikely(pn, dn);
         }
         (pn.clamp(1, OPEN_MAX), dn.clamp(1, OPEN_MAX))
+    }
+
+    /// The base pair of a fresh child, attacker-oriented: before
+    /// `global_scale`, the priors, EF-PN and the simulation.
+    ///
+    /// R1 (`fresh-class`): the deciding number is the class and the other
+    /// number is 1 — `(class, 1)` at an OR node, `(1, class)` at an AND node
+    /// with the AND class in `{1, 2}` (2 for a defence unlikely to refute).
+    /// Otherwise the product table, with the R3 evasion count as the check
+    /// base and the plan-13 `fresh-dn` patch.
+    pub fn base_pair(&self, input: &StartInput, attacker_node: bool) -> (u32, u32) {
+        let c = &self.config;
+        if c.fresh_class {
+            return if attacker_node {
+                (self.or_number(input), 1)
+            } else {
+                (1, input.and_number.clamp(1, 2))
+            };
+        }
+        let base = if input.class == MoveClass::Evasion && c.check_evasions {
+            Pair {
+                pn: input.evasions.max(1),
+                dn: input.evasions.max(1),
+            }
+        } else if input.class == MoveClass::Quiet {
+            if c.quiet_grouping {
+                self.params.quiet
+            } else {
+                Pair { pn: 1, dn: 1 }
+            }
+        } else if c.move_classes {
+            self.params.pair(input.class)
+        } else {
+            Pair { pn: 1, dn: 1 }
+        };
+        let (pn, dn) = if attacker_node {
+            (base.pn, base.dn)
+        } else {
+            (base.dn, base.pn)
+        };
+        // Plan-13 conformance probe: a fresh disproof number is 1.
+        (pn, if c.fresh_dn { 1 } else { dn })
+    }
+
+    /// The OR deciding number of a fresh child under R1: R4's exact count
+    /// when it decides, else the surviving evasion count, else the class
+    /// table.
+    fn or_number(&self, input: &StartInput) -> u32 {
+        if let Some(pn) = input.or_number {
+            return pn.clamp(1, OPEN_MAX);
+        }
+        if input.class == MoveClass::Evasion && self.config.check_evasions {
+            return input.evasions.clamp(1, OPEN_MAX);
+        }
+        self.params.pair(input.class).pn.clamp(1, OPEN_MAX)
     }
 
     /// The simulation adjustment: `score` is from the attacker's perspective
@@ -499,48 +673,41 @@ mod tests {
         Move::make_move(Square::E2, Square::E4)
     }
 
+    /// A plain fresh-pair input: no exact number, AND class 1, the context's
+    /// legal count, no child eval and no simulation.
+    fn si(class: MoveClass) -> StartInput {
+        StartInput {
+            class,
+            or_number: None,
+            and_number: 1,
+            evasions: 12,
+            child_eval: 0,
+            sim: 0,
+            unlikely_prior: false,
+        }
+    }
+
+    fn start(g: &Guide, c: &NodeContext, input: &StartInput, attacker_node: bool) -> (u32, u32) {
+        let h = History::new();
+        g.start_numbers(c, input, attacker_node, Color::White, mv(), &h)
+    }
+
     #[test]
     fn disabled_guide_is_identity() {
         let g = Guide::new(GuideConfig::none());
-        let h = History::new();
-        assert_eq!(
-            g.start_numbers(
-                &ctx(false),
-                MoveClass::Threat,
-                true,
-                Color::White,
-                mv(),
-                &h,
-                0
-            ),
-            (1, 1)
-        );
-        assert_eq!(
-            g.start_numbers(
-                &ctx(true),
-                MoveClass::Evasion,
-                false,
-                Color::White,
-                mv(),
-                &h,
-                0
-            ),
-            (1, 1)
-        );
+        for attacker_node in [true, false] {
+            for class in [MoveClass::Threat, MoveClass::Evasion, MoveClass::Quiet] {
+                assert_eq!(start(&g, &ctx(false), &si(class), attacker_node), (1, 1));
+            }
+        }
     }
 
     #[test]
     fn class_pairs_are_oriented_and_positive() {
-        let g = Guide::new(GuideConfig::hand());
-        let h = History::new();
-        let c = NodeContext {
-            eval: 0,
-            ..ctx(false)
-        };
-        let (pn, dn) = g.start_numbers(&c, MoveClass::Threat, true, Color::White, mv(), &h, 0);
-        assert_eq!((pn, dn), (4, 16));
-        let (pn, dn) = g.start_numbers(&c, MoveClass::Threat, false, Color::White, mv(), &h, 0);
-        assert_eq!((pn, dn), (16, 4));
+        let g = Guide::new(GuideConfig::product());
+        let c = ctx(false);
+        assert_eq!(start(&g, &c, &si(MoveClass::Threat), true), (4, 16));
+        assert_eq!(start(&g, &c, &si(MoveClass::Threat), false), (16, 4));
         for class in [
             MoveClass::Threat,
             MoveClass::WeakThreat,
@@ -549,7 +716,7 @@ mod tests {
             MoveClass::Evasion,
         ] {
             for attacker_node in [true, false] {
-                let (pn, dn) = g.start_numbers(&c, class, attacker_node, Color::White, mv(), &h, 0);
+                let (pn, dn) = start(&g, &c, &si(class), attacker_node);
                 assert!(pn >= 1 && dn >= 1 && pn <= OPEN_MAX && dn <= OPEN_MAX);
             }
         }
@@ -557,16 +724,23 @@ mod tests {
 
     #[test]
     fn evasion_base_is_the_legal_move_count() {
-        let g = Guide::new(GuideConfig::hand());
-        let h = History::new();
-        let c = NodeContext {
-            legal: 7,
-            ..ctx(true)
+        let g = Guide::new(GuideConfig::product());
+        let c = ctx(true);
+        let legal = StartInput {
+            evasions: 7,
+            ..si(MoveClass::Evasion)
         };
-        assert_eq!(
-            g.start_numbers(&c, MoveClass::Evasion, true, Color::White, mv(), &h, 0),
-            (7, 7)
-        );
+        assert_eq!(start(&g, &c, &legal, true), (7, 7));
+        // R3 hands the surviving count in place of the legal count.
+        let g3 = Guide::new(GuideConfig {
+            evasions_count: true,
+            ..GuideConfig::product()
+        });
+        let input = StartInput {
+            evasions: 3,
+            ..si(MoveClass::Evasion)
+        };
+        assert_eq!(start(&g3, &c, &input, true), (3, 3));
     }
 
     #[test]
@@ -583,16 +757,181 @@ mod tests {
         for attacker_node in [true, false] {
             let (pn, dn) = g.start_numbers(
                 &c,
-                MoveClass::Quiet,
+                &si(MoveClass::Quiet),
                 attacker_node,
                 Color::White,
                 mv(),
                 &h,
-                0,
             );
             assert!(pn >= 1 && dn >= 1 && pn < crate::search::value::INFINITY);
             assert!(dn < crate::search::value::INFINITY);
         }
+    }
+
+    /// R1: a fresh child's deciding number is its class and the other number
+    /// is 1 — `(class, 1)` at an OR node, `(1, class)` at an AND node with
+    /// the AND class in `{1, 2}`. `--guide none` stays `(1, 1)`.
+    #[test]
+    fn fresh_class_pair_on_both_node_kinds() {
+        let g = Guide::new(GuideConfig {
+            enabled: true,
+            fresh_class: true,
+            ..GuideConfig::none()
+        });
+        let c = ctx(false);
+        assert_eq!(start(&g, &c, &si(MoveClass::Quiet), true), (9, 1));
+        assert_eq!(start(&g, &c, &si(MoveClass::Threat), true), (4, 1));
+        assert_eq!(start(&g, &c, &si(MoveClass::Quiet), false), (1, 1));
+        let unlikely = StartInput {
+            and_number: 2,
+            ..si(MoveClass::Quiet)
+        };
+        assert_eq!(start(&g, &c, &unlikely, false), (1, 2));
+        // R4's exact number wins over the table at an OR node.
+        let exact = StartInput {
+            or_number: Some(1),
+            ..si(MoveClass::Threat)
+        };
+        assert_eq!(start(&g, &c, &exact, true), (1, 1));
+        // The guide off stays the identity for both node kinds.
+        let off = Guide::new(GuideConfig::none());
+        assert_eq!(start(&off, &c, &si(MoveClass::Threat), true), (1, 1));
+        assert_eq!(start(&off, &c, &unlikely, false), (1, 1));
+        // The aggregate switch turns R1 on (the R2 band scales the pair
+        // afterwards, so the base is what this pins).
+        let n = Guide::new(GuideConfig::numbers());
+        assert_eq!(n.base_pair(&si(MoveClass::Quiet), true), (9, 1));
+        assert_eq!(n.base_pair(&unlikely, false), (1, 2));
+    }
+
+    /// Plan-19 §7: the shipped `--guide hand` is the product stack plus R1,
+    /// R3 and R6; R2 and R4/R5 stay opt-in.
+    #[test]
+    fn hand_is_the_adopted_numbers_arm() {
+        let hand = GuideConfig::hand();
+        let product = GuideConfig::product();
+        assert!(hand.fresh_class && hand.evasions_count && hand.unlikely_exact);
+        assert!(!hand.efpn_banded && !hand.threat_count && !hand.hanging_quiet);
+        // Every other product switch is untouched.
+        assert_eq!(
+            GuideConfig {
+                fresh_class: false,
+                evasions_count: false,
+                unlikely_exact: false,
+                ..hand
+            },
+            product
+        );
+        // The explicit spelling on the CLI resolves to the same config.
+        let args: Vec<String> = [
+            "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1",
+            "--guide",
+            "hand",
+            "--guide-on",
+            "numbers",
+            "--guide-off",
+            "efpn-banded,threat-count,hanging-quiet",
+        ]
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+        assert_eq!(crate::cli::parse_prove(&args).unwrap().guide, hand);
+    }
+
+    /// R6: a defence unlikely to refute starts as `(1, 2)` outright; the
+    /// product prior's `pn/2, dn*2` no longer applies.
+    #[test]
+    fn unlikely_exact_sets_the_pair_outright() {
+        let g = Guide::new(GuideConfig {
+            unlikely_exact: true,
+            ..GuideConfig::product()
+        });
+        let c = ctx(false);
+        let unlikely = StartInput {
+            and_number: 2,
+            ..si(MoveClass::Threat)
+        };
+        assert_eq!(start(&g, &c, &unlikely, false), (1, 2));
+        let likely = StartInput {
+            and_number: 1,
+            ..si(MoveClass::Threat)
+        };
+        assert_eq!(start(&g, &c, &likely, false), (16, 4));
+        // OR children are untouched.
+        assert_eq!(start(&g, &c, &unlikely, true), (4, 16));
+    }
+
+    /// R2: the band is three steps from the parent's eval, applied at both
+    /// node kinds: the deciding number takes the larger factor swing.
+    #[test]
+    fn efpn_banded_steps_both_node_kinds() {
+        let g = Guide::new(GuideConfig {
+            enabled: true,
+            fresh_class: true,
+            efpn_banded: true,
+            ..GuideConfig::none()
+        });
+        let input = StartInput {
+            or_number: Some(9),
+            ..si(MoveClass::Quiet)
+        };
+        // `ahead` is the attacker's eval: at an AND node the parent's eval is
+        // read from the defender's side, hence the sign flip.
+        let or = |ahead: i32| {
+            start(
+                &g,
+                &NodeContext {
+                    eval: ahead,
+                    ..ctx(false)
+                },
+                &input,
+                true,
+            )
+        };
+        let and = |ahead: i32| {
+            start(
+                &g,
+                &NodeContext {
+                    eval: -ahead,
+                    ..ctx(false)
+                },
+                &input,
+                false,
+            )
+        };
+        // OR: the proof number is the deciding one.
+        assert_eq!(or(128), (9, 21));
+        assert_eq!(or(0), (54, 11));
+        assert_eq!(or(-128), (99, 1));
+        // AND: the disproof number is the deciding one.
+        assert_eq!(and(128), (1, 11));
+        assert_eq!(and(0), (11, 6));
+        assert_eq!(and(-128), (21, 1));
+        // The eval is read at the parent, oriented to the attacker.
+        let tight = Guide::new(GuideConfig {
+            enabled: true,
+            fresh_class: true,
+            efpn_banded: true,
+            ..GuideConfig::none()
+        })
+        .with_params(GuideParams {
+            ef_band: 64,
+            ..GuideParams::default()
+        });
+        let (pn, _) = start(
+            &tight,
+            &NodeContext {
+                eval: 128,
+                ..ctx(false)
+            },
+            &input,
+            true,
+        );
+        assert_eq!(pn, 9, "eval 128 is beyond a 64 edge");
+        // Edges: step 2 at exactly the edge, step 1 just inside it.
+        assert_eq!(eval::band_step(64, 64), 2);
+        assert_eq!(eval::band_step(63, 64), 1);
+        assert_eq!(eval::band_step(-64, 64), 0);
     }
 
     #[test]
@@ -622,6 +961,12 @@ mod tests {
             ("replay-exact", |c| c.replay_exact),
             ("sim-exact", |c| c.sim_exact),
             ("null-exact", |c| c.null_exact),
+            ("fresh-class", |c| c.fresh_class),
+            ("efpn-banded", |c| c.efpn_banded),
+            ("evasions-count", |c| c.evasions_count),
+            ("threat-count", |c| c.threat_count),
+            ("hanging-quiet", |c| c.hanging_quiet),
+            ("unlikely-exact", |c| c.unlikely_exact),
         ] {
             let base = GuideConfig::hand();
             let mut off = base;
@@ -639,6 +984,7 @@ mod tests {
         p.threat.pn = 3;
         p.global_scale = 64;
         p.ef_weight = 0;
+        p.ef_band = 64;
         p.max_sim = 7;
         p.max_settle = 0;
         p.aux_budget = 123_456_789;
@@ -658,6 +1004,8 @@ mod tests {
             123_456_789
         );
         assert_eq!(GuideParams::parse("sim_plies=2").unwrap().sim_plies, 2);
+        assert_eq!(GuideParams::parse("ef_band=0").unwrap().ef_band, 0);
+        assert_eq!(GuideParams::parse("ef_band=64").unwrap().ef_band, 64);
     }
 
     #[test]
@@ -665,30 +1013,33 @@ mod tests {
         let h = History::new();
         let c = ctx(false);
         let mut p = GuideParams::default();
-        let g = Guide::new(GuideConfig::hand()).with_params(p);
+        let g = Guide::new(GuideConfig::product()).with_params(p);
         assert_eq!(
-            g.start_numbers(&c, MoveClass::Threat, true, Color::White, mv(), &h, 0),
+            g.start_numbers(&c, &si(MoveClass::Threat), true, Color::White, mv(), &h),
             (4, 16)
         );
         p.global_scale = 4;
-        let g = Guide::new(GuideConfig::hand()).with_params(p);
+        let g = Guide::new(GuideConfig::product()).with_params(p);
         assert_eq!(
-            g.start_numbers(&c, MoveClass::Threat, true, Color::White, mv(), &h, 0),
+            g.start_numbers(&c, &si(MoveClass::Threat), true, Color::White, mv(), &h),
             (16, 64)
         );
         // Weight 16 is the plan3 identity, weight 0 neutralises the eval.
         p.global_scale = 1;
         p.ef_weight = 0;
-        let g = Guide::new(GuideConfig::hand()).with_params(p);
+        let g = Guide::new(GuideConfig::product()).with_params(p);
+        let scored = StartInput {
+            child_eval: 200,
+            ..si(MoveClass::Threat)
+        };
         assert_eq!(
             g.start_numbers(
                 &NodeContext { eval: 200, ..c },
-                MoveClass::Threat,
+                &scored,
                 true,
                 Color::White,
                 mv(),
-                &h,
-                200,
+                &h
             ),
             (4, 16)
         );
