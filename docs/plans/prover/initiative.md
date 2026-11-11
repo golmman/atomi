@@ -2,7 +2,7 @@
 
 ## Status
 
-**Open (2026-11-10).** On the D30 staircase the engine is at **`T_2`** (`core`+`easy-win` at 120 s); `T_3` (`deep-win` at 120 s) is the next rung; `T_5` (the goal) is not met. The bare tree is the product candidate; item 24 (conformance line) Phase A is done and G3 passed (D29), so Phase B is next. Full record: [`history.md`](history.md); decision rationale: [`decisions.md`](decisions.md).
+**Open (2026-11-10).** On the D30 staircase the engine is at **`T_2`** (`core`+`easy-win` at 120 s); `T_3` (`deep-win` at 120 s) is the next rung; `T_5` (the goal) is not met. The bare tree is the product candidate; item 24 (conformance line) Phase A passed (D29) and Phase B (plan17) is **negative**: exact replay cannot apply at the first divergence and cuts `core` only 1.02×, so the line is closed. Full record: [`history.md`](history.md); decision rationale: [`decisions.md`](decisions.md).
 
 ## Reference
 
@@ -118,7 +118,7 @@ One-line resolutions; full text, rationale, source take-list and legacy measured
 
 Items are stable semantic identities. Plans are numbered sequentially and independently of items. Plans use stack-level gating (D21), except a single-mechanism plan that is independently meaningful.
 
-**Priority after plan session 16 (2026-11-10):** the bare tree is the product. On the D30 staircase the engine is at **`T_2`**; the next rung is **`T_3`** (`deep-win` 3/3 at 120 s), a coverage problem, not a wall problem. The initiative is **not closed**: D29 authorises **item 24, the conformance line**. The diagnosis is search-tree directedness, not per-node cost; the untested levers are exact proof replay, exact `pn`/`dn`, quiet grouping as one child, and restarts. Item 24 Phase A (plan16) found quiet grouping as the named `core` divergence; Phase B (exact replay) is the next plan, gated on tree size at fixed evals. The 120 s budget is not raised, the hand-guide/auxiliary line stays closed, and no portfolio is built.
+**Priority after plan session 16 (2026-11-10), updated by plan17:** the bare tree is the product. On the D30 staircase the engine is at **`T_2`**; the next rung is **`T_3`** (`deep-win` 3/3 at 120 s), a coverage problem, not a wall problem. D29 authorised **item 24, the conformance line**. Phase A (plan16) found quiet grouping as the named `core` divergence; Phase B (plan17) failed both stops: no first move-divergent position is a defender node, and exact replay cuts `core` only 1.02× at 20 M. The conformance line is closed; the next decision is a formulation change or a new search algorithm. The 120 s budget is not raised, the hand-guide/auxiliary line stays closed, and no portfolio is built.
 
 | # | Milestone | Gate | Status |
 | --- | --- | --- | --- |
@@ -136,7 +136,7 @@ Items are stable semantic identities. Plans are numbered sequentially and indepe
 | 21 | `deep-win` tree size: entry reuse | stop rule at 20 M; if started, `deep-win` 3/3 at 120 s and no >10 % regression | **stop rule fired** — [plan12](plan12.md), [report12](report12.md) |
 | 22 | Cheap probes before any conformance stack | A: `deep-win` 3/3; B: cap ≥ 2× fewer unique expansions; C: `core` ≥ 2× cut | **all fail; hand-guide line closed** — [plan13](plan13.md), [report13](report13.md) |
 | 23 | `deep-win` formulation decision (kill review) | owner records A, B or C in `initiative.md` and `bench.md`; no silent goal change | **executed; option A, D28** — [plan14](plan14.md) |
-| 24 | **Conformance line** | Phase A: a named divergence explains the first divergent ply, or stop. B/C/D: ≥ 2× cut in `core` unique expansions vs bare at 20 M, no `easy-win` regression > 10 % | **Phase A done; G3 pass (quiet grouping); plan17 next** — [plan16](plan16.md), [report16](report16.md) |
+| 24 | **Conformance line** | Phase A: a named divergence explains the first divergent ply, or stop. B/C/D: ≥ 2× cut in `core` unique expansions vs bare at 20 M, no `easy-win` regression > 10 % | **closed negative** — Phase A passed (quiet grouping); Phase B failed G2 (no defender node at the first divergence) and G3 (`replay_exact` 1.02× `core`, no `easy-win` regression); B3/C/D not implemented — [plan16](plan16.md), [report16](report16.md), [plan17](plan17.md), [report17](report17.md) |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose before the M2+M3 stack. If the hand-guide stack cannot meet D21, do not split it back into mechanism plans: record the stack, its census and both-direction ablations, and take the continue/re-scope/close decision at a kill review. The conformance line (item 24) is a separate stack: its stop rule is the Phase A differential, not the hand-guide stop rule.
 

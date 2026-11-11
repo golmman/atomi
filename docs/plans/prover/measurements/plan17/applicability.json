@@ -1,0 +1,287 @@
+{
+ "phase": "applicability",
+ "source": "/workspace/atomi/docs/plans/prover/measurements/plan16/classify.json",
+ "source_sha256": "03267d447f1676c0a7b9ca697bf5584a2a05227f8a3a002362c4be9f47b361d2",
+ "rule": "exact sibling replay applies only at a defender (AND) node when the just-proved child is in the next ply and at least one sibling is still Open (src/search/mod.rs)",
+ "cells": {
+  "core": {
+   "first_divergent_ply": 2,
+   "first_move_divergent_ply": 1,
+   "positions": [
+    {
+     "fen": "r1b1kb1r/ppp3pp/n6n/3p1pN1/1P2P3/8/P1P2PPP/RNBQKB1R w KQkq - 1 2",
+     "ply": 1,
+     "attacker": "w",
+     "node_kind": "attacker (OR)",
+     "provari_move": "e4d5",
+     "atomi_move": "d1e2",
+     "sides": {
+      "provari": {
+       "move": "e4d5",
+       "class": "Hanging",
+       "child": "r1b1kb1r/ppp3pp/n6n/5pN1/1P6/8/P1P2PPP/RNBQKB1R b KQkq - 0 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      },
+      "atomi": {
+       "move": "d1e2",
+       "class": "Quiet",
+       "child": "r1b1kb1r/ppp3pp/n6n/3p1pN1/1P2P3/8/P1P1QPPP/RNB1KB1R b KQkq - 2 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      }
+     }
+    },
+    {
+     "fen": "r1b1kbnr/ppp3p1/n6p/3p1pN1/1P2P3/8/P1P2PPP/RNBQKB1R w KQkq - 0 2",
+     "ply": 1,
+     "attacker": "w",
+     "node_kind": "attacker (OR)",
+     "provari_move": "g5h7",
+     "atomi_move": "e4d5",
+     "sides": {
+      "provari": {
+       "move": "g5h7",
+       "class": "Quiet",
+       "child": "r1b1kbnr/ppp3pN/n6p/3p1p2/1P2P3/8/P1P2PPP/RNBQKB1R b KQkq - 1 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      },
+      "atomi": {
+       "move": "e4d5",
+       "class": "Hanging",
+       "child": "r1b1kbnr/ppp3p1/n6p/5pN1/1P6/8/P1P2PPP/RNBQKB1R b KQkq - 0 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      }
+     }
+    },
+    {
+     "fen": "r1b1kbnr/ppp3pp/8/2np1pN1/1P2P3/8/P1P2PPP/RNBQKB1R w KQkq - 1 2",
+     "ply": 1,
+     "attacker": "w",
+     "node_kind": "attacker (OR)",
+     "provari_move": "e4d5",
+     "atomi_move": "f1b5",
+     "sides": {
+      "provari": {
+       "move": "e4d5",
+       "class": "Hanging",
+       "child": "r1b1kbnr/ppp3pp/8/5pN1/1P6/8/P1P2PPP/RNBQKB1R b KQkq - 0 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      },
+      "atomi": {
+       "move": "f1b5",
+       "class": "Threat",
+       "child": "r1b1kbnr/ppp3pp/8/1Bnp1pN1/1P2P3/8/P1P2PPP/RNBQK2R b KQkq - 2 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      }
+     }
+    },
+    {
+     "fen": "r1b2bnr/ppp1k1pp/n7/3p1pN1/1P2P3/8/P1P2PPP/RNBQKB1R w KQ - 1 2",
+     "ply": 1,
+     "attacker": "w",
+     "node_kind": "attacker (OR)",
+     "provari_move": "g5e6",
+     "atomi_move": "e4d5",
+     "sides": {
+      "provari": {
+       "move": "g5e6",
+       "class": "Quiet",
+       "child": "r1b2bnr/ppp1k1pp/n3N3/3p1p2/1P2P3/8/P1P2PPP/RNBQKB1R b KQ - 2 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      },
+      "atomi": {
+       "move": "e4d5",
+       "class": "Hanging",
+       "child": "r1b2bnr/ppp1k1pp/n7/5pN1/1P6/8/P1P2PPP/RNBQKB1R b KQ - 0 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      }
+     }
+    },
+    {
+     "fen": "rnb1kbnr/ppp3pp/8/3p1pN1/1P2P3/8/P1P2PPP/RNBQKB1R w KQkq - 1 2",
+     "ply": 1,
+     "attacker": "w",
+     "node_kind": "attacker (OR)",
+     "provari_move": "e4d5",
+     "atomi_move": "f1b5",
+     "sides": {
+      "provari": {
+       "move": "e4d5",
+       "class": "Hanging",
+       "child": "rnb1kbnr/ppp3pp/8/5pN1/1P6/8/P1P2PPP/RNBQKB1R b KQkq - 0 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      },
+      "atomi": {
+       "move": "f1b5",
+       "class": "Threat",
+       "child": "rnb1kbnr/ppp3pp/8/1B1p1pN1/1P2P3/8/P1P2PPP/RNBQK2R b KQkq - 2 2",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      }
+     }
+    }
+   ]
+  },
+  "easy-win": {
+   "first_divergent_ply": 1,
+   "first_move_divergent_ply": 2,
+   "positions": [
+    {
+     "fen": "rnbq1b1r/pp1pk1pp/2p2p1n/3Pp1N1/4P1P1/2N5/PPP2P1P/R1BQKB1R w KQ - 2 3",
+     "ply": 2,
+     "attacker": "w",
+     "node_kind": "attacker (OR)",
+     "provari_move": "g5e6",
+     "atomi_move": "d5d6",
+     "sides": {
+      "provari": {
+       "move": "g5e6",
+       "class": "Quiet",
+       "child": "rnbq1b1r/pp1pk1pp/2p1Np1n/3Pp3/4P1P1/2N5/PPP2P1P/R1BQKB1R b KQ - 3 3",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      },
+      "atomi": {
+       "move": "d5d6",
+       "class": "Threat",
+       "child": "rnbq1b1r/pp1pk1pp/2pP1p1n/4p1N1/4P1P1/2N5/PPP2P1P/R1BQKB1R b KQ - 0 3",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      }
+     }
+    }
+   ]
+  },
+  "deep-win": {
+   "first_divergent_ply": 1,
+   "first_move_divergent_ply": 2,
+   "positions": [
+    {
+     "fen": "rnb1k1nr/ppp3pp/8/3p1pN1/4P3/b7/PPP2PPP/RNBQKB1R w KQkq - 1 3",
+     "ply": 2,
+     "attacker": "w",
+     "node_kind": "attacker (OR)",
+     "provari_move": "f1b5",
+     "atomi_move": "e4d5",
+     "sides": {
+      "provari": {
+       "move": "f1b5",
+       "class": "Threat",
+       "child": "rnb1k1nr/ppp3pp/8/1B1p1pN1/4P3/b7/PPP2PPP/RNBQK2R b KQkq - 2 3",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      },
+      "atomi": {
+       "move": "e4d5",
+       "class": "Hanging",
+       "child": "rnb1k1nr/ppp3pp/8/5pN1/8/b7/PPP2PPP/RNBQKB1R b KQkq - 0 3",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      }
+     }
+    },
+    {
+     "fen": "rnb1kbnr/ppp3pp/8/5pN1/3pP3/8/PPP2PPP/RNBQKB1R w KQkq - 0 3",
+     "ply": 2,
+     "attacker": "w",
+     "node_kind": "attacker (OR)",
+     "provari_move": "g5e6",
+     "atomi_move": "c2c3",
+     "sides": {
+      "provari": {
+       "move": "g5e6",
+       "class": "Quiet",
+       "child": "rnb1kbnr/ppp3pp/4N3/5p2/3pP3/8/PPP2PPP/RNBQKB1R b KQkq - 1 3",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      },
+      "atomi": {
+       "move": "c2c3",
+       "class": "Quiet",
+       "child": "rnb1kbnr/ppp3pp/8/5pN1/3pP3/2P5/PP3PPP/RNBQKB1R b KQkq - 0 3",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      }
+     }
+    },
+    {
+     "fen": "rnb2bnr/ppp1k1pp/8/3p1pN1/4P3/8/PPP2PPP/RNBQKB1R w KQ - 1 3",
+     "ply": 2,
+     "attacker": "w",
+     "node_kind": "attacker (OR)",
+     "provari_move": "g5e6",
+     "atomi_move": "e4d5",
+     "sides": {
+      "provari": {
+       "move": "g5e6",
+       "class": "Quiet",
+       "child": "rnb2bnr/ppp1k1pp/4N3/3p1p2/4P3/8/PPP2PPP/RNBQKB1R b KQ - 2 3",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      },
+      "atomi": {
+       "move": "e4d5",
+       "class": "Hanging",
+       "child": "rnb2bnr/ppp1k1pp/8/5pN1/8/8/PPP2PPP/RNBQKB1R b KQ - 0 3",
+       "child_in_next_ply": false,
+       "sibling_open": null,
+       "applicable": false,
+       "reason": "not a defender (AND) node"
+      }
+     }
+    }
+   ]
+  }
+ },
+ "summary": {
+  "positions": 9,
+  "move_sides": 18,
+  "defender_nodes": 0,
+  "child_in_next_ply": 0,
+  "applicable": 0,
+  "g2_pass": false,
+  "verdict": "no first move-divergent position is a defender node; exact replay cannot apply at the first divergence, so B3 is not implemented and Phase B is re-scoped to the isolation matrix"
+ }
+}
