@@ -11,6 +11,7 @@
 //! `strategy` depends on `table::proofs` (read only) and `rules`; `mover`
 //! depends only on `rules`.
 
+pub mod classify;
 pub mod cli;
 pub mod events;
 pub mod guide;

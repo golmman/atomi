@@ -559,6 +559,30 @@ fn moves_subcommand() {
 }
 
 #[test]
+fn classify_subcommand_is_read_only_and_default_off() {
+    let out = atomi(&["classify", MATE_IN_1_CHECKMATE]);
+    assert_eq!(out.status.code(), Some(0));
+    let j: serde_json::Value = serde_json::from_str(&String::from_utf8_lossy(&out.stdout)).unwrap();
+    let moves = j["moves"].as_array().unwrap();
+    assert!(!moves.is_empty());
+    for (i, m) in moves.iter().enumerate() {
+        assert_eq!(m["start_pn"], 1);
+        assert_eq!(m["start_dn"], 1);
+        assert_eq!(m["class"], "Quiet");
+        assert_eq!(m["order"], i);
+        assert!(m["child"].as_str().unwrap().contains(' '));
+    }
+    // The hand guide changes the fresh numbers but never the legal set.
+    let out = atomi(&["classify", MATE_IN_1_CHECKMATE, "--guide", "hand"]);
+    assert_eq!(out.status.code(), Some(0));
+    let h: serde_json::Value = serde_json::from_str(&String::from_utf8_lossy(&out.stdout)).unwrap();
+    assert_eq!(h["legal"], j["legal"]);
+    assert_eq!(h["moves"].as_array().unwrap().len(), moves.len());
+    let out = atomi(&["classify", "nonsense"]);
+    assert_eq!(out.status.code(), Some(2));
+}
+
+#[test]
 fn proof_source_for_store_is_complete() {
     // The ProofSource impl for ProofStore returns the same entries get()
     // exposes (the impl is a thin forwarder; kept so the differential test

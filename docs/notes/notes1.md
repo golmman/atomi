@@ -130,3 +130,7 @@ Decisions that touched tier formulation should be re-formulated or deprecated th
 
 Read `https://www.schadd.com/Papers/2011PNeval.pdf`.
 Can we adopt something for the `prover` initiative?
+
+---
+
+node count instead of wall time as a new rung

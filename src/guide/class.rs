@@ -43,6 +43,17 @@ impl MoveClass {
     pub fn is_quiet(self) -> bool {
         self == MoveClass::Quiet
     }
+
+    /// The stable diagnostic name (`classify` output).
+    pub fn as_str(self) -> &'static str {
+        match self {
+            MoveClass::Threat => "Threat",
+            MoveClass::WeakThreat => "WeakThreat",
+            MoveClass::Hanging => "Hanging",
+            MoveClass::Quiet => "Quiet",
+            MoveClass::Evasion => "Evasion",
+        }
+    }
 }
 
 /// Whether a capture at `to` lands in the blast zone of `commoner`.

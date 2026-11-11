@@ -29,6 +29,12 @@ fn print_help() {
          \x20                       [--guide-fresh-dn] [--guide-replay-exact]\n\
          \x20   atomi validate PROOF.jsonl...\n\
          \x20   atomi moves \"<FEN>\"\n\
+         \x20   atomi classify \"<FEN>\" [--guide none|hand] [--guide-off LIST]\n\
+         \x20                   [--guide-on LIST] [--guide-params PATH]\n\
+         \x20                   [--guide-scale N] [--guide-ef-weight N]\n\
+         \x20                   [--guide-group] [--guide-fresh-dn]\n\
+         \x20                   [--guide-replay-exact] [--seed N]\n\
+         \x20                   [--attacker white|black]\n\
          \x20   atomi --help | --version"
     );
 }
@@ -146,6 +152,20 @@ fn moves_cmd(args: &[String]) -> ExitCode {
     ExitCode::SUCCESS
 }
 
+fn classify_cmd(args: &[String]) -> ExitCode {
+    let opts = match atomi::classify::parse(args) {
+        Ok(o) => o,
+        Err(e) => return error(&e),
+    };
+    match atomi::classify::run(&opts) {
+        Ok(line) => {
+            println!("{line}");
+            ExitCode::SUCCESS
+        }
+        Err(e) => error(&e),
+    }
+}
+
 fn validate_cmd(args: &[String]) -> ExitCode {
     if args.is_empty() {
         return error("validate needs at least one file");
@@ -181,6 +201,7 @@ fn main() -> ExitCode {
         }
         Some("prove") => prove(&args[1..]),
         Some("moves") => moves_cmd(&args[1..]),
+        Some("classify") => classify_cmd(&args[1..]),
         Some("validate") => validate_cmd(&args[1..]),
         Some(other) => error(&format!("unknown subcommand or option: {other}")),
     }
