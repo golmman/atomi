@@ -372,100 +372,41 @@ ledger row is appended: plan1 does not touch the win path. Details in
 
 ## Ledger
 
-**D30 ledger convention (plan session 17, 2026-11-10).** The ledger reports
-the highest rung reached on the D30 staircase, then the next rung's gap.
-`T_1`–`T_4` are coverage rungs (necessary conditions); `T_5` is the goal and
-the only rung that carries wall factors. The tier clauses of D27/D28/D29 are
-superseded; their measurements stand. Existing rows are not rewritten.
-
-**D27 ledger convention (plan9, 2026-11-09; tier structure superseded by
-D30).** The ledger reports both tiers: Tier 1 coverage at 120 s, then Tier 2
-wall at 10 s on shared cells. Existing rows are not rewritten; their
-own-session factors remain. The re-pin itself appends no performance row. The
-first plan9 row appears only after the coverage measurement and states
-coverage before factors.
-
-**D27 status (not a performance claim; tier structure superseded by D30):**
-Tier 1 3/3 at 120 s is pending; the last recorded coverage is 1/3 at 10 s
-(plan8). No factor is published until Tier 1 passes.
-
-**D28 status (plan14, 2026-11-10; goal clause superseded by D30):** Tier 1 is
-amended to **2/3** at 120 s / 192 MB (`core`, `easy-win`); `deep-win` is
-recorded as 1/3 and is not a pass condition. The last recorded coverage is 2/3
-(plan11, bare tree). No ledger row is appended by the decision; Tier 2 is
-unchanged. The `deep-win` 1/3 measurement stands as evidence.
-
-**Plan15 status (2026-11-10):** Tier 1 is confirmed **2/3** at 120 s
-(`core` 3/3 17.471 s, `easy-win` 3/3 2.023 s, `deep-win` 1/3 seed 1
-113.458 s; 7/7 D14 accepted). Tier 2 at 10 s is **1/3 shared** with a
-shared-cell geomean of **15.757** (`easy-win` 1.686 s vs 0.107 s); `core`
-(≥ 20.49×) and `deep-win` (≥ 1.549×) are censored. Tier 2 **fails** on both
-the geomean and the stale 3/3 coverage clause. The first ledger row since
-plan2 is appended below.
-
-**D29 status (plan session 16, 2026-11-10):** the initiative is **not
-closed**. The plan15 close recommendation is rejected; the Tier 2 coverage
-clause is fixed to the Tier 1 level (2/3) with the geomean over shared cells,
-and **item 24 (conformance line)** is authorised: a read-only differential,
-then exact proof replay, exact `pn`/`dn` and restarts, each gated on tree size
-at fixed evals before any wall claim. No ledger row is appended by the
-decision; the plan15 row stands as the last measured head-to-head. **Tier 2
-coverage clause superseded by D30; the item 24 authorisation stands.**
-
-**Pins.** `atomi@0c5a882+d` = atomi built from HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
-on a dirty tree (uncommitted work-in-progress) · `atomi@a4c135d+d` = atomi
-built from HEAD `a4c135d6ee1956588e01733bd101f6373e7d2e72` on a dirty tree
-(plan2 work uncommitted) · `atomi@e71289b+d` = atomi built from HEAD
-`e71289b630f87137774810403492eedba10d22be` on a dirty tree (plan19 work
-uncommitted; binary sha256 `bf98c6df…`) · `solver@5f85133` =
-`5f85133ea9d751368a682e53e354bd3fc0016d00` · `provari-v0.1.0` =
-`48686bc6c786d6ea70568f0b2ad4002cf0520206` (the 1.000 side of every factor).
+**Convention (D30).** Report the highest rung reached on the D30 staircase,
+then the next rung's gap. `T_1`–`T_4` are coverage rungs (necessary
+conditions); `T_5` is the goal and the only rung that carries wall factors.
+Existing rows are not rewritten and keep their own-session factors. Decisions
+append no row; the decision history (D27–D30) lives in
+[`decisions.md`](decisions.md).
 
 | Plan | Date | Host · pins | Stack | `core` | `easy-win` | `deep-win` | Geomean | Coverage |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | `plan1` | 2026-11-06 | `ae54d05b36f8` · `atomi@0c5a882+d` | atomi **m0** | censored (≥ 18.76) 10.061 s / 59.5 M | **36.365** (4.982 s / 30.2 M) | censored (≥ 1.52) 10.061 s / 61.8 M | **36.365** (1 cell) | 1/3 |
 | `plan1` | 2026-11-06 | `ae54d05b36f8` · `solver@5f85133` | legacy **default** | censored (≥ 18.76) 10.020 s / 66.2 M | **45.358** (6.214 s / 43.3 M) | censored (≥ 1.52) 10.019 s / 67.6 M | **45.358** (1 cell) | 1/3 |
 | `plan1` | 2026-11-06 | `ae54d05b36f8` · `solver@5f85133` | legacy **opt** | **7.43** (3.960 s / 17.2 M) | **5.38** (0.737 s / 3.23 M) | censored (≥ 1.52) 10.019 s / 46.2 M | **6.322** (2 cells) | 2/3 |
-| `plan1` (stretch) | 2026-11-06 | `ae54d05b36f8` · `provari-v0.2.0@224ce85` | v0.2.0 **hand** | 0.987× | 1.007× | 1.010× | **1.001** (3 cells, stretch block only) | 3/3 |
 | `plan2` | 2026-11-06 | `ae54d05b36f8` · `atomi@a4c135d+d` | atomi **m1** | censored (≥ 18.9) 10.003 s / 181.8 M | **10.897** (1.482 s / 30.3 M) | censored (≥ 1.48) 10.003 s / 186.6 M | **10.897** (1 cell) | 1/3 |
-| `plan2` (stretch) | 2026-11-06 | `ae54d05b36f8` · `provari-v0.2.0@224ce85` | v0.2.0 **hand** | 1.040× | 0.985× | 1.001× | **1.008** (3 cells, stretch block only) | 3/3 |
 | `plan15` | 2026-11-10 | `e10de197da58` · `atomi@8953596+d` | atomi **bare** (Tier 2, 10 s) | censored (≥ 20.49) 10.000 s / 162.5 M | **15.757** (1.686 s / 30.3 M) | censored (≥ 1.549) 10.000 s / 168.6 M | **15.757** (1 cell) | 1/3 |
 | `plan19` | 2026-11-11 | `e10de197da58` · `atomi@e71289b+d` | atomi **default** (NUMBERS-V1 R1+R3+R6, Tier 2, 10 s) | censored (≥ 19.31) 10.000 s | **57.0** (7.582 s) | censored (≥ 1.533) 10.000 s | **57.0** (1 cell) | 1/3 |
 
 Cell syntax: `factor (candidate wall / candidate evals)`; legacy evals are
 its `evals:` counter, atomi's are `child_evals`. Reference
-(`provari-v0.1.0 --guide hand`) is **1.000** everywhere.
+(`provari-v0.1.0 --guide hand`) is **1.000** everywhere. Every row is a
+candidate vs. that reference; provari-version controls (v0.2.0 vs v0.1.0,
+D17) are in the plan notes below, not the ledger.
 
-**plan15 Tier 1 (120 s, not a wall row):** `core` 3/3 at 17.471 s (35.8×),
-`easy-win` 3/3 at 2.023 s (18.9×), `deep-win` 1/3 (seed 1 113.458 s, seeds
-0/2 censor at 120 s); 7/7 D14 proofs accepted. Tier 1 is **2/3, pass** under
-D28. The row above is the Tier 2 10 s head-to-head; its coverage is 1/3 and
-its geomean 15.757, so Tier 2 **fails**. Legacy `default`/`opt` and provari
-v0.2.0 controls were **unavailable** and not substituted.
+Pins: `atomi@0c5a882+d` = HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
+(plan1, dirty tree) · `atomi@a4c135d+d` = HEAD
+`a4c135d6ee1956588e01733bd101f6373e7d2e72` (plan2, dirty tree) ·
+`atomi@e71289b+d` = HEAD `e71289b630f87137774810403492eedba10d22be`
+(plan19, dirty tree; binary sha256 `bf98c6df…`) · `atomi@8953596+d` = HEAD
+`89535961ebdd73e78d7b2267177da1eb87bc3216` (plan15, dirty tree; binary
+sha256 `b28bdb1e…62ba71f`) · `solver@5f85133` =
+`5f85133ea9d751368a682e53e354bd3fc0016d00` · `provari-v0.1.0` =
+`48686bc6c786d6ea70568f0b2ad4002cf0520206` (the 1.000 side of every factor).
 
-Session reference line (v0.1.0 hand medians, 3 repeats): `core` 0.533 s ·
-342,289 nodes · mate 17; `easy-win` (`1eb80b92f92c`) 0.137 s · 72,523
-nodes · mate 15; `deep-win` (`db6a741c723f`) 6.567 s · 4,574,912 nodes ·
-mate 22.
+## Plan notes
 
-Proof-check (D14): the `easy-win` atomi cell re-ran at `--seconds 600`
-with identical `child_evals` (30,245,030), `proof` written (2,083
-positions, length 17), `atomi validate` valid, `provari check` valid and
-positions == won_positions: `proof_verdict = accepted`. Censored cells
-needed no proof run.
-
-**plan19 status (2026-11-11, item 26; not a wall row):** the default's 120 s
-coverage is `core` **2/3** (118.0 / 115.1 s, seed 2 censored), `easy-win`
-**3/3** (7.6 / 16.8 / 10.4 s) and `deep-win` **0/3**; the product hand was
-`core` 0/3, `easy-win` 3/3 (22.0 / 29.8 / 10.6 s), `deep-win` 0/3. Tree-only
-the default cuts `core` 4.74×, `easy-win` 3.34× and `deep-win` 2.80× against
-the product hand (medians of seeds 0–2, 2 G child evals). The wall is now
-auxiliary-bound: `core` needs 84.8 M child evals tree-only (14 s) and ~115 s
-with the passes on. D14 16/16 accepted. No rung change; `T_2` still rests on
-the bare tree's `core` 3/3. Numbers:
-[`measurements/plan19/`](measurements/plan19/README.md).
-
-### plan1 summary
+### plan1
 
 Numbers: [`measurements/plan1/bench.json`](measurements/plan1/bench.json);
 per-node baseline: [`measurements/plan1/pernode.json`](measurements/plan1/pernode.json).
@@ -494,7 +435,7 @@ per-node baseline: [`measurements/plan1/pernode.json`](measurements/plan1/pernod
   rounds its bucket count down to a power of two). This is M1's reference
   number.
 
-### plan2 summary
+### plan2
 
 Numbers: [`measurements/plan2/bench.json`](measurements/plan2/bench.json);
 per-node: [`measurements/plan2/pernode.json`](measurements/plan2/pernode.json).
@@ -519,7 +460,7 @@ a dirty tree (plan2 work uncommitted), binary sha256 `2008857f…2847ab`.
 - Legacy controls were not re-run (plan1's rows stand; their factors are
   ratios of their own session).
 
-### plan3 (no ledger row — gate failed)
+### plan3 (no row: gate failed)
 
 Plan3's hand-guide stack did **not** meet the D21 gate, so by the plan's rule
 no ledger row is appended (`measurements/plan3/guidance.json`). For the
@@ -530,7 +471,7 @@ both are censored. `hand` coverage is 19/24 versus provari hand 24/24; the
 18 `wins.tsv`-derived cells are proved on every seed. Full details in
 [`report3.md`](report3.md).
 
-### plan4 (no ledger row — G1 failed)
+### plan4 (no row: G1 failed)
 
 Plan4 CORE-RESET did not meet G1 (`core` proved at 10 s), so no ledger row
 is appended (`measurements/plan4/gate.json`). The calibrated point
@@ -540,6 +481,36 @@ is appended (`measurements/plan4/gate.json`). The calibrated point
 budget proves `core` at 120 s (278.5 M child evals, length 20) with an
 accepted proof; that is the M4-first pivot. Item 3 is closed. Details in
 [`report4.md`](report4.md).
+
+### plan15
+
+Tier 1 (120 s, not a wall row): `core` 3/3 at 17.471 s (35.8×), `easy-win`
+3/3 at 2.023 s (18.9×), `deep-win` 1/3 (seed 1 113.458 s, seeds 0/2 censor
+at 120 s); 7/7 D14 proofs accepted. Tier 1 is **2/3, pass** under D28. The
+ledger row is the Tier 2 10 s head-to-head; coverage 1/3 and geomean 15.757,
+so Tier 2 **fails**. Legacy `default`/`opt` and provari v0.2.0 controls were
+**unavailable** and not substituted.
+
+Session reference line (v0.1.0 hand medians, 3 repeats): `core` 0.533 s ·
+342,289 nodes · mate 17; `easy-win` (`1eb80b92f92c`) 0.137 s · 72,523 nodes ·
+mate 15; `deep-win` (`db6a741c723f`) 6.567 s · 4,574,912 nodes · mate 22.
+
+Proof-check (D14): the `easy-win` atomi cell re-ran at `--seconds 600` with
+identical `child_evals` (30,245,030), `proof` written (2,083 positions,
+length 17), `atomi validate` valid, `provari check` valid and positions ==
+won_positions: `proof_verdict = accepted`. Censored cells needed no proof run.
+
+### plan19
+
+The default's 120 s coverage (item 26) is `core` **2/3** (118.0 / 115.1 s,
+seed 2 censored), `easy-win` **3/3** (7.6 / 16.8 / 10.4 s) and `deep-win`
+**0/3**; the product hand was `core` 0/3, `easy-win` 3/3 (22.0 / 29.8 /
+10.6 s), `deep-win` 0/3. Tree-only the default cuts `core` 4.74×, `easy-win`
+3.34× and `deep-win` 2.80× against the product hand (medians of seeds 0–2,
+2 G child evals). The wall is now auxiliary-bound: `core` needs 84.8 M child
+evals tree-only (14 s) and ~115 s with the passes on. D14 16/16 accepted. No
+rung change; `T_2` still rests on the bare tree's `core` 3/3. Numbers:
+[`measurements/plan19/`](measurements/plan19/README.md).
 
 ## History
 

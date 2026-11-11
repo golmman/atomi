@@ -153,3 +153,12 @@ Compile a complete table with concise descriptions of ideas/features that improv
 Where is the "secret sauce"? What ideas can we adopt?
 
 Store your findings in `docs/plans/prover/analysis1.md`.
+
+---
+
+Is the "Ledger" section in `docs/plans/prover/bench.md` supposed to show the plans wall time factors compared to provari?
+It looks very convoluted, to much information mixed up, little context given, no common theme found.
+
+---
+
+tune `--guide hand` via ...
