@@ -162,3 +162,8 @@ It looks very convoluted, to much information mixed up, little context given, no
 ---
 
 tune `--guide hand` via ...
+
+---
+
+Looking at the `docs/plans/prover/bench.md` ledger, why did we go worse?
+Row 3 shows a 2/3 coverage and 6.3 geomean, the most recent row is so much worse. What happened?

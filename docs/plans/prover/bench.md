@@ -372,36 +372,66 @@ ledger row is appended: plan1 does not touch the win path. Details in
 
 ## Ledger
 
-**Convention (D30).** Report the highest rung reached on the D30 staircase,
-then the next rung's gap. `T_1`–`T_4` are coverage rungs (necessary
-conditions); `T_5` is the goal and the only rung that carries wall factors.
-Existing rows are not rewritten and keep their own-session factors. Decisions
-append no row; the decision history (D27–D30) lives in
-[`decisions.md`](decisions.md).
+**Convention (D30, amended 2026-11-11).** A factor carries **no budget**: it
+is `candidate wall / provari hand wall`, and provari's side is fixed — the
+bench set is selected so it proves with the hand guide inside 10 s (`core`
+0.49 s, `easy-win` 0.11 s, `deep-win` 6.5 s), so a longer run cannot change
+the reference. A time budget has exactly two roles: (a) the **economic cap**
+at which an unfinished run is reported `censored (≥ cap/ref)` — 120 s today;
+(b) the **`T_5` goal threshold**, 10 s. The ledger is therefore a single
+**Factors** table (no per-cell budget); the 10 s goal and the rung status
+live in the goal section above and the plan notes, not in a ledger table.
+Existing rows are not rewritten; rows measured under the old 10 s canonical
+protocol keep their session numbers, and the `Cap` column names the censoring
+cap only. Decisions append no row (history D27–D30 in
+[`decisions.md`](decisions.md)).
 
-| Plan | Date | Host · pins | Stack | `core` | `easy-win` | `deep-win` | Geomean | Coverage |
+### Factors
+
+| Plan | Date | Host · pins | Stack | `core` | `easy-win` | `deep-win` | Geomean | Cap |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| `plan1` | 2026-11-06 | `ae54d05b36f8` · `atomi@0c5a882+d` | atomi **m0** | censored (≥ 18.76) 10.061 s / 59.5 M | **36.365** (4.982 s / 30.2 M) | censored (≥ 1.52) 10.061 s / 61.8 M | **36.365** (1 cell) | 1/3 |
-| `plan1` | 2026-11-06 | `ae54d05b36f8` · `solver@5f85133` | legacy **default** | censored (≥ 18.76) 10.020 s / 66.2 M | **45.358** (6.214 s / 43.3 M) | censored (≥ 1.52) 10.019 s / 67.6 M | **45.358** (1 cell) | 1/3 |
-| `plan1` | 2026-11-06 | `ae54d05b36f8` · `solver@5f85133` | legacy **opt** | **7.43** (3.960 s / 17.2 M) | **5.38** (0.737 s / 3.23 M) | censored (≥ 1.52) 10.019 s / 46.2 M | **6.322** (2 cells) | 2/3 |
-| `plan2` | 2026-11-06 | `ae54d05b36f8` · `atomi@a4c135d+d` | atomi **m1** | censored (≥ 18.9) 10.003 s / 181.8 M | **10.897** (1.482 s / 30.3 M) | censored (≥ 1.48) 10.003 s / 186.6 M | **10.897** (1 cell) | 1/3 |
-| `plan15` | 2026-11-10 | `e10de197da58` · `atomi@8953596+d` | atomi **bare** (Tier 2, 10 s) | censored (≥ 20.49) 10.000 s / 162.5 M | **15.757** (1.686 s / 30.3 M) | censored (≥ 1.549) 10.000 s / 168.6 M | **15.757** (1 cell) | 1/3 |
-| `plan19` | 2026-11-11 | `e10de197da58` · `atomi@e71289b+d` | atomi **default** (NUMBERS-V1 R1+R3+R6, Tier 2, 10 s) | censored (≥ 19.31) 10.000 s | **57.0** (7.582 s) | censored (≥ 1.533) 10.000 s | **57.0** (1 cell) | 1/3 |
+| `plan1` | 2026-11-06 | `ae54d05b36f8` · `atomi@0c5a882+d` | atomi **m0** | censored (≥ 18.76) 59.5 M ev | **36.365** (4.982 s / 30.2 M) | censored (≥ 1.52) 61.8 M ev | **36.365** (1 cell) | 10 s |
+| `plan2` | 2026-11-06 | `ae54d05b36f8` · `atomi@a4c135d+d` | atomi **m1** | censored (≥ 18.9) 181.8 M ev | **10.897** (1.482 s / 30.3 M) | censored (≥ 1.48) 186.6 M ev | **10.897** (1 cell) | 10 s |
+| `plan11` | 2026-11-10 | `e10de197da58` · `atomi@b52e186+d` | atomi **bare** | **35.3** (17.390 s) | **19.1** (2.008 s) | censored (1/3; seed 1 111.218 s) | **25.9** (2 cells) | 120 s |
+| `plan15` | 2026-11-10 | `e10de197da58` · `atomi@8953596+d` | atomi **bare** | **35.8** (17.471 s) | **18.9** (2.023 s) | censored (1/3; seed 1 113.458 s) | **26.0** (2 cells) | 120 s |
+| `plan19` | 2026-11-11 | `e10de197da58` · `atomi@e71289b+d` | atomi **default** (R1+R3+R6) | censored (2/3; 115.1 s) | **78** (10.4 s) | censored (0/3; ≥ 18.4) | **78** (1 cell) | 120 s |
 
-Cell syntax: `factor (candidate wall / candidate evals)`; legacy evals are
-its `evals:` counter, atomi's are `child_evals`. Reference
-(`provari-v0.1.0 --guide hand`) is **1.000** everywhere. Every row is a
-candidate vs. that reference; provari-version controls (v0.2.0 vs v0.1.0,
-D17) are in the plan notes below, not the ledger.
+Cell syntax: `factor (candidate wall / candidate evals)`; atomi's evals are
+its `child_evals` counter. Reference (`provari-v0.1.0 --guide hand`) is
+**1.000** everywhere. `Cap` is the censoring cap only — the factor itself is
+budget-free. A cell proved only on some seeds is reported as
+`censored (n/3; …)`, never averaged as if it were 3/3.
+
+**At the same 120 s cap the plan19 default is slower than the bare tree on
+every cell** (`easy-win` 78 vs 18.9; `core` 2/3 at 115–118 s vs 3/3 at
+17.5 s): the tree cut does not pay for the auxiliary passes (report19 §5).
+Whether `--guide hand` should stay the default is an open owner decision, not
+a ledger fact.
+
+**Rung (D30).** Highest rung is **`T_2`**: the bare tree proves `core` and
+`easy-win` at 120 s (plan11/plan15). `T_5` is not met; its 10 s coverage and
+geomeans are in the plan notes (plan15/plan19 Tier 2).
+
+**One engine per table (D10 amendment, 2026-11-11).** Only `atomi@*` rows
+form a series. The legacy `solver@5f85133` controls measured in plan1
+(`default` 45.358, 1/3; `opt` 6.322, 2/3) are a frozen one-session baseline:
+a different engine, host and session, recorded in the [plan1 notes](#plan1)
+and [`measurements/plan1/`](measurements/plan1/README.md), never ordered as
+if they were `atomi` rows (reading rule 1). They were removed from the table
+on 2026-11-11 because a mixed series invites exactly that comparison; the
+measurement record is unchanged.
 
 Pins: `atomi@0c5a882+d` = HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
 (plan1, dirty tree) · `atomi@a4c135d+d` = HEAD
 `a4c135d6ee1956588e01733bd101f6373e7d2e72` (plan2, dirty tree) ·
-`atomi@e71289b+d` = HEAD `e71289b630f87137774810403492eedba10d22be`
+`atomi@b52e186+d` = HEAD `b52e186…` (plan11, dirty tree; binary sha256
+`e416f075…12c811`) · `atomi@e71289b+d` = HEAD
+`e71289b630f87137774810403492eedba10d22be`
 (plan19, dirty tree; binary sha256 `bf98c6df…`) · `atomi@8953596+d` = HEAD
 `89535961ebdd73e78d7b2267177da1eb87bc3216` (plan15, dirty tree; binary
 sha256 `b28bdb1e…62ba71f`) · `solver@5f85133` =
-`5f85133ea9d751368a682e53e354bd3fc0016d00` · `provari-v0.1.0` =
+`5f85133ea9d751368a682e53e354bd3fc0016d00` (the frozen legacy control of the
+[plan1 notes](#plan1), not a ledger row) · `provari-v0.1.0` =
 `48686bc6c786d6ea70568f0b2ad4002cf0520206` (the 1.000 side of every factor).
 
 ## Plan notes
@@ -415,8 +445,10 @@ per-node baseline: [`measurements/plan1/pernode.json`](measurements/plan1/pernod
   session).** Legacy `default`: **45.358** on one shared cell (`easy-win`),
   coverage 1/3. Legacy `opt`: **6.322** on two shared cells (`core` 7.43,
   `easy-win` 5.38), coverage 2/3. Both are censored on `deep-win`. This is
-  the initiative's re-measured baseline gap. It is not compared with the
-  frozen legacy rows (reading rule 1).
+  the initiative's re-measured baseline gap, kept here as the frozen record
+  (the legacy controls are not ledger rows; D10 amendment): a different
+  engine, host and session, never ordered against `atomi` rows (reading
+  rule 1).
 - **atomi M0: no performance claim.** Heuristic-free DF-PN (uniform starting
   numbers, movegen order, no guide). It wins `easy-win` at **36.365**
   (4.982 s, 30,245,030 child evals; the D14 proof run was accepted by
@@ -595,3 +627,21 @@ rung change; `T_2` still rests on the bare tree's `core` 3/3. Numbers:
   is not raised, the hand-guide/auxiliary line stays closed, no portfolio is
   built, and the bare tree is the product candidate. No ledger row, no engine
   change. Details in [`plan14.md`](plan14.md).
+- **2026-11-11** — ledger cleanup, no measurement: the two legacy
+  `solver@5f85133` rows (`default` 45.358, `opt` 6.322) are removed from the
+  ledger table. They are a frozen one-session plan1 baseline of a different
+  engine, host and session and were never comparable to `atomi` rows
+  (reading rule 1); they remain in the [plan1 notes](#plan1), the pins and
+  [`measurements/plan1/`](measurements/plan1/README.md). The table now holds
+  `atomi` rows only. No factor, pin or measurement changes; **D10 amended**
+  (see [`decisions.md`](decisions.md)).
+- **2026-11-11** — ledger split, no measurement: the single table becomes
+  **Factors** (budget-free). A factor now carries no budget; a time budget
+  survives only as the 120 s censoring cap (a `Cap` column) and as the 10 s
+  `T_5` threshold stated in the goal section. The plan15/plan19 10 s results
+  were moved to a short `T_5` gate table, which was then removed on the same
+  day (the goal section and plan notes carry the 10 s status; the Factors
+  table is sufficient). The 120 s factors join the Factors table
+  (plan11/plan15 bare 35.3/19.1 and 35.8/18.9; plan19 default 78 on
+  `easy-win`). The split makes the plan19 default's 120 s regression vs the
+  bare tree explicit (78 vs 18.9). No engine change.
