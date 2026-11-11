@@ -378,6 +378,7 @@ impl Frame {
                 let sim_wanted = matches!(value, Value::Open { .. })
                     && guide_on
                     && guide.config.sibling_sim
+                    && !guide.config.sim_exact
                     && (max_sim == 0 || sim_nodes < max_sim);
                 if sim_wanted && !aux_available(settle_nodes, sim_nodes) {
                     aux_skipped += 1;
@@ -391,6 +392,7 @@ impl Frame {
                 if matches!(value, Value::Open { .. })
                     && !attacker_node
                     && guide.config.defender_priors
+                    && !guide.config.null_exact
                     && matches!(guide.replay(&ctx, child, attacker), Some((false, false)))
                 {
                     start = guide.unlikely(start.0, start.1);

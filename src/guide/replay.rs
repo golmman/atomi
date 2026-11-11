@@ -1,3 +1,5 @@
+// Justification for >10 KB: the exact replay, the null-guide entry point and their differential tests are one contract.
+
 //! Exact sibling proof replay (plan 13 Phase C, `--guide-replay-exact`).
 //!
 //! Kawano-style simulation: replay a proved sibling's proof on another
@@ -15,6 +17,7 @@
 //! This module never writes a table and never emits an event; it returns the
 //! proofs for the caller to store. It is default off and measurement only.
 
+use crate::guide::threat;
 use crate::rules;
 use crate::search::value::Value;
 use crate::table::{ProofEntry, Tables};
@@ -55,6 +58,61 @@ pub fn simulate(
     search_line: &[u64],
     tables: &Tables,
 ) -> Option<ReplayProof> {
+    simulate_inner(
+        pos,
+        guide,
+        None,
+        attacker,
+        remaining,
+        budget,
+        line,
+        search_line,
+        tables,
+    )
+}
+
+/// Replay a proof that is not in the tables (the null position's proof) on
+/// `pos`. `guide_mv` is the guide's winning move and `guide_length` its proof
+/// length; deeper guide positions are looked up normally. The null guide
+/// itself is never keyed or stored.
+#[allow(clippy::too_many_arguments)]
+pub fn simulate_with_guide_proof(
+    pos: &Board,
+    guide: &Board,
+    guide_mv: Move,
+    guide_length: u16,
+    attacker: Color,
+    remaining: u16,
+    budget: &mut u32,
+    line: &mut Vec<u64>,
+    search_line: &[u64],
+    tables: &Tables,
+) -> Option<ReplayProof> {
+    simulate_inner(
+        pos,
+        guide,
+        Some((guide_mv, guide_length)),
+        attacker,
+        remaining,
+        budget,
+        line,
+        search_line,
+        tables,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn simulate_inner(
+    pos: &Board,
+    guide: &Board,
+    guide_proof: Option<(Move, u16)>,
+    attacker: Color,
+    remaining: u16,
+    budget: &mut u32,
+    line: &mut Vec<u64>,
+    search_line: &[u64],
+    tables: &Tables,
+) -> Option<ReplayProof> {
     match rules::status(pos, attacker) {
         // A terminal win has no move; the caller's parent already sees it.
         rules::Status::Won => return None,
@@ -81,11 +139,21 @@ pub fn simulate(
         return None;
     }
     *budget -= 1;
-    let gkey = rules::key(guide);
-    let gcounter = guide.rule50();
-    let gmv = match tables.lookup(gkey, gcounter) {
-        Some(Value::Proved { mv: Some(mv), .. }) => mv,
-        _ => return None,
+    let gmv = match guide_proof {
+        Some((mv, length)) => {
+            if length > remaining {
+                return None;
+            }
+            mv
+        }
+        None => {
+            let gkey = rules::key(guide);
+            let gcounter = guide.rule50();
+            match tables.lookup(gkey, gcounter) {
+                Some(Value::Proved { mv: Some(mv), .. }) => mv,
+                _ => return None,
+            }
+        }
     };
     if !pos.is_legal(gmv) {
         return None;
@@ -184,6 +252,25 @@ fn simulate_defences(
                         line.pop();
                         return None;
                     }
+                } else if next.rule50() < 100
+                    && let Some(explosion) = threat::immediate_explosion(&next, attacker)
+                {
+                    // The defence lets the attacker explode at once: a
+                    // one-move proof that needs no guide. Provari's
+                    // `exposing` shortcut. The child's own proof is returned
+                    // so the caller stores and emits it; the writer needs it.
+                    (
+                        1,
+                        99,
+                        vec![(
+                            nkey,
+                            ProofEntry {
+                                mv: explosion.to_bits(),
+                                length: 1,
+                                limit: 99,
+                            },
+                        )],
+                    )
                 } else if guide.is_legal(m) {
                     let mut gnext = guide.clone();
                     gnext.do_move(m, &mut StateInfo::new());
@@ -279,6 +366,61 @@ mod tests {
                 &mut line,
                 &[],
                 &tables
+            )
+            .is_none()
+        );
+    }
+
+    #[test]
+    fn a_null_guide_proof_replays_on_a_child() {
+        // Black to move; if Black passes, White's Rxa7 blasts the commoner
+        // on a8. After Kb8 the same move still blasts it.
+        let b = board("k7/p7/8/8/8/8/8/R3K3 b - - 0 1");
+        let null = crate::guide::null::null_board(&b, Color::White).unwrap();
+        let mv = null.move_from_uci("a1a7").unwrap();
+        let mut child = b.clone();
+        child.do_move(b.move_from_uci("a8b8").unwrap(), &mut StateInfo::new());
+        let tables = Tables::new(16, true);
+        let mut budget = REPLAY_BUDGET;
+        let mut line = Vec::new();
+        let p = simulate_with_guide_proof(
+            &child,
+            &null,
+            mv,
+            1,
+            Color::White,
+            u16::MAX,
+            &mut budget,
+            &mut line,
+            &[],
+            &tables,
+        )
+        .expect("null replay");
+        assert_eq!((p.length, p.limit, p.mv), (1, 99, mv));
+    }
+
+    #[test]
+    fn a_parrying_defence_refuses_the_null_guide_proof() {
+        let b = board("k7/p7/8/8/8/8/8/R3K3 b - - 0 1");
+        let null = crate::guide::null::null_board(&b, Color::White).unwrap();
+        let mv = null.move_from_uci("a1a7").unwrap();
+        let mut child = b.clone();
+        child.do_move(b.move_from_uci("a7a6").unwrap(), &mut StateInfo::new());
+        let tables = Tables::new(16, true);
+        let mut budget = REPLAY_BUDGET;
+        let mut line = Vec::new();
+        assert!(
+            simulate_with_guide_proof(
+                &child,
+                &null,
+                mv,
+                1,
+                Color::White,
+                u16::MAX,
+                &mut budget,
+                &mut line,
+                &[],
+                &tables,
             )
             .is_none()
         );

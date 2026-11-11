@@ -50,7 +50,13 @@ Referenced from `AGENTS.md` §Correctness.
   pending-proof retention must use that member's key, or the writer fails.
   The flag is default off; item 15 is closed ([`report6`](report6.md)).
 - The null-side threat signature is a pure function of the board; no null
-  position is ever keyed, searched, stored, put on `line` or emitted.
+  position is ever keyed, searched, stored, put on `line` or emitted. The
+  opt-in `--guide-null-exact` builds the passed board **ephemerally** for the
+  one-ply exact null win and the guide side of the replay; only real child
+  keys and proofs leave that module ([report18](report18.md)).
+- An exact-replay path that proves a child by an immediate explosion must
+  return the **child's own** one-move proof entry, not just the length; the
+  writer walks real positions and fails `missing` otherwise (plan18 D14).
 
 ## Tree size
 

@@ -814,6 +814,55 @@ fn guide_conformance_flags_prove_a_small_position() {
 }
 
 #[test]
+fn guide_exactness_flags_are_default_off() {
+    // Plan 18: `--guide-sim-exact` and `--guide-null-exact` are opt-in. With
+    // `--guide none` they are inert and the trajectory is the bare tree.
+    let plain = atomi(&["prove", MATE_IN_2, "--seconds", "30", "--memory", "16"]);
+    let flagged = atomi(&[
+        "prove",
+        MATE_IN_2,
+        "--seconds",
+        "30",
+        "--memory",
+        "16",
+        "--guide",
+        "none",
+        "--guide-sim-exact",
+        "--guide-null-exact",
+    ]);
+    let plain: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&plain.stdout).trim()).unwrap();
+    let flagged: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&flagged.stdout).trim()).unwrap();
+    assert_eq!(plain["child_evals"], flagged["child_evals"]);
+    assert_eq!(plain["expansions"], flagged["expansions"]);
+    assert_eq!(plain["exit"], flagged["exit"]);
+}
+
+#[test]
+fn guide_exactness_flags_prove_a_small_position() {
+    // The exactness stack must stay sound on a small win: the null replay
+    // only stores proofs it verified, and the result is still a proof.
+    let out = atomi(&[
+        "prove",
+        MATE_IN_2,
+        "--seconds",
+        "30",
+        "--memory",
+        "16",
+        "--guide",
+        "hand",
+        "--guide-sim-exact",
+        "--guide-null-exact",
+    ]);
+    assert_eq!(out.status.code(), Some(0));
+    let json: serde_json::Value =
+        serde_json::from_str(String::from_utf8_lossy(&out.stdout).trim()).unwrap();
+    assert_eq!(json["exit"], "proved");
+    assert_eq!(json["length"], 2);
+}
+
+#[test]
 fn cli_stats_object_is_emitted() {
     let out = atomi(&[
         "prove",

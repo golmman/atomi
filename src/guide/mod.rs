@@ -12,6 +12,7 @@
 pub mod class;
 pub mod eval;
 pub mod history;
+pub mod null;
 pub mod replay;
 pub mod simulate;
 pub mod threat;
@@ -80,6 +81,13 @@ pub struct GuideConfig {
     /// Plan-13 conformance probe: exact sibling proof replay
     /// (`--guide-replay-exact`, default off).
     pub replay_exact: bool,
+    /// Plan-18 exact sibling simulation: replace the greedy playout with
+    /// the exact sibling proof replay (`--guide-sim-exact`, default off).
+    pub sim_exact: bool,
+    /// Plan-18 exact null-threat replay: replace the signature prior with
+    /// verified replay of a null-position proof (`--guide-null-exact`,
+    /// default off).
+    pub null_exact: bool,
 }
 
 impl GuideConfig {
@@ -104,6 +112,8 @@ impl GuideConfig {
             group: false,
             fresh_dn: false,
             replay_exact: false,
+            sim_exact: false,
+            null_exact: false,
         }
     }
 
@@ -133,6 +143,8 @@ impl GuideConfig {
             "group" => self.group = on,
             "fresh-dn" => self.fresh_dn = on,
             "replay-exact" => self.replay_exact = on,
+            "sim-exact" => self.sim_exact = on,
+            "null-exact" => self.null_exact = on,
             _ => return Err(format!("unknown guide mechanism: {name}")),
         }
         Ok(())
@@ -351,6 +363,7 @@ impl Guide {
         };
         let null_sig = if need_null
             && self.config.null_replay
+            && !self.config.null_exact
             && !in_check
             && !board.commoners(board.side_to_move()).is_empty()
         {
@@ -607,6 +620,8 @@ mod tests {
             ("group", |c| c.group),
             ("fresh-dn", |c| c.fresh_dn),
             ("replay-exact", |c| c.replay_exact),
+            ("sim-exact", |c| c.sim_exact),
+            ("null-exact", |c| c.null_exact),
         ] {
             let base = GuideConfig::hand();
             let mut off = base;

@@ -143,3 +143,12 @@ the most recent version of provari is 0.4.0. Should we repin?
 ---
 
 I'd rather explore the df-pn "secret sauce" of provari instead of trying a completely new algorithm that moves us away from adopting more ideas. The risk i see is this: pds-pn proves to be somewhat more efficient first, we adopt it, then we try to adopt more provari ideas but this fails since they are based on the df-pn base.
+
+---
+
+Analyze the `provari` search in depth and compare it to the current state of `atomi`.
+Compile a complete table with concise descriptions of ideas/features that improve the search of `provari` compared to `atomi`.
+
+Where is the "secret sauce"? What ideas can we adopt?
+
+Store your findings in `docs/plans/prover/analysis1.md`.

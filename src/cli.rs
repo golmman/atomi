@@ -76,6 +76,16 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
             i += 1;
             continue;
         }
+        if arg == "--guide-sim-exact" {
+            guide.sim_exact = true;
+            i += 1;
+            continue;
+        }
+        if arg == "--guide-null-exact" {
+            guide.null_exact = true;
+            i += 1;
+            continue;
+        }
         if arg.starts_with('-') {
             let value = args
                 .get(i + 1)

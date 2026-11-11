@@ -1,0 +1,42 @@
+{
+ "plan": "plan18",
+ "phase": "probe",
+ "purpose": "a single parsed 20 M run of the combined stack on the gate cell; the mechanism applicability is read from the sim/aux counters and the unique-expansion trajectory",
+ "row": {
+  "cell": "deep-win",
+  "stack": "sim_null",
+  "seed": 0,
+  "flags": [
+   "--guide",
+   "hand",
+   "--guide-sim-exact",
+   "--guide-null-exact"
+  ],
+  "seconds": 600,
+  "evals": 20000000,
+  "memory_mb": 192,
+  "unique_keys": 614821,
+  "unique_keys_capped": false,
+  "re_expansions": 111443,
+  "proved": false,
+  "exit": "evals",
+  "length": null,
+  "child_evals": 20000014,
+  "expansions": 726264,
+  "sim_nodes": 1091904,
+  "settle_nodes": 37739283,
+  "aux_nodes": 43739368,
+  "aux_skipped": 0,
+  "ms": 26284,
+  "external_wall_s": 26.289,
+  "returncode": 0,
+  "stderr": null,
+  "proof": "not-requested",
+  "proof_positions": null,
+  "proof_length": null,
+  "proof_entries": 1621161,
+  "proof_full": false,
+  "proof_file_exists": false,
+  "proof_file_bytes": null
+ }
+}

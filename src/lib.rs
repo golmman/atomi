@@ -7,9 +7,9 @@
 //! Layer rules: `validate` uses only `std`, `serde_json` and `atomic_movegen`,
 //! never other `crate::` modules (enforced by a test); `search` depends only
 //! on `events`, `guide`, `mover`, `rules`, `table` and `value`; `guide`
-//! depends on `mover`, `rules` and `value` (never `search` or `table`);
-//! `strategy` depends on `table::proofs` (read only) and `rules`; `mover`
-//! depends only on `rules`.
+//! depends on `mover`, `rules`, `table` (exact replay reads proofs) and
+//! `value` (never `search`); `strategy` depends on `table::proofs` (read
+//! only) and `rules`; `mover` depends only on `rules`.
 
 pub mod classify;
 pub mod cli;

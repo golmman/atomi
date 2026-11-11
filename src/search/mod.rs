@@ -402,6 +402,11 @@ impl<S: ProofSink> Engine<S> {
             self.line.pop();
             return Value::Open { pn: 0, dn: 0 };
         }
+        // Plan-18 exact null-threat replay: at a defender node, a proof for
+        // the passed position can prove or lower every open defence.
+        if self.guide.config.enabled && self.guide.config.null_exact && !frame.attacker_node {
+            self.null_replay(&mut frame, board);
+        }
         // MID loop.
         loop {
             let v = node_value(&frame);
@@ -470,7 +475,7 @@ impl<S: ProofSink> Engine<S> {
             // siblings by replaying its proof (exact, default off).
             if !frame.attacker_node
                 && self.guide.config.enabled
-                && self.guide.config.replay_exact
+                && (self.guide.config.replay_exact || self.guide.config.sim_exact)
                 && let Value::Proved { length, .. } = cv
                 && length > 0
             {
@@ -533,6 +538,90 @@ impl<S: ProofSink> Engine<S> {
     /// Replay the proved child `best`'s proof on the frame's other open
     /// children (plan-13 `--guide-replay-exact`). `guide` is the proved
     /// child's board; `remaining` is its proof length.
+    /// Plan-18 `--guide-null-exact`: replay a proof for the passed position
+    /// on every open defence. A defence that cannot be replayed starts at the
+    /// `UNLIKELY` prior. The null board itself is never keyed or stored.
+    fn null_replay(&mut self, frame: &mut Frame, board: &Board) {
+        if !frame
+            .children
+            .iter()
+            .any(|c| matches!(c.value, Value::Open { .. }))
+        {
+            return;
+        }
+        let Some((null, win, work)) =
+            crate::guide::null::null_win(board, self.attacker, &self.tables, u16::MAX)
+        else {
+            return;
+        };
+        let mut aux_left = if self.guide.params.aux_budget == 0 {
+            u64::MAX
+        } else {
+            self.guide.params.aux_budget.saturating_sub(self.aux_nodes)
+        };
+        if aux_left < work {
+            self.aux_skipped += 1;
+            return;
+        }
+        self.aux_nodes += work;
+        aux_left -= work;
+        for j in 0..frame.children.len() {
+            if !matches!(frame.children[j].value, Value::Open { .. }) {
+                continue;
+            }
+            let mut child = board.clone();
+            child.do_move(frame.children[j].mv, &mut StateInfo::new());
+            let mut budget = crate::guide::replay::REPLAY_BUDGET
+                .min(u32::try_from(aux_left).unwrap_or(u32::MAX));
+            let mut line = Vec::new();
+            let proof = crate::guide::replay::simulate_with_guide_proof(
+                &child,
+                &null,
+                win.mv,
+                win.length,
+                self.attacker,
+                u16::MAX,
+                &mut budget,
+                &mut line,
+                &self.line,
+                &self.tables,
+            );
+            let spent = u64::from(crate::guide::replay::REPLAY_BUDGET - budget);
+            aux_left = aux_left.saturating_sub(spent);
+            self.sim_nodes += spent;
+            self.aux_nodes += spent;
+            let Some(proof) = proof else {
+                // The defence parried the threat: the provari prior.
+                let (pn, dn) = pn_dn(&frame.children[j].value);
+                let (pn, dn) = self.guide.unlikely(pn, dn);
+                frame.children[j].value = Value::Open { pn, dn };
+                continue;
+            };
+            for (key, entry) in &proof.proofs {
+                let Some(mv) = atomic_movegen::types::Move::from_bits(entry.mv) else {
+                    continue;
+                };
+                let value = Value::Proved {
+                    length: entry.length,
+                    limit: entry.limit,
+                    mv: Some(mv),
+                };
+                self.tables.store(*key, &value, 0);
+                self.sink.proven(ProofEvent::AttackerProven {
+                    key: *key,
+                    mv,
+                    length: entry.length,
+                    limit: entry.limit,
+                });
+            }
+            frame.children[j].value = Value::Proved {
+                length: proof.length,
+                limit: proof.limit,
+                mv: Some(proof.mv),
+            };
+        }
+    }
+
     fn replay_siblings(
         &mut self,
         frame: &mut Frame,

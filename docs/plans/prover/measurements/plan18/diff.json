@@ -1,0 +1,89 @@
+{
+ "plan": "plan18",
+ "phase": "A-differential",
+ "provari": {
+  "version": "provari 0.1.0",
+  "source": "/tmp/atomi-oracle/provari",
+  "sibling_simulation": {
+   "site": "dfpn.rs mid(), after a defence is proved",
+   "guard": "!attacking && value.proof == 0; sibling open and not already simulated",
+   "guide": "the just-proved defence position, looked up in the proof table",
+   "budget": "a fixed simulation counter per sibling",
+   "success": "the sibling child becomes WON; the replay proofs are kept"
+  },
+  "simulate": {
+   "attacker_move": "the guide's stored proof move, or the guide's immediate explosion / dropped mate",
+   "defences": "every legal reply; a reply that explodes the attacker fails, an exposing reply is a one-move proof, a stored proof is reused, else the same reply in the guide is replayed",
+   "exposing_shortcut": "moves::exploding_capture(next, attacker) -> (1, LAST)",
+   "cycle": "the search path and the replay line are both checked"
+  },
+  "replay_threat": {
+   "site": "dfpn.rs mid(), defender node, no known value, not in check",
+   "null": "pos.null(): side to move passed, en passant cleared",
+   "win": "immediate explosion, a check every evasion loses, a double threat no defence parries, or a move into a known proof",
+   "replay": "the null proof is replayed on every open defence via simulate()",
+   "miss": "a fresh defence starts at half its proof number"
+  }
+ },
+ "atomi": {
+  "sibling_simulation": {
+   "site": "src/search/mod.rs replay_siblings(), src/guide/replay.rs",
+   "guard": "defender node, proved child, replay_exact or sim_exact",
+   "guide": "the just-proved child position, looked up in the proof table",
+   "budget": "REPLAY_BUDGET",
+   "success": "the sibling child becomes Proved; the replay proofs are stored and emitted"
+  },
+  "greedy_simulation": {
+   "site": "src/guide/simulate.rs, src/search/frame.rs pass 1",
+   "what": "a bounded 6-ply greedy playout that adjusts fresh start numbers; no proof"
+  },
+  "null_replay": {
+   "site": "src/guide/threat.rs Guide::replay, src/search/frame.rs pass 1",
+   "what": "a 64-bit explosion-threat signature; parried/created only lowers the start pair via UNLIKELY",
+   "null_position": "never built; the signature is a pure function of the board"
+  }
+ },
+ "gaps": [
+  {
+   "id": "G2-a",
+   "name": "exact null-threat replay",
+   "provari": "build the passed position, find a winning move, replay it on every open defence, lower a fresh parrying defence",
+   "atomi": "signature-only prior; no null proof and no replay",
+   "portability": "same DF-PN base and the same exact replay module; no new search algorithm",
+   "portable": true
+  },
+  {
+   "id": "G2-b",
+   "name": "exposing one-move shortcut",
+   "provari": "simulate_defences treats a defence after which the attacker can explode at once as a one-move proof",
+   "atomi": "replay::simulate_defences had no such shortcut; it needed a stored proof or the guide's reply",
+   "portability": "a local branch in guide/replay.rs using threat::immediate_explosion",
+   "portable": true
+  },
+  {
+   "id": "G2-c",
+   "name": "guide explosion / dropped mate fallback",
+   "provari": "simulate falls back to the guide's immediate explosion or dropped mate when the guide has no stored proof",
+   "atomi": "simulate requires a stored guide proof",
+   "portability": "local, but only useful once the null guide proof is supplied",
+   "portable": true
+  },
+  {
+   "id": "G2-d",
+   "name": "top-level guide proof override",
+   "provari": "the null proof is stored in the table and looked up like any other",
+   "atomi": "the null position must not be keyed or stored, so the top guide move is passed explicitly",
+   "portability": "a new simulate_with_guide_proof entry point",
+   "portable": true
+  }
+ ],
+ "g2": {
+  "pass": true,
+  "rule": "at least one concrete exactness gap portable without changing the DF-PN base",
+  "verdict": "G2-a..G2-d are portable on the existing DF-PN and replay base; Phase B is authorised"
+ },
+ "not_ported": [
+  "provari's check-every-evasion and double-threat null-win cases (only the immediate explosion, stored proof and exposed mate-in-two are ported)",
+  "provari's recomputed proofs (atomi has no recomputed proof table)"
+ ]
+}

@@ -76,6 +76,21 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-10**: plan18 (item 25) executed. G2 passed: the read-only
+  differential found four portable exactness gaps (exact null-threat replay,
+  the exposing one-move shortcut, the guide explosion fallback and the
+  top-level guide-proof override). The opt-in `--guide-sim-exact` and
+  `--guide-null-exact` flags landed with tests; `--guide-null-exact` builds
+  the passed position only ephemerally for the exact one-ply check and the
+  guide side of the replay. G3 **failed**: the declared stack cuts
+  `deep-win` unique expansions only 1.009× at 20 M (2× required), with
+  `core` 1.002 and `easy-win` 0.055. The individual `null_exact` flag proves
+  `core` at 18.3 M and cuts `easy-win` 32.7×, but `deep-win` is insensitive
+  (0.990) and the combined stack regresses `core`. D14 5/5 accepted after
+  fixing a writer `missing` bug (an exact-replay explosion must return the
+  child's own proof entry). No 120 s matrix, no ledger row, no `T_3` claim.
+  See [`report18`](report18.md).
+
 - **2026-11-10**: plan session 18 (plans 16–17 kill review). The conformance
   line is **closed negative**: Phase A (plan16) named quiet grouping at the
   first `core` move divergence, but Phase B (plan17) found all nine
