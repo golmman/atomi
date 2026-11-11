@@ -133,4 +133,8 @@ Can we adopt something for the `prover` initiative?
 
 ---
 
-node count instead of wall time as a new rung
+Should we add node count instead of wall time as a new goal rung?
+
+---
+
+the most recent version of provari is 0.4.0. Should we repin?
