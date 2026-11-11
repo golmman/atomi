@@ -111,10 +111,11 @@ Would this be a valid approach?
 I want the `prover` initiative file shortened and organized.
 
 Some ideas to make it shorter:
-* status -> reduce to one line plus the summary table, everything else is redundant with decisions, milestones and history, see below
-* decisions -> shorten significantly, outsource details to dedicated file.
-* milestones -> shorten significantly, details live in the plan-files.
-* history -> outsource to dedicated file, then shorten: details live in the report-files.
+
+- status -> reduce to one line plus the summary table, everything else is redundant with decisions, milestones and history, see below
+- decisions -> shorten significantly, outsource details to dedicated file.
+- milestones -> shorten significantly, details live in the plan-files.
+- history -> outsource to dedicated file, then shorten: details live in the report-files.
 
 ---
 
@@ -138,3 +139,7 @@ Should we add node count instead of wall time as a new goal rung?
 ---
 
 the most recent version of provari is 0.4.0. Should we repin?
+
+---
+
+I'd rather explore the df-pn "secret sauce" of provari instead of trying a completely new algorithm that moves us away from adopting more ideas. The risk i see is this: pds-pn proves to be somewhat more efficient first, we adopt it, then we try to adopt more provari ideas but this fails since they are based on the df-pn base.

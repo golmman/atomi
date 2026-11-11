@@ -76,6 +76,27 @@ premise are the recorded starting point for the D21 kill review.
 
 ## History
 
+- **2026-11-10**: plan session 18 (plans 16–17 kill review). The conformance
+  line is **closed negative**: Phase A (plan16) named quiet grouping at the
+  first `core` move divergence, but Phase B (plan17) found all nine
+  move-divergent positions are attacker nodes, so exact replay cannot apply
+  there; in isolation `--guide-replay-exact` cuts `core` only 1.02× at 20 M
+  and is slightly larger than `hand` on all three cells. Phase C/D are
+  cancelled. The kill review records the absolute distance (`T_2`; `T_3`
+  needs ~2× on `deep-win`; `T_5` needs 20–36× wall plus 3/3), the proof-set
+  gap (0.10–0.20 % of expansions), and the prior-art re-run. PDS-PN/PN² are
+  rejected for now because they replace the DF-PN base; provari's ideas are
+  DF-PN-shaped. **D31** authorises **item 25**, a DF-PN exactness stack
+  (exact simulation + exact null-threat replay) gated on a ≥ 2× `deep-win`
+  unique-expansion cut at 20 M / 192 MB. Wrote [`plan18`](plan18.md). No
+  code, no measurements.
+
+- **2026-11-10**: plan16/17 (item 24) executed. Phase A passed on `core`
+  (quiet grouping holds and is specific); Phase B failed G2 (no defender
+  node at the first move divergence) and G3 (`replay_exact` 1.02× `core`,
+  no `easy-win` regression). B3/C/D were not implemented. See
+  [`report16`](report16.md) and [`report17`](report17.md).
+
 - **2026-11-10**: plan session 16. The plan15 close recommendation is
   rejected; the initiative stays open. **D29** fixes the stale Tier 2
   coverage clause (2/3, shared cells) and authorises **item 24, the

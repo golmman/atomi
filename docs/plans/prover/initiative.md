@@ -2,7 +2,7 @@
 
 ## Status
 
-**Open (2026-11-10).** On the D30 staircase the engine is at **`T_2`** (`core`+`easy-win` at 120 s); `T_3` (`deep-win` at 120 s) is the next rung; `T_5` (the goal) is not met. The bare tree is the product candidate; item 24 (conformance line) Phase A passed (D29) and Phase B (plan17) is **negative**: exact replay cannot apply at the first divergence and cuts `core` only 1.02×, so the line is closed. Full record: [`history.md`](history.md); decision rationale: [`decisions.md`](decisions.md).
+**Open (2026-11-10).** On the D30 staircase the engine is at **`T_2`** (`core`+`easy-win` at 120 s); `T_3` (`deep-win` at 120 s) is the next rung; `T_5` (the goal) is not met. The bare tree is the product candidate; item 24 (conformance line) is **closed negative** (Phase B: exact replay cannot apply at the first divergence and cuts `core` only 1.02×). Item 25 authorises a **DF-PN exactness stack** (D31), gated on a ≥ 2× `deep-win` unique-expansion cut at 20 M. Full record: [`history.md`](history.md); decision rationale: [`decisions.md`](decisions.md).
 
 ## Reference
 
@@ -113,12 +113,13 @@ One-line resolutions; full text, rationale, source take-list and legacy measured
 | D28 | Tier 1 amended to 2/3 | **Goal clause superseded by D30**; the `deep-win` 1/3 measurement stands as evidence |
 | D29 | Conformance line and Tier 2 coverage | **Tier 2 coverage clause superseded by D30**; item 24 authorised (differential, exact replay, exact `pn`/`dn`, restarts) |
 | D30 | Goal staircase (necessary conditions) | `T_1`…`T_5`, each a subset of the next; `T_5` is the goal; supersedes the tier clauses of D27/D28/D29 |
+| D31 | Conformance close and DF-PN exactness stack | Item 24 closed negative; PDS-PN/PN² rejected for now; item 25 authorises exact simulation + exact null-threat replay, gated on ≥ 2× `deep-win` unique-expansion cut at 20 M; no default change |
 
 ## Backlog
 
 Items are stable semantic identities. Plans are numbered sequentially and independently of items. Plans use stack-level gating (D21), except a single-mechanism plan that is independently meaningful.
 
-**Priority after plan session 16 (2026-11-10), updated by plan17:** the bare tree is the product. On the D30 staircase the engine is at **`T_2`**; the next rung is **`T_3`** (`deep-win` 3/3 at 120 s), a coverage problem, not a wall problem. D29 authorised **item 24, the conformance line**. Phase A (plan16) found quiet grouping as the named `core` divergence; Phase B (plan17) failed both stops: no first move-divergent position is a defender node, and exact replay cuts `core` only 1.02× at 20 M. The conformance line is closed; the next decision is a formulation change or a new search algorithm. The 120 s budget is not raised, the hand-guide/auxiliary line stays closed, and no portfolio is built.
+**Priority after plan session 18 (2026-11-10), updated by plan17:** the bare tree is the product. On the D30 staircase the engine is at **`T_2`**; the next rung is **`T_3`** (`deep-win` 3/3 at 120 s), a coverage problem, not a wall problem. Item 24 (conformance) is **closed negative**: Phase A named quiet grouping, but Phase B found no first move-divergent position is a defender node and exact replay cuts `core` only 1.02× at 20 M. The hand-guide/auxiliary line, the portfolio and restarts stay closed. **Item 25** is the only open line: a DF-PN exactness stack (exact simulation + exact null-threat replay), gated on a ≥ 2× `deep-win` unique-expansion cut at 20 M / 192 MB. PDS-PN/PN² are rejected for now because they replace the DF-PN base. The proof-set gap is 0.10–0.20 % (proof positions vs expansions), so the search is tree-directedness-limited. The 120 s budget is not raised; if the stack fails, the next decision is a goal re-pin under D30 or a separately authorised new search.
 
 | # | Milestone | Gate | Status |
 | --- | --- | --- | --- |
@@ -137,6 +138,7 @@ Items are stable semantic identities. Plans are numbered sequentially and indepe
 | 22 | Cheap probes before any conformance stack | A: `deep-win` 3/3; B: cap ≥ 2× fewer unique expansions; C: `core` ≥ 2× cut | **all fail; hand-guide line closed** — [plan13](plan13.md), [report13](report13.md) |
 | 23 | `deep-win` formulation decision (kill review) | owner records A, B or C in `initiative.md` and `bench.md`; no silent goal change | **executed; option A, D28** — [plan14](plan14.md) |
 | 24 | **Conformance line** | Phase A: a named divergence explains the first divergent ply, or stop. B/C/D: ≥ 2× cut in `core` unique expansions vs bare at 20 M, no `easy-win` regression > 10 % | **closed negative** — Phase A passed (quiet grouping); Phase B failed G2 (no defender node at the first divergence) and G3 (`replay_exact` 1.02× `core`, no `easy-win` regression); B3/C/D not implemented — [plan16](plan16.md), [report16](report16.md), [plan17](plan17.md), [report17](report17.md) |
+| 25 | **DF-PN exactness stack** | G2 mechanism differential finds a portable exactness gap; G3 ≥ 2× `deep-win` unique-expansion cut vs bare at 20 M / 192 MB, no `core`/`easy-win` regression > 10 %; if G3 passes, 120 s matrix and D14, `T_3` only if 3/3 | **open; plan18** — [plan18](plan18.md) |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose before the M2+M3 stack. If the hand-guide stack cannot meet D21, do not split it back into mechanism plans: record the stack, its census and both-direction ablations, and take the continue/re-scope/close decision at a kill review. The conformance line (item 24) is a separate stack: its stop rule is the Phase A differential, not the hand-guide stop rule.
 

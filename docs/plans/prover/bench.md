@@ -170,6 +170,17 @@ initiative goal is not met; the recommendation is to close with the negative
 Tier 2 result or take an owner decision for a new speed mechanism. See
 [`report15.md`](report15.md).
 
+**Update (plan session 18, 2026-11-10).** Item 24 (conformance) is **closed
+negative**: Phase B found no first move-divergent position is a defender
+node, and exact replay cuts `core` only 1.02× at 20 M. The absolute distance
+is unchanged (`T_2`; `T_3` needs ~2× on `deep-win`; `T_5` needs 20–36× wall
+plus 3/3). The proof-set gap is 0.10–0.20 % (proof positions vs expansions),
+so the search is tree-directedness-limited. **D31** authorises **item 25**, a
+DF-PN exactness stack (exact simulation + exact null-threat replay) gated on a
+≥ 2× `deep-win` unique-expansion cut at 20 M / 192 MB; PDS-PN/PN² are rejected
+for now because they replace the DF-PN base. No ledger row follows from the
+decision. See [`plan18`](plan18.md).
+
 <!-- from atomic_solver@5f85133ea9d751368a682e53e354bd3fc0016d00:docs/plans/winprover/bench.md §Names and ids -->
 
 ## Names and ids (read this first)
