@@ -146,6 +146,7 @@ I'd rather explore the df-pn "secret sauce" of provari instead of trying a compl
 
 ---
 
+Our project `atomi` is still not on par with the search tree reduction of `provari`.
 Analyze the `provari` search in depth and compare it to the current state of `atomi`.
 Compile a complete table with concise descriptions of ideas/features that improve the search of `provari` compared to `atomi`.
 
