@@ -1,0 +1,36 @@
+{
+  "cell": "deep-win",
+  "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+  "cap": {
+    "kind": "evals",
+    "value": 5000000,
+    "seed": 0
+  },
+  "control_expansions": 168910,
+  "configs": {
+    "default-2^17": {
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "wall_s": 2.603,
+      "null_cache_hits": 1014999,
+      "null_cache_misses": 2364622,
+      "tree_identical_to_control": true
+    },
+    "disabled-0": {
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "wall_s": 2.865,
+      "null_cache_hits": 0,
+      "null_cache_misses": 0,
+      "tree_identical_to_control": true
+    },
+    "requested-2^21": {
+      "child_evals": 5000025,
+      "expansions": 168885,
+      "wall_s": 2.819,
+      "null_cache_hits": 1200836,
+      "null_cache_misses": 2178341,
+      "tree_identical_to_control": false
+    }
+  }
+}

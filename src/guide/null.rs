@@ -19,9 +19,9 @@
 use crate::guide::threat;
 use crate::rules;
 use crate::search::value::Value;
-use crate::table::Tables;
+use crate::table::{CachedLimit, NullCache, Tables};
 use atomic_movegen::board::{Board, StateInfo};
-use atomic_movegen::movegen::generate_legal;
+use atomic_movegen::movegen::{generate_legal, generate_pseudo_legal};
 use atomic_movegen::types::{Color, EnPassantMode, Move, MoveList};
 
 /// A winning move for the attacker in the null position, with its proof.
@@ -66,7 +66,7 @@ pub struct NullWork {
 pub fn null_win(
     board: &Board,
     attacker: Color,
-    tables: &Tables,
+    tables: &mut Tables,
     remaining: u16,
     screen: bool,
     work: &mut NullWork,
@@ -124,9 +124,10 @@ pub fn null_win(
         return None;
     }
     // Pass 2: every defence exposes the commoner (a mate in two).
+    let cache = tables.null_cache_mut();
     for &m in moves.as_slice() {
         scratch.do_move(m, &mut state);
-        if let Some(limit) = exposed_limit(&scratch, attacker, work) {
+        if let Some(limit) = exposed_limit(&scratch, attacker, work, cache) {
             return Some((
                 null,
                 NullWin {
@@ -148,20 +149,54 @@ pub fn null_win(
 /// self-explosion, material draw, or [`threat::immediate_explosion_bits`])
 /// instead of `rules::status` + `immediate_explosion`, and one scratch board
 /// is reused for every reply.
-fn exposed_limit(child: &Board, attacker: Color, work: &mut NullWork) -> Option<u8> {
+fn exposed_limit(
+    child: &Board,
+    attacker: Color,
+    work: &mut NullWork,
+    cache: &mut NullCache,
+) -> Option<u8> {
     if child.rule50() >= 100 {
         return None;
     }
+    let key = rules::key(child);
+    let rule50 = child.rule50() as u8;
+    if let Some(cached) = cache.get(key, rule50, attacker) {
+        return match cached {
+            CachedLimit::Negative => None,
+            CachedLimit::Positive(limit) => Some(limit),
+        };
+    }
+    let result = exposed_limit_uncached(child, attacker, work);
+    cache.insert(key, rule50, attacker, result);
+    result
+}
+
+/// The uncached body of [`exposed_limit`] (plan-26 EARLY-REPLY).
+///
+/// The pseudo-legal stream is filtered lazily: the first illegal reply is
+/// skipped, and the first legal reply that is not accepted ends the scan.
+/// The result is order-independent (all accepted vs one rejected; `limit`
+/// is a max over accepted replies), so the tree is unchanged.
+fn exposed_limit_uncached(child: &Board, attacker: Color, work: &mut NullWork) -> Option<u8> {
     let mut replies = MoveList::new();
-    generate_legal(child, &mut replies);
+    generate_pseudo_legal(child, &mut replies);
     if replies.is_empty() {
         return None;
     }
+    // Two states: one for the child's legality predicate, one for the
+    // scratch make/unmake. Sharing them diverged in the plan-26 probe.
+    let mut child_state = StateInfo::new();
+    child.populate_state(&mut child_state);
     let defender = attacker.flip();
     let mut limit = 99u8;
     let mut scratch = child.clone();
     let mut state = StateInfo::new();
+    let mut any_legal = false;
     for &reply in replies.as_slice() {
+        if !child.is_legal_with_state(reply, &child_state) {
+            continue;
+        }
+        any_legal = true;
         work.replies += 1;
         scratch.do_move(reply, &mut state);
         if scratch.rule50() >= 100 {
@@ -185,6 +220,9 @@ fn exposed_limit(child: &Board, attacker: Color, work: &mut NullWork) -> Option<
             limit = 98;
         }
         scratch.undo_move(reply, &state);
+    }
+    if !any_legal {
+        return None;
     }
     Some(limit)
 }
@@ -327,10 +365,10 @@ mod tests {
         // Black to move; White's rook on a1 can take a7 and blast the black
         // commoner on a8 if White were to move.
         let b = board("k7/p7/8/8/8/8/8/R3K3 b - - 0 1");
-        let tables = Tables::new(16, true);
+        let mut tables = Tables::new(16, true);
         let mut work = NullWork::default();
         let (null, win) =
-            null_win(&b, Color::White, &tables, u16::MAX, false, &mut work).expect("null win");
+            null_win(&b, Color::White, &mut tables, u16::MAX, false, &mut work).expect("null win");
         assert_eq!(win.length, 1);
         let mut after = null.clone();
         after.do_move(win.mv, &mut StateInfo::new());
@@ -360,16 +398,16 @@ mod tests {
         );
         let mut work = NullWork::default();
         let (_, win) =
-            null_win(&b, Color::White, &tables, u16::MAX, false, &mut work).expect("null win");
+            null_win(&b, Color::White, &mut tables, u16::MAX, false, &mut work).expect("null win");
         assert_eq!((win.mv, win.length), (mv, 2));
     }
 
     #[test]
     fn no_null_win_on_a_quiet_position() {
         let b = board("4k3/8/8/8/8/8/8/4K3 b - - 0 1");
-        let tables = Tables::new(16, true);
+        let mut tables = Tables::new(16, true);
         let mut work = NullWork::default();
-        assert!(null_win(&b, Color::White, &tables, u16::MAX, false, &mut work).is_none());
+        assert!(null_win(&b, Color::White, &mut tables, u16::MAX, false, &mut work).is_none());
     }
 
     #[test]
@@ -393,7 +431,8 @@ mod tests {
                 let attacker = child.side_to_move().flip();
                 let mut closure_work = NullWork::default();
                 let mut reference_work = NullWork::default();
-                let closure = exposed_limit(&child, attacker, &mut closure_work);
+                let mut cache = NullCache::new(1 << 10);
+                let closure = exposed_limit(&child, attacker, &mut closure_work, &mut cache);
                 let reference = exposed_limit_reference(&child, attacker, &mut reference_work);
                 assert_eq!(
                     closure, reference,
@@ -409,12 +448,12 @@ mod tests {
 
     #[test]
     fn scratch_null_win_matches_the_clone_reference() {
-        let tables = Tables::new(16, true);
+        let mut tables = Tables::new(16, true);
         for fen in FIXTURES {
             let b = board(fen);
             let attacker = b.side_to_move().flip();
             let mut work = NullWork::default();
-            let got = null_win(&b, attacker, &tables, u16::MAX, false, &mut work);
+            let got = null_win(&b, attacker, &mut tables, u16::MAX, false, &mut work);
             let reference = null_win_reference(&b, attacker, &tables, u16::MAX);
             match (got, reference) {
                 (None, None) => {}
@@ -430,6 +469,31 @@ mod tests {
                 (got, reference) => panic!(
                     "null win presence mismatch on {fen}: got {got:?}, reference {reference:?}"
                 ),
+            }
+        }
+    }
+
+    #[test]
+    fn cache_matches_an_uncached_call_on_a_repeated_position() {
+        for fen in FIXTURES {
+            let b = board(fen);
+            let mut moves = MoveList::new();
+            generate_legal(&b, &mut moves);
+            for &m in moves.as_slice() {
+                let mut child = b.clone();
+                child.do_move(m, &mut StateInfo::new());
+                if child.rule50() >= 100 {
+                    continue;
+                }
+                let attacker = child.side_to_move().flip();
+                let mut cache = NullCache::new(1 << 10);
+                let mut first_work = NullWork::default();
+                let first = exposed_limit(&child, attacker, &mut first_work, &mut cache);
+                let mut second_work = NullWork::default();
+                let second = exposed_limit(&child, attacker, &mut second_work, &mut cache);
+                assert_eq!(first, second, "cache mismatch on {fen} after {m:?}");
+                assert_eq!(second_work.replies, 0, "cache hit did work on {fen}");
+                assert_eq!(cache.hits(), 1, "cache did not hit on {fen}");
             }
         }
     }

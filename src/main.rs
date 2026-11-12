@@ -25,6 +25,7 @@ fn print_help() {
          \x20                       [--guide-max-sim N] [--guide-max-settle N]\n\
          \x20                       [--guide-aux-budget N] [--guide-sim-plies N]\n\
          \x20                       [--guide-group] [--proof-share PERCENT]\n\
+         \x20                       [--null-cache-entries N]\n\
          \x20                       [--stats] [--max-depth N]\n\
          \x20                       [--guide-fresh-dn] [--guide-replay-exact]\n\
          \x20   atomi validate PROOF.jsonl...\n\
@@ -58,6 +59,7 @@ fn prove(args: &[String]) -> ExitCode {
         guide: opts.guide,
         guide_params: opts.guide_params,
         proof_share_percent: opts.proof_share_percent,
+        null_cache_entries: opts.null_cache_entries,
         seed: opts.seed,
         stats: opts.stats,
         max_depth: opts.max_depth,
@@ -87,6 +89,7 @@ fn prove(args: &[String]) -> ExitCode {
              \"attacker_expansions\":{},\"defender_expansions\":{},\
              \"plain_children\":{},\"group_children\":{},\
              \"null_calls\":{},\"null_replies\":{},\
+             \"null_cache_hits\":{},\"null_cache_misses\":{},\
              \"depth_histogram\":[{}],\"selected_class\":[{}]}}",
             result.unique_keys,
             result.unique_keys_capped,
@@ -100,6 +103,8 @@ fn prove(args: &[String]) -> ExitCode {
             result.group_children,
             result.null_calls,
             result.null_replies,
+            result.null_cache_hits,
+            result.null_cache_misses,
             depth.join(","),
             class.join(","),
         )

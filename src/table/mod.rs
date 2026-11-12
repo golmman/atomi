@@ -21,12 +21,14 @@
 
 mod alloc;
 mod filter;
+mod null_cache;
 pub mod proofs;
 mod tt;
 
 use crate::search::value::{ANY, Value};
 use atomic_movegen::types::Move;
 pub use filter::Filter;
+pub use null_cache::{CachedLimit, DEFAULT_ENTRIES as DEFAULT_NULL_CACHE_ENTRIES, NullCache};
 pub use proofs::{ProofEntry, ProofSlot, ProofTable};
 pub use tt::{Cluster, Tt};
 
@@ -41,6 +43,15 @@ pub struct Budget {
     pub proof_slots: usize,
     /// Filter bits (a power of two in `[2^20, 2^25]`).
     pub filter_bits: usize,
+    /// Exposed-limit cache slots actually allocated (plan 26).
+    pub cache_entries: usize,
+}
+
+impl Budget {
+    /// Bytes charged to the exposed-limit cache.
+    pub fn cache_bytes(&self) -> usize {
+        self.cache_entries * null_cache::ENTRY_BYTES
+    }
 }
 
 /// Split `mb` MiB into the TT / proof-table / filter budgets with the
@@ -55,22 +66,61 @@ pub fn split(mb: usize) -> Budget {
 /// (1..=90; the CLI and `Tables` validate). Invariant:
 /// `64*tt_clusters + 16*proof_slots + filter_bits/8` bytes fit the label.
 pub fn split_share(mb: usize, proof_percent: u8) -> Budget {
-    let total = mb.saturating_mul(1 << 20);
+    split_share_with_cache(mb, proof_percent, 0)
+}
+
+/// Like [`split_share`], but request up to `cache_entries` slots for the
+/// exposed-limit cache. The request is clamped to the label's free space and
+/// rounded down to a power of two; [`Budget::cache_entries`] is the size
+/// actually allocated. The cache is compensated from the filter/TT, never
+/// added on top of the label.
+pub fn split_share_with_cache(mb: usize, proof_percent: u8, cache_entries: usize) -> Budget {
+    let label = mb.saturating_mul(1 << 20);
     let pct = usize::from(proof_percent.clamp(1, 90));
     // The filter has a 2^20-bit floor (128 KiB); reserve it plus one TT
     // cluster, so every share keeps the byte invariant even at 1 MiB.
-    let proof_cap = total.saturating_sub(64 + (1 << 17));
-    let proof_bytes = (total * pct / 100).min(proof_cap);
+    let proof_cap = label.saturating_sub(64 + (1 << 17));
+    let proof_bytes = (label * pct / 100).min(proof_cap);
     let proof_slots = proof_bytes / 16;
-    let tt_slot_estimate = (total - proof_bytes) / 16;
+    let tt_slot_estimate = (label - proof_bytes) / 16;
     // prev_power_of_two(8 * tt_slot_estimate), clamped to [2^20, 2^25].
     let x = (8 * tt_slot_estimate).max(1);
-    let filter_bits = (1usize << (usize::BITS - 1 - x.leading_zeros())).clamp(1 << 20, 1 << 25);
-    let tt_clusters = total.saturating_sub(proof_bytes + filter_bits / 8) / 64;
+    let base_filter_bits =
+        (1usize << (usize::BITS - 1 - x.leading_zeros())).clamp(1 << 20, 1 << 25);
+    let base_tt_clusters = label.saturating_sub(proof_bytes + base_filter_bits / 8) / 64;
+    // Take the cache from the filter first (tree-neutral: the filter is
+    // exact in the negative direction), then from the TT. The proof table
+    // keeps its size, so proof retention is unchanged. Unused filter slack
+    // stays padding, so a filter-only cache leaves the TT size unchanged.
+    let filter_floor = 1 << 20;
+    let filter_slack = base_filter_bits.saturating_sub(filter_floor) / 8;
+    let max_cache = filter_slack + base_tt_clusters.saturating_sub(1) * 64;
+    let requested_bytes = cache_entries
+        .saturating_mul(null_cache::ENTRY_BYTES)
+        .min(max_cache);
+    let requested_entries = requested_bytes / null_cache::ENTRY_BYTES;
+    let cache_entries = if requested_entries == 0 {
+        0
+    } else {
+        1usize << (usize::BITS - 1 - requested_entries.leading_zeros())
+    };
+    let cache_bytes = cache_entries * null_cache::ENTRY_BYTES;
+    let wanted_filter_bytes = (base_filter_bits / 8).saturating_sub(cache_bytes);
+    let filter_bytes = wanted_filter_bytes.max(filter_floor / 8);
+    let filter_bits = if filter_bytes == 0 {
+        filter_floor
+    } else {
+        let bits = filter_bytes * 8;
+        (1usize << (usize::BITS - 1 - bits.leading_zeros())).clamp(filter_floor, base_filter_bits)
+    };
+    let from_filter = base_filter_bits / 8 - filter_bits / 8;
+    let from_tt = cache_bytes.saturating_sub(from_filter);
+    let tt_clusters = base_tt_clusters.saturating_sub(from_tt.div_ceil(64));
     Budget {
         tt_clusters: tt_clusters.clamp(1, u32::MAX as usize),
         proof_slots,
         filter_bits,
+        cache_entries,
     }
 }
 
@@ -105,6 +155,7 @@ pub struct Tables {
     tt: Tt,
     proofs: ProofTable,
     filter: Filter,
+    null_cache: NullCache,
 }
 
 impl Tables {
@@ -117,7 +168,24 @@ impl Tables {
 
     /// Allocate with an explicit proof-table share (percent of `--memory`).
     pub fn with_share(memory_mb: usize, filter: bool, proof_percent: u8) -> Tables {
-        let b = split_share(memory_mb, proof_percent);
+        Tables::with_share_and_cache(
+            memory_mb,
+            filter,
+            proof_percent,
+            null_cache::DEFAULT_ENTRIES,
+        )
+    }
+
+    /// Allocate with an explicit proof-table share and a requested cache
+    /// size. The splitter clamps the request and returns the size actually
+    /// allocated, so accounting and allocation can never disagree.
+    pub fn with_share_and_cache(
+        memory_mb: usize,
+        filter: bool,
+        proof_percent: u8,
+        cache_entries: usize,
+    ) -> Tables {
+        let b = split_share_with_cache(memory_mb, proof_percent, cache_entries);
         Tables {
             tt: Tt::new(b.tt_clusters),
             proofs: ProofTable::new(b.proof_slots),
@@ -126,6 +194,7 @@ impl Tables {
             } else {
                 Filter::disabled()
             },
+            null_cache: NullCache::new(b.cache_entries),
         }
     }
 
@@ -133,7 +202,12 @@ impl Tables {
     /// equivalence test).
     #[cfg(test)]
     pub fn from_parts(tt: Tt, proofs: ProofTable, filter: Filter) -> Tables {
-        Tables { tt, proofs, filter }
+        Tables {
+            tt,
+            proofs,
+            filter,
+            null_cache: NullCache::new(0),
+        }
     }
 
     /// Whether the filter is still answering (enabled and not dropped).
@@ -217,6 +291,16 @@ impl Tables {
         &self.proofs
     }
 
+    /// The exposed-limit cache (plan 26).
+    pub fn null_cache(&self) -> &NullCache {
+        &self.null_cache
+    }
+
+    /// The exposed-limit cache, mutably (plan 26).
+    pub fn null_cache_mut(&mut self) -> &mut NullCache {
+        &mut self.null_cache
+    }
+
     /// Consume the tables, returning the proof table.
     pub fn into_proofs(self) -> ProofTable {
         self.proofs
@@ -247,7 +331,8 @@ mod tests {
             for pct in 1u8..=90 {
                 let b = split_share(mb, pct);
                 assert!(
-                    64 * b.tt_clusters + 16 * b.proof_slots + b.filter_bits / 8 <= mb << 20,
+                    64 * b.tt_clusters + 16 * b.proof_slots + b.filter_bits / 8 + b.cache_bytes()
+                        <= mb << 20,
                     "mb={mb} pct={pct}: {b:?}"
                 );
                 assert!(b.tt_clusters >= 1);
@@ -255,6 +340,55 @@ mod tests {
             }
         }
         assert_eq!(split_share(192, 75).proof_slots, split(192).proof_slots);
+    }
+
+    #[test]
+    fn split_with_cache_invariant() {
+        for mb in [1usize, 7, 16, 64, 192, 1024, 4096] {
+            for pct in [1u8, 25, 50, 75, 90] {
+                for entries in [0usize, 1 << 10, 1 << 17, 1 << 20] {
+                    let b = split_share_with_cache(mb, pct, entries);
+                    assert!(
+                        64 * b.tt_clusters
+                            + 16 * b.proof_slots
+                            + b.filter_bits / 8
+                            + b.cache_bytes()
+                            <= mb << 20,
+                        "mb={mb} pct={pct} entries={entries}: {b:?}"
+                    );
+                    assert!(b.cache_entries <= entries);
+                    assert!(b.cache_entries.is_power_of_two() || b.cache_entries == 0);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn filter_only_cache_keeps_tt_and_proof_sizes() {
+        let base = split_share(192, 75);
+        let entries = 1 << 17;
+        let b = split_share_with_cache(192, 75, entries);
+        assert_eq!(b.cache_entries, entries);
+        assert_eq!(b.proof_slots, base.proof_slots);
+        assert_eq!(b.tt_clusters, base.tt_clusters);
+        assert!(b.filter_bits < base.filter_bits);
+    }
+
+    #[test]
+    fn cache_allocation_equals_the_budget() {
+        for mb in [7usize, 16, 192, 1024] {
+            for pct in [25u8, 75, 90] {
+                for entries in [0usize, 1 << 10, 1 << 17, 1 << 21] {
+                    let t = Tables::with_share_and_cache(mb, true, pct, entries);
+                    let b = split_share_with_cache(mb, pct, entries);
+                    assert_eq!(t.null_cache.len(), b.cache_entries);
+                    assert_eq!(
+                        t.null_cache.len() * null_cache::ENTRY_BYTES,
+                        b.cache_bytes()
+                    );
+                }
+            }
+        }
     }
 
     #[test]

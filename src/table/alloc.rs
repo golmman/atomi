@@ -124,6 +124,9 @@ unsafe impl ZeroValid for Cluster {}
 unsafe impl ZeroValid for ProofSlot {}
 // SAFETY: a filter word of zeros means no bit set.
 unsafe impl ZeroValid for u64 {}
+// SAFETY: a byte of zeros is a valid `u8`; the null cache reads `0` as the
+// empty-slot signal.
+unsafe impl ZeroValid for u8 {}
 
 /// An owning `n`-element, zero-initialized, lazily committed array of `T`.
 /// Dereferences to `[T]`.

@@ -4,7 +4,8 @@
 
 **Open (2026-11-10; revised 2026-11-12 by [`report20.md`](report20.md),
 [`report21.md`](report21.md), [`report23.md`](report23.md),
-[`report24.md`](report24.md) and [`report25.md`](report25.md)).**
+[`report24.md`](report24.md), [`report25.md`](report25.md) and
+[`report27.md`](report27.md)).**
 Items 26–29 are **executed**; item 29 (GROUP-V1) is **closed negative**
 ([`report24`](report24.md)): score-free plain members with the group on by
 default lose `deep-win` (`0/3` at 120 s vs a `3/3` control, median 105.0 s)
@@ -16,13 +17,19 @@ NULL-V1: at 120 s, seeds 0–2, `deep-win` 0.796× the same-session control
 (median 83.5 s), `core` 0.784×, `easy-win` 0.766×, with
 `child_evals`/`expansions` identical 9/9 and D14 9/9 accepted. NULL-S
 (`--guide-null-screen`) cuts `deep-win` further (0.571×) but fails the
-small-cell guard (`easy-win` 3.349×), so it stays opt-in. `T_4` distance is
-`deep-win` **8.35×** (83.5 s → 10 s). Item 34 (NULL-V2, [`report26`](report26.md))
-then missed G-N2: at 120 s, seeds 0–2, `deep-win` 0.8631× the same-session
-control (median 71.7 s vs 83.0 s) against the declared ≤ 0.85×, with the tree
-identical 9/9 and `core` 0.8843× / `easy-win` 0.8631×. The stack was not
-adopted and the per-node micro-line is **closed**; the next decision is a
-formulation choice (PDS-PN/PN² or a goal re-pin), not another micro-plan.
+small-cell guard (`easy-win` 3.349×), so it stays opt-in. Item 34 (NULL-V2,
+[`report26`](report26.md)) then missed G-N2: at 120 s, seeds 0–2, `deep-win`
+0.8631× the same-session control (median 71.7 s vs 83.0 s) against the
+declared ≤ 0.85×, with the tree identical 9/9 and `core` 0.8843× /
+`easy-win` 0.8631×. The gate was not moved: the miss is recorded, and the
+owner adopted the cleaned stack by explicit **override** (D39,
+[`plan27`](plan27.md)) — 2^17 filter-only cache, tree-identical at the
+measured size, with `--null-cache-entries` as the deterministic knob. The
+per-node micro-line stays **closed**; `T_4` distance is now `deep-win`
+**7.17×** (71.7 s → 10 s), or 7.74× on the same-session Cap-120 bench row
+(77.4 s, geomean **9.681**, 3/3 claimed, D14 3/3 accepted, D39). The next
+decision is still a formulation choice (PDS-PN/PN² or a goal re-pin), not
+another micro-plan.
 Item 26 adopted the starting-number algebra
 R1+R3+R6 (`core` 4.74×, `easy-win` 3.34×, `deep-win` 2.80× vs the product
 hand). Items 27–28 (AUX-V1, [`plan20`](plan20.md)) made the exact sibling
@@ -163,6 +170,12 @@ One-line resolutions; full text, rationale, source take-list and legacy measured
 | D31 | Conformance close and DF-PN exactness stack | Item 24 closed negative; PDS-PN/PN² rejected for now; item 25 authorises exact simulation + exact null-threat replay, gated on ≥ 2× `deep-win` unique-expansion cut at 20 M; no default change |
 | D32 | Product premise after analysis1 | The bare tree is provari minus the guide (9.27 M vs 8.65 M on `core`); the guide's starting-number algebra is a measured 2.6–3.6× tree lever (`core` 3/3 at 120 s, `deep-win` proved at 23.4 M / 107 s); supersedes the "bare tree is the product candidate" clause of D28 and the hand-guide-line **closure** clause of D28/D31 (the closure judged the product number mapping, not the mechanism); authorises items 26–29 in adopt order, defaults change only through a stack gate + D14. **Confirmed by item 26** (report19): the algebra is a 2.8–4.7× tree lever and is now the default; the analysis1 wall table was tree-only (its "aux on" rows match the aux-off timings), so the aux cost is the next lever |
 | D33 | Instrumentation traps | Guide flags must follow `--guide hand` (it assigns a fresh config; order-independent merge belongs to item 26); `--stats` unique counts are a capped lower bound at 1,468,006 (2^21 set stops at 70 %) — never compared at the cap, earlier >1.47 M figures re-derived before use |
+| D34 | Ledger budget convention | `bench.md` is a results ledger; goal/rungs/budgets live only in `initiative.md`; a row records its cap, and geomeans compare only within one cap |
+| D35 | Proof-retention share | Default proof-table share 75 % of `--memory` (was 25 %); item 32 reaches `T_3` with 9/9 D14 accepted |
+| D36 | Wall decomposition and item 29 closure | GROUP-V1 closed negative; wall = tree × per-expansion; the remaining gap is per-expansion cost (11.5–15.5×) |
+| D37 | Per-node cost and NULL-V1 | Exact null replay is the first-order term; NULL-V1 adopted (`deep-win` 0.796×, tree identical); NULL-S stays opt-in |
+| D38 | NULL-V2 and the micro-line closure | G-N2 missed (`deep-win` 0.8631× vs ≤ 0.85×); per-node micro-line closed; the "not adopted" clause is superseded by D39 |
+| D39 | NULL-V2 adoption by owner override | **Adopted despite the G-N2 miss**, recorded not rewritten: the 2^17 filter-only cache is exact and tree-identical; the stored plan26 patch's 2^21 constant is corrected; `--null-cache-entries` (default 2^17, `0` off) is the deterministic knob; probe-only counters removed. Cap-120 bench 3/3, geomean 9.681, D14 3/3; `T_4` distance `deep-win` 7.17×. Supersedes D38's "not adopted" clause; the per-node micro-line stays closed |
 
 ## Backlog
 
@@ -202,7 +215,7 @@ Still closed: portfolio and restarts. Still rejected for now: PDS-PN/PN² (they 
 | 31 | **Ledger budget convention** | one row per executed plan, each at its own cap; `bench.md` states no goal, no rung and no cap policy; D34 records the split | **done** — [plan21](plan21.md), [report21](report21.md): D34 supersedes D30's ledger-split clause, `bench.md` is a results ledger (staircase, current position and the cap convention removed), `scripts/check_goal.py` scans three normative docs instead of four, and the plan20 stack is appended at Cap 600 s (`core` 16.28, `easy-win` 6.91, `deep-win` not claimed `store-full`, geomean 10.6 over 2 claimed cells) |
 | 32 | **Proof-retention share** (RET-V1) | one global proof-table share; Phase A 25/50/75 × seeds 0–2; adopt the smallest share with `deep-win` 3/3 at 120 s, `core`/`easy-win` 3/3 and no median-wall regression > 10 %; D14 on every proved seed | **done** — [plan23](plan23.md), [report23](report23.md): 50 % fails (`deep-win` 2/3, seed 1 `proof_full`); **75 % selected** and made the default (D35). Phase C: all nine 120 s runs proved, all nine D14 proofs accepted, `core` 15.68, `easy-win` 6.84, `deep-win` 15.81, geomean 11.93 at Cap 120 s. **`T_3` reached** |
 | 33 | **Per-node cost** (NULL-V1) | Phase A attribution (`null_calls`/`null_replies`); NULL-V1 = closure reply test, one scratch board, defender-eval guard; G-V1 120 s × seeds 0–2: `deep-win` median ≤ 0.80× control, `core`/`easy-win` ≤ 1.1×, tree identical, every proved seed D14-accepted; then NULL-S `deep-win` ≤ 0.67× with the same small-cell guard | **done; NULL-V1 adopted, NULL-S opt-in** — [plan25](plan25.md), [report25](report25.md): NULL-V1 gives `deep-win` 0.796× (83.5 s vs 104.9 s), `core` 0.784×, `easy-win` 0.766×, tree identical 9/9, D14 9/9. NULL-S gives `deep-win` 0.571× but `easy-win` 3.349×, so it fails G-S and stays `--guide-null-screen`. `T_4` distance `deep-win` 8.35× |
-| 34 | **Per-node residual** (NULL-V2) | EARLY-REPLY (pseudo-legal + lazy legality, two `StateInfo`s) + EXPOSED-CACHE (direct-mapped `(child key, rule50, attacker)`, both signs, full-key compare, inside the 192 MB label); G-N2 120 s × seeds 0–2: `deep-win` median ≤ 0.85× control, `core`/`easy-win` ≤ 1.1×, tree identical, every proved seed D14-accepted | **closed negative; per-node micro-line closed** — [plan26](plan26.md), [report26](report26.md): the tree-neutral 2^17 filter-only cache gives `deep-win` **0.8631×** (71.7 s vs 83.0 s), `core` 0.8843×, `easy-win` 0.8631×, tree identical 9/9, but misses the ≤ 0.85× guard. Larger caches (2^18–2^21) have a better hit rate but take TT bytes and change the tree. The positive-null cache (11.1 % repeat ceiling) changes the tree and is excluded. Source reverted; patch in [`measurements/plan26/`](measurements/plan26/README.md). No D14 claim; `T_4` distance unchanged at `deep-win` 8.35× |
+| 34 | **Per-node residual** (NULL-V2) | EARLY-REPLY (pseudo-legal + lazy legality, two `StateInfo`s) + EXPOSED-CACHE (direct-mapped `(child key, rule50, attacker)`, both signs, full-key compare, inside the 192 MB label); G-N2 120 s × seeds 0–2: `deep-win` median ≤ 0.85× control, `core`/`easy-win` ≤ 1.1×, tree identical, every proved seed D14-accepted | **G-N2 missed; adopted by owner override (D39); per-node micro-line closed** — [plan26](plan26.md), [report26](report26.md), [plan27](plan27.md): the tree-neutral 2^17 filter-only cache gives `deep-win` **0.8631×** (71.7 s vs 83.0 s), `core` 0.8843×, `easy-win` 0.8631×, tree identical 9/9, but misses the ≤ 0.85× guard. Larger caches (2^18–2^21) have a better hit rate but take TT bytes and change the tree. The positive-null cache (11.1 % repeat ceiling) changes the tree and is excluded. The plan26 patch is historical (its `1 << 21` constant would change the tree); the cleaned stack is the deliverable, with `--null-cache-entries` (default 2^17). Cap-120 bench: 3/3, factors 13.288 / 3.891 / 17.549, geomean 9.681, D14 3/3 accepted; `T_4` distance now `deep-win` 7.17× |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose before the M2+M3 stack. If the hand-guide stack cannot meet D21, do not split it back into mechanism plans: record the stack, its census and both-direction ablations, and take the continue/re-scope/close decision at a kill review. The conformance line (item 24) is a separate stack: its stop rule is the Phase A differential, not the hand-guide stop rule. **Item 26 stop rule:** if the numbers stack misses its 20 M gate, the hand-guide line closes for good — no per-class re-tuning, no mechanism split, and the owner takes the goal re-pin at the next kill review. Items 26–29 are one adopt order: a plan may not run item 27–29 ahead of a failed item 26.
 

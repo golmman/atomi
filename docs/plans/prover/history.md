@@ -398,3 +398,14 @@ premise are the recorded starting point for the D21 kill review.
   `make test-full` + veto green on the reverted tree. Data:
   [`measurements/plan26/`](measurements/plan26/README.md); report:
   [`report26.md`](report26.md).
+- **2026-11-12** — plan27 (item 34, NULL-V2 adoption) executed. The owner
+  overrode G-N2's miss (0.8631× vs ≤ 0.85×) and adopted the cleaned stack:
+  2^17 filter-only cache, `Budget.cache_entries` as the single size authority,
+  `--null-cache-entries` (default 2^17, `0` disables), probe-only
+  `positive_null`/`null_positive_repeats` removed. The stored plan26 patch was
+  wrong (`1 << 21`, 168,885 expansions); the cleaned default reproduces the
+  control's 168,910. Cap-120 bench: 3/3, factors 13.288 / 3.891 / 17.549,
+  geomean **9.681**, D14 3/3 accepted; `T_4` distance `deep-win` 7.17×. Gates:
+  `make test`, `make lint`, `make test-full` + veto green. Data:
+  [`measurements/plan27/`](measurements/plan27/README.md); report:
+  [`report27.md`](report27.md); decision D39.

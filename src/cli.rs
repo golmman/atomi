@@ -98,6 +98,9 @@ pub struct ProveOptions {
     pub guide_params: GuideParams,
     /// Share of `--memory` given to the proof table, in percent (default 75).
     pub proof_share_percent: u8,
+    /// Requested exposed-limit cache slots (`--null-cache-entries`,
+    /// default 2^17; `0` disables it). The splitter clamps it.
+    pub null_cache_entries: usize,
     /// Tie-break seed (0 = movegen order).
     pub seed: u64,
     /// Collect the plan-12 attribution counters.
@@ -116,6 +119,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
     let mut guide_args = GuideArgs::new();
     let mut guide_params = GuideParams::default();
     let mut proof_share_percent = 75u8;
+    let mut null_cache_entries = crate::table::DEFAULT_NULL_CACHE_ENTRIES;
     let mut seed = 0u64;
     let mut stats = false;
     let mut max_depth = None;
@@ -206,6 +210,11 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
                     }
                     proof_share_percent = n;
                 }
+                "--null-cache-entries" => {
+                    null_cache_entries = value
+                        .parse()
+                        .map_err(|_| format!("bad value for {arg}: {value}"))?;
+                }
                 _ => return Err(format!("unknown option: {arg}")),
             }
             i += 2;
@@ -228,6 +237,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
         guide,
         guide_params,
         proof_share_percent,
+        null_cache_entries,
         seed,
         stats,
         max_depth,
@@ -319,6 +329,21 @@ mod tests {
         // their own except through `--guide-on`).
         let off = parse(&["--guide", "none", "--guide-off", "classes"]);
         assert_eq!(off.guide, GuideConfig::none());
+    }
+
+    /// The exposed-limit cache request defaults to the measured 2^17 and
+    /// accepts an explicit size (including the disabled `0`).
+    #[test]
+    fn null_cache_entries_default_and_override() {
+        assert_eq!(
+            parse(&[]).null_cache_entries,
+            crate::table::DEFAULT_NULL_CACHE_ENTRIES
+        );
+        assert_eq!(parse(&["--null-cache-entries", "0"]).null_cache_entries, 0);
+        assert_eq!(
+            parse(&["--null-cache-entries", "65536"]).null_cache_entries,
+            65_536
+        );
     }
 
     /// The plan-19 NUMBERS-V1 aggregate switch is accepted and resolves to

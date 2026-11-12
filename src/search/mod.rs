@@ -58,6 +58,9 @@ pub struct Limits {
     pub guide_params: GuideParams,
     /// Share of `--memory` given to the proof table, in percent.
     pub proof_share_percent: u8,
+    /// Requested exposed-limit cache slots (`--null-cache-entries`; the
+    /// splitter clamps it to the label and returns the allocated size).
+    pub null_cache_entries: usize,
     /// The tie-break seed (0 = movegen order).
     pub seed: u64,
     /// Collect the plan-12 attribution counters (`--stats`).
@@ -125,6 +128,10 @@ pub struct SearchResult {
     /// Defender replies examined by the exact null replay (plan-25 Phase A,
     /// `--stats` only).
     pub null_replies: u64,
+    /// Exposed-limit cache hits (plan 26, `--stats` only).
+    pub null_cache_hits: u64,
+    /// Exposed-limit cache misses (plan 26, `--stats` only).
+    pub null_cache_misses: u64,
     /// Search time in milliseconds (allocation excluded).
     pub ms: u64,
     /// Live entries in the proof table at exit.
@@ -180,8 +187,12 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
     std::thread::Builder::new()
         .stack_size(256 << 20)
         .spawn(move || {
-            let tables =
-                Tables::with_share(limits.memory_mb, limits.filter, limits.proof_share_percent);
+            let tables = Tables::with_share_and_cache(
+                limits.memory_mb,
+                limits.filter,
+                limits.proof_share_percent,
+                limits.null_cache_entries,
+            );
             let start = Instant::now();
             let deadline = limits.seconds.map(|s| start + Duration::from_secs(s));
             let guide = Guide::new(limits.guide).with_params(limits.guide_params);
@@ -201,6 +212,8 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
                 group_children: 0,
                 null_calls: 0,
                 null_replies: 0,
+                null_cache_hits: 0,
+                null_cache_misses: 0,
                 stop: None,
                 sink,
                 guide,
@@ -249,6 +262,8 @@ struct Engine<S> {
     group_children: u64,
     null_calls: u64,
     null_replies: u64,
+    null_cache_hits: u64,
+    null_cache_misses: u64,
     stop: Option<Exit>,
     sink: S,
     guide: Guide,
@@ -308,6 +323,8 @@ impl<S: ProofSink> Engine<S> {
             group_children: self.group_children,
             null_calls: self.null_calls,
             null_replies: self.null_replies,
+            null_cache_hits: self.null_cache_hits,
+            null_cache_misses: self.null_cache_misses,
             ms: 0,
             proof_entries: 0,
             proof_full: false,
@@ -588,15 +605,19 @@ impl<S: ProofSink> Engine<S> {
         let Some((null, win)) = crate::guide::null::null_win(
             board,
             self.attacker,
-            &self.tables,
+            &mut self.tables,
             u16::MAX,
             self.guide.config.null_screen,
             &mut work,
         ) else {
             self.null_replies += work.replies;
+            self.null_cache_hits = self.tables.null_cache().hits();
+            self.null_cache_misses = self.tables.null_cache().misses();
             return;
         };
         self.null_replies += work.replies;
+        self.null_cache_hits = self.tables.null_cache().hits();
+        self.null_cache_misses = self.tables.null_cache().misses();
         let work = work.moves;
         let mut aux_left = if self.guide.params.aux_budget == 0 {
             u64::MAX
@@ -1031,6 +1052,8 @@ mod tests {
             group_children: 0,
             null_calls: 0,
             null_replies: 0,
+            null_cache_hits: 0,
+            null_cache_misses: 0,
             stop: None,
             sink: NullSink,
             guide: Guide::new(GuideConfig::none()),
@@ -1101,6 +1124,8 @@ mod tests {
             group_children: 0,
             null_calls: 0,
             null_replies: 0,
+            null_cache_hits: 0,
+            null_cache_misses: 0,
             stop: None,
             sink: NullSink,
             guide: Guide::new(GuideConfig::none()),

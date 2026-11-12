@@ -1,5 +1,11 @@
 # Plan 26 measurements — item 34, NULL-V2 (per-node residual)
 
+> **Addendum (2026-11-12):** do not re-apply `null_v2.patch` verbatim.
+> Its `DEFAULT_ENTRIES` is `1 << 21`, not the measured `1 << 17`: the 5 M
+> `deep-win` probe then gives 168,885 expansions (the tree-changing 2^21 arm)
+> instead of the control's 168,910. The corrected, adopted implementation is
+> [`measurements/plan27/`](../plan27/README.md) (D39).
+
 Plan: [`plan26.md`](../../docs/plans/prover/plan26.md). Report:
 [`report26.md`](../../docs/plans/prover/report26.md). Host and binaries:
 [`env.json`](env.json). Control is the pre-plan tree built from

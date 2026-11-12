@@ -181,6 +181,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
 | `plan21`[^p21] | 2026-11-12 | `e10de197da58` | atomi **default** (AUX-V1) | **16.28** | **6.91** | not claimed | **10.6** (2) | 600 s |
 | `plan23`[^p23] | 2026-11-12 | `e10de197da58` | atomi **default** (RET-V1) | **15.68** | **6.84** | **15.81** | **11.93** (3) | 120 s |
 | `plan25`[^p25] | 2026-11-12 | `e10de197da58` | atomi **default** (NULL-V1) | **14.679** | **4.598** | **20.227** | **11.093** (3) | 120 s |
+| `plan27`[^p27] | 2026-11-12 | `e10de197da58` | atomi **default** (NULL-V2) | **13.288** | **3.891** | **17.549** | **9.681** (3) | 120 s |
 
 [^host]: the plan's `env.json` machine id. Factors are same-session ratios, so a
     row is valid on its own host and never against another row's (rule 1).
@@ -275,6 +276,17 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     (3.349×) and stays opt-in. Numbers:
     [`measurements/plan25/`](measurements/plan25/README.md).
 
+[^p27]: **plan27 — NULL-V2** (EARLY-REPLY + the 2^17 filter-only
+    exposed-limit cache; D39 owner override of the missed G-N2). At Cap 120 s
+    all three cells are 3/3: `core` 6.910 s, `easy-win` 0.533 s, `deep-win`
+    77.442 s; the same-session reference is 0.520 / 0.137 / 4.413 s, so the
+    factors are 13.288 / 3.891 / 17.549 and the geomean is 9.681 over 3
+    claimed cells. **3/3 D14 proofs** matched `child_evals` and were accepted
+    by `atomi validate` and `provari check`. The default cache is 2^17 entries
+    (1.25 MB, filter slack only, tree-identical); the stored plan26 patch's
+    `1 << 21` constant is corrected. Numbers:
+    [`measurements/plan27/`](measurements/plan27/README.md).
+
 **One engine per table (D10 amendment, 2026-11-11).** Only `atomi@*` rows form
 a series. The legacy `solver@5f85133` controls measured in plan1 (`default`
 45.358, 1/3; `opt` 6.322, 2/3) are a frozen one-session baseline of a different
@@ -296,6 +308,7 @@ They left the table because a mixed series invites exactly that comparison.
 | `atomi@772b3cb+d` | `772b3cb767a07b28bcd7260e83a13f190f2bbd1b` | plan20, plan21 |
 | `atomi@e681d9f+d` | `e681d9f2c45c4bb45e9434fbf817217504ed368e` | plan23 |
 | `atomi@a257e6f+d` | `a257e6f28d29748c6208374881773b6e69435f6d` | plan25 |
+| `atomi@7cc3494+d` | `7cc34948a65566790bab77d0f9c8a0c1ffb91838` | plan27 |
 | `provari-v0.1.0` | `48686bc6c786d6ea70568f0b2ad4002cf0520206` | the 1.000 side of every factor |
 | `solver@5f85133` | `5f85133ea9d751368a682e53e354bd3fc0016d00` | the frozen legacy control of the [plan1 note](#plan1), not a row |
 
@@ -341,7 +354,7 @@ per-node: [`measurements/plan1/pernode.json`](measurements/plan1/pernode.json).
 
 Chronological entries — including every plan session that appended no row — are
 in [`history.md`](history.md) (through plan18) and, for plans 19 onward, in
-the [backlog table](initiative.md#backlog) of `initiative.md` and D32–D37 of
+the [backlog table](initiative.md#backlog) of `initiative.md` and D32–D39 of
 [`decisions.md`](decisions.md). Only ledger-structure changes are kept here:
 
 - **2026-11-12** — D34 (item 31, [plan21](plan21.md)): the ledger states no
