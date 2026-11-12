@@ -103,6 +103,7 @@ Adapted from `winprover`'s working agreement.
 7. **Copy with provenance.** Every file or fragment copied from `atomic_solver` carries the line `from atomic_solver@<40-hex sha>:<path>` and has a row in `PROVENANCE.md`. After the copy, this repo owns it. Copies are re-made on purpose, never synced implicitly.
 8. **Same-session measurement.** Factors are same-host, same-session ratios. The reading rules in [`bench.md`](bench.md) (created by plan1) apply.
 9. **Negative results are recorded.** A mechanism that fails its gate closes with the evidence. Stop rules are honoured (§Backlog).
+10. **Kill review includes the oracle delta.** The prior-art step re-runs the literature search **and** updates the [`analysis1`](analysis1.md) §3 mechanism table — only rows whose atomi state changed since the last review, plus any row touched by a pin change; a full re-read only when the oracle pin changes. The table is the durable asset; the delta is time-boxed.
 
 ## Decisions
 

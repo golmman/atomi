@@ -6,10 +6,9 @@
 `atomic-movegen` 2.4.x, MIT): prove the side to move can force a win, with a
 proof this repo's validator **and** external `provari check` accept. Target:
 beat provari `--guide hand` on the shared-win bench. The goal is the top rung
-`T_5` of the necessary-condition staircase in D30. T_5 (goal): all three
-cells proved at 10 s, geomean wall < 1.0 vs provari --guide hand, every claim
-D14-accepted. Initiative: `docs/plans/prover/` (read `initiative.md`);
-predecessor: closed `winprover`.
+of the D30 staircase. T_5 (goal): all three cells proved at 10 s, geomean wall
+< 1.0 vs provari --guide hand, every claim D14-accepted. Initiative:
+`docs/plans/prover/` (read `initiative.md`); predecessor: `winprover`.
 
 ## Collaboration
 
@@ -29,7 +28,7 @@ predecessor: closed `winprover`.
   `table/` TT, filter, full-key proof table, lazy allocator.
 - `search/` driver/frames/value algebra; `events.rs` + `strategy/` proof
   events/writer; `validate/` independent validator; `cli.rs`/`main.rs`;
-  `tests/`, `bench/`, `scripts/`. Details: module docs and reports.
+  `tests/`, `bench/`, `scripts/`.
 
 ## Commands
 
@@ -42,7 +41,7 @@ predecessor: closed `winprover`.
   covers TT, proofs and filter.
 - `make oracle` (pinned provari in `/tmp/atomi-oracle`); `make veto` (our
   validator + `provari check`; missing oracle = **red**); `make bench`,
-  `make pernode` (`bench/README.md`).
+  `make pernode`.
 
 ## GPL boundary (hard rules)
 
@@ -73,7 +72,7 @@ predecessor: closed `winprover`.
 - `atomic_solver` (pin in `initiative.md`) is a **read-only** sibling clone
   (`../atomic_solver`): never a submodule/dependency, never edited here; its
   binary is only an external process (bench controls).
-- Legacy conventions (Win/Loss/Draw search, GHI, refinement) do **not** apply.
+- Legacy conventions do **not** apply.
 
 ## Correctness
 
@@ -100,7 +99,9 @@ predecessor: closed `winprover`.
 - **Kill review after every 2 plans** (fixed prompt, do not implement): "What
   is the absolute distance to the goal now? If we started today, would we
   build this? Which initiative or plan would you cancel? Re-run the prior-art
-  search. What is the smallest next experiment?"
+  search — literature **and** the `analysis1` §3 oracle table, delta only
+  (changed rows + pin change); full re-read only on pin change. What is the
+  smallest next experiment?"
 - **Docs budget:** plans ≤ 8 KB, reports ≤ 12 KB, this file ≤ 6 KiB, one-line
   status entries. If docs outgrow the code, cut docs, not tests.
 - **Measurements:** one process at a time, same-session ratios, reading rules

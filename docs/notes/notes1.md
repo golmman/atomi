@@ -170,5 +170,6 @@ Row 3 shows a 2/3 coverage and 6.3 geomean, the most recent row is so much worse
 
 ---
 
-The last revisit analysis of `provari` (`docs/plans/prover/analysis1.md`) proved to be very fruitful.
+Last session we finished with `docs/plans/prover/report23.md`.
+The last revisit analysis of `provari` (`docs/plans/prover/analysis1.md`) apparently proved to be very fruitful.
 Should we add this to the regular kill reviews?
