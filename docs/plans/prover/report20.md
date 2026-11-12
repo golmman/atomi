@@ -20,6 +20,12 @@ auxiliary gate `aux_nodes`/expansion ≤ 1 is a **miss** (7.1–13.4, from
 213–215); no `T_3` (`deep-win` 0/3 at 120 s); `T_2` stands. The goal remains
 `T_5`.
 
+**Correction (plan21, D14):** "prove `deep-win` 3/3 at 600 s" is a *search*
+finding, not a claim. At the 192 MB label the proof table is full and the
+export is refused (`store-full`), so both checkers have nothing to accept and
+`deep-win` is not claimable at any cap under that label; at 384 MB the proof
+exports and is accepted. See [`report21.md`](report21.md).
+
 ## 1. Phase A — G2 (item 27 with the existing flags)
 
 `probe.json`, three cells, seed 0, 2 G child evals / 600 s / 192 MB. The

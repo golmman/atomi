@@ -29,45 +29,17 @@ sections below stay untouched:
   label). From M1 (plan2) `--memory` covers the TT, the proof table and the
   filter; `--proof-memory` is gone.
 
-## The goal this ledger measures
+## Goal, rungs and budgets are not stated here
 
-The initiative's success condition, reformulated as a necessary-condition
-staircase by **D30** (plan session 17, 2026-11-10), superseding the tier
-clauses of D27/D28/D29, quoted from [`initiative.md`](initiative.md):
+The goal, the necessary-condition rungs `T_1`–`T_5`, their budgets and the
+**current position** are stated only in [`initiative.md`](initiative.md)
+(D30), together with the claim clauses (every claimed win accepted by this
+repo's validator **and** the pinned `provari check`; gates green; no fixture
+regressions; re-pin only via D17). This file is the results ledger: it
+records what was measured, **at the cap each row used**, and makes no goal
+claim. It is a performance history, not a policy document (D34).
 
-T_5 (goal): all three cells proved at 10 s, geomean wall < 1.0 vs provari --guide hand, every claim D14-accepted.
-
-The goal is the top rung of a chain of **necessary conditions**, each a subset
-of the next (`T_5 ⊆ T_4 ⊆ … ⊆ T_1`), so `goal ⇒ every rung` and a failed rung
-is a hard "not yet":
-
-| Rung | Requirement | Implied by the next |
-| --- | --- | --- |
-| `T_1` | `core` proved at 120 s | yes |
-| `T_2` | `core` + `easy-win` at 120 s | yes (more cells) |
-| `T_3` | all three at 120 s | yes (more cells) |
-| `T_4` | all three at 10 s | yes (tighter budget) |
-| `T_5` | all three at 10 s **and** geomean `< 1.0` | — (the goal) |
-
-Nesting is sound because the search is deterministic (D22) and `--seconds`
-only stops it, so proving at 10 s implies proving at 120 s; more cells is
-monotone by definition. The wall clause lives only at `T_5` because
-`geomean < 1` does not imply each cell `< 1`. A lower rung is necessary, never
-sufficient; a censored cell is never converted and a longer run is never
-substituted. Current position: `T_2` (plan15).
-
-- every claimed win is accepted by this repo's own replay validator **and** by
-  the pinned `provari check` (every rung);
-- this repo's gates are green, and there are no outcome regressions on the
-  copied fixture oracle (§Corpus and fixtures);
-- the reference is re-pinned only via D17 at M5; the node/`child_evals` score
-  option is not chosen.
-
-The original handoff §2 wall-only condition (geomean `< 1.0`; coverage at
-least provari hand's) is the `T_5` wall clause, not deleted and not silently
-changed.
-
-## Absolute distance to the goal (read this first)
+## Distance log (dated; history, not current claims)
 
 State on 2026-11-09, after plan4 CORE-RESET (item 3 closed):
 
@@ -240,18 +212,20 @@ factor(cell) = median candidate wall [s] / median provari --guide hand wall [s]
   (`--guide model`) is *recorded separately and never mixed in* — it is a
   stretch column that needs an out-of-scope external artifact.
 - **`< 1.0` means we are faster than provari on that cell.**
-- **Ledger score = geometric mean of `factor(cell)` over the *canonical
-  shared cells*** — cells where both sides prove a win inside the canonical
-  budget. Censored cells are not part of the geometric mean (they have no
-  wall time), they are counted in **coverage** instead.
-- **Censoring convention.** A cell where we do not win inside the budget is
-  reported as `censored`, and where a bound is meaningful it is printed as
-  `≥ budget / reference_wall` (a *lower* bound on the factor, never a factor).
-  A censored cell is never dropped and never silently converted into a win.
-- **Rung order (D30).** Report the highest rung reached, then the next rung's
-  gap. Coverage rungs (`T_1`–`T_4`) are necessary conditions; wall factors at
-  10 s are claimed only at `T_5` on shared cells. Existing rows keep their own
-  session and are not rewritten.
+- **Ledger score = geometric mean of `factor(cell)` over the *claimed cells
+  of that row*** — cells where both sides prove a win at the row's `Cap` and
+  the claim passes D14. Unclaimed cells are not part of the geometric mean
+  (they have no factor), they are counted in **coverage** instead, and the
+  mean names the cell count.
+- **Censoring convention.** A cell that is not a claimed win at **the row's
+  own cap** is `censored`, and where a bound is meaningful it is printed as
+  `≥ cap / reference_wall` (a *lower* bound on the factor, never a factor).
+  A run that reaches a mate but whose claim fails (D14, e.g. an export refused
+  as `store-full`) is `not claimed (<verdict>)` with the found wall, never a
+  factor. A censored cell is never dropped and never converted into a win.
+- **Rungs are not a ledger column.** Which rung a set of measurements reaches
+  is decided in [`initiative.md`](initiative.md) from the rows, not re-derived
+  here. Existing rows keep their own session and are not rewritten.
 - **Deterministic accompaniment.** Wall time is the product metric but noisy;
   every row also records `child_evals` (ours, deterministic per stack) and
   provari's `nodes` for the same cell. They are **not** comparable
@@ -262,9 +236,10 @@ factor(cell) = median candidate wall [s] / median provari --guide hand wall [s]
 
 | Item | Value |
 | --- | --- |
-| Budget, both sides | 10 s, 192 MB label (`--seconds 10 --memory 192` vs `--timeout 10 --tt-size 192`) |
+| Reference budget | 10 s, 192 MB label (`--seconds 10 --memory 192`) — fixed: the bench set is selected so the hand guide proves inside it, so the reference cannot change with a candidate cap |
+| Candidate budget | the row's `Cap`, 192 MB label (`--seconds <cap> --memory 192`); 10 s / 120 s / 600 s so far |
 | Reference command | `provari prove "<FEN>" --seconds 10 --memory 192 --guide hand` |
-| Candidate command | `atomic_solver --fen "<FEN>" --timeout 10 --tt-size 192 --first-outcome --outcome-only <stack flags>` |
+| Candidate command | `atomi prove "<FEN>" --seconds <cap> --memory 192 [--seed N] <stack flags>` (the inherited `run_bench.py` block below still spells the legacy binary) |
 | Repeats | 3 per cell per side (medians reported); one process at a time |
 | Ordering | all reference runs and candidate runs of a row are measured in the same session, on the same host |
 | Host | recorded per row; factors are same-session ratios, so a row is valid on its own host even when another row ran elsewhere |
@@ -354,10 +329,10 @@ ledger row is appended: plan1 does not touch the win path. Details in
    child-eval reduction that does not move the wall is a mechanism finding,
    not a speed win (and vice versa: a wall win with identical evals is a
    per-node cost effect, `performance`'s territory).
-3. **Censored is a result.** `≥ budget/reference` bounds and coverage counts
-   are the honest form; a censored cell may never be replaced by the wall of
-   a longer run without stating the budget used (as done for `deep-win`
-   above).
+3. **Censored is a result — at the row's cap.** `≥ cap/reference` bounds and
+   coverage counts are the honest form. A longer run is **its own row** with
+   its own `Cap`, never a substitution inside another row, and a cap is never
+   chosen to drop a difficult cell (that is cap shopping, see rule 6).
 4. **Opt-in ≠ shipped.** The ledger's `Stack` column is part of the result.
    Only a default-flag decision (item 6) turns a stack row into a product
    row; until then both stack rows stay visible.
@@ -365,25 +340,29 @@ ledger row is appended: plan1 does not touch the win path. Details in
    plan's gate passed (`make test`, plus quick suite / repetition soundness /
    drift protocol for behaviour-changing levers) and, for new proof shapes,
    after the item-2 checker accepted the exported proof.
-6. **Coverage is a first-class target.** A geomean below 1.0 on two cells
-   while the third stays censored does not meet the goal. State coverage in
-   every row. From D30, report the highest rung reached; wall factors are
-   claimed only at `T_5`.
+6. **Coverage is stated in every row, and geomeans are compared only within
+   one cap.** State `(cap, coverage, geomean)` together; a `7.0` on one cell at
+   10 s is not better than a `14.0` on three cells at 600 s. The geomean is
+   **non-monotone in the cap** (a longer cap claims more cells, hence more
+   factors in the mean), so a cross-cap geomean comparison is a reading error
+   and a cap picked per plan to improve the headline is cap shopping. A rung
+   is reached only through what `initiative.md` says.
 
 ## Ledger
 
-**Convention (D30, amended 2026-11-11).** A factor carries **no budget**: it
-is `candidate wall / provari hand wall`, and provari's side is fixed — the
-bench set is selected so it proves with the hand guide inside 10 s (`core`
-0.49 s, `easy-win` 0.11 s, `deep-win` 6.5 s), so a longer run cannot change
-the reference. A time budget has exactly two roles: (a) the **economic cap**
-at which an unfinished run is reported `censored (≥ cap/ref)` — 120 s today;
-(b) the **`T_5` goal threshold**, 10 s. The ledger is therefore a single
-**Factors** table (no per-cell budget); the 10 s goal and the rung status
-live in the goal section above and the plan notes, not in a ledger table.
-Existing rows are not rewritten; rows measured under the old 10 s canonical
-protocol keep their session numbers, and the `Cap` column names the censoring
-cap only. Decisions append no row (history D27–D30 in
+**Convention (D34, 2026-11-12; supersedes D30's ledger-split clause).** The
+ledger is a **results history**: one row per executed plan, each with the
+budget it was measured at. The `Cap` column is part of the result, not a
+policy: it is the wall guard under which the row's cells were classified, so
+`censored` always means "not claimed at this cap", and a run under a longer
+cap is a new row, not a conversion. A factor itself needs no budget — it is
+`candidate wall / provari hand wall`, and provari's side is fixed because the
+bench set is selected so the hand guide proves inside 10 s (`core` 0.49 s,
+`easy-win` 0.11 s, `deep-win` 6.5 s) — so a longer candidate run cannot change
+the reference. Where the goal and the rungs put their budgets is
+`initiative.md`'s business, not this table's. Existing rows are not rewritten;
+rows measured under the old 10 s canonical protocol keep their session
+numbers. Decisions append no row (history D27–D34 in
 [`decisions.md`](decisions.md)).
 
 ### Factors
@@ -396,22 +375,21 @@ cap only. Decisions append no row (history D27–D30 in
 | `plan15` | 2026-11-10 | `e10de197da58` · `atomi@8953596+d` | atomi **bare** | **35.8** (17.471 s) | **18.9** (2.023 s) | censored (1/3; seed 1 113.458 s) | **26.0** (2 cells) | 120 s |
 | `plan19` | 2026-11-11 | `e10de197da58` · `atomi@e71289b+d` | atomi **default** (R1+R3+R6) | censored (2/3; 115.1 s) | **78** (10.4 s) | censored (0/3; ≥ 18.4) | **78** (1 cell) | 120 s |
 | `plan20` | 2026-11-12 | `e10de197da58` · `atomi@772b3cb+d` | atomi **default** (AUX-V1) | **16.3** (8.36 s) | **7.0** (0.91 s) | censored (0/3; ≥ 18.5) | **10.8** (2 cells) | 120 s |
+| `plan21` | 2026-11-12 | `e10de197da58` · `atomi@772b3cb+d` | atomi **default** (AUX-V1) | **16.28** (8.468 s / 10.10 M) | **6.91** (0.919 s / 1.18 M) | not claimed (`store-full`; 3/3 found mate 132.2–175.4 s, no exportable proof at 192 MB) | **10.6** (2 cells) | 600 s |
 
 Cell syntax: `factor (candidate wall / candidate evals)`; atomi's evals are
 its `child_evals` counter. Reference (`provari-v0.1.0 --guide hand`) is
-**1.000** everywhere. `Cap` is the censoring cap only — the factor itself is
-budget-free. A cell proved only on some seeds is reported as
-`censored (n/3; …)`, never averaged as if it were 3/3.
+**1.000** everywhere. `Cap` is the wall guard the row was **measured at** —
+part of the result; the factor itself is budget-free. A cell proved only on
+some seeds is reported as `censored (n/3; …)`, never averaged as if it were
+3/3. A row's geomean covers the cells **claimed** at that cap and names the
+cell count; it is never compared to another cap's geomean (reading rule 6).
 
 **At the same 120 s cap the plan19 default is slower than the bare tree on
 every cell** (`easy-win` 78 vs 18.9; `core` 2/3 at 115–118 s vs 3/3 at
 17.5 s): the tree cut does not pay for the auxiliary passes (report19 §5).
 Whether `--guide hand` should stay the default is an open owner decision, not
 a ledger fact.
-
-**Rung (D30).** Highest rung is **`T_2`**: the bare tree proves `core` and
-`easy-win` at 120 s (plan11/plan15). `T_5` is not met; its 10 s coverage and
-geomeans are in the plan notes (plan15/plan19 Tier 2).
 
 **One engine per table (D10 amendment, 2026-11-11).** Only `atomi@*` rows
 form a series. The legacy `solver@5f85133` controls measured in plan1
@@ -426,7 +404,9 @@ Pins: `atomi@0c5a882+d` = HEAD `0c5a882ef9ab93c0d48d6a3f5176cfb64a0a78bb`
 (plan1, dirty tree) · `atomi@a4c135d+d` = HEAD
 `a4c135d6ee1956588e01733bd101f6373e7d2e72` (plan2, dirty tree) ·
 `atomi@b52e186+d` = HEAD `b52e186…` (plan11, dirty tree; binary sha256
-`e416f075…12c811`) · `atomi@e71289b+d` = HEAD
+`e416f075…12c811`) · `atomi@772b3cb+d` = HEAD
+`772b3cb767a07b28bcd7260e83a13f190f2bbd1b` (plan20/plan21, dirty tree;
+binary sha256 `4df19305…f3bd77`) · `atomi@e71289b+d` = HEAD
 `e71289b630f87137774810403492eedba10d22be`
 (plan19, dirty tree; binary sha256 `bf98c6df…`) · `atomi@8953596+d` = HEAD
 `89535961ebdd73e78d7b2267177da1eb87bc3216` (plan15, dirty tree; binary
@@ -545,6 +525,38 @@ evals tree-only (14 s) and ~115 s with the passes on. D14 16/16 accepted. No
 rung change; `T_2` still rests on the bare tree's `core` 3/3. Numbers:
 [`measurements/plan19/`](measurements/plan19/README.md).
 
+### plan21
+
+Item 31 (D34): the same stack as plan20, measured at **Cap 600 s** with the
+reference re-measured in the same session. Numbers:
+[`measurements/plan21/`](measurements/plan21/README.md).
+
+Same-session reference (v0.1.0 hand medians, 3 repeats): `core` 0.520 s ·
+342,289 nodes · mate 17; `easy-win` 0.133 s · 72,523 · mate 15; `deep-win`
+6.564 s · 4,574,912 · mate 22.
+
+- **`core` 16.28** (8.468 s median of 10.217 / 8.468 / 8.217 s; 10.10 M
+  child evals) — **D14 3/3 accepted**, proofs 13,751–16,991 positions
+  (lengths 15 / 26 / 20).
+- **`easy-win` 6.91** (0.919 s; 0.806 / 0.919 / 1.431 s; 1.18 M evals) —
+  **D14 3/3 accepted**, proofs 2,794–4,100 positions (lengths 19 / 19 / 16).
+- **`deep-win` not claimed.** The search finds a mate on **3/3** seeds
+  (175.408 / 132.185 / 153.740 s, median 153.740 s = 23.42× if it were
+  claimable; 188.6 M evals, lengths 28 / 36 / 34), but the 192 MB label's
+  proof table is **full** on every seed: `proof_full: true`, 2,831,155
+  entries, the export is refused closed (`proof: store-full`, exit 3), so
+  both checkers have nothing to accept. `child_evals` reproduce the plan20
+  gate rows exactly (205,208,471 / 163,653,289 / 188,579,356), so this is
+  the same trajectory, not a different search.
+- **Memory ladder (diagnostic, one seed, not a row).** `deep-win` seed 1 with
+  a larger label: **384 MB** — proof written, 94,686 positions, length 35,
+  both checkers accept (106.4 s, 139.4 M evals); **768 MB** — proof written,
+  74,157 positions, length 37, both accept (81.7 s, 113.5 M evals). The
+  blocker is the proof store at the 192 MB label, not the search: item 30.
+- Geomean **10.6** over 2 claimed cells; not comparable with the plan20
+  Cap-120 row's `10.8` (reading rule 6) — the `core`/`easy-win` walls are the
+  same measurement inside noise; the difference is which cells are claimed.
+
 ## History
 
 - **2026-11-10** — plan15 (items 5 and 6) executed. Item 5 (M4) closed as
@@ -660,3 +672,20 @@ rung change; `T_2` still rests on the bare tree's `core` 3/3. Numbers:
   The control is `--guide hand --guide-off sim-exact,null-exact,closure-bits`.
   Details in [`report20.md`](report20.md) and
   [`measurements/plan20/`](measurements/plan20/README.md).
+
+- **2026-11-12** — plan21 (item 31) executed; **D34: `bench.md` is a results
+  ledger**. The goal staircase, the "current position" line, the ledger-local
+  D30 amendment and the "cap is policy" framing are removed from this file
+  (goal/rungs/budgets live in `initiative.md`); `Cap` is now stated as the
+  budget a row was measured at, reading rule 6 forbids cross-cap geomean
+  comparisons (the geomean is non-monotone in the cap), and
+  `scripts/check_goal.py` scans three normative docs instead of four. The
+  plan20 stack is appended at **Cap 600 s**: `core` 16.28 and `easy-win` 6.91
+  claimed (6/6 D14 accepted), **`deep-win` not claimed** — the mate is found
+  on 3/3 seeds at 132.2–175.4 s but the 192 MB proof table is full and the
+  export fails closed (`store-full`), so the plan20 note's "`deep-win` proves
+  at 128–175 s with a generous cap" is corrected to a **search finding, not a
+  claim**. At 384 MB the seed-1 proof exports and both checkers accept it, so
+  item 30 (proof-store headroom) is now the gate for any `deep-win` claim.
+  Geomean 10.6 over 2 claimed cells. Details in [`report21.md`](report21.md)
+  and [`measurements/plan21/`](measurements/plan21/README.md).

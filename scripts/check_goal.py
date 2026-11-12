@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Goal-consistency gate (D30).
 
-The goal is the top rung of the D30 staircase. It is stated verbatim in four
-normative documents; this gate fails if any of them drifts. Historical records
-(history.md, reportN.md, planN.md, bench.md ledger rows) are not scanned.
+The goal is the top rung of the D30 staircase. It is stated verbatim once in
+each *normative* document (the initiative, AGENTS.md and the decisions); this
+gate fails if any of them drifts. bench.md is a results ledger, not a normative
+document (D34), so it is not scanned; neither are the historical records
+(history.md, reportN.md, planN.md, ledger rows).
 
 Run from `make lint`; exit 1 on any drift.
 """
@@ -23,7 +25,6 @@ CANONICAL = (
 FILES = [
     "AGENTS.md",
     "docs/plans/prover/initiative.md",
-    "docs/plans/prover/bench.md",
     "docs/plans/prover/decisions.md",
 ]
 

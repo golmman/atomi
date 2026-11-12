@@ -1,0 +1,60 @@
+{
+ "plan": "plan21",
+ "phase": "ledger",
+ "cap_seconds": 600,
+ "reference": {
+  "core": 0.52,
+  "easy-win": 0.133,
+  "deep-win": 6.564
+ },
+ "candidate_median_s": {
+  "core": 8.468,
+  "easy-win": 0.919,
+  "deep-win": 153.74
+ },
+ "claims": {
+  "core": {
+   "found": 3,
+   "seeds": 3,
+   "d14_accepted": 3,
+   "d14_rows": 3,
+   "verdicts": [
+    "written",
+    "written",
+    "written"
+   ],
+   "claimed": true
+  },
+  "easy-win": {
+   "found": 3,
+   "seeds": 3,
+   "d14_accepted": 3,
+   "d14_rows": 3,
+   "verdicts": [
+    "written",
+    "written",
+    "written"
+   ],
+   "claimed": true
+  },
+  "deep-win": {
+   "found": 3,
+   "seeds": 3,
+   "d14_accepted": 0,
+   "d14_rows": 3,
+   "verdicts": [
+    "store-full",
+    "store-full",
+    "store-full"
+   ],
+   "claimed": false
+  }
+ },
+ "factors": {
+  "core": 16.28,
+  "easy-win": 6.91
+ },
+ "geomean": 10.6,
+ "geomean_cells": 2,
+ "note": "Factor = median candidate wall / same-session provari hand median, over the cells CLAIMED at this cap (search proved on every seed AND D14 accepted). Geomean over the covered cells of this cap only; never compared across caps."
+}

@@ -2,20 +2,26 @@
 
 ## Status
 
-**Open (2026-11-10; revised 2026-11-12 by [`report20.md`](report20.md)).**
+**Open (2026-11-10; revised 2026-11-12 by [`report20.md`](report20.md) and [`report21.md`](report21.md)).**
 Items 26–28 are **executed**. Item 26 adopted the starting-number algebra
 R1+R3+R6 (`core` 4.74×, `easy-win` 3.34×, `deep-win` 2.80× vs the product
 hand). Items 27–28 (AUX-V1, [`plan20`](plan20.md)) made the exact sibling
 simulation, the exact null-threat replay and the board-free one-ply closure
 the default: with a generous cap the tree cuts `core` 5.88×, `easy-win`
 4.65× and `deep-win` 1.66× in child evals, and the 120 s wall cuts `core`
-14.4× (3/3 at 8.3 s) and `easy-win` 10.9× (3/3 at 0.94 s); `deep-win` proves
-at 128–175 s but is 0/3 at 120 s. The auxiliary gate
+14.4× (3/3 at 8.3 s) and `easy-win` 10.9× (3/3 at 0.94 s); `deep-win` finds
+the mate at 128–175 s but is 0/3 at 120 s, and at 192 MB no seed can export
+a proof (`store-full`), so it is not a claim at any cap. The auxiliary gate
 (`aux_nodes`/expansion ≤ 1) is reported as a miss (7–13, 16–28× better) —
 exact replays are per-defence work. On the D30 staircase the engine is at
 **`T_2`** (now 3/3 + 3/3 at 120 s); `T_3` (`deep-win` at 120 s) is the next
-rung; `T_5` (the goal) is not met. Item 30's trigger (`proof_full`) appeared
-on `deep-win`. Item 24 (conformance line) is **closed negative** (Phase B: exact replay cannot apply at the first divergence and cuts `core` only 1.02×). Item 25 (DF-PN exactness stack, D31) is **closed negative for its `deep-win` gate**: the opt-in exact simulation + exact null-threat replay cut `deep-win` only 1.009× at 20 M (2× required), though `--guide-null-exact` alone proves `core` at 18.3 M and cuts `easy-win` 32.7×.
+rung and is blocked by item 30 (proof-store headroom) before the wall;
+`T_5` (the goal) is not met. Item 30's trigger appeared on `deep-win`, and
+plan21 showed it is a **claim blocker**, not a nice-to-have: item 30 is the
+gate for any `deep-win` claim. Item 31 ([`plan21`](plan21.md)) made
+[`bench.md`](bench.md) a results history (per-row cap, D34) and re-measured
+the plan20 stack at Cap 600 s: `core` 16.28 and `easy-win` 6.91 claimed
+(6/6 D14 accepted), `deep-win` not claimed. Item 24 (conformance line) is **closed negative** (Phase B: exact replay cannot apply at the first divergence and cuts `core` only 1.02×). Item 25 (DF-PN exactness stack, D31) is **closed negative for its `deep-win` gate**: the opt-in exact simulation + exact null-threat replay cut `deep-win` only 1.009× at 20 M (2× required), though `--guide-null-exact` alone proves `core` at 18.3 M and cuts `easy-win` 32.7×.
 
 The 2026-11-11 read-only differential ([`analysis1.md`](analysis1.md)) **re-opens the guide question with a measured case**. atomi's bare tree is provari with the whole guide removed (9.27 M vs 8.65 M expansions on `core`), so the entire 25–27× tree gap is the guide stack; the product `--guide hand` is a **net loss** on all three cells (tree 0.72–0.74× of `--guide none`); and a **starting-number algebra** that matches provari's conventions — flags only, no new code — inverts that sign: `core` tree 2.58× vs bare / 3.56× vs product, `easy-win` 1.56×, `deep-win` **proved** at 23.4 M / 107 s, and at 120 s with the auxiliary passes on `core` **3/3** (16.5–18.0 s), `easy-win` **3/3** (3.0–7.5 s), `deep-win` **1/3**. Still `T_2` on the rungs and a probe only (one seed, no repeats, no D14), but it is the first >2× tree lever in 19 plans, and it changes the product premise: the bare tree is not the product, the guide's number algebra is. Items 26–30 authorise the adopt order; D32 records the premise change. Full record: [`history.md`](history.md); decision rationale: [`decisions.md`](decisions.md).
 
@@ -54,6 +60,8 @@ The goal is the top rung of a chain of **necessary conditions**, each a subset o
 | `T_5` | all three at 10 s **and** geomean `< 1.0` | — (the goal) |
 
 Nesting is sound because the search is deterministic (D22) and `--seconds` only stops it, so proving at 10 s implies proving at 120 s; more cells is monotone by definition. The wall clause lives only at `T_5` because `geomean < 1` does not imply each cell `< 1`. A lower rung is necessary, never sufficient; a censored cell is never converted and a longer run is never substituted. Current position: `T_2` (plan15 bare-tree matrix: `core` 3/3 at 17.5 s, `easy-win` 3/3 at 2.0 s, `deep-win` 1/3 at 120 s); the next rung is `T_3`, `deep-win` 3/3 at 120 s.
+
+**The goal, the rungs and their budgets are stated here and nowhere else** (D34). [`bench.md`](bench.md) is the results ledger: it records what was measured and the cap each row used, and makes no goal claim — a longer run is its own row, and a cell is never "converted" by changing a cap. One rung note from the ledger: `deep-win` is not only a budget problem. plan21 found the mate on all three seeds at 132–175 s and the 192 MB proof table refuses the export (`store-full`), so **no `deep-win` win is claimable at any cap under the 192 MB label** until item 30 (memory headroom) lands; at 384 MB the seed-1 proof is exported and accepted by both checkers ([`report21.md`](report21.md)).
 
 - every claimed win is accepted by this repo's own replay validator **and** by the pinned `provari check` (every rung);
 - this repo's gates are green, and there are no outcome regressions on the copied fixture oracle (§Corpus and fixtures). The legacy solver's gates are not this repo's gates.
@@ -167,7 +175,8 @@ Still closed: portfolio and restarts. Still rejected for now: PDS-PN/PN² (they 
 | 27 | **Exact replays by default** (R18+R19) | `--guide-null-exact` + `--guide-sim-exact` become the default, greedy playout and signature prior removed; gate on top of item 26: three cells at 20 M, no tree regression > 10 %, aux work ≤ 1 per expansion | **done** — [plan20](plan20.md), [report20](report20.md): G2 passed (`sim`/exp 0.61–1.90), tree cut 5.88× `core`, 4.65× `easy-win`, `deep-win` 0/3 → 3/3 at 128–175 s; the aux ≤ 1 clause missed (53–64 before item 28, 7–13 with it) and is recorded as a wrong denominator for per-defence replays. Default changed (Phase D) |
 | 28 | **Board-free closures** (R11–R13) | bit-test exposing shortcut, double threat with exposure, exposed win in two; gate: `aux_nodes` per expansion ≤ 1 with no tree regression > 10 % | **done** — [plan20](plan20.md), [report20](report20.md): R11 `closure-bits` (pseudo-legal + blast casualties + candidate legality; bit-test screen) cuts aux 5–7.5× and `easy-win` tree 2.52× (2.65× expansions), `deep-win` median −7.5 % (inside the 10 % guard), aux/exp 13.4/7.1/8.1 (the ≤ 1 clause missed, same denominator problem). R13 was already in the exact null replay; R12 is subsumed. Default changed |
 | 29 | **Plain-move grouping by default** (R9) | members never scored, one salted GROUP child; gate: expansions at 20 M and per-node wall, no regression > 10 % | **authorised** |
-| 30 | **Memory headroom** (R17) | do not store recomputable proofs, mate cache in the TT, drop mates when proofs fill; only if `proof_full` appears in a real run | **conditional** |
+| 30 | **Memory headroom** (R17) | do not store recomputable proofs, mate cache in the TT, drop mates when proofs fill; only if `proof_full` appears in a real run | **triggered; now the gate for any `deep-win` claim** (plan21, [report21](report21.md)): at 192 MB the 600 s `deep-win` runs find the mate on 3/3 seeds (132.2–175.4 s) but the proof table is full (`store-full`, 2,831,155 entries) and refuses the export, so no `deep-win` win is claimable at any cap under the 192 MB label. A 384 MB label exports a both-checker-accepted proof (seed 1: 94,686 positions, length 35), so the blocker is the proof store, not the search |
+| 31 | **Ledger budget convention** | one row per executed plan, each at its own cap; `bench.md` states no goal, no rung and no cap policy; D34 records the split | **done** — [plan21](plan21.md), [report21](report21.md): D34 supersedes D30's ledger-split clause, `bench.md` is a results ledger (staircase, current position and the cap convention removed), `scripts/check_goal.py` scans three normative docs instead of four, and the plan20 stack is appended at Cap 600 s (`core` 16.28, `easy-win` 6.91, `deep-win` not claimed `store-full`, geomean 10.6 over 2 claimed cells) |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose before the M2+M3 stack. If the hand-guide stack cannot meet D21, do not split it back into mechanism plans: record the stack, its census and both-direction ablations, and take the continue/re-scope/close decision at a kill review. The conformance line (item 24) is a separate stack: its stop rule is the Phase A differential, not the hand-guide stop rule. **Item 26 stop rule:** if the numbers stack misses its 20 M gate, the hand-guide line closes for good — no per-class re-tuning, no mechanism split, and the owner takes the goal re-pin at the next kill review. Items 26–29 are one adopt order: a plan may not run item 27–29 ahead of a failed item 26.
 
@@ -196,7 +205,7 @@ Cannot-win material is part of the M2+M3 stack. Compact `.pvr` is M4. Root-`Loss
 - **Budgets:** 10 s and a 192 MB label on both sides. provari: `prove "<FEN>" --seconds 10 --memory 192 --guide hand`. atomi: `prove "<FEN>" --seconds 10 --memory 192`. Three repeats per cell and side for any reported wall ratio.
 - **Fixture oracle:** known side-to-move wins copied from the legacy fixtures (`decisive_positions.txt`, `decisive_remaining.txt`, `move_order_positions.txt`, the quick suite). A *refutation* there is a bug to investigate. Censoring is a result. Legacy side-to-move losses are kept as **never-prove** negatives: proving one is a soundness failure.
 - **Instrumentation traps (D33):** guide flags must follow `--guide hand`, which resets the guide configuration; `--stats` unique-key counts come from a fixed 2^21 set that stops inserting at 70 % (1,468,006) and then reports a capped lower bound — a count at that value is not comparable.
-- **Ledger:** [`bench.md`](bench.md). Every plan that touches the search appends one `atomi` row; the table holds `atomi` rows only. A factor is budget-free (candidate wall / the fixed provari hand wall); a time budget only censors (120 s cap) and sets the `T_5` threshold (10 s), which is stated in the goal section, not a ledger table. The legacy `solver@5f85133` controls are a frozen one-session plan1 baseline (D10 amendment, 2026-11-11), never ledger rows. Rows pin `atomi@<sha>` and the oracle commit.
+- **Ledger:** [`bench.md`](bench.md). Every plan that touches the search appends one `atomi` row; the table holds `atomi` rows only. A factor is budget-free (candidate wall / the fixed provari hand wall). A row records the **cap it was measured at** (D34): `censored` means "not claimed at that cap", a longer run is its own row, and geomeans are only compared within one cap. Which rung a row reaches — and the 120 s/10 s budgets that define the rungs — is stated in the goal section above, not in the ledger. The legacy `solver@5f85133` controls are a frozen one-session plan1 baseline (D10 amendment, 2026-11-11), never ledger rows. Rows pin `atomi@<sha>` and the oracle commit.
 - **Artifacts:** drivers, parsed results (`*.json`, `*.csv`), `env.json` and provenance READMEs go under `docs/plans/prover/measurements/planN/`. Raw transcripts, provari sources, binaries and proofs, and `__pycache__` are never committed.
 
 ## Risks

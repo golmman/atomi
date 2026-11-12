@@ -1,0 +1,39 @@
+{
+ "plan": "plan21",
+ "phase": "mem_ladder",
+ "note": "Diagnostic only: the D14 arm is the 192 MB label; a larger label is a different row. One deep-win seed (1) per memory label.",
+ "rows": [
+  {
+   "memory_mb": 384,
+   "seed": 1,
+   "wall_s": 106.422,
+   "rc": 0,
+   "exit": "proved",
+   "proof": "written",
+   "proof_entries": 5569395,
+   "proof_full": false,
+   "proof_positions": 94686,
+   "length": 35,
+   "child_evals": 139442665,
+   "atomi_validate": true,
+   "provari_check": true,
+   "proof_bytes": 7876937
+  },
+  {
+   "memory_mb": 768,
+   "seed": 1,
+   "wall_s": 81.74,
+   "rc": 0,
+   "exit": "proved",
+   "proof": "written",
+   "proof_entries": 4845277,
+   "proof_full": false,
+   "proof_positions": 74157,
+   "length": 37,
+   "child_evals": 113469046,
+   "atomi_validate": true,
+   "provari_check": true,
+   "proof_bytes": 6140806
+  }
+ ]
+}
