@@ -1,0 +1,198 @@
+{
+  "date": "2026-11-12",
+  "cell": "deep-win",
+  "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+  "probe": "4 s wall, --memory 192 --seed 0 --guide hand; perf record -e cpu-clock -F 999; self time, no children",
+  "control_profile": [
+    {
+      "symbol": "atomic_movegen::movegen::generate_pseudo_legal",
+      "self_percent": 20.73
+    },
+    {
+      "symbol": "<atomi::table::Tables>::lookup_with_source",
+      "self_percent": 12.69
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::legal",
+      "self_percent": 9.29
+    },
+    {
+      "symbol": "atomi::guide::threat::immediate_explosion_bits",
+      "self_percent": 6.84
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::do_move",
+      "self_percent": 6.46
+    },
+    {
+      "symbol": "<atomi::search::frame::Frame>::enter",
+      "self_percent": 4.93
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::compute_checkers",
+      "self_percent": 4.68
+    },
+    {
+      "symbol": "atomi::guide::null::null_win",
+      "self_percent": 3.71
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::attackers_to_color",
+      "self_percent": 3.18
+    },
+    {
+      "symbol": "atomic_movegen::movegen::has_legal_move_with_state",
+      "self_percent": 2.48
+    },
+    {
+      "symbol": "atomic_movegen::attacks::attacks_from",
+      "self_percent": 2.38
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::populate_state",
+      "self_percent": 2.15
+    },
+    {
+      "symbol": "atomi::guide::eval::hand_eval",
+      "self_percent": 2.15
+    },
+    {
+      "symbol": "<atomi::mover::Mover>::effect",
+      "self_percent": 2.05
+    },
+    {
+      "symbol": "__memmove_avx_unaligned_erms",
+      "self_percent": 1.13
+    },
+    {
+      "symbol": "atomi::search::node_value",
+      "self_percent": 1.13
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::from_fen",
+      "self_percent": 1.08
+    },
+    {
+      "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid",
+      "self_percent": 1.05
+    },
+    {
+      "symbol": "atomic_movegen::movegen::generate_legal_with_state",
+      "self_percent": 0.95
+    },
+    {
+      "symbol": "<atomi::guide::Guide>::start_numbers",
+      "self_percent": 0.9
+    }
+  ],
+  "candidate_profile": [
+    {
+      "symbol": "atomi::guide::threat::immediate_explosion_bits",
+      "self_percent": 13.97
+    },
+    {
+      "symbol": "<atomi::table::proofs::ProofTable>::get",
+      "self_percent": 13.29
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::legal",
+      "self_percent": 9.86
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::do_move",
+      "self_percent": 6.52
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::compute_checkers",
+      "self_percent": 6.09
+    },
+    {
+      "symbol": "<atomi::search::frame::Frame>::enter",
+      "self_percent": 5.12
+    },
+    {
+      "symbol": "atomi::guide::null::null_win",
+      "self_percent": 4.99
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::attackers_to_color",
+      "self_percent": 4.61
+    },
+    {
+      "symbol": "atomic_movegen::movegen::generate_legal_with_state",
+      "self_percent": 4.29
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::populate_state",
+      "self_percent": 3.34
+    },
+    {
+      "symbol": "atomic_movegen::attacks::attacks_from",
+      "self_percent": 3.14
+    },
+    {
+      "symbol": "atomi::guide::eval::hand_eval",
+      "self_percent": 2.81
+    },
+    {
+      "symbol": "<atomi::mover::Mover>::effect",
+      "self_percent": 2.68
+    },
+    {
+      "symbol": "atomic_movegen::movegen::has_legal_move_with_state",
+      "self_percent": 2.26
+    },
+    {
+      "symbol": "<atomi::table::Tables>::lookup",
+      "self_percent": 2.18
+    },
+    {
+      "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid",
+      "self_percent": 1.71
+    },
+    {
+      "symbol": "<atomi::guide::Guide>::start_numbers",
+      "self_percent": 1.5
+    },
+    {
+      "symbol": "atomi::search::node_value",
+      "self_percent": 1.23
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::undo_move",
+      "self_percent": 1.05
+    },
+    {
+      "symbol": "<atomic_movegen::board::Board>::is_pseudo_legal",
+      "self_percent": 0.98
+    }
+  ],
+  "counters_5m": {
+    "control": {
+      "expansions": 168910,
+      "child_evals": 5000034,
+      "ms_median": 2558,
+      "null_calls": 105120,
+      "null_replies": 2782739,
+      "entry_proof_hits": 0,
+      "entry_tt_hits": 37333,
+      "entry_would_return": 592
+    },
+    "candidate": {
+      "expansions": 168910,
+      "child_evals": 5000034,
+      "ms_median": 2099,
+      "null_calls": 105120,
+      "null_replies": 2782739,
+      "entry_proof_hits": 0,
+      "entry_tt_hits": 37333,
+      "entry_would_return": 592
+    }
+  },
+  "derived": {
+    "null_calls_per_expansion": 0.6223,
+    "null_replies_per_expansion": 16.475,
+    "candidate_speedup": 1.2187
+  },
+  "missing_counters": "needs_board and per-node child lookup hits/misses were not added: the gate missed on the safe stack before the probe would have been used for a decision."
+}

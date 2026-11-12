@@ -64,9 +64,9 @@ committed.
 
 | # | Item | Status |
 | --- | --- | --- |
-| MG1 | `null_for` | proposed (plan28 Phase 0) |
-| MG2 | public `for_each_pseudo_legal` | proposed (plan28 Phase 0) |
-| MG3 | `outcome_after` | proposed (plan28 Phase D, conditional) |
+| MG1 | `null_for` | prototype measured (plan28), not released |
+| MG2 | public `for_each_pseudo_legal` | prototype measured (plan28), not released |
+| MG3 | `outcome_after` | proposed (plan28 Phase D, not started: G-H1 missed) |
 | MG4 | `TrivialLegality` expansion | proposed (after MG3) |
 | MG5 | `legal` fast path | proposed (after MG4) |
 | MG6 | movegen micro-optimisation | proposed (after MG2) |
@@ -94,3 +94,9 @@ committed.
 
 - **2026-11-12** — initiative created from the `prover` hot-path profile
   ([`../prover/plan28.md`](../prover/plan28.md)); MG1–MG7 proposed.
+- **2026-11-12** — plan28 prototyped MG1 (`Board::null_for`) and MG2
+  (public `for_each_pseudo_legal`) in a local checkout and measured them in
+  the prover's S1+S2+S3 stack. The stack was tree-identical but reached only
+  1.219× on the 5 M `deep-win` probe, below the prover's 1.5× gate, so the
+  prover did not adopt it and MG3 was not started. The prototypes remain
+  unreleased; the prover dependency stays on published 2.4.0.

@@ -1,0 +1,122 @@
+{
+  "cell": "deep-win",
+  "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+  "cap": {
+    "kind": "evals",
+    "value": 5000000,
+    "seed": 0
+  },
+  "control_expansions": 168910,
+  "gate": {
+    "max_ratio": 0.667,
+    "min_speedup": 1.5
+  },
+  "configs": {
+    "control": {
+      "runs": [
+        {
+          "ms": 2546,
+          "child_evals": 5000034,
+          "expansions": 168910,
+          "null_calls": 105120,
+          "null_replies": 2782739
+        },
+        {
+          "ms": 2582,
+          "child_evals": 5000034,
+          "expansions": 168910,
+          "null_calls": 105120,
+          "null_replies": 2782739
+        },
+        {
+          "ms": 2558,
+          "child_evals": 5000034,
+          "expansions": 168910,
+          "null_calls": 105120,
+          "null_replies": 2782739
+        }
+      ],
+      "median_ms": 2558,
+      "child_evals": [
+        5000034
+      ],
+      "expansions": [
+        168910
+      ],
+      "tree_identical_to_control": true,
+      "ratio_to_control": 1.0,
+      "speedup": 1.0
+    },
+    "s3": {
+      "runs": [
+        {
+          "ms": 2586,
+          "child_evals": 5000034,
+          "expansions": 168910,
+          "null_calls": 105120,
+          "null_replies": 2782739
+        },
+        {
+          "ms": 2555,
+          "child_evals": 5000034,
+          "expansions": 168910,
+          "null_calls": 105120,
+          "null_replies": 2782739
+        },
+        {
+          "ms": 2560,
+          "child_evals": 5000034,
+          "expansions": 168910,
+          "null_calls": 105120,
+          "null_replies": 2782739
+        }
+      ],
+      "median_ms": 2560,
+      "child_evals": [
+        5000034
+      ],
+      "expansions": [
+        168910
+      ],
+      "tree_identical_to_control": true,
+      "ratio_to_control": 1.0008,
+      "speedup": 0.9992
+    },
+    "candidate": {
+      "runs": [
+        {
+          "ms": 2097,
+          "child_evals": 5000034,
+          "expansions": 168910,
+          "null_calls": 105120,
+          "null_replies": 2782739
+        },
+        {
+          "ms": 2113,
+          "child_evals": 5000034,
+          "expansions": 168910,
+          "null_calls": 105120,
+          "null_replies": 2782739
+        },
+        {
+          "ms": 2099,
+          "child_evals": 5000034,
+          "expansions": 168910,
+          "null_calls": 105120,
+          "null_replies": 2782739
+        }
+      ],
+      "median_ms": 2099,
+      "child_evals": [
+        5000034
+      ],
+      "expansions": [
+        168910
+      ],
+      "tree_identical_to_control": true,
+      "ratio_to_control": 0.8206,
+      "speedup": 1.2187
+    }
+  },
+  "verdict": "miss"
+}

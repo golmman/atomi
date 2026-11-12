@@ -58,6 +58,12 @@ Referenced from `AGENTS.md` §Correctness.
   opt-in `--guide-null-exact` builds the passed board **ephemerally** for the
   one-ply exact null win and the guide side of the replay; only real child
   keys and proofs leave that module ([report18](report18.md)).
+- **`null_win`'s `work.moves` is the full legal move count, not the number
+  scanned.** It feeds the auxiliary budget in `Engine::null_replay`; an early
+  exit that reports fewer moves changes the budget and therefore the tree.
+  Plan 28's S2 therefore routes only `exposed_limit_uncached` through the
+  callback stream; a future `null_win` early exit needs a separate tree-identity
+  proof ([report28](report28.md)).
 - An exact-replay path that proves a child by an immediate explosion must
   return the **child's own** one-move proof entry, not just the length; the
   writer walks real positions and fails `missing` otherwise (plan18 D14).

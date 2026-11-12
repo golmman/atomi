@@ -409,3 +409,18 @@ premise are the recorded starting point for the D21 kill review.
   `make test`, `make lint`, `make test-full` + veto green. Data:
   [`measurements/plan27/`](measurements/plan27/README.md); report:
   [`report27.md`](report27.md); decision D39.
+
+- **2026-11-12** — plan28 (item 35, HOTPATH-V1) executed and **closed
+  negative**. The tree-identical S1+S2+S3 stack (MG1 `Board::null_for`, MG2
+  public `for_each_pseudo_legal`, S3 lean lookup) was measured with a
+  measurement-only path dependency on a local `atomic-movegen` checkout. G-H1
+  at 5 M evals, `deep-win`, seed 0: `child_evals` 5,000,034 and expansions
+  168,910 in every arm, but the candidate is **0.8206×** the same-session
+  control (2.099 s vs 2.558 s, 1.219×) against the declared ≤ 0.667×
+  (≥ 1.5×); S3 alone is 1.0008×. S4 was not started, no 120 s matrix, D14
+  claim or bench row follows, and the repo is restored to the published
+  `atomic-movegen 2.4.0` dependency. The per-node line is closed for good;
+  the next plan is the formulation decision (PDS-PN/PN² or a goal re-pin).
+  Gates: `make test`, `make lint` green on the reverted tree. Data:
+  [`measurements/plan28/`](measurements/plan28/README.md); report:
+  [`report28.md`](report28.md); decision D40 closed.
