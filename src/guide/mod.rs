@@ -51,7 +51,7 @@ impl EfPnMode {
 
 /// The mechanism names `--guide-on` / `--guide-off` accept (D33: parsing
 /// defers them, so the list lives here next to `GuideConfig::set_switch`.
-pub const MECHANISMS: [&str; 21] = [
+pub const MECHANISMS: [&str; 22] = [
     "classes",
     "evasions",
     "quiet",
@@ -72,6 +72,7 @@ pub const MECHANISMS: [&str; 21] = [
     "threat-count",
     "hanging-quiet",
     "unlikely-exact",
+    "closure-bits",
     "numbers",
 ];
 
@@ -132,6 +133,10 @@ pub struct GuideConfig {
     /// Plan-19 R6 `unlikely-exact`: the `UNLIKELY` prior sets the pair
     /// outright (`--guide-on unlikely-exact`).
     pub unlikely_exact: bool,
+    /// Plan-20 R11 `closure-bits`: the one-ply explosion settle and its
+    /// screen read bitboards instead of building a child and generating its
+    /// legal moves (`--guide-on closure-bits`, default off).
+    pub closure_bits: bool,
 }
 
 impl GuideConfig {
@@ -141,13 +146,20 @@ impl GuideConfig {
     }
 
     /// The shipped hand guide (`--guide hand`): the product stack plus the
-    /// plan-19 starting-number algebra R1, R3 and R6 (report19 §5). R2
-    /// (`efpn_banded`) and R4/R5 (`threat_count`, `hanging_quiet`) are
-    /// rejected by the post-gate ablations and stay opt-in.
+    /// plan-19 starting-number algebra R1, R3 and R6 (report19 §5) and the
+    /// plan-20 AUX-V1 stack (report20): the exact sibling simulation, the
+    /// exact null-threat replay and the board-free one-ply closures. R2
+    /// (`efpn_banded`) and R4/R5 (`threat_count`, `hanging_quiet`) stay
+    /// opt-in. The greedy playout and the signature prior are inert while
+    /// their exact replacements are on; `--guide-off sim-exact,null-exact,
+    /// closure-bits` restores the plan-19 default.
     pub fn hand() -> GuideConfig {
         let mut c = GuideConfig::product();
         c.r1_r3();
         c.unlikely_exact = true;
+        c.sim_exact = true;
+        c.null_exact = true;
+        c.closure_bits = true;
         c
     }
 
@@ -177,6 +189,7 @@ impl GuideConfig {
             threat_count: false,
             hanging_quiet: false,
             unlikely_exact: false,
+            closure_bits: false,
         }
     }
 
@@ -241,6 +254,7 @@ impl GuideConfig {
             "threat-count" => self.threat_count = on,
             "hanging-quiet" => self.hanging_quiet = on,
             "unlikely-exact" => self.unlikely_exact = on,
+            "closure-bits" => self.closure_bits = on,
             "numbers" => self.numbers_switches(on),
             _ => return Err(format!("unknown guide mechanism: {name}")),
         }
@@ -812,12 +826,17 @@ mod tests {
         let product = GuideConfig::product();
         assert!(hand.fresh_class && hand.evasions_count && hand.unlikely_exact);
         assert!(!hand.efpn_banded && !hand.threat_count && !hand.hanging_quiet);
+        // Plan-20 AUX-V1: the exact replays and the board-free closures.
+        assert!(hand.sim_exact && hand.null_exact && hand.closure_bits);
         // Every other product switch is untouched.
         assert_eq!(
             GuideConfig {
                 fresh_class: false,
                 evasions_count: false,
                 unlikely_exact: false,
+                sim_exact: false,
+                null_exact: false,
+                closure_bits: false,
                 ..hand
             },
             product
@@ -828,7 +847,7 @@ mod tests {
             "--guide",
             "hand",
             "--guide-on",
-            "numbers",
+            "numbers,sim-exact,null-exact,closure-bits",
             "--guide-off",
             "efpn-banded,threat-count,hanging-quiet",
         ]
@@ -967,6 +986,7 @@ mod tests {
             ("threat-count", |c| c.threat_count),
             ("hanging-quiet", |c| c.hanging_quiet),
             ("unlikely-exact", |c| c.unlikely_exact),
+            ("closure-bits", |c| c.closure_bits),
         ] {
             let base = GuideConfig::hand();
             let mut off = base;
@@ -1054,9 +1074,17 @@ mod tests {
                 .unwrap();
         let mut st = StateInfo::new();
         b.populate_state(&mut st);
-        let g = Guide::new(GuideConfig::hand());
+        // The signature prior is built only while the exact replay is off.
+        let g = Guide::new(GuideConfig {
+            null_exact: false,
+            ..GuideConfig::hand()
+        });
         let c = g.context(&b, &st, 30, true);
         assert!(c.null_sig.is_some());
         assert_eq!(c.null_sig, Some(threat::signature_for(&b, Color::Black)));
+        // With the exact replay on (the shipped default) no signature is
+        // computed at all.
+        let exact = Guide::new(GuideConfig::hand()).context(&b, &st, 30, true);
+        assert!(exact.null_sig.is_none());
     }
 }

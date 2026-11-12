@@ -563,7 +563,10 @@ impl<S: ProofSink> Engine<S> {
             self.aux_skipped += 1;
             return;
         }
+        // The null position's movegen is simulation-side work: keep the
+        // `aux_nodes == sim_nodes + settle_nodes` accounting invariant.
         self.aux_nodes += work;
+        self.sim_nodes += work;
         aux_left -= work;
         for j in 0..frame.children.len() {
             if !matches!(frame.children[j].value, Value::Open { .. }) {
@@ -630,13 +633,26 @@ impl<S: ProofSink> Engine<S> {
         guide: &Board,
         remaining: u16,
     ) {
+        // D25: the global auxiliary budget also bounds the exact sibling
+        // replay, so a small `--guide-aux-budget` cannot be overshot by one
+        // replay per sibling.
+        let mut aux_left = if self.guide.params.aux_budget == 0 {
+            u64::MAX
+        } else {
+            self.guide.params.aux_budget.saturating_sub(self.aux_nodes)
+        };
         for j in 0..frame.children.len() {
             if j == best || !matches!(frame.children[j].value, Value::Open { .. }) {
                 continue;
             }
+            if aux_left == 0 {
+                self.aux_skipped += 1;
+                continue;
+            }
             let mut sibling = board.clone();
             sibling.do_move(frame.children[j].mv, &mut StateInfo::new());
-            let mut budget = crate::guide::replay::REPLAY_BUDGET;
+            let mut budget = crate::guide::replay::REPLAY_BUDGET
+                .min(u32::try_from(aux_left).unwrap_or(u32::MAX));
             let mut line = Vec::new();
             let Some(proof) = crate::guide::replay::simulate(
                 &sibling,
@@ -651,6 +667,7 @@ impl<S: ProofSink> Engine<S> {
                 continue;
             };
             let spent = u64::from(crate::guide::replay::REPLAY_BUDGET - budget);
+            aux_left = aux_left.saturating_sub(spent);
             self.sim_nodes += spent;
             self.aux_nodes += spent;
             for (key, entry) in &proof.proofs {

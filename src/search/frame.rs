@@ -249,6 +249,8 @@ impl Frame {
         let guide_on = guide.config.enabled;
         let max_settle = u64::from(guide.params.max_settle);
         let max_sim = u64::from(guide.params.max_sim);
+        // Plan-20 R11: the board-free settle and screen (default off).
+        let closure_bits = guide_on && guide.config.closure_bits;
         let group_enabled = guide_on && guide.config.group && attacker_node;
 
         // Pass 1 (effects + guide).
@@ -310,7 +312,12 @@ impl Frame {
                 && guide_on
                 && guide.config.static_closures
                 && (max_settle == 0 || settle_nodes < max_settle)
-                && (built.is_some() || threat::settle_screen(board, m, mover));
+                && (built.is_some()
+                    || if closure_bits {
+                        threat::settle_screen_bits(board, m, mover)
+                    } else {
+                        threat::settle_screen(board, m, mover)
+                    });
             if settle_wanted && !aux_available(settle_nodes, sim_nodes) {
                 aux_skipped += 1;
             }
@@ -322,9 +329,16 @@ impl Frame {
                     built = Some(child);
                 }
                 let child = built.as_ref().expect("child built above");
-                settle_nodes += 1;
-                if let Some((settle, work)) = threat::one_ply_settle(child, attacker) {
-                    settle_nodes += work;
+                let settled = if closure_bits {
+                    threat::one_ply_settle_bits(child, attacker)
+                } else {
+                    settle_nodes += 1;
+                    threat::one_ply_settle(child, attacker)
+                };
+                if let Some((settle, work)) = settled {
+                    if !closure_bits {
+                        settle_nodes += work;
+                    }
                     value = match settle {
                         Settle::SideToMoveWins(mv) => Value::Proved {
                             length: 1,

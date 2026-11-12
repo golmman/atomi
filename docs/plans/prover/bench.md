@@ -395,6 +395,7 @@ cap only. Decisions append no row (history D27–D30 in
 | `plan11` | 2026-11-10 | `e10de197da58` · `atomi@b52e186+d` | atomi **bare** | **35.3** (17.390 s) | **19.1** (2.008 s) | censored (1/3; seed 1 111.218 s) | **25.9** (2 cells) | 120 s |
 | `plan15` | 2026-11-10 | `e10de197da58` · `atomi@8953596+d` | atomi **bare** | **35.8** (17.471 s) | **18.9** (2.023 s) | censored (1/3; seed 1 113.458 s) | **26.0** (2 cells) | 120 s |
 | `plan19` | 2026-11-11 | `e10de197da58` · `atomi@e71289b+d` | atomi **default** (R1+R3+R6) | censored (2/3; 115.1 s) | **78** (10.4 s) | censored (0/3; ≥ 18.4) | **78** (1 cell) | 120 s |
+| `plan20` | 2026-11-12 | `e10de197da58` · `atomi@772b3cb+d` | atomi **default** (AUX-V1) | **16.3** (8.36 s) | **7.0** (0.91 s) | censored (0/3; ≥ 18.5) | **10.8** (2 cells) | 120 s |
 
 Cell syntax: `factor (candidate wall / candidate evals)`; atomi's evals are
 its `child_evals` counter. Reference (`provari-v0.1.0 --guide hand`) is
@@ -645,3 +646,17 @@ rung change; `T_2` still rests on the bare tree's `core` 3/3. Numbers:
   (plan11/plan15 bare 35.3/19.1 and 35.8/18.9; plan19 default 78 on
   `easy-win`). The split makes the plan19 default's 120 s regression vs the
   bare tree explicit (78 vs 18.9). No engine change.
+
+- **2026-11-12** — plan20 (items 27–28) executed; **the default is now
+  AUX-V1**: `sim-exact` + `null-exact` + the board-free `closure-bits`
+  closures on top of the plan-19 numbers. Tree-only medians vs the plan-19
+  default: `core` 5.88×, `easy-win` 4.65×, `deep-win` 1.66× (censored control)
+  in child evals; 120 s wall 14.4× `core` (2/3 → 3/3 at 8.3 s) and 10.9×
+  `easy-win` (3/3 at 0.94 s). The `aux_nodes`/expansion ≤ 1 gate is a miss
+  (7–13, from 213–215); exact replays are per-defence work. 10 s: `core` 2/3,
+  `easy-win` 3/3, `deep-win` 0/3 → factors 16.3 / 7.0 / censored. `deep-win`
+  proves at 128–175 s with a generous cap but is 0/3 at 120 s: no `T_3`, `T_2`
+  stands 3/3 + 3/3. `proof_full` appeared on `deep-win` (item 30 trigger).
+  The control is `--guide hand --guide-off sim-exact,null-exact,closure-bits`.
+  Details in [`report20.md`](report20.md) and
+  [`measurements/plan20/`](measurements/plan20/README.md).

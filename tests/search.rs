@@ -997,11 +997,11 @@ fn aux_budget_is_deterministic_and_caps_work() {
         capped,
         run(&["--guide-max-sim", "1", "--guide-max-settle", "1"])
     );
-    assert!(capped.1 <= full.1, "{capped:?} vs {full:?}");
-    assert!(capped.2 <= full.2, "{capped:?} vs {full:?}");
-    // The auxiliary caps change the guide's starts (so the main tree may
-    // differ), but they stay out of `child_evals`/`expansions` accounting.
+    // The auxiliary caps change the guide's starts, so the main tree may
+    // differ in either direction (and does once the exact replays are on):
+    // the caps are a deterministic work bound, not a monotone tree order.
     assert!(capped.0 > 0 && full.0 > 0);
+    assert_eq!(capped.3, capped.1 + capped.2);
     assert_eq!(full.3, full.1 + full.2);
     assert_eq!(full.4, 0, "unlimited work skips nothing");
 
@@ -1011,8 +1011,9 @@ fn aux_budget_is_deterministic_and_caps_work() {
     let budgeted = run(&["--guide-aux-budget", "1000"]);
     assert_eq!(budgeted, run(&["--guide-aux-budget", "1000"]));
     assert_eq!(budgeted.3, budgeted.1 + budgeted.2);
-    // The last admitted operation may overshoot the cap by its own work.
-    assert!(budgeted.3 <= 1000 + 16, "{budgeted:?}");
+    // The last admitted operation may overshoot the cap by its own work:
+    // one exact replay is bounded by the 1000-unit replay budget.
+    assert!(budgeted.3 <= 1000 + 1000, "{budgeted:?}");
     assert!(
         budgeted.4 > 0,
         "a small budget must skip work: {budgeted:?}"
@@ -1026,32 +1027,42 @@ fn settled_child_proof_round_trip() {
     // settled Proved without being expanded). The writer must find the
     // child's own proof entry, and the event-fed store must agree.
     let root = board(MATE_IN_2);
-    let lim = Limits {
-        seconds: Some(60),
-        evals: None,
-        memory_mb: 192,
-        filter: true,
-        guide: atomi::guide::GuideConfig::hand(),
-        guide_params: atomi::guide::GuideParams::default(),
-        proof_share_percent: 25,
-        seed: 0,
-        stats: false,
-        max_depth: None,
-    };
-    let out = search::prove(&root, &lim, ProofStore::new(64));
-    assert_eq!(out.result.exit, Exit::Proved);
-    assert!(out.result.settle_nodes > 0, "{:?}", out.result);
-    let dir = std::path::Path::new(env!("CARGO_TARGET_TMPDIR"));
-    let p_table = dir.join("settle-table.jsonl");
-    let p_store = dir.join("settle-store.jsonl");
-    let stats = atomi::strategy::write_proof(&root, &out.proofs, &p_table)
-        .unwrap_or_else(|e| panic!("{e:?}"));
-    atomi::strategy::write_proof(&root, &out.sink, &p_store).unwrap_or_else(|e| panic!("{e:?}"));
-    assert_eq!(
-        std::fs::read(&p_table).unwrap(),
-        std::fs::read(&p_store).unwrap(),
-        "settled-child proof: table vs store"
-    );
-    assert!(atomi::validate::validate_file(&p_table).valid);
-    assert!(stats.positions > 0);
+    // Both closure implementations must round-trip a settled child's proof:
+    // the build-and-verify path (plan-19 default) and the board-free closure
+    // (plan-20 `closure-bits`, the shipped default).
+    for bits in [false, true] {
+        let mut guide = atomi::guide::GuideConfig::hand();
+        guide.closure_bits = bits;
+        let lim = Limits {
+            seconds: Some(60),
+            evals: None,
+            memory_mb: 192,
+            filter: true,
+            guide,
+            guide_params: atomi::guide::GuideParams::default(),
+            proof_share_percent: 25,
+            seed: 0,
+            stats: false,
+            max_depth: None,
+        };
+        let out = search::prove(&root, &lim, ProofStore::new(64));
+        assert_eq!(out.result.exit, Exit::Proved);
+        if !bits {
+            assert!(out.result.settle_nodes > 0, "{:?}", out.result);
+        }
+        let dir = std::path::Path::new(env!("CARGO_TARGET_TMPDIR"));
+        let p_table = dir.join(format!("settle-table-{bits}.jsonl"));
+        let p_store = dir.join(format!("settle-store-{bits}.jsonl"));
+        let stats = atomi::strategy::write_proof(&root, &out.proofs, &p_table)
+            .unwrap_or_else(|e| panic!("{e:?}"));
+        atomi::strategy::write_proof(&root, &out.sink, &p_store)
+            .unwrap_or_else(|e| panic!("{e:?}"));
+        assert_eq!(
+            std::fs::read(&p_table).unwrap(),
+            std::fs::read(&p_store).unwrap(),
+            "settled-child proof (bits={bits}): table vs store"
+        );
+        assert!(atomi::validate::validate_file(&p_table).valid);
+        assert!(stats.positions > 0);
+    }
 }

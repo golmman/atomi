@@ -12,7 +12,7 @@
 //! or emitted.
 
 use atomic_movegen::board::{Board, StateInfo};
-use atomic_movegen::movegen::generate_legal;
+use atomic_movegen::movegen::generate_pseudo_legal;
 use atomic_movegen::types::{Bitboard, Color, Move, MoveList};
 
 /// A side's immediate explosion threats.
@@ -80,8 +80,10 @@ pub fn signature(board: &Board) -> ThreatSignature {
 /// The exact one-ply explosion test: does `side` (to move) have a legal
 /// capture that removes the opponent's commoner?
 ///
-/// The candidate is confirmed by making the move, so there are no false
-/// positives. Returns the winning move.
+/// This is the shipped path: candidates are confirmed by making the move, so
+/// there are no false positives. [`immediate_explosion_bits`] is the
+/// board-free closure (plan-20 R11) and must agree with this on every legal
+/// position (test oracle).
 pub fn immediate_explosion(board: &Board, side: Color) -> Option<Move> {
     debug_assert_eq!(board.side_to_move(), side);
     if board.commoners(side.flip()).is_empty() {
@@ -89,14 +91,50 @@ pub fn immediate_explosion(board: &Board, side: Color) -> Option<Move> {
     }
     let zone = Board::blast_zone(board.commoners(side.flip()).lsb());
     let mut moves = MoveList::new();
-    generate_legal(board, &mut moves);
-    for m in &moves {
+    atomic_movegen::movegen::generate_legal(board, &mut moves);
+    for &m in moves.as_slice() {
         if !board.is_capture(m) || (Board::blast_zone(m.to_sq()) & zone).is_empty() {
             continue;
         }
         let mut child = board.clone();
         child.do_move(m, &mut StateInfo::new());
         if child.commoners(side.flip()).is_empty() {
+            return Some(m);
+        }
+    }
+    None
+}
+
+/// The board-free one-ply explosion closure (plan-20 R11, item 28):
+/// candidates come from the pseudo-legal stream, their casualties are read
+/// with [`Board::blast_casualties`], and only the candidates are legality
+/// checked. No child board is built and no legal move list is generated.
+///
+/// The move chosen can differ from [`immediate_explosion`]'s (the pseudo-legal
+/// order is not the legal order); the settled value is the same.
+pub fn immediate_explosion_bits(board: &Board, side: Color) -> Option<Move> {
+    debug_assert_eq!(board.side_to_move(), side);
+    let enemy_commoners = board.commoners(side.flip());
+    if enemy_commoners.is_empty() {
+        return None;
+    }
+    let mut state = StateInfo::new();
+    board.populate_state(&mut state);
+    let mut moves = MoveList::new();
+    generate_pseudo_legal(board, &mut moves);
+    for &m in moves.as_slice() {
+        if !board.is_capture(m) {
+            continue;
+        }
+        // A captured piece can only blast the enemy commoner when that
+        // commoner is at or beside the capture square.
+        if (Board::blast_zone(m.to_sq()) & enemy_commoners).is_empty() {
+            continue;
+        }
+        if (board.blast_casualties(m).all() & enemy_commoners).is_empty() {
+            continue;
+        }
+        if board.legal(m, &state) {
             return Some(m);
         }
     }
@@ -126,9 +164,23 @@ pub fn one_ply_settle(board: &Board, attacker: Color) -> Option<(Settle, u64)> {
     Some((settle, 1))
 }
 
-/// A conservative screen for a **non-built** quiet child: could the opponent
-/// have an immediate explosion after our move? A miss only loses a settle
-/// opportunity (never soundness); a hit is verified by
+/// The board-free settle variant (plan-20 R11): same value as
+/// [`one_ply_settle`], no child build and no legal move list. The returned
+/// work is `0` — the bit tests are pass-1 effect work, not auxiliary work.
+pub fn one_ply_settle_bits(board: &Board, attacker: Color) -> Option<(Settle, u64)> {
+    let side = board.side_to_move();
+    let mv = immediate_explosion_bits(board, side)?;
+    let settle = if side == attacker {
+        Settle::SideToMoveWins(mv)
+    } else {
+        Settle::SideToMoveLoses(mv)
+    };
+    Some((settle, 0))
+}
+
+/// The shipped conservative screen for a **non-built** quiet child: could the
+/// opponent have an immediate explosion after our move? A miss only loses a
+/// settle opportunity (never soundness); a hit is verified by
 /// [`one_ply_settle`].
 pub fn settle_screen(board: &Board, m: Move, mover: Color) -> bool {
     let victim_side = mover;
@@ -162,8 +214,50 @@ pub fn settle_screen(board: &Board, m: Move, mover: Color) -> bool {
     false
 }
 
-/// Whether `from` lies on a rank, file or diagonal through `to` (a
-/// conservative line-opening test).
+/// The board-free screen (plan-20 R11): the quiet move's occupancy change is
+/// applied to the bitboards, the pieces left beside our commoner (and away
+/// from theirs, where a capture would also destroy their commoner) are read
+/// off, and one attack lookup per such square decides. A miss loses a settle
+/// opportunity only; a hit is verified by [`one_ply_settle_bits`].
+pub fn settle_screen_bits(board: &Board, m: Move, mover: Color) -> bool {
+    let commoners = board.commoners(mover);
+    if commoners.is_empty() {
+        return false;
+    }
+    let k = commoners.lsb();
+    let (from, to) = (m.from_sq(), m.to_sq());
+    let from_bb = Bitboard::square_bb(from);
+    let to_bb = Bitboard::square_bb(to);
+    // Squares where one of our pieces is beside our commoner and a capture
+    // there would blast it. Their commoner's own blast ring is excluded:
+    // such a capture would destroy their commoner too, so it is never legal.
+    let mut beside = Board::blast_zone(k);
+    let their_commoners = board.commoners(mover.flip());
+    if !their_commoners.is_empty() {
+        beside = beside & !Board::blast_zone(their_commoners.lsb());
+    }
+    // The quiet move's own occupancy change: the moved piece leaves `from`
+    // and lands on `to` (non-built moves are never captures or specials).
+    let ours = (board.pieces_color(mover) & !from_bb) | to_bb;
+    let exposed = ours & beside;
+    if exposed.is_empty() {
+        return false;
+    }
+    let occ = (board.occupied() & !from_bb) | to_bb;
+    let them = mover.flip();
+    let capturers = board.pieces_color(them) & !board.commoners(them);
+    let mut sq = exposed;
+    while !sq.is_empty() {
+        let d = sq.pop_lsb();
+        if !(board.attackers_to_color(d, them, occ) & capturers).is_empty() {
+            return true;
+        }
+    }
+    false
+}
+
+/// Whether `from` lies on a rank, file or diagonal through `to` (the shipped
+/// screen's conservative line-opening test).
 fn on_ray(from: atomic_movegen::types::Square, to: atomic_movegen::types::Square) -> bool {
     let (f, t) = (from as i32, to as i32);
     let (fd, td) = (f & 7, t & 7);
@@ -206,6 +300,7 @@ mod tests {
     use super::*;
     use crate::rules;
     use crate::testutil;
+    use atomic_movegen::movegen::generate_legal;
 
     #[test]
     fn signature_is_deterministic_and_self_consistent() {
@@ -264,24 +359,81 @@ mod tests {
     }
 
     #[test]
-    fn screen_never_hides_a_built_settle() {
-        // A hit screened from the parent is verified; a missed hit is a
-        // strength loss only, so this test pins that a hit implies the
-        // built child's exact settle and that a quiet move screen is
-        // conservative on the obvious case.
-        let b = Board::from_fen("k7/8/8/8/8/8/1R6/4K3 w - - 0 1").unwrap();
-        let mut moves = MoveList::new();
-        generate_legal(&b, &mut moves);
-        let _ = settle_screen(&b, moves.as_slice()[0], b.side_to_move());
+    fn board_free_explosion_matches_the_build_path() {
+        // Plan-20 R11: the pseudo-legal + blast-casualties closure must equal
+        // the old build-and-make oracle on every fixture position.
+        let mut checked = 0usize;
+        let mut hits = 0usize;
+        for (board, _line, _att) in testutil::positions() {
+            let side = board.side_to_move();
+            let fast = immediate_explosion_bits(&board, side);
+            let full = immediate_explosion(&board, side);
+            assert_eq!(fast, full, "{board:?}");
+            checked += 1;
+            if fast.is_some() {
+                hits += 1;
+            }
+        }
+        assert!(checked >= 1_000, "only {checked} positions");
+        eprintln!("board-free explosion: positions={checked} hits={hits}");
     }
 
     #[test]
-    fn ray_test() {
-        use atomic_movegen::types::Square;
-        assert!(on_ray(Square::A1, Square::H8));
-        assert!(on_ray(Square::A1, Square::A8));
-        assert!(on_ray(Square::A1, Square::H1));
-        assert!(!on_ray(Square::A1, Square::B3));
-        assert!(!on_ray(Square::A1, Square::A1));
+    fn board_free_explosion_never_claims_a_false_win() {
+        // Every move the closure returns is legal and really removes the
+        // enemy commoner after the move (no false win).
+        let mut hits = 0usize;
+        for (board, _line, _att) in testutil::positions().into_iter().take(400) {
+            let side = board.side_to_move();
+            let Some(mv) = immediate_explosion_bits(&board, side) else {
+                continue;
+            };
+            hits += 1;
+            assert!(board.is_legal(mv), "{mv} on {board:?}");
+            let mut child = board.clone();
+            child.do_move(mv, &mut StateInfo::new());
+            assert!(
+                child.commoners(side.flip()).is_empty(),
+                "{mv} did not explode the commoner on {board:?}"
+            );
+        }
+        assert!(hits >= 1, "no explosion closure hit in the sample");
+    }
+
+    #[test]
+    fn screen_never_misses_a_settle() {
+        // The screen is a conservative hint: a false hit only costs a build,
+        // but a miss would lose the settle. For every fixture move whose
+        // child really has an immediate explosion, the parent screen must
+        // fire.
+        let mut settles = 0usize;
+        let mut missed = 0usize;
+        for (board, _line, _att) in testutil::positions().into_iter().take(400) {
+            let mover = board.side_to_move();
+            let ctx = crate::mover::Mover::new(&board);
+            let mut moves = MoveList::new();
+            generate_legal(&board, &mut moves);
+            for &m in moves.as_slice() {
+                if ctx.effect(&board, m).needs_board {
+                    continue;
+                }
+                let mut child = board.clone();
+                child.do_move(m, &mut StateInfo::new());
+                if immediate_explosion_bits(&child, child.side_to_move()).is_none() {
+                    continue;
+                }
+                settles += 1;
+                if !settle_screen_bits(&board, m, mover) {
+                    missed += 1;
+                    eprintln!(
+                        "missed settle: fen={} move={}",
+                        board.fen_with(atomic_movegen::types::EnPassantMode::Legal),
+                        m.to_uci()
+                    );
+                }
+            }
+        }
+        assert!(settles >= 1, "only {settles} child settles");
+        assert_eq!(missed, 0, "{missed} of {settles} settles missed");
     }
 }
