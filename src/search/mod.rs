@@ -120,6 +120,11 @@ pub struct SearchResult {
     pub plain_children: u64,
     /// Expansions that installed a `GROUP` child.
     pub group_children: u64,
+    /// `null_win` calls (plan-25 Phase A, `--stats` only).
+    pub null_calls: u64,
+    /// Defender replies examined by the exact null replay (plan-25 Phase A,
+    /// `--stats` only).
+    pub null_replies: u64,
     /// Search time in milliseconds (allocation excluded).
     pub ms: u64,
     /// Live entries in the proof table at exit.
@@ -194,6 +199,8 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
                 aux_skipped: 0,
                 plain_children: 0,
                 group_children: 0,
+                null_calls: 0,
+                null_replies: 0,
                 stop: None,
                 sink,
                 guide,
@@ -240,6 +247,8 @@ struct Engine<S> {
     aux_skipped: u64,
     plain_children: u64,
     group_children: u64,
+    null_calls: u64,
+    null_replies: u64,
     stop: Option<Exit>,
     sink: S,
     guide: Guide,
@@ -297,6 +306,8 @@ impl<S: ProofSink> Engine<S> {
             aux_skipped: self.aux_skipped,
             plain_children: self.plain_children,
             group_children: self.group_children,
+            null_calls: self.null_calls,
+            null_replies: self.null_replies,
             ms: 0,
             proof_entries: 0,
             proof_full: false,
@@ -572,11 +583,21 @@ impl<S: ProofSink> Engine<S> {
         {
             return;
         }
-        let Some((null, win, work)) =
-            crate::guide::null::null_win(board, self.attacker, &self.tables, u16::MAX)
-        else {
+        self.null_calls += 1;
+        let mut work = crate::guide::null::NullWork::default();
+        let Some((null, win)) = crate::guide::null::null_win(
+            board,
+            self.attacker,
+            &self.tables,
+            u16::MAX,
+            self.guide.config.null_screen,
+            &mut work,
+        ) else {
+            self.null_replies += work.replies;
             return;
         };
+        self.null_replies += work.replies;
+        let work = work.moves;
         let mut aux_left = if self.guide.params.aux_budget == 0 {
             u64::MAX
         } else {
@@ -1008,6 +1029,8 @@ mod tests {
             aux_skipped: 0,
             plain_children: 0,
             group_children: 0,
+            null_calls: 0,
+            null_replies: 0,
             stop: None,
             sink: NullSink,
             guide: Guide::new(GuideConfig::none()),
@@ -1076,6 +1099,8 @@ mod tests {
             aux_skipped: 0,
             plain_children: 0,
             group_children: 0,
+            null_calls: 0,
+            null_replies: 0,
             stop: None,
             sink: NullSink,
             guide: Guide::new(GuideConfig::none()),

@@ -1,0 +1,415 @@
+{
+ "provenance": {
+  "date": "2026-11-12",
+  "host": "e10de197da58",
+  "platform": "Linux-7.2.13-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "cpu_model": "AMD Ryzen 9 5950X 16-Core Processor",
+  "cpu_count": 32,
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "atomic_movegen": "2.4.0",
+  "atomi": {
+   "version": "atomi 0.1.0 (a257e6f28d29748c6208374881773b6e69435f6d)",
+   "binary_sha256": "144ef4a4deb9536c4ef9fa0747cc056f9ebbe2f53205170d53dc8c6f8e9dfee1",
+   "binary": "target/release/atomi"
+  },
+  "repo_head": "a257e6f28d29748c6208374881773b6e69435f6d",
+  "repo_dirty": true,
+  "provari": {
+   "commit": "48686bc",
+   "guide": "hand",
+   "version": "provari 0.1.0",
+   "binary": "/tmp/atomi-oracle/provari/target/release/provari"
+  },
+  "provari_stretch": {
+   "commit": "unknown",
+   "guide": "hand",
+   "version": null,
+   "binary": null
+  },
+  "legacy": {
+   "commit": "unknown",
+   "binary": null
+  },
+  "stacks": {
+   "atomi": {
+    "hand": [
+     "--guide",
+     "hand"
+    ]
+   },
+   "legacy": {}
+  },
+  "budgets": {
+   "seconds": 120.0,
+   "memory_mb": 192,
+   "repeats": 3
+  },
+  "corpus": {
+   "path": "/workspace/atomi/bench/corpus.json",
+   "sha256": "9cd0169a30bb7d5b162b6a1ec119fe194b776c8a24a46cdf1582c07062847d0e"
+  },
+  "proof_verdicts": {}
+ },
+ "runs": [
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 0.515,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342290,
+   "ms": 486
+  },
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 0.533,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342290,
+   "ms": 504
+  },
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 0.534,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342290,
+   "ms": 506
+  },
+  {
+   "case": "core",
+   "side": "atomi:hand",
+   "run": 1,
+   "wall_s": 7.952,
+   "returncode": 0,
+   "win": true,
+   "length": 15,
+   "exit": "proved",
+   "child_evals": 12439376,
+   "expansions": 424249,
+   "ms": 7948,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "core",
+   "side": "atomi:hand",
+   "run": 2,
+   "wall_s": 7.824,
+   "returncode": 0,
+   "win": true,
+   "length": 15,
+   "exit": "proved",
+   "child_evals": 12439376,
+   "expansions": 424249,
+   "ms": 7821,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "core",
+   "side": "atomi:hand",
+   "run": 3,
+   "wall_s": 7.823,
+   "returncode": 0,
+   "win": true,
+   "length": 15,
+   "exit": "proved",
+   "child_evals": 12439376,
+   "expansions": 424249,
+   "ms": 7820,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 0.132,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 103
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 0.132,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 104
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 0.137,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 108
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:hand",
+   "run": 1,
+   "wall_s": 0.607,
+   "returncode": 0,
+   "win": true,
+   "length": 19,
+   "exit": "proved",
+   "child_evals": 1016547,
+   "expansions": 37999,
+   "ms": 604,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:hand",
+   "run": 2,
+   "wall_s": 0.607,
+   "returncode": 0,
+   "win": true,
+   "length": 19,
+   "exit": "proved",
+   "child_evals": 1016547,
+   "expansions": 37999,
+   "ms": 604,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:hand",
+   "run": 3,
+   "wall_s": 0.625,
+   "returncode": 0,
+   "win": true,
+   "length": 19,
+   "exit": "proved",
+   "child_evals": 1016547,
+   "expansions": 37999,
+   "ms": 622,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 4.36,
+   "returncode": 0,
+   "win": true,
+   "mate": 19,
+   "nodes": 3024117,
+   "ms": 4331
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 4.374,
+   "returncode": 0,
+   "win": true,
+   "mate": 19,
+   "nodes": 3024117,
+   "ms": 4346
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 4.367,
+   "returncode": 0,
+   "win": true,
+   "mate": 19,
+   "nodes": 3024117,
+   "ms": 4338
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:hand",
+   "run": 1,
+   "wall_s": 88.437,
+   "returncode": 0,
+   "win": true,
+   "length": 36,
+   "exit": "proved",
+   "child_evals": 155236740,
+   "expansions": 5803257,
+   "ms": 88434,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:hand",
+   "run": 2,
+   "wall_s": 88.33,
+   "returncode": 0,
+   "win": true,
+   "length": 36,
+   "exit": "proved",
+   "child_evals": 155236740,
+   "expansions": 5803257,
+   "ms": 88326,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:hand",
+   "run": 3,
+   "wall_s": 88.194,
+   "returncode": 0,
+   "win": true,
+   "length": 36,
+   "exit": "proved",
+   "child_evals": 155236740,
+   "expansions": 5803257,
+   "ms": 88190,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  }
+ ],
+ "ledger": {
+  "cells": {
+   "core": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 0.533,
+     "win": true,
+     "nodes": 342290,
+     "mate": 17,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "hand": {
+     "runs": 3,
+     "wall_s": 7.824,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 12439376,
+     "exit": "proved",
+     "returncodes": [
+      0
+     ],
+     "factor": 14.679,
+     "note": "shared win"
+    }
+   },
+   "1eb80b92f92c": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 0.132,
+     "win": true,
+     "nodes": 72523,
+     "mate": 15,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "hand": {
+     "runs": 3,
+     "wall_s": 0.607,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 1016547,
+     "exit": "proved",
+     "returncodes": [
+      0
+     ],
+     "factor": 4.598,
+     "note": "shared win"
+    }
+   },
+   "db6a741c723f": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 4.367,
+     "win": true,
+     "nodes": 3024117,
+     "mate": 19,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "hand": {
+     "runs": 3,
+     "wall_s": 88.33,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 155236740,
+     "exit": "proved",
+     "returncodes": [
+      0
+     ],
+     "factor": 20.227,
+     "note": "shared win"
+    }
+   }
+  },
+  "summary": {
+   "hand": {
+    "shared_cells": [
+     "core",
+     "1eb80b92f92c",
+     "db6a741c723f"
+    ],
+    "shared_count": 3,
+    "geomean_factor": 11.093,
+    "coverage_reference": 3,
+    "coverage_candidate": 3,
+    "censored_cells": []
+   }
+  }
+ }
+}

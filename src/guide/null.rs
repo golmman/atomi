@@ -50,26 +50,43 @@ pub fn null_board(board: &Board, attacker: Color) -> Option<Board> {
     Board::from_fen(&parts.join(" ")).ok()
 }
 
+/// The work a null replay spent. `moves` is the existing auxiliary work
+/// unit (the null movegen); `replies` is observation-only (plan 25).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct NullWork {
+    /// Null moves scanned (the auxiliary work unit).
+    pub moves: u64,
+    /// Defender replies examined in the exposed-limit pass.
+    pub replies: u64,
+}
+
 /// Find an exact winning move for `attacker` in the null position and return
-/// it with the null board and the movegen work spent. `remaining` bounds the
-/// proof length.
+/// it with the null board. `remaining` bounds the proof length. `screen`
+/// enables the plan-25 NULL-S pass-2 signature screen (default off).
 pub fn null_win(
     board: &Board,
     attacker: Color,
     tables: &Tables,
     remaining: u16,
-) -> Option<(Board, NullWin, u64)> {
+    screen: bool,
+    work: &mut NullWork,
+) -> Option<(Board, NullWin)> {
     if board.side_to_move() == attacker {
         return None;
     }
     let null = null_board(board, attacker)?;
     let mut moves = MoveList::new();
     generate_legal(&null, &mut moves);
+    work.moves = u64::from(moves.len() as u32);
+    // One scratch board for both passes: make, inspect, unmake. The cached
+    // attack fields are not restored by `undo_move`, but every query below
+    // populates its own `StateInfo`, so no stale cache is read.
+    let mut scratch = null.clone();
+    let mut state = StateInfo::new();
     // Pass 1: a direct win or a stored proof (shorter proofs first).
     for &m in moves.as_slice() {
-        let mut child = null.clone();
-        child.do_move(m, &mut StateInfo::new());
-        if rules::status(&child, attacker) == rules::Status::Won {
+        scratch.do_move(m, &mut state);
+        if rules::status(&scratch, attacker) == rules::Status::Won {
             return Some((
                 null,
                 NullWin {
@@ -77,15 +94,14 @@ pub fn null_win(
                     length: 1,
                     limit: 99,
                 },
-                u64::from(moves.len() as u32),
             ));
         }
-        let key = rules::key(&child);
-        let counter = child.rule50();
+        let key = rules::key(&scratch);
+        let counter = scratch.rule50();
         if let Some(Value::Proved { length, limit, .. }) = tables.lookup(key, counter)
             && length <= remaining
         {
-            let limit = if child.rule50() == 0 {
+            let limit = if scratch.rule50() == 0 {
                 99
             } else {
                 limit.saturating_sub(1).min(99)
@@ -97,15 +113,20 @@ pub fn null_win(
                     length: length.saturating_add(1),
                     limit,
                 },
-                u64::from(moves.len() as u32),
             ));
         }
+        scratch.undo_move(m, &state);
+    }
+    // NULL-S: pass 2 only when the null position has an immediate explosion
+    // threat. Pass 1 is untouched; the screen is a heuristic (tree growth is
+    // reported, not gated).
+    if screen && threat::signature_for(&null, attacker).is_empty() {
+        return None;
     }
     // Pass 2: every defence exposes the commoner (a mate in two).
     for &m in moves.as_slice() {
-        let mut child = null.clone();
-        child.do_move(m, &mut StateInfo::new());
-        if let Some(limit) = exposed_limit(&child, attacker) {
+        scratch.do_move(m, &mut state);
+        if let Some(limit) = exposed_limit(&scratch, attacker, work) {
             return Some((
                 null,
                 NullWin {
@@ -113,16 +134,21 @@ pub fn null_win(
                     length: 2,
                     limit,
                 },
-                u64::from(moves.len() as u32),
             ));
         }
+        scratch.undo_move(m, &state);
     }
     None
 }
 
 /// If every legal defence from `child` (defender to move) lets `attacker`
 /// explode the defender's commoner at once, return the proof limit.
-fn exposed_limit(child: &Board, attacker: Color) -> Option<u8> {
+///
+/// Plan 25 NULL-V1: the reply test is the board-free closure (defender
+/// self-explosion, material draw, or [`threat::immediate_explosion_bits`])
+/// instead of `rules::status` + `immediate_explosion`, and one scratch board
+/// is reused for every reply.
+fn exposed_limit(child: &Board, attacker: Color, work: &mut NullWork) -> Option<u8> {
     if child.rule50() >= 100 {
         return None;
     }
@@ -131,23 +157,34 @@ fn exposed_limit(child: &Board, attacker: Color) -> Option<u8> {
     if replies.is_empty() {
         return None;
     }
+    let defender = attacker.flip();
     let mut limit = 99u8;
+    let mut scratch = child.clone();
+    let mut state = StateInfo::new();
     for &reply in replies.as_slice() {
-        let mut next = child.clone();
-        next.do_move(reply, &mut StateInfo::new());
-        if next.rule50() >= 100 {
+        work.replies += 1;
+        scratch.do_move(reply, &mut state);
+        if scratch.rule50() >= 100 {
             return None;
         }
-        match rules::status(&next, attacker) {
-            rules::Status::Won => {}
-            rules::Status::Open => {
-                threat::immediate_explosion(&next, attacker)?;
-            }
-            rules::Status::Failed { .. } => return None,
+        // The closure must agree with `rules::status` + `immediate_explosion`:
+        // a defender self-explosion is `Won`; a missing attacker commoner, a
+        // material draw or a failed explosion is `Failed`/`Open` without a
+        // win.
+        let accepted = if scratch.commoners(defender).is_empty() {
+            true
+        } else if scratch.commoners(attacker).is_empty() || rules::material_draw(&scratch) {
+            false
+        } else {
+            threat::immediate_explosion_bits(&scratch, attacker).is_some()
+        };
+        if !accepted {
+            return None;
         }
-        if next.rule50() == 0 {
+        if scratch.rule50() == 0 {
             limit = 98;
         }
+        scratch.undo_move(reply, &state);
     }
     Some(limit)
 }
@@ -159,6 +196,123 @@ mod tests {
     fn board(fen: &str) -> Board {
         Board::from_fen(fen).unwrap()
     }
+
+    /// The pre-plan-25 clone-based reply test, kept as the differential
+    /// oracle for the closure.
+    fn exposed_limit_reference(child: &Board, attacker: Color, work: &mut NullWork) -> Option<u8> {
+        if child.rule50() >= 100 {
+            return None;
+        }
+        let mut replies = MoveList::new();
+        generate_legal(child, &mut replies);
+        if replies.is_empty() {
+            return None;
+        }
+        let mut limit = 99u8;
+        for &reply in replies.as_slice() {
+            work.replies += 1;
+            let mut next = child.clone();
+            next.do_move(reply, &mut StateInfo::new());
+            if next.rule50() >= 100 {
+                return None;
+            }
+            match rules::status(&next, attacker) {
+                rules::Status::Won => {}
+                rules::Status::Open => {
+                    threat::immediate_explosion(&next, attacker)?;
+                }
+                rules::Status::Failed { .. } => return None,
+            }
+            if next.rule50() == 0 {
+                limit = 98;
+            }
+        }
+        Some(limit)
+    }
+
+    /// The pre-plan-25 clone-per-move `null_win`, kept as the differential
+    /// oracle for the scratch-board path.
+    fn null_win_reference(
+        board: &Board,
+        attacker: Color,
+        tables: &Tables,
+        remaining: u16,
+    ) -> Option<(Board, NullWin, NullWork)> {
+        if board.side_to_move() == attacker {
+            return None;
+        }
+        let null = null_board(board, attacker)?;
+        let mut moves = MoveList::new();
+        generate_legal(&null, &mut moves);
+        let mut work = NullWork {
+            moves: u64::from(moves.len() as u32),
+            replies: 0,
+        };
+        for &m in moves.as_slice() {
+            let mut child = null.clone();
+            child.do_move(m, &mut StateInfo::new());
+            if rules::status(&child, attacker) == rules::Status::Won {
+                return Some((
+                    null,
+                    NullWin {
+                        mv: m,
+                        length: 1,
+                        limit: 99,
+                    },
+                    work,
+                ));
+            }
+            let key = rules::key(&child);
+            let counter = child.rule50();
+            if let Some(Value::Proved { length, limit, .. }) = tables.lookup(key, counter)
+                && length <= remaining
+            {
+                let limit = if child.rule50() == 0 {
+                    99
+                } else {
+                    limit.saturating_sub(1).min(99)
+                };
+                return Some((
+                    null,
+                    NullWin {
+                        mv: m,
+                        length: length.saturating_add(1),
+                        limit,
+                    },
+                    work,
+                ));
+            }
+        }
+        for &m in moves.as_slice() {
+            let mut child = null.clone();
+            child.do_move(m, &mut StateInfo::new());
+            if let Some(limit) = exposed_limit_reference(&child, attacker, &mut work) {
+                return Some((
+                    null,
+                    NullWin {
+                        mv: m,
+                        length: 2,
+                        limit,
+                    },
+                    work,
+                ));
+            }
+        }
+        None
+    }
+
+    /// A small fixture corpus: the three bench cells, the module's own
+    /// positions, a material draw and a clock position.
+    const FIXTURES: &[&str] = &[
+        "k7/p7/8/8/8/8/8/R3K3 b - - 0 1",
+        "7k/7p/8/8/8/8/8/R3K3 b - - 0 1",
+        "4k3/8/8/8/8/8/8/4K3 b - - 0 1",
+        "4k3/8/8/8/8/8/8/R3K3 w - - 0 1",
+        "4k3/8/8/8/8/8/8/4K3 w - - 99 1",
+        "r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1",
+        "rnbq1b1r/pp1p1kpp/2p1pp1n/8/3PP1P1/2N2N2/PPP2P1P/R1BQKB1R w KQ - 0 1",
+        "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+    ];
 
     #[test]
     fn null_board_flips_the_mover_and_clears_ep() {
@@ -174,7 +328,9 @@ mod tests {
         // commoner on a8 if White were to move.
         let b = board("k7/p7/8/8/8/8/8/R3K3 b - - 0 1");
         let tables = Tables::new(16, true);
-        let (null, win, _) = null_win(&b, Color::White, &tables, u16::MAX).expect("null win");
+        let mut work = NullWork::default();
+        let (null, win) =
+            null_win(&b, Color::White, &tables, u16::MAX, false, &mut work).expect("null win");
         assert_eq!(win.length, 1);
         let mut after = null.clone();
         after.do_move(win.mv, &mut StateInfo::new());
@@ -202,7 +358,9 @@ mod tests {
             },
             0,
         );
-        let (_, win, _) = null_win(&b, Color::White, &tables, u16::MAX).expect("null win");
+        let mut work = NullWork::default();
+        let (_, win) =
+            null_win(&b, Color::White, &tables, u16::MAX, false, &mut work).expect("null win");
         assert_eq!((win.mv, win.length), (mv, 2));
     }
 
@@ -210,7 +368,8 @@ mod tests {
     fn no_null_win_on_a_quiet_position() {
         let b = board("4k3/8/8/8/8/8/8/4K3 b - - 0 1");
         let tables = Tables::new(16, true);
-        assert!(null_win(&b, Color::White, &tables, u16::MAX).is_none());
+        let mut work = NullWork::default();
+        assert!(null_win(&b, Color::White, &tables, u16::MAX, false, &mut work).is_none());
     }
 
     #[test]
@@ -220,5 +379,90 @@ mod tests {
         let tables = Tables::new(16, true);
         let null = null_board(&b, Color::White).unwrap();
         assert!(tables.lookup(rules::key(&null), null.rule50()).is_none());
+    }
+
+    #[test]
+    fn closure_matches_the_clone_reference_on_every_fixture_child() {
+        for fen in FIXTURES {
+            let b = board(fen);
+            let mut moves = MoveList::new();
+            generate_legal(&b, &mut moves);
+            for &m in moves.as_slice() {
+                let mut child = b.clone();
+                child.do_move(m, &mut StateInfo::new());
+                let attacker = child.side_to_move().flip();
+                let mut closure_work = NullWork::default();
+                let mut reference_work = NullWork::default();
+                let closure = exposed_limit(&child, attacker, &mut closure_work);
+                let reference = exposed_limit_reference(&child, attacker, &mut reference_work);
+                assert_eq!(
+                    closure, reference,
+                    "closure mismatch on {fen} after {m:?} (attacker {attacker:?})"
+                );
+                assert_eq!(
+                    closure_work.replies, reference_work.replies,
+                    "reply count mismatch on {fen} after {m:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn scratch_null_win_matches_the_clone_reference() {
+        let tables = Tables::new(16, true);
+        for fen in FIXTURES {
+            let b = board(fen);
+            let attacker = b.side_to_move().flip();
+            let mut work = NullWork::default();
+            let got = null_win(&b, attacker, &tables, u16::MAX, false, &mut work);
+            let reference = null_win_reference(&b, attacker, &tables, u16::MAX);
+            match (got, reference) {
+                (None, None) => {}
+                (Some((null, win)), Some((rnull, rwin, rwork))) => {
+                    assert_eq!(win, rwin, "null win mismatch on {fen}");
+                    assert_eq!(work, rwork, "null work mismatch on {fen}");
+                    assert_eq!(
+                        rules::key(&null),
+                        rules::key(&rnull),
+                        "null board mismatch on {fen}"
+                    );
+                }
+                (got, reference) => panic!(
+                    "null win presence mismatch on {fen}: got {got:?}, reference {reference:?}"
+                ),
+            }
+        }
+    }
+
+    #[test]
+    fn undo_move_restores_every_field_the_null_pass_reads() {
+        for fen in FIXTURES {
+            let b = board(fen);
+            let mut moves = MoveList::new();
+            generate_legal(&b, &mut moves);
+            for &m in moves.as_slice() {
+                let mut scratch = b.clone();
+                let before = (
+                    scratch.fen_with(EnPassantMode::Legal),
+                    rules::key(&scratch),
+                    scratch.rule50(),
+                    scratch.side_to_move(),
+                    scratch.commoners(Color::White),
+                    scratch.commoners(Color::Black),
+                );
+                let mut state = StateInfo::new();
+                scratch.do_move(m, &mut state);
+                scratch.undo_move(m, &state);
+                let after = (
+                    scratch.fen_with(EnPassantMode::Legal),
+                    rules::key(&scratch),
+                    scratch.rule50(),
+                    scratch.side_to_move(),
+                    scratch.commoners(Color::White),
+                    scratch.commoners(Color::Black),
+                );
+                assert_eq!(before, after, "undo mismatch on {fen} after {m:?}");
+            }
+        }
     }
 }

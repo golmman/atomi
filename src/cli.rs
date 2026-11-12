@@ -128,7 +128,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
         if let Some(name) = arg.strip_prefix("--guide-").filter(|n| {
             matches!(
                 *n,
-                "group" | "fresh-dn" | "replay-exact" | "sim-exact" | "null-exact"
+                "group" | "fresh-dn" | "replay-exact" | "sim-exact" | "null-exact" | "null-screen"
             )
         }) {
             guide_args.flag(name)?;

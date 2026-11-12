@@ -3,15 +3,21 @@
 ## Status
 
 **Open (2026-11-10; revised 2026-11-12 by [`report20.md`](report20.md),
-[`report21.md`](report21.md), [`report23.md`](report23.md) and
-[`report24.md`](report24.md)).**
+[`report21.md`](report21.md), [`report23.md`](report23.md),
+[`report24.md`](report24.md) and [`report25.md`](report25.md)).**
 Items 26–29 are **executed**; item 29 (GROUP-V1) is **closed negative**
 ([`report24`](report24.md)): score-free plain members with the group on by
 default lose `deep-win` (`0/3` at 120 s vs a `3/3` control, median 105.0 s)
 while `core` is 1.045× and `easy-win` 0.863×, so the change was reverted and
 the plain-move group stays the opt-in `--guide-group` kill-test flag. The
-engine remains at `T_3`; the wall is per-expansion cost (11.5–15.5×), which
-is item 33 (proposed D36). Item 26 adopted the starting-number algebra
+engine remains at `T_3`; the wall was per-expansion cost (11.5–15.5×),
+which item 33 ([`report25`](report25.md), proposed D37) attacked with
+NULL-V1: at 120 s, seeds 0–2, `deep-win` 0.796× the same-session control
+(median 83.5 s), `core` 0.784×, `easy-win` 0.766×, with
+`child_evals`/`expansions` identical 9/9 and D14 9/9 accepted. NULL-S
+(`--guide-null-screen`) cuts `deep-win` further (0.571×) but fails the
+small-cell guard (`easy-win` 3.349×), so it stays opt-in. `T_4` distance is
+`deep-win` **8.35×** (83.5 s → 10 s). Item 26 adopted the starting-number algebra
 R1+R3+R6 (`core` 4.74×, `easy-win` 3.34×, `deep-win` 2.80× vs the product
 hand). Items 27–28 (AUX-V1, [`plan20`](plan20.md)) made the exact sibling
 simulation, the exact null-threat replay and the board-free one-ply closure
@@ -189,6 +195,7 @@ Still closed: portfolio and restarts. Still rejected for now: PDS-PN/PN² (they 
 | 30 | **Memory headroom** (R17) | do not store recomputable proofs, mate cache in the TT, drop mates when proofs fill; only if `proof_full` appears in a real run | **triggered; now the gate for any `deep-win` claim** (plan21, [report21](report21.md)): at 192 MB the 600 s `deep-win` runs find the mate on 3/3 seeds (132.2–175.4 s) but the proof table is full (`store-full`, 2,831,155 entries) and refuses the export, so no `deep-win` win is claimable at any cap under the 192 MB label. Plan22 **stopped at its Phase A stop rule** ([report22](report22.md), [data](measurements/plan22/README.md)): at the default 25 % proof share even 384 MB refuses, with **5,639,488 live attacker entries** vs the 2,831,155 threshold (1.99×) and only 22,822 defender entries, so the MEM-V1 memo tier cannot make the archive fit. A 192 MB, 50–75 % proof-share probe exports a both-checker-accepted seed-0 proof at 103–115 s, but it is one seed and not a claim. Next review: plan22 option 1 (event-log export) or a proof-share stack with its own gate |
 | 31 | **Ledger budget convention** | one row per executed plan, each at its own cap; `bench.md` states no goal, no rung and no cap policy; D34 records the split | **done** — [plan21](plan21.md), [report21](report21.md): D34 supersedes D30's ledger-split clause, `bench.md` is a results ledger (staircase, current position and the cap convention removed), `scripts/check_goal.py` scans three normative docs instead of four, and the plan20 stack is appended at Cap 600 s (`core` 16.28, `easy-win` 6.91, `deep-win` not claimed `store-full`, geomean 10.6 over 2 claimed cells) |
 | 32 | **Proof-retention share** (RET-V1) | one global proof-table share; Phase A 25/50/75 × seeds 0–2; adopt the smallest share with `deep-win` 3/3 at 120 s, `core`/`easy-win` 3/3 and no median-wall regression > 10 %; D14 on every proved seed | **done** — [plan23](plan23.md), [report23](report23.md): 50 % fails (`deep-win` 2/3, seed 1 `proof_full`); **75 % selected** and made the default (D35). Phase C: all nine 120 s runs proved, all nine D14 proofs accepted, `core` 15.68, `easy-win` 6.84, `deep-win` 15.81, geomean 11.93 at Cap 120 s. **`T_3` reached** |
+| 33 | **Per-node cost** (NULL-V1) | Phase A attribution (`null_calls`/`null_replies`); NULL-V1 = closure reply test, one scratch board, defender-eval guard; G-V1 120 s × seeds 0–2: `deep-win` median ≤ 0.80× control, `core`/`easy-win` ≤ 1.1×, tree identical, every proved seed D14-accepted; then NULL-S `deep-win` ≤ 0.67× with the same small-cell guard | **done; NULL-V1 adopted, NULL-S opt-in** — [plan25](plan25.md), [report25](report25.md): NULL-V1 gives `deep-win` 0.796× (83.5 s vs 104.9 s), `core` 0.784×, `easy-win` 0.766×, tree identical 9/9, D14 9/9. NULL-S gives `deep-win` 0.571× but `easy-win` 3.349×, so it fails G-S and stays `--guide-null-screen`. `T_4` distance `deep-win` 8.35× |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose before the M2+M3 stack. If the hand-guide stack cannot meet D21, do not split it back into mechanism plans: record the stack, its census and both-direction ablations, and take the continue/re-scope/close decision at a kill review. The conformance line (item 24) is a separate stack: its stop rule is the Phase A differential, not the hand-guide stop rule. **Item 26 stop rule:** if the numbers stack misses its 20 M gate, the hand-guide line closes for good — no per-class re-tuning, no mechanism split, and the owner takes the goal re-pin at the next kill review. Items 26–29 are one adopt order: a plan may not run item 27–29 ahead of a failed item 26.
 

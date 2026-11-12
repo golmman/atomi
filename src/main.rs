@@ -86,6 +86,7 @@ fn prove(args: &[String]) -> ExitCode {
              \"entry_would_return\":{},\
              \"attacker_expansions\":{},\"defender_expansions\":{},\
              \"plain_children\":{},\"group_children\":{},\
+             \"null_calls\":{},\"null_replies\":{},\
              \"depth_histogram\":[{}],\"selected_class\":[{}]}}",
             result.unique_keys,
             result.unique_keys_capped,
@@ -97,6 +98,8 @@ fn prove(args: &[String]) -> ExitCode {
             result.defender_expansions,
             result.plain_children,
             result.group_children,
+            result.null_calls,
+            result.null_replies,
             depth.join(","),
             class.join(","),
         )

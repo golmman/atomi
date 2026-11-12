@@ -159,9 +159,9 @@ pub fn run(opts: &Options) -> Result<String, String> {
     let in_check = !state.checkers.is_empty();
     let legal = u32::try_from(moves.len()).unwrap_or(u32::MAX);
     let guide = Guide::new(opts.guide).with_params(opts.guide_params);
-    let ctx = guide.context(&board, &state, legal, false);
-    let mover_ctx = Mover::new(&board);
     let attacker_node = board.side_to_move() == attacker;
+    let ctx = guide.context(&board, &state, legal, attacker_node, false);
+    let mover_ctx = Mover::new(&board);
     let history = History::new();
     let node_key = rules::key(&board);
     let order_classes = guide.config.enabled

@@ -37,7 +37,7 @@
 //! settle: their `rules::status` already decides every immediate explosion.
 
 use crate::guide::threat::{self, Settle};
-use crate::guide::{self, Guide, History, MoveClass, StartInput};
+use crate::guide::{self, EfPnMode, Guide, History, MoveClass, StartInput};
 use crate::mover::Mover;
 use crate::rules::{self, Status};
 use crate::search::value::{ANY, Child, INFINITY, OPEN_MAX, Value, pn_dn};
@@ -243,6 +243,7 @@ impl Frame {
             board,
             &state,
             u32::try_from(moves.len()).unwrap_or(u32::MAX),
+            attacker_node,
             !attacker_node,
         );
         let mover_ctx = Mover::new(board);
@@ -386,20 +387,25 @@ impl Frame {
                 );
             }
             let child_ref = built.as_ref();
-            let child_eval = if !guide_on {
-                0
-            } else if let Some(child) = child_ref {
-                let e = guide::eval::hand_eval(child);
-                if child.side_to_move() == attacker {
-                    e
+            // Plan 25 DEFENDER-EVAL: the shipped `ef_pn = OrOnly` reads
+            // `child_eval` only at attacker nodes; the opt-in `Both` mode
+            // also reads it at defender nodes. `efpn_banded` reads the
+            // parent eval in `ctx`, not this value.
+            let child_eval =
+                if !guide_on || !(attacker_node || guide.config.ef_pn == EfPnMode::Both) {
+                    0
+                } else if let Some(child) = child_ref {
+                    let e = guide::eval::hand_eval(child);
+                    if child.side_to_move() == attacker {
+                        e
+                    } else {
+                        -e
+                    }
+                } else if attacker_node {
+                    ctx.eval
                 } else {
-                    -e
-                }
-            } else if attacker_node {
-                ctx.eval
-            } else {
-                -ctx.eval
-            };
+                    -ctx.eval
+                };
             let mut sim = 0i32;
             let mut unlikely_prior = false;
             if let Some(child) = child_ref {

@@ -710,6 +710,7 @@ fn stats_are_observation_only() {
     assert_eq!(a.unique_keys, 0);
     assert_eq!(a.re_expansions, 0);
     assert_eq!((a.plain_children, a.group_children), (0, 0));
+    assert_eq!((a.null_calls, a.null_replies), (0, 0));
     assert_eq!(a.entry_would_return, 0);
     // On: the counters are internally consistent.
     assert!(b.unique_keys <= b.expansions);
@@ -718,6 +719,7 @@ fn stats_are_observation_only() {
     assert_eq!(b.attacker_expansions + b.defender_expansions, b.expansions);
     assert_eq!(b.depth_histogram.iter().sum::<u64>(), b.expansions);
     assert!(b.selected_class.iter().sum::<u64>() > 0);
+    assert!(b.null_replies >= b.null_calls);
     off.stats = true;
     assert_eq!(
         search::prove(&root, &off, NullSink).result.unique_keys,

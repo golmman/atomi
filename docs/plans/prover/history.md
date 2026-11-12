@@ -364,3 +364,18 @@ premise are the recorded starting point for the D21 kill review.
   `make test-full` + veto green. Data:
   [`measurements/plan24/`](measurements/plan24/README.md); report:
   [`report24.md`](report24.md).
+- **2026-11-12** — plan25 (item 33, NULL-V1) executed. Phase A added the
+  permanent `null_calls`/`null_replies` counters and measured the exact null
+  replay as the first-order per-node term (`deep-win`: ~37 replies per call,
+  `aux_nodes` ≈ 8.8–9.7 per expansion; 21.96 → 17.33 µs/exp at 20 M seed 0).
+  Phase B implemented NULL-V1: the exposed-limit reply test is the board-free
+  closure, one scratch board with `do_move`/`undo_move` replaces the
+  clone-per-move/reply path, and `hand_eval` is computed only where it is
+  read. G-V1 passed at 120 s, seeds 0–2: `deep-win` 0.796× the same-session
+  control (median 83.498 s vs 104.876 s), `core` 0.784×, `easy-win` 0.766×,
+  `child_evals`/`expansions` identical 9/9, D14 9/9 accepted. NULL-S
+  (`--guide-null-screen`) passed `deep-win` (0.571×) but failed `easy-win`
+  (3.349×), so it stays opt-in. `T_3` unchanged; `T_4` distance is
+  `deep-win` 8.35×. Gates: `make test`, `make lint`, `make test-full` + veto
+  green. Data: [`measurements/plan25/`](measurements/plan25/README.md);
+  report: [`report25.md`](report25.md).

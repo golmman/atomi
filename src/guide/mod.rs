@@ -51,7 +51,7 @@ impl EfPnMode {
 
 /// The mechanism names `--guide-on` / `--guide-off` accept (D33: parsing
 /// defers them, so the list lives here next to `GuideConfig::set_switch`.
-pub const MECHANISMS: [&str; 22] = [
+pub const MECHANISMS: [&str; 23] = [
     "classes",
     "evasions",
     "quiet",
@@ -66,6 +66,7 @@ pub const MECHANISMS: [&str; 22] = [
     "replay-exact",
     "sim-exact",
     "null-exact",
+    "null-screen",
     "fresh-class",
     "efpn-banded",
     "evasions-count",
@@ -117,6 +118,10 @@ pub struct GuideConfig {
     /// verified replay of a null-position proof (`--guide-null-exact`,
     /// default off).
     pub null_exact: bool,
+    /// Plan-25 NULL-S: run the exact null replay's pass 2 only when the null
+    /// position has an immediate explosion threat (`--guide-null-screen`,
+    /// default off; the heuristic arm).
+    pub null_screen: bool,
     /// Plan-19 R1 `fresh-class`: a fresh child's deciding number is its
     /// class and the other number is 1 (`--guide-on fresh-class`).
     pub fresh_class: bool,
@@ -185,6 +190,7 @@ impl GuideConfig {
             replay_exact: false,
             sim_exact: false,
             null_exact: false,
+            null_screen: false,
             fresh_class: false,
             efpn_banded: false,
             evasions_count: false,
@@ -250,6 +256,7 @@ impl GuideConfig {
             "replay-exact" => self.replay_exact = on,
             "sim-exact" => self.sim_exact = on,
             "null-exact" => self.null_exact = on,
+            "null-screen" => self.null_screen = on,
             "fresh-class" => self.fresh_class = on,
             "efpn-banded" => self.efpn_banded = on,
             "evasions-count" => self.evasions_count = on,
@@ -480,11 +487,16 @@ impl Guide {
     }
 
     /// Build the node context. No movegen beyond the caller's own.
+    ///
+    /// Plan 25 DEFENDER-EVAL: `hand_eval` is computed only where it is read —
+    /// at attacker (OR) nodes, under `efpn_banded` (both node kinds), or when
+    /// the opt-in symmetric EF-PN mode `Both` needs the defender side.
     pub fn context(
         &self,
         board: &Board,
         state: &StateInfo,
         legal: u32,
+        attacker_node: bool,
         need_null: bool,
     ) -> NodeContext {
         let in_check = !state.checkers.is_empty();
@@ -496,7 +508,10 @@ impl Guide {
                 null_sig: None,
             };
         }
-        let eval = if self.config.ef_pn != EfPnMode::Off || self.config.efpn_banded {
+        let eval = if self.config.efpn_banded
+            || (self.config.ef_pn != EfPnMode::Off
+                && (attacker_node || self.config.ef_pn == EfPnMode::Both))
+        {
             eval::hand_eval(board)
         } else {
             0
@@ -982,6 +997,7 @@ mod tests {
             ("replay-exact", |c| c.replay_exact),
             ("sim-exact", |c| c.sim_exact),
             ("null-exact", |c| c.null_exact),
+            ("null-screen", |c| c.null_screen),
             ("fresh-class", |c| c.fresh_class),
             ("efpn-banded", |c| c.efpn_banded),
             ("evasions-count", |c| c.evasions_count),
@@ -1081,12 +1097,12 @@ mod tests {
             null_exact: false,
             ..GuideConfig::hand()
         });
-        let c = g.context(&b, &st, 30, true);
+        let c = g.context(&b, &st, 30, false, true);
         assert!(c.null_sig.is_some());
         assert_eq!(c.null_sig, Some(threat::signature_for(&b, Color::Black)));
         // With the exact replay on (the shipped default) no signature is
         // computed at all.
-        let exact = Guide::new(GuideConfig::hand()).context(&b, &st, 30, true);
+        let exact = Guide::new(GuideConfig::hand()).context(&b, &st, 30, false, true);
         assert!(exact.null_sig.is_none());
     }
 }
