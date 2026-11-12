@@ -31,7 +31,8 @@ pub use proofs::{ProofEntry, ProofSlot, ProofTable};
 pub use tt::{Cluster, Tt};
 
 /// The `--memory` budget for one `prove` run, in bytes over `mb * 2^20`:
-/// a quarter to the proof table, a 128 KiB–4 MiB filter, the rest to the TT.
+/// three quarters to the proof table, a 128 KiB–4 MiB filter, the rest to
+/// the TT.
 #[derive(Debug, Clone, Copy)]
 pub struct Budget {
     /// TT clusters (64 B each).
@@ -43,9 +44,11 @@ pub struct Budget {
 }
 
 /// Split `mb` MiB into the TT / proof-table / filter budgets with the
-/// default proof share (1/4).
+/// default proof share (3/4). Plan23 selected it: at 192 MB the deep-win
+/// archive (up to 5.7 M live entries) fits, while the 1/4 control fills and
+/// refuses the export.
 pub fn split(mb: usize) -> Budget {
-    split_share(mb, 25)
+    split_share(mb, 75)
 }
 
 /// Split `mb` MiB with `proof_percent` of the label for the proof table
@@ -109,7 +112,7 @@ impl Tables {
     /// test hook for the filter-neutrality test; the CLI always passes
     /// `true`.
     pub fn new(memory_mb: usize, filter: bool) -> Tables {
-        Tables::with_share(memory_mb, filter, 25)
+        Tables::with_share(memory_mb, filter, 75)
     }
 
     /// Allocate with an explicit proof-table share (percent of `--memory`).
@@ -251,15 +254,15 @@ mod tests {
                 assert!(b.filter_bits.is_power_of_two());
             }
         }
-        assert_eq!(split_share(192, 25).proof_slots, split(192).proof_slots);
+        assert_eq!(split_share(192, 75).proof_slots, split(192).proof_slots);
     }
 
     #[test]
     fn split_at_192mb() {
         let b = split(192);
-        assert_eq!(b.proof_slots, 3_145_728);
-        assert_eq!(b.filter_bits, 1 << 25);
-        assert_eq!(b.tt_clusters, 2_293_760);
+        assert_eq!(b.proof_slots, 9_437_184);
+        assert_eq!(b.filter_bits, 1 << 24);
+        assert_eq!(b.tt_clusters, 753_664);
     }
 
     #[test]

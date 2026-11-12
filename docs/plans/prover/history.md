@@ -340,3 +340,13 @@ premise are the recorded starting point for the D21 kill review.
   claim. Gates: `make test`, `make lint`, `make test-full` + veto green.
   Data: [`measurements/plan22/`](measurements/plan22/README.md); report:
   [`report22.md`](report22.md).
+- **2026-11-12** — plan23 (item 32, RET-V1) executed. Phase A swept the
+  proof share 25/50/75 on seeds 0–2 at 120 s: 50 % still fails `deep-win`
+  2/3 (seed 1 `proof_full`), 75 % gives 3/3 with all proofs D14-accepted and
+  no `core`/`easy-win` wall regression. The default proof share moved from
+  25 % to 75 % of the unchanged 192 MB label (D35). Phase C: all nine 120 s
+  runs proved, 9/9 D14 proofs accepted, `core` 15.68, `easy-win` 6.84,
+  `deep-win` 15.81, geomean 11.93 at Cap 120 s — **`T_3` reached**. Gates:
+  `make test`, `make lint`, `make test-full` + veto green. Data:
+  [`measurements/plan23/`](measurements/plan23/README.md); report:
+  [`report23.md`](report23.md).

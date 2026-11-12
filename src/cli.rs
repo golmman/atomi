@@ -96,7 +96,7 @@ pub struct ProveOptions {
     pub guide: GuideConfig,
     /// The starting-number table.
     pub guide_params: GuideParams,
-    /// Share of `--memory` given to the proof table, in percent (default 25).
+    /// Share of `--memory` given to the proof table, in percent (default 75).
     pub proof_share_percent: u8,
     /// Tie-break seed (0 = movegen order).
     pub seed: u64,
@@ -115,7 +115,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
     let mut proof_out = None;
     let mut guide_args = GuideArgs::new();
     let mut guide_params = GuideParams::default();
-    let mut proof_share_percent = 25u8;
+    let mut proof_share_percent = 75u8;
     let mut seed = 0u64;
     let mut stats = false;
     let mut max_depth = None;

@@ -2,7 +2,8 @@
 
 ## Status
 
-**Open (2026-11-10; revised 2026-11-12 by [`report20.md`](report20.md) and [`report21.md`](report21.md)).**
+**Open (2026-11-10; revised 2026-11-12 by [`report20.md`](report20.md),
+[`report21.md`](report21.md) and [`report23.md`](report23.md)).**
 Items 26–28 are **executed**. Item 26 adopted the starting-number algebra
 R1+R3+R6 (`core` 4.74×, `easy-win` 3.34×, `deep-win` 2.80× vs the product
 hand). Items 27–28 (AUX-V1, [`plan20`](plan20.md)) made the exact sibling
@@ -13,10 +14,12 @@ the default: with a generous cap the tree cuts `core` 5.88×, `easy-win`
 the mate at 128–175 s but is 0/3 at 120 s, and at 192 MB no seed can export
 a proof (`store-full`), so it is not a claim at any cap. The auxiliary gate
 (`aux_nodes`/expansion ≤ 1) is reported as a miss (7–13, 16–28× better) —
-exact replays are per-defence work. On the D30 staircase the engine is at
-**`T_2`** (now 3/3 + 3/3 at 120 s); `T_3` (`deep-win` at 120 s) is the next
-rung and is blocked by item 30 (proof-store headroom) before the wall;
-`T_5` (the goal) is not met. Item 30's trigger appeared on `deep-win`, and
+exact replays are per-defence work. On the D30 staircase the engine was at
+**`T_2`** (3/3 + 3/3 at 120 s); item 30's proof-store blocker is resolved by
+item 32 ([`plan23`](plan23.md), D35): the default proof share is 75 % of the
+192 MB label, and at Cap 120 s all three cells are 3/3 with every D14 proof
+accepted, so the engine is now at **`T_3`**. `T_4` (all three at 10 s) is
+the next rung; `T_5` (the goal) is not met. Item 30's trigger appeared on `deep-win`, and
 plan21 showed it is a **claim blocker**, not a nice-to-have: item 30 is the
 gate for any `deep-win` claim. Item 31 ([`plan21`](plan21.md)) made
 [`bench.md`](bench.md) a results history (per-row cap, D34) and re-measured
@@ -59,9 +62,9 @@ The goal is the top rung of a chain of **necessary conditions**, each a subset o
 | `T_4` | all three at 10 s | yes (tighter budget) |
 | `T_5` | all three at 10 s **and** geomean `< 1.0` | — (the goal) |
 
-Nesting is sound because the search is deterministic (D22) and `--seconds` only stops it, so proving at 10 s implies proving at 120 s; more cells is monotone by definition. The wall clause lives only at `T_5` because `geomean < 1` does not imply each cell `< 1`. A lower rung is necessary, never sufficient; a censored cell is never converted and a longer run is never substituted. Current position: `T_2` (plan15 bare-tree matrix: `core` 3/3 at 17.5 s, `easy-win` 3/3 at 2.0 s, `deep-win` 1/3 at 120 s); the next rung is `T_3`, `deep-win` 3/3 at 120 s.
+Nesting is sound because the search is deterministic (D22) and `--seconds` only stops it, so proving at 10 s implies proving at 120 s; more cells is monotone by definition. The wall clause lives only at `T_5` because `geomean < 1` does not imply each cell `< 1`. A lower rung is necessary, never sufficient; a censored cell is never converted and a longer run is never substituted. Current position: `T_3` (item 32, plan23: at Cap 120 s `core` 3/3 at 8.33 s, `easy-win` 3/3 at 0.91 s, `deep-win` 3/3 at 105.3 s, 9/9 D14 accepted; geomean 11.93 at Cap 120 s); the next rung is `T_4`, all three at 10 s.
 
-**The goal, the rungs and their budgets are stated here and nowhere else** (D34). [`bench.md`](bench.md) is the results ledger: it records what was measured and the cap each row used, and makes no goal claim — a longer run is its own row, and a cell is never "converted" by changing a cap. One rung note from the ledger: `deep-win` is not only a budget problem. plan21 found the mate on all three seeds at 132–175 s and the 192 MB proof table refuses the export (`store-full`), so **no `deep-win` win is claimable at any cap under the 192 MB label** until item 30 (memory headroom) lands; at 384 MB the seed-1 proof is exported and accepted by both checkers ([`report21.md`](report21.md)).
+**The goal, the rungs and their budgets are stated here and nowhere else** (D34). [`bench.md`](bench.md) is the results ledger: it records what was measured and the cap each row used, and makes no goal claim — a longer run is its own row, and a cell is never "converted" by changing a cap. One rung note from the ledger: plan21 found the `deep-win` mate on all three seeds at 132–175 s but the 192 MB, 25 % proof table refused the export (`store-full`), so no `deep-win` win was claimable then. Item 32 resolved that by moving the default proof share to 75 % (D35), not by raising the label: at 120 s the three `deep-win` proofs export and both checkers accept them ([`report23.md`](report23.md)). `deep-win` is still the wall (`T_4` needs 10 s).
 
 - every claimed win is accepted by this repo's own replay validator **and** by the pinned `provari check` (every rung);
 - this repo's gates are green, and there are no outcome regressions on the copied fixture oracle (§Corpus and fixtures). The legacy solver's gates are not this repo's gates.
@@ -177,6 +180,7 @@ Still closed: portfolio and restarts. Still rejected for now: PDS-PN/PN² (they 
 | 29 | **Plain-move grouping by default** (R9) | members never scored, one salted GROUP child; gate: expansions at 20 M and per-node wall, no regression > 10 % | **authorised** |
 | 30 | **Memory headroom** (R17) | do not store recomputable proofs, mate cache in the TT, drop mates when proofs fill; only if `proof_full` appears in a real run | **triggered; now the gate for any `deep-win` claim** (plan21, [report21](report21.md)): at 192 MB the 600 s `deep-win` runs find the mate on 3/3 seeds (132.2–175.4 s) but the proof table is full (`store-full`, 2,831,155 entries) and refuses the export, so no `deep-win` win is claimable at any cap under the 192 MB label. Plan22 **stopped at its Phase A stop rule** ([report22](report22.md), [data](measurements/plan22/README.md)): at the default 25 % proof share even 384 MB refuses, with **5,639,488 live attacker entries** vs the 2,831,155 threshold (1.99×) and only 22,822 defender entries, so the MEM-V1 memo tier cannot make the archive fit. A 192 MB, 50–75 % proof-share probe exports a both-checker-accepted seed-0 proof at 103–115 s, but it is one seed and not a claim. Next review: plan22 option 1 (event-log export) or a proof-share stack with its own gate |
 | 31 | **Ledger budget convention** | one row per executed plan, each at its own cap; `bench.md` states no goal, no rung and no cap policy; D34 records the split | **done** — [plan21](plan21.md), [report21](report21.md): D34 supersedes D30's ledger-split clause, `bench.md` is a results ledger (staircase, current position and the cap convention removed), `scripts/check_goal.py` scans three normative docs instead of four, and the plan20 stack is appended at Cap 600 s (`core` 16.28, `easy-win` 6.91, `deep-win` not claimed `store-full`, geomean 10.6 over 2 claimed cells) |
+| 32 | **Proof-retention share** (RET-V1) | one global proof-table share; Phase A 25/50/75 × seeds 0–2; adopt the smallest share with `deep-win` 3/3 at 120 s, `core`/`easy-win` 3/3 and no median-wall regression > 10 %; D14 on every proved seed | **done** — [plan23](plan23.md), [report23](report23.md): 50 % fails (`deep-win` 2/3, seed 1 `proof_full`); **75 % selected** and made the default (D35). Phase C: all nine 120 s runs proved, all nine D14 proofs accepted, `core` 15.68, `easy-win` 6.84, `deep-win` 15.81, geomean 11.93 at Cap 120 s. **`T_3` reached** |
 
 **Stop rules (handoff §7).** If M1 does not improve per-node cost over the legacy front-end, the per-node diagnosis is wrong: stop and re-diagnose before the M2+M3 stack. If the hand-guide stack cannot meet D21, do not split it back into mechanism plans: record the stack, its census and both-direction ablations, and take the continue/re-scope/close decision at a kill review. The conformance line (item 24) is a separate stack: its stop rule is the Phase A differential, not the hand-guide stop rule. **Item 26 stop rule:** if the numbers stack misses its 20 M gate, the hand-guide line closes for good — no per-class re-tuning, no mechanism split, and the owner takes the goal re-pin at the next kill review. Items 26–29 are one adopt order: a plan may not run item 27–29 ahead of a failed item 26.
 
