@@ -106,7 +106,9 @@ fn prove(args: &[String]) -> ExitCode {
          \"aux_nodes\":{},\"aux_skipped\":{},\
          \"ms\":{},\"seconds\":{},\"memory_mb\":{},\
          \"evals_limit\":{},\"proof\":\"{}\",\"proof_positions\":{},\
-         \"proof_length\":{},\"proof_entries\":{},\"proof_full\":{}{}}}",
+         \"proof_length\":{},\"proof_entries\":{},\"proof_full\":{},\
+         \"proof_attacker_entries\":{},\"proof_defender_entries\":{},\
+         \"proof_archive_refused\":{}{}}}",
         found,
         length,
         result.exit.as_str(),
@@ -125,6 +127,9 @@ fn prove(args: &[String]) -> ExitCode {
         positions,
         proof_length,
         result.proof_entries,
+        result.proof_full,
+        result.proof_attacker_entries,
+        result.proof_defender_entries,
         result.proof_full,
         stats,
     );

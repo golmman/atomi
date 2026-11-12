@@ -9,7 +9,8 @@
 //! `{"found","length","exit","child_evals","expansions","seed","sim_nodes",
 //! "settle_nodes","aux_nodes","aux_skipped","ms","seconds","memory_mb",
 //! "evals_limit","proof","proof_positions","proof_length","proof_entries",
-//! "proof_full"}`, plus an optional `"stats"` object (the plan-12
+//! "proof_full","proof_attacker_entries","proof_defender_entries",
+//! "proof_archive_refused"}`, plus an optional `"stats"` object (the plan-12
 //! attribution counters) when `--stats` is given.
 
 use crate::guide::{GuideConfig, GuideParams, MECHANISMS};

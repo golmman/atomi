@@ -330,7 +330,10 @@ fn cli_prove_output_contract() {
     assert_eq!(json["proof"], "not-requested");
     assert!(json["proof_entries"].is_number());
     assert!(json["proof_full"].is_boolean());
-    // All 16 keys in the contract order.
+    assert!(json["proof_attacker_entries"].is_number());
+    assert!(json["proof_defender_entries"].is_number());
+    assert!(json["proof_archive_refused"].is_boolean());
+    // All 22 keys in the contract order.
     let keys = [
         "\"found\"",
         "\"length\"",
@@ -351,6 +354,9 @@ fn cli_prove_output_contract() {
         "\"proof_length\"",
         "\"proof_entries\"",
         "\"proof_full\"",
+        "\"proof_attacker_entries\"",
+        "\"proof_defender_entries\"",
+        "\"proof_archive_refused\"",
     ];
     let mut pos = 0usize;
     for k in keys {

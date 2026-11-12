@@ -327,3 +327,16 @@ premise are the recorded starting point for the D21 kill review.
   **CORE-RESET** (calibration of starting numbers, settle-proof retention,
   memory split, auxiliary budget), proposed D23, G1 = `core` proved at 10 s
   and `easy-win` ≤ 145,046; if G1 fails the item closes. No code changed.
+- **2026-11-12** — plan22 (item 30) executed Phase A only. Added the
+  permanent proof-table composition counters (`proof_attacker_entries`,
+  `proof_defender_entries`, `proof_archive_refused`) and ran the four
+  `deep-win` probes (`--guide hand`, 600 s, seed 0, one process at a time).
+  The stop rule fired: the 384 MB control also refuses at the default 25 %
+  proof share, with 5,639,488 live attacker entries (1.99× the 192 MB
+  9/10 slot count) against 22,822 defender entries, so MEM-V1's memo tier
+  cannot recover the space. No two-tier code, no default change, no gate,
+  no D35, no ledger row. A 192 MB 50–75 % proof-share probe wrote proofs
+  accepted by both checkers (103.4 / 114.7 s) but is one seed and not a
+  claim. Gates: `make test`, `make lint`, `make test-full` + veto green.
+  Data: [`measurements/plan22/`](measurements/plan22/README.md); report:
+  [`report22.md`](report22.md).

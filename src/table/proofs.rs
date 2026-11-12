@@ -67,8 +67,12 @@ pub struct ProofTable {
     live: usize,
     /// Non-free slots (live + tombstones).
     used: usize,
+    /// Live attacker entries (`mv != 0`).
+    attacker_live: usize,
+    /// Live defender entries (`mv == 0`).
+    defender_live: usize,
     /// An insert was refused at the 90% load bound.
-    refused: bool,
+    archive_refused: bool,
 }
 
 impl ProofTable {
@@ -78,7 +82,9 @@ impl ProofTable {
             slots: Zeroed::new(slots.max(1)),
             live: 0,
             used: 0,
-            refused: false,
+            attacker_live: 0,
+            defender_live: 0,
+            archive_refused: false,
         }
     }
 
@@ -90,7 +96,9 @@ impl ProofTable {
             slots: Zeroed::eager(slots.max(1)),
             live: 0,
             used: 0,
-            refused: false,
+            attacker_live: 0,
+            defender_live: 0,
+            archive_refused: false,
         }
     }
 
@@ -146,6 +154,11 @@ impl ProofTable {
             {
                 self.slots[i].state = TOMBSTONE;
                 self.live -= 1;
+                if self.slots[i].mv == 0 {
+                    self.defender_live -= 1;
+                } else {
+                    self.attacker_live -= 1;
+                }
                 // A tombstone created by this insert is reusable too.
                 if tomb.is_none() {
                     tomb = Some(i);
@@ -161,7 +174,7 @@ impl ProofTable {
             Some(t) => t,
             None => {
                 if self.used >= n * 9 / 10 {
-                    self.refused = true;
+                    self.archive_refused = true;
                     return;
                 }
                 self.used += 1;
@@ -177,6 +190,11 @@ impl ProofTable {
             _pad: [0; 2],
         };
         self.live += 1;
+        if entry.mv == 0 {
+            self.defender_live += 1;
+        } else {
+            self.attacker_live += 1;
+        }
     }
 
     /// The shortest live entry for `key` that holds at `counter`
@@ -255,10 +273,20 @@ impl ProofTable {
         self.used
     }
 
-    /// Whether any insert was refused at the 90% load bound (export then
-    /// fails `store-full`).
+    /// Live attacker entries (`mv != 0`).
+    pub fn attacker_live(&self) -> usize {
+        self.attacker_live
+    }
+
+    /// Live defender entries (`mv == 0`).
+    pub fn defender_live(&self) -> usize {
+        self.defender_live
+    }
+
+    /// Whether an archive insert was refused at the 90% load bound (export
+    /// then fails `store-full`).
     pub fn refused(&self) -> bool {
-        self.refused
+        self.archive_refused
     }
 
     /// Slot count.
@@ -370,6 +398,20 @@ mod tests {
         t.insert(hi - (1 << 62) - 1, e(3, 3, 30));
         assert!(t.live() >= 2);
         assert_eq!(t.get(hi, 0), Some(e(1, 1, 10)));
+    }
+
+    #[test]
+    fn composition_counters() {
+        let mut t = ProofTable::new(64);
+        t.insert(1, e(10, 5, 50));
+        t.insert(2, e(0, 7, 40));
+        assert_eq!(t.attacker_live(), 1);
+        assert_eq!(t.defender_live(), 1);
+        // Domination moves one entry between classes.
+        t.insert(2, e(11, 6, 60));
+        assert_eq!(t.attacker_live(), 2);
+        assert_eq!(t.defender_live(), 0);
+        assert_eq!(t.live(), 2);
     }
 
     #[test]

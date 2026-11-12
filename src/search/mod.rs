@@ -121,6 +121,10 @@ pub struct SearchResult {
     pub proof_entries: u64,
     /// The proof table refused an insert at its 90% load bound.
     pub proof_full: bool,
+    /// Live attacker entries in the proof table (`mv != 0`).
+    pub proof_attacker_entries: u64,
+    /// Live defender entries in the proof table (`mv == 0`).
+    pub proof_defender_entries: u64,
     /// Distinct keys expanded (`--stats`; a lower bound when
     /// `unique_keys_capped`).
     pub unique_keys: u64,
@@ -202,6 +206,8 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
             result.ms = start.elapsed().as_millis() as u64;
             result.proof_entries = engine.tables.proofs().live() as u64;
             result.proof_full = engine.tables.proofs().refused();
+            result.proof_attacker_entries = engine.tables.proofs().attacker_live() as u64;
+            result.proof_defender_entries = engine.tables.proofs().defender_live() as u64;
             Output {
                 result,
                 proofs: engine.tables.into_proofs(),
@@ -283,6 +289,8 @@ impl<S: ProofSink> Engine<S> {
             ms: 0,
             proof_entries: 0,
             proof_full: false,
+            proof_attacker_entries: 0,
+            proof_defender_entries: 0,
             unique_keys,
             unique_keys_capped: self.unique.as_ref().is_some_and(|s| s.capped()),
             re_expansions: if self.unique.is_some() {
