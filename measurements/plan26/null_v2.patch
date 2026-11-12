@@ -1,0 +1,731 @@
+diff --git a/src/guide/null.rs b/src/guide/null.rs
+index bab66a4..cee7d7f 100644
+--- a/src/guide/null.rs
++++ b/src/guide/null.rs
+@@ -19,9 +19,9 @@
+ use crate::guide::threat;
+ use crate::rules;
+ use crate::search::value::Value;
+-use crate::table::Tables;
++use crate::table::{CachedLimit, NullCache, Tables};
+ use atomic_movegen::board::{Board, StateInfo};
+-use atomic_movegen::movegen::generate_legal;
++use atomic_movegen::movegen::{generate_legal, generate_pseudo_legal};
+ use atomic_movegen::types::{Color, EnPassantMode, Move, MoveList};
+ 
+ /// A winning move for the attacker in the null position, with its proof.
+@@ -66,7 +66,7 @@ pub struct NullWork {
+ pub fn null_win(
+     board: &Board,
+     attacker: Color,
+-    tables: &Tables,
++    tables: &mut Tables,
+     remaining: u16,
+     screen: bool,
+     work: &mut NullWork,
+@@ -124,9 +124,10 @@ pub fn null_win(
+         return None;
+     }
+     // Pass 2: every defence exposes the commoner (a mate in two).
++    let cache = tables.null_cache_mut();
+     for &m in moves.as_slice() {
+         scratch.do_move(m, &mut state);
+-        if let Some(limit) = exposed_limit(&scratch, attacker, work) {
++        if let Some(limit) = exposed_limit(&scratch, attacker, work, cache) {
+             return Some((
+                 null,
+                 NullWin {
+@@ -148,20 +149,54 @@ pub fn null_win(
+ /// self-explosion, material draw, or [`threat::immediate_explosion_bits`])
+ /// instead of `rules::status` + `immediate_explosion`, and one scratch board
+ /// is reused for every reply.
+-fn exposed_limit(child: &Board, attacker: Color, work: &mut NullWork) -> Option<u8> {
++fn exposed_limit(
++    child: &Board,
++    attacker: Color,
++    work: &mut NullWork,
++    cache: &mut NullCache,
++) -> Option<u8> {
+     if child.rule50() >= 100 {
+         return None;
+     }
++    let key = rules::key(child);
++    let rule50 = child.rule50() as u8;
++    if let Some(cached) = cache.get(key, rule50, attacker) {
++        return match cached {
++            CachedLimit::Negative => None,
++            CachedLimit::Positive(limit) => Some(limit),
++        };
++    }
++    let result = exposed_limit_uncached(child, attacker, work);
++    cache.insert(key, rule50, attacker, result);
++    result
++}
++
++/// The uncached body of [`exposed_limit`] (plan-26 EARLY-REPLY).
++///
++/// The pseudo-legal stream is filtered lazily: the first illegal reply is
++/// skipped, and the first legal reply that is not accepted ends the scan.
++/// The result is order-independent (all accepted vs one rejected; `limit`
++/// is a max over accepted replies), so the tree is unchanged.
++fn exposed_limit_uncached(child: &Board, attacker: Color, work: &mut NullWork) -> Option<u8> {
+     let mut replies = MoveList::new();
+-    generate_legal(child, &mut replies);
++    generate_pseudo_legal(child, &mut replies);
+     if replies.is_empty() {
+         return None;
+     }
++    // Two states: one for the child's legality predicate, one for the
++    // scratch make/unmake. Sharing them diverged in the plan-26 probe.
++    let mut child_state = StateInfo::new();
++    child.populate_state(&mut child_state);
+     let defender = attacker.flip();
+     let mut limit = 99u8;
+     let mut scratch = child.clone();
+     let mut state = StateInfo::new();
++    let mut any_legal = false;
+     for &reply in replies.as_slice() {
++        if !child.is_legal_with_state(reply, &child_state) {
++            continue;
++        }
++        any_legal = true;
+         work.replies += 1;
+         scratch.do_move(reply, &mut state);
+         if scratch.rule50() >= 100 {
+@@ -186,6 +221,9 @@ fn exposed_limit(child: &Board, attacker: Color, work: &mut NullWork) -> Option<
+         }
+         scratch.undo_move(reply, &state);
+     }
++    if !any_legal {
++        return None;
++    }
+     Some(limit)
+ }
+ 
+@@ -327,10 +365,10 @@ mod tests {
+         // Black to move; White's rook on a1 can take a7 and blast the black
+         // commoner on a8 if White were to move.
+         let b = board("k7/p7/8/8/8/8/8/R3K3 b - - 0 1");
+-        let tables = Tables::new(16, true);
++        let mut tables = Tables::new(16, true);
+         let mut work = NullWork::default();
+         let (null, win) =
+-            null_win(&b, Color::White, &tables, u16::MAX, false, &mut work).expect("null win");
++            null_win(&b, Color::White, &mut tables, u16::MAX, false, &mut work).expect("null win");
+         assert_eq!(win.length, 1);
+         let mut after = null.clone();
+         after.do_move(win.mv, &mut StateInfo::new());
+@@ -360,16 +398,16 @@ mod tests {
+         );
+         let mut work = NullWork::default();
+         let (_, win) =
+-            null_win(&b, Color::White, &tables, u16::MAX, false, &mut work).expect("null win");
++            null_win(&b, Color::White, &mut tables, u16::MAX, false, &mut work).expect("null win");
+         assert_eq!((win.mv, win.length), (mv, 2));
+     }
+ 
+     #[test]
+     fn no_null_win_on_a_quiet_position() {
+         let b = board("4k3/8/8/8/8/8/8/4K3 b - - 0 1");
+-        let tables = Tables::new(16, true);
++        let mut tables = Tables::new(16, true);
+         let mut work = NullWork::default();
+-        assert!(null_win(&b, Color::White, &tables, u16::MAX, false, &mut work).is_none());
++        assert!(null_win(&b, Color::White, &mut tables, u16::MAX, false, &mut work).is_none());
+     }
+ 
+     #[test]
+@@ -393,7 +431,8 @@ mod tests {
+                 let attacker = child.side_to_move().flip();
+                 let mut closure_work = NullWork::default();
+                 let mut reference_work = NullWork::default();
+-                let closure = exposed_limit(&child, attacker, &mut closure_work);
++                let mut cache = NullCache::new(1 << 10);
++                let closure = exposed_limit(&child, attacker, &mut closure_work, &mut cache);
+                 let reference = exposed_limit_reference(&child, attacker, &mut reference_work);
+                 assert_eq!(
+                     closure, reference,
+@@ -409,12 +448,12 @@ mod tests {
+ 
+     #[test]
+     fn scratch_null_win_matches_the_clone_reference() {
+-        let tables = Tables::new(16, true);
++        let mut tables = Tables::new(16, true);
+         for fen in FIXTURES {
+             let b = board(fen);
+             let attacker = b.side_to_move().flip();
+             let mut work = NullWork::default();
+-            let got = null_win(&b, attacker, &tables, u16::MAX, false, &mut work);
++            let got = null_win(&b, attacker, &mut tables, u16::MAX, false, &mut work);
+             let reference = null_win_reference(&b, attacker, &tables, u16::MAX);
+             match (got, reference) {
+                 (None, None) => {}
+@@ -434,6 +473,31 @@ mod tests {
+         }
+     }
+ 
++    #[test]
++    fn cache_matches_an_uncached_call_on_a_repeated_position() {
++        for fen in FIXTURES {
++            let b = board(fen);
++            let mut moves = MoveList::new();
++            generate_legal(&b, &mut moves);
++            for &m in moves.as_slice() {
++                let mut child = b.clone();
++                child.do_move(m, &mut StateInfo::new());
++                if child.rule50() >= 100 {
++                    continue;
++                }
++                let attacker = child.side_to_move().flip();
++                let mut cache = NullCache::new(1 << 10);
++                let mut first_work = NullWork::default();
++                let first = exposed_limit(&child, attacker, &mut first_work, &mut cache);
++                let mut second_work = NullWork::default();
++                let second = exposed_limit(&child, attacker, &mut second_work, &mut cache);
++                assert_eq!(first, second, "cache mismatch on {fen} after {m:?}");
++                assert_eq!(second_work.replies, 0, "cache hit did work on {fen}");
++                assert_eq!(cache.hits(), 1, "cache did not hit on {fen}");
++            }
++        }
++    }
++
+     #[test]
+     fn undo_move_restores_every_field_the_null_pass_reads() {
+         for fen in FIXTURES {
+diff --git a/src/main.rs b/src/main.rs
+index 6fd53f4..be8ceb8 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -87,6 +87,8 @@ fn prove(args: &[String]) -> ExitCode {
+              \"attacker_expansions\":{},\"defender_expansions\":{},\
+              \"plain_children\":{},\"group_children\":{},\
+              \"null_calls\":{},\"null_replies\":{},\
++             \"null_cache_hits\":{},\"null_cache_misses\":{},\
++             \"null_positive_repeats\":{},\
+              \"depth_histogram\":[{}],\"selected_class\":[{}]}}",
+             result.unique_keys,
+             result.unique_keys_capped,
+@@ -100,6 +102,9 @@ fn prove(args: &[String]) -> ExitCode {
+             result.group_children,
+             result.null_calls,
+             result.null_replies,
++            result.null_cache_hits,
++            result.null_cache_misses,
++            result.null_positive_repeats,
+             depth.join(","),
+             class.join(","),
+         )
+diff --git a/src/search/mod.rs b/src/search/mod.rs
+index 94ef7ff..9426de1 100644
+--- a/src/search/mod.rs
++++ b/src/search/mod.rs
+@@ -37,6 +37,7 @@ use atomic_movegen::board::{Board, StateInfo};
+ use atomic_movegen::types::Color;
+ use frame::{Entered, Frame, Group};
+ use keyset::KeySet;
++use std::collections::HashSet;
+ use std::time::{Duration, Instant};
+ use value::{Child, INFINITY, Value, and_value, exit_value, or_value, pn_dn};
+ 
+@@ -125,6 +126,13 @@ pub struct SearchResult {
+     /// Defender replies examined by the exact null replay (plan-25 Phase A,
+     /// `--stats` only).
+     pub null_replies: u64,
++    /// Exposed-limit cache hits (plan 26, `--stats` only).
++    pub null_cache_hits: u64,
++    /// Exposed-limit cache misses (plan 26, `--stats` only).
++    pub null_cache_misses: u64,
++    /// Repeated positive null positions (the positive-null cache ceiling,
++    /// plan 26 Phase A, `--stats` only).
++    pub null_positive_repeats: u64,
+     /// Search time in milliseconds (allocation excluded).
+     pub ms: u64,
+     /// Live entries in the proof table at exit.
+@@ -201,6 +209,10 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
+                 group_children: 0,
+                 null_calls: 0,
+                 null_replies: 0,
++                null_cache_hits: 0,
++                null_cache_misses: 0,
++                null_positive_repeats: 0,
++                positive_null: limits.stats.then(HashSet::new),
+                 stop: None,
+                 sink,
+                 guide,
+@@ -249,6 +261,12 @@ struct Engine<S> {
+     group_children: u64,
+     null_calls: u64,
+     null_replies: u64,
++    null_cache_hits: u64,
++    null_cache_misses: u64,
++    null_positive_repeats: u64,
++    /// Positive null keys seen (`--stats` only; the positive-null cache
++    /// ceiling counter).
++    positive_null: Option<HashSet<(u64, u16)>>,
+     stop: Option<Exit>,
+     sink: S,
+     guide: Guide,
+@@ -308,6 +326,9 @@ impl<S: ProofSink> Engine<S> {
+             group_children: self.group_children,
+             null_calls: self.null_calls,
+             null_replies: self.null_replies,
++            null_cache_hits: self.null_cache_hits,
++            null_cache_misses: self.null_cache_misses,
++            null_positive_repeats: self.null_positive_repeats,
+             ms: 0,
+             proof_entries: 0,
+             proof_full: false,
+@@ -588,15 +609,25 @@ impl<S: ProofSink> Engine<S> {
+         let Some((null, win)) = crate::guide::null::null_win(
+             board,
+             self.attacker,
+-            &self.tables,
++            &mut self.tables,
+             u16::MAX,
+             self.guide.config.null_screen,
+             &mut work,
+         ) else {
+             self.null_replies += work.replies;
++            self.null_cache_hits = self.tables.null_cache().hits();
++            self.null_cache_misses = self.tables.null_cache().misses();
+             return;
+         };
+         self.null_replies += work.replies;
++        self.null_cache_hits = self.tables.null_cache().hits();
++        self.null_cache_misses = self.tables.null_cache().misses();
++        if let Some(seen) = &mut self.positive_null {
++            let key = rules::key(&null);
++            if !seen.insert((key, null.rule50())) {
++                self.null_positive_repeats += 1;
++            }
++        }
+         let work = work.moves;
+         let mut aux_left = if self.guide.params.aux_budget == 0 {
+             u64::MAX
+@@ -1031,6 +1062,10 @@ mod tests {
+             group_children: 0,
+             null_calls: 0,
+             null_replies: 0,
++            null_cache_hits: 0,
++            null_cache_misses: 0,
++            null_positive_repeats: 0,
++            positive_null: None,
+             stop: None,
+             sink: NullSink,
+             guide: Guide::new(GuideConfig::none()),
+@@ -1101,6 +1136,10 @@ mod tests {
+             group_children: 0,
+             null_calls: 0,
+             null_replies: 0,
++            null_cache_hits: 0,
++            null_cache_misses: 0,
++            null_positive_repeats: 0,
++            positive_null: None,
+             stop: None,
+             sink: NullSink,
+             guide: Guide::new(GuideConfig::none()),
+diff --git a/src/table/alloc.rs b/src/table/alloc.rs
+index 1526be6..90ab39c 100644
+--- a/src/table/alloc.rs
++++ b/src/table/alloc.rs
+@@ -124,6 +124,9 @@ unsafe impl ZeroValid for Cluster {}
+ unsafe impl ZeroValid for ProofSlot {}
+ // SAFETY: a filter word of zeros means no bit set.
+ unsafe impl ZeroValid for u64 {}
++// SAFETY: a byte of zeros is a valid `u8`; the null cache reads `0` as the
++// empty-slot signal.
++unsafe impl ZeroValid for u8 {}
+ 
+ /// An owning `n`-element, zero-initialized, lazily committed array of `T`.
+ /// Dereferences to `[T]`.
+diff --git a/src/table/mod.rs b/src/table/mod.rs
+index c307eae..5a28f99 100644
+--- a/src/table/mod.rs
++++ b/src/table/mod.rs
+@@ -21,12 +21,14 @@
+ 
+ mod alloc;
+ mod filter;
++mod null_cache;
+ pub mod proofs;
+ mod tt;
+ 
+ use crate::search::value::{ANY, Value};
+ use atomic_movegen::types::Move;
+ pub use filter::Filter;
++pub use null_cache::{CachedLimit, NullCache};
+ pub use proofs::{ProofEntry, ProofSlot, ProofTable};
+ pub use tt::{Cluster, Tt};
+ 
+@@ -41,6 +43,8 @@ pub struct Budget {
+     pub proof_slots: usize,
+     /// Filter bits (a power of two in `[2^20, 2^25]`).
+     pub filter_bits: usize,
++    /// Bytes reserved for the exposed-limit cache (plan 26).
++    pub cache_bytes: usize,
+ }
+ 
+ /// Split `mb` MiB into the TT / proof-table / filter budgets with the
+@@ -55,22 +59,50 @@ pub fn split(mb: usize) -> Budget {
+ /// (1..=90; the CLI and `Tables` validate). Invariant:
+ /// `64*tt_clusters + 16*proof_slots + filter_bits/8` bytes fit the label.
+ pub fn split_share(mb: usize, proof_percent: u8) -> Budget {
+-    let total = mb.saturating_mul(1 << 20);
++    split_share_with_cache(mb, proof_percent, 0)
++}
++
++/// Like [`split_share`], but reserve `cache_bytes` of the label for the
++/// exposed-limit cache first. The cache is compensated from the TT/filter,
++/// never added on top of the label.
++pub fn split_share_with_cache(mb: usize, proof_percent: u8, cache_bytes: usize) -> Budget {
++    let label = mb.saturating_mul(1 << 20);
+     let pct = usize::from(proof_percent.clamp(1, 90));
+     // The filter has a 2^20-bit floor (128 KiB); reserve it plus one TT
+     // cluster, so every share keeps the byte invariant even at 1 MiB.
+-    let proof_cap = total.saturating_sub(64 + (1 << 17));
+-    let proof_bytes = (total * pct / 100).min(proof_cap);
++    let proof_cap = label.saturating_sub(64 + (1 << 17));
++    let proof_bytes = (label * pct / 100).min(proof_cap);
+     let proof_slots = proof_bytes / 16;
+-    let tt_slot_estimate = (total - proof_bytes) / 16;
++    let tt_slot_estimate = (label - proof_bytes) / 16;
+     // prev_power_of_two(8 * tt_slot_estimate), clamped to [2^20, 2^25].
+     let x = (8 * tt_slot_estimate).max(1);
+-    let filter_bits = (1usize << (usize::BITS - 1 - x.leading_zeros())).clamp(1 << 20, 1 << 25);
+-    let tt_clusters = total.saturating_sub(proof_bytes + filter_bits / 8) / 64;
++    let base_filter_bits =
++        (1usize << (usize::BITS - 1 - x.leading_zeros())).clamp(1 << 20, 1 << 25);
++    let base_tt_clusters = label.saturating_sub(proof_bytes + base_filter_bits / 8) / 64;
++    // Take the cache from the filter first (tree-neutral: the filter is
++    // exact in the negative direction), then from the TT. The proof table
++    // keeps its size, so proof retention is unchanged. Unused filter slack
++    // stays padding, so a filter-only cache leaves the TT size unchanged.
++    let filter_floor = 1 << 20;
++    let filter_slack = base_filter_bits.saturating_sub(filter_floor) / 8;
++    let max_cache = filter_slack + base_tt_clusters.saturating_sub(1) * 64;
++    let cache_bytes = cache_bytes.min(max_cache);
++    let wanted_filter_bytes = (base_filter_bits / 8).saturating_sub(cache_bytes);
++    let filter_bytes = wanted_filter_bytes.max(filter_floor / 8);
++    let filter_bits = if filter_bytes == 0 {
++        filter_floor
++    } else {
++        let bits = filter_bytes * 8;
++        (1usize << (usize::BITS - 1 - bits.leading_zeros())).clamp(filter_floor, base_filter_bits)
++    };
++    let from_filter = base_filter_bits / 8 - filter_bits / 8;
++    let from_tt = cache_bytes.saturating_sub(from_filter);
++    let tt_clusters = base_tt_clusters.saturating_sub(from_tt.div_ceil(64));
+     Budget {
+         tt_clusters: tt_clusters.clamp(1, u32::MAX as usize),
+         proof_slots,
+         filter_bits,
++        cache_bytes,
+     }
+ }
+ 
+@@ -105,6 +137,7 @@ pub struct Tables {
+     tt: Tt,
+     proofs: ProofTable,
+     filter: Filter,
++    null_cache: NullCache,
+ }
+ 
+ impl Tables {
+@@ -117,7 +150,9 @@ impl Tables {
+ 
+     /// Allocate with an explicit proof-table share (percent of `--memory`).
+     pub fn with_share(memory_mb: usize, filter: bool, proof_percent: u8) -> Tables {
+-        let b = split_share(memory_mb, proof_percent);
++        let entries = null_cache::entries_for_memory(memory_mb);
++        let cache_bytes = entries * null_cache::ENTRY_BYTES;
++        let b = split_share_with_cache(memory_mb, proof_percent, cache_bytes);
+         Tables {
+             tt: Tt::new(b.tt_clusters),
+             proofs: ProofTable::new(b.proof_slots),
+@@ -126,6 +161,7 @@ impl Tables {
+             } else {
+                 Filter::disabled()
+             },
++            null_cache: NullCache::new(entries),
+         }
+     }
+ 
+@@ -133,7 +169,12 @@ impl Tables {
+     /// equivalence test).
+     #[cfg(test)]
+     pub fn from_parts(tt: Tt, proofs: ProofTable, filter: Filter) -> Tables {
+-        Tables { tt, proofs, filter }
++        Tables {
++            tt,
++            proofs,
++            filter,
++            null_cache: NullCache::new(0),
++        }
+     }
+ 
+     /// Whether the filter is still answering (enabled and not dropped).
+@@ -217,6 +258,16 @@ impl Tables {
+         &self.proofs
+     }
+ 
++    /// The exposed-limit cache (plan 26).
++    pub fn null_cache(&self) -> &NullCache {
++        &self.null_cache
++    }
++
++    /// The exposed-limit cache, mutably (plan 26).
++    pub fn null_cache_mut(&mut self) -> &mut NullCache {
++        &mut self.null_cache
++    }
++
+     /// Consume the tables, returning the proof table.
+     pub fn into_proofs(self) -> ProofTable {
+         self.proofs
+@@ -247,7 +298,8 @@ mod tests {
+             for pct in 1u8..=90 {
+                 let b = split_share(mb, pct);
+                 assert!(
+-                    64 * b.tt_clusters + 16 * b.proof_slots + b.filter_bits / 8 <= mb << 20,
++                    64 * b.tt_clusters + 16 * b.proof_slots + b.filter_bits / 8 + b.cache_bytes
++                        <= mb << 20,
+                     "mb={mb} pct={pct}: {b:?}"
+                 );
+                 assert!(b.tt_clusters >= 1);
+@@ -257,6 +309,35 @@ mod tests {
+         assert_eq!(split_share(192, 75).proof_slots, split(192).proof_slots);
+     }
+ 
++    #[test]
++    fn split_with_cache_invariant() {
++        for mb in [1usize, 7, 16, 64, 192, 1024, 4096] {
++            for pct in [1u8, 25, 50, 75, 90] {
++                for entries in [0usize, 1 << 10, 1 << 17, 1 << 20] {
++                    let cache_bytes = entries * null_cache::ENTRY_BYTES;
++                    let b = split_share_with_cache(mb, pct, cache_bytes);
++                    assert!(
++                        64 * b.tt_clusters + 16 * b.proof_slots + b.filter_bits / 8 + b.cache_bytes
++                            <= mb << 20,
++                        "mb={mb} pct={pct} entries={entries}: {b:?}"
++                    );
++                    assert!(b.tt_clusters >= 1);
++                    assert!(b.filter_bits.is_power_of_two());
++                }
++            }
++        }
++    }
++
++    #[test]
++    fn filter_only_cache_keeps_tt_and_proof_sizes() {
++        let base = split_share(192, 75);
++        let entries = 1 << 17;
++        let b = split_share_with_cache(192, 75, entries * null_cache::ENTRY_BYTES);
++        assert_eq!(b.proof_slots, base.proof_slots);
++        assert_eq!(b.tt_clusters, base.tt_clusters);
++        assert!(b.filter_bits < base.filter_bits);
++    }
++
+     #[test]
+     fn split_at_192mb() {
+         let b = split(192);
+diff --git a/src/table/null_cache.rs b/src/table/null_cache.rs
+new file mode 100644
+index 0000000..c30d414
+--- /dev/null
++++ b/src/table/null_cache.rs
+@@ -0,0 +1,196 @@
++//! The plan-26 exposed-limit cache (NULL-V2).
++//!
++//! `exposed_limit` is a pure function of the child board: it asks whether
++//! every legal defender reply lets the attacker explode the defender's
++//! commoner, and returns the highest 50-move counter at which that holds.
++//! The null replay calls it once per null move and the same child recurs
++//! often, so a small direct-mapped cache removes the repeats.
++//!
++//! The key is `(child key, rule50, attacker)`. Both a positive answer (the
++//! limit) and a negative answer are exact, so both are stored. A hit is
++//! accepted only after a full-key and full-meta compare; a collision simply
++//! recomputes, exactly like a TT collision. The cache is board-only: it
++//! never stores a null position, a proof or a table-dependent value.
++//!
++//! Storage is three parallel arrays (`u64` key, `u8` meta, `u8` value) so an
++//! entry costs 10 bytes rather than the 16 a padded struct would take. The
++//! arrays are lazily zeroed like the other tables; `value == 0` is the only
++//! liveness signal.
++
++use crate::table::alloc::Zeroed;
++use atomic_movegen::types::Color;
++
++/// The default entry count at the 192 MB label (2^17 entries, 1.25 MiB).
++///
++/// Plan-26 Phase A swept 2^17/2^18/2^20/2^21. The larger caches need TT
++/// compensation, which changes the search trajectory; 2^17 fits in the
++/// filter's slack, so the TT and proof table keep their sizes and the tree
++/// is identical to the control (see report26).
++pub const DEFAULT_ENTRIES: usize = 1 << 21;
++
++/// Bytes per entry: `u64` key + `u8` meta + `u8` value.
++pub const ENTRY_BYTES: usize = 10;
++
++const EMPTY: u8 = 0;
++const NEGATIVE: u8 = 1;
++const POSITIVE_BASE: u8 = 2;
++
++/// A cached `exposed_limit` answer.
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++pub enum CachedLimit {
++    /// Not every defence exposes the commoner.
++    Negative,
++    /// Every defence exposes it; the proof holds up to this counter.
++    Positive(u8),
++}
++
++/// The direct-mapped exposed-limit cache.
++pub struct NullCache {
++    keys: Zeroed<u64>,
++    meta: Zeroed<u8>,
++    values: Zeroed<u8>,
++    mask: usize,
++    hits: u64,
++    misses: u64,
++}
++
++impl NullCache {
++    /// A cache of `entries` slots (rounded down to a power of two; `0`
++    /// disables it).
++    pub fn new(entries: usize) -> NullCache {
++        let entries = if entries == 0 {
++            0
++        } else {
++            1usize << (usize::BITS - 1 - entries.leading_zeros())
++        };
++        NullCache {
++            keys: Zeroed::new(entries),
++            meta: Zeroed::new(entries),
++            values: Zeroed::new(entries),
++            mask: entries.saturating_sub(1),
++            hits: 0,
++            misses: 0,
++        }
++    }
++
++    /// The number of slots.
++    pub fn len(&self) -> usize {
++        self.keys.len()
++    }
++
++    /// Whether the cache is disabled.
++    pub fn is_empty(&self) -> bool {
++        self.keys.is_empty()
++    }
++
++    /// Cache hits so far.
++    pub fn hits(&self) -> u64 {
++        self.hits
++    }
++
++    /// Cache misses so far.
++    pub fn misses(&self) -> u64 {
++        self.misses
++    }
++
++    fn index(&self, key: u64, meta: u8) -> usize {
++        let h = key.wrapping_mul(0x9E37_79B9_7F4A_7C15)
++            ^ u64::from(meta).wrapping_mul(0xBF58_476D_1CE4_E5B9);
++        (h >> 32) as usize & self.mask
++    }
++
++    fn encode(rule50: u8, attacker: Color) -> u8 {
++        (rule50 << 1) | u8::from(attacker == Color::Black)
++    }
++
++    /// Look up `(key, rule50, attacker)`. A hit is exact: the full key and
++    /// meta must match.
++    pub fn get(&mut self, key: u64, rule50: u8, attacker: Color) -> Option<CachedLimit> {
++        if self.is_empty() {
++            return None;
++        }
++        let meta = Self::encode(rule50, attacker);
++        let idx = self.index(key, meta);
++        if self.values[idx] != EMPTY && self.keys[idx] == key && self.meta[idx] == meta {
++            self.hits += 1;
++            let value = self.values[idx];
++            return Some(if value == NEGATIVE {
++                CachedLimit::Negative
++            } else {
++                CachedLimit::Positive(value - POSITIVE_BASE)
++            });
++        }
++        self.misses += 1;
++        None
++    }
++
++    /// Store an exact answer for `(key, rule50, attacker)`.
++    pub fn insert(&mut self, key: u64, rule50: u8, attacker: Color, limit: Option<u8>) {
++        if self.is_empty() {
++            return;
++        }
++        let meta = Self::encode(rule50, attacker);
++        let idx = self.index(key, meta);
++        self.keys[idx] = key;
++        self.meta[idx] = meta;
++        self.values[idx] = match limit {
++            None => NEGATIVE,
++            Some(limit) => POSITIVE_BASE + limit,
++        };
++    }
++}
++
++/// The cache entry count for a `memory_mb` label: at most
++/// [`DEFAULT_ENTRIES`] and at most one eighth of the label.
++pub fn entries_for_memory(memory_mb: usize) -> usize {
++    let by_memory = memory_mb.saturating_mul(1 << 20) / ENTRY_BYTES / 8;
++    let entries = by_memory.min(DEFAULT_ENTRIES);
++    if entries == 0 {
++        0
++    } else {
++        1usize << (usize::BITS - 1 - entries.leading_zeros())
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn positive_and_negative_round_trip() {
++        let mut c = NullCache::new(1 << 10);
++        assert_eq!(c.get(7, 3, Color::White), None);
++        c.insert(7, 3, Color::White, Some(42));
++        assert_eq!(c.get(7, 3, Color::White), Some(CachedLimit::Positive(42)));
++        c.insert(7, 3, Color::White, None);
++        assert_eq!(c.get(7, 3, Color::White), Some(CachedLimit::Negative));
++        assert_eq!(c.hits(), 2);
++        assert_eq!(c.misses(), 1);
++    }
++
++    #[test]
++    fn key_meta_and_attacker_are_verified() {
++        let mut c = NullCache::new(1 << 10);
++        c.insert(7, 3, Color::White, Some(42));
++        assert_eq!(c.get(7, 4, Color::White), None);
++        assert_eq!(c.get(7, 3, Color::Black), None);
++        assert_eq!(c.get(8, 3, Color::White), None);
++    }
++
++    #[test]
++    fn disabled_cache_is_inert() {
++        let mut c = NullCache::new(0);
++        assert!(c.is_empty());
++        c.insert(1, 0, Color::White, Some(1));
++        assert_eq!(c.get(1, 0, Color::White), None);
++        assert_eq!((c.hits(), c.misses()), (0, 0));
++    }
++
++    #[test]
++    fn entries_scale_with_the_label() {
++        assert_eq!(entries_for_memory(192), DEFAULT_ENTRIES);
++        assert!(entries_for_memory(16) <= DEFAULT_ENTRIES);
++        assert!(entries_for_memory(16).is_power_of_two());
++        assert_eq!(entries_for_memory(0), 0);
++    }
++}

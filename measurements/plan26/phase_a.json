@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-12",
+  "cell": "deep-win",
+  "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+  "cap": {
+    "kind": "evals",
+    "value": 5000000,
+    "seconds": 600,
+    "seed": 0
+  },
+  "control": {
+    "child_evals": 5000034,
+    "expansions": 168910,
+    "null_calls": 105120,
+    "wall_s": 3.015,
+    "maxrss_kb": 217300,
+    "tree_identical": true
+  },
+  "sweep": [
+    {
+      "entries": 131072,
+      "entries_pow2": 17,
+      "cache_bytes": 1310720,
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "null_calls": 105120,
+      "hits": 1014999,
+      "misses": 2364622,
+      "hit_rate": 0.3003,
+      "wall_s": 2.557,
+      "maxrss_kb": 217892,
+      "tree_identical": true,
+      "note": "fits the filter slack; TT and proof table keep their sizes"
+    },
+    {
+      "entries": 262144,
+      "entries_pow2": 18,
+      "cache_bytes": 2621440,
+      "child_evals": 5000006,
+      "expansions": 168909,
+      "null_calls": 105120,
+      "hits": 1065092,
+      "misses": 2314529,
+      "hit_rate": 0.3151,
+      "wall_s": 2.655,
+      "maxrss_kb": 218236,
+      "tree_identical": false,
+      "note": "0.66 MB from the TT; the tree changes"
+    },
+    {
+      "entries": 1048576,
+      "entries_pow2": 20,
+      "cache_bytes": 10485760,
+      "child_evals": 5000027,
+      "expansions": 168910,
+      "null_calls": 105121,
+      "hits": 1166804,
+      "misses": 2212858,
+      "hit_rate": 0.3453,
+      "wall_s": 2.699,
+      "maxrss_kb": 218544,
+      "tree_identical": false,
+      "note": "8.1 MB from the TT; the tree changes"
+    },
+    {
+      "entries": 2097152,
+      "entries_pow2": 21,
+      "cache_bytes": 20971520,
+      "child_evals": 5000025,
+      "expansions": 168885,
+      "null_calls": 105098,
+      "hits": 1200836,
+      "misses": 2178341,
+      "hit_rate": 0.3554,
+      "wall_s": 2.801,
+      "maxrss_kb": 218032,
+      "tree_identical": false,
+      "note": "18.1 MB from the TT; the tree changes"
+    }
+  ],
+  "positive_null_ceiling": {
+    "null_calls": 105120,
+    "positive_repeats": 11651,
+    "repeat_share": 0.1108,
+    "included": false,
+    "note": "a positive-null cache changed the tree (null_calls 104137 vs 105120) because it freezes a table-dependent result; excluded"
+  }
+}

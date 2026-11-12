@@ -379,3 +379,22 @@ premise are the recorded starting point for the D21 kill review.
   `deep-win` 8.35×. Gates: `make test`, `make lint`, `make test-full` + veto
   green. Data: [`measurements/plan25/`](measurements/plan25/README.md);
   report: [`report25.md`](report25.md).
+- **2026-11-12** — plan26 (item 34, NULL-V2) executed and **closed
+  negative**. Phase A swept the exposed-limit cache at 2^17/2^18/2^20/2^21
+  entries on `deep-win` at 5 M evals: 2^17 (1.25 MB) is the largest size that
+  fits the filter slack, so the TT and proof table keep their sizes and the
+  tree is identical to the control (30.0 % hit rate, 3.015 → 2.557 s);
+  larger caches take TT bytes and change the tree. The positive-null cache
+  ceiling is 11.1 % of `null_win` calls, but it changes the tree and was
+  excluded. Phase B implemented EARLY-REPLY (pseudo-legal + lazy legality,
+  two `StateInfo`s) and the 2^17 EXPOSED-CACHE. G-N2 at 120 s, seeds 0–2:
+  `deep-win` **0.8631×** the same-session control (median 71.666 s vs
+  83.029 s) against the declared ≤ 0.85×, `core` 0.8843×, `easy-win`
+  0.8631×, tree identical 9/9. The wall guard failed, so D14 was not run and
+  no claim is made. The source was reverted; the patch is
+  [`measurements/plan26/null_v2.patch`](measurements/plan26/null_v2.patch).
+  The per-node micro-line is closed; the next decision is a formulation
+  choice (PDS-PN/PN² or a goal re-pin). Gates: `make test`, `make lint`,
+  `make test-full` + veto green on the reverted tree. Data:
+  [`measurements/plan26/`](measurements/plan26/README.md); report:
+  [`report26.md`](report26.md).
