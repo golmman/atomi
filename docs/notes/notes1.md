@@ -173,3 +173,8 @@ Row 3 shows a 2/3 coverage and 6.3 geomean, the most recent row is so much worse
 Last session we finished with `docs/plans/prover/report23.md`.
 The last revisit analysis of `provari` (`docs/plans/prover/analysis1.md`) apparently proved to be very fruitful.
 Should we add this to the regular kill reviews?
+
+---
+
+Analysis:
+At each expansion we do the same conceptual work provari does, but with more board copies, more movegen, and more auxiliary passes. The M0 baseline was ≈ 5.18 µs per expansion; provari's equivalent is a fraction of that. That's why the initiative says the remaining wall is per-expansion cost, not tree size — and why the closed "per-node micro-line" (NULL-V1/V2) was trying to shave exactly this number.
