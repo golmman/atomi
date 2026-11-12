@@ -49,6 +49,10 @@ Referenced from `AGENTS.md` §Correctness.
   group-proved parent event must carry the selected member's move, and the
   pending-proof retention must use that member's key, or the writer fails.
   The flag is default off; item 15 is closed ([`report6`](report6.md)).
+  Plan 24's GROUP-V1 (score-free members, default on) also failed —
+  `deep-win` 0/3 at 120 s vs a 3/3 control — so the group is not a product
+  arm; a re-proposal needs a mechanism-level claim, not another default flip
+  ([`report24`](report24.md)).
 - The null-side threat signature is a pure function of the board; no null
   position is ever keyed, searched, stored, put on `line` or emitted. The
   opt-in `--guide-null-exact` builds the passed board **ephemerally** for the

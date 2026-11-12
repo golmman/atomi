@@ -350,3 +350,17 @@ premise are the recorded starting point for the D21 kill review.
   `make test`, `make lint`, `make test-full` + veto green. Data:
   [`measurements/plan23/`](measurements/plan23/README.md); report:
   [`report23.md`](report23.md).
+- **2026-11-12** — plan24 (item 29, GROUP-V1) executed and **closed
+  negative**. Phase A added the permanent `plain_children`/`group_children`
+  counters and measured the plain share: 38–47 % of `child_evals` and ~38 %
+  of expansions, with `child_evals`/exp and µs/exp flat across arms. Phase B
+  made plain members score-free and `group` on by default; the Phase C gate
+  on `deep-win` failed hard (`0/3` at 120 s vs a `3/3` same-session control,
+  median 105.032 s; `core` 1.045×, `easy-win` 0.863×), with D14 6/6 accepted
+  on the six proved seeds. Phase D reverted the change (the binary is
+  byte-identical to the Phase A build) and kept the counters; the group stays
+  the opt-in `--guide-group` flag. `T_3` unchanged; the wall is per-expansion
+  cost (D36), so item 33 is next. Gates: `make test`, `make lint`,
+  `make test-full` + veto green. Data:
+  [`measurements/plan24/`](measurements/plan24/README.md); report:
+  [`report24.md`](report24.md).

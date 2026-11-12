@@ -115,6 +115,11 @@ pub struct SearchResult {
     pub aux_nodes: u64,
     /// Optional auxiliary operations skipped by the global budget.
     pub aux_skipped: u64,
+    /// Plain moves deferred into the virtual `GROUP` child (plan-24
+    /// GROUP-V1; zero when `--guide-group` is off).
+    pub plain_children: u64,
+    /// Expansions that installed a `GROUP` child.
+    pub group_children: u64,
     /// Search time in milliseconds (allocation excluded).
     pub ms: u64,
     /// Live entries in the proof table at exit.
@@ -187,6 +192,8 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
                 sim_nodes: 0,
                 aux_nodes: 0,
                 aux_skipped: 0,
+                plain_children: 0,
+                group_children: 0,
                 stop: None,
                 sink,
                 guide,
@@ -231,6 +238,8 @@ struct Engine<S> {
     sim_nodes: u64,
     aux_nodes: u64,
     aux_skipped: u64,
+    plain_children: u64,
+    group_children: u64,
     stop: Option<Exit>,
     sink: S,
     guide: Guide,
@@ -286,6 +295,8 @@ impl<S: ProofSink> Engine<S> {
             sim_nodes: self.sim_nodes,
             aux_nodes: self.aux_nodes,
             aux_skipped: self.aux_skipped,
+            plain_children: self.plain_children,
+            group_children: self.group_children,
             ms: 0,
             proof_entries: 0,
             proof_full: false,
@@ -388,6 +399,10 @@ impl<S: ProofSink> Engine<S> {
                 self.sim_nodes += sim;
                 self.aux_nodes += settle + sim;
                 self.aux_skipped += skipped;
+                if let Some(g) = &frame.group {
+                    self.group_children += 1;
+                    self.plain_children += g.members.len() as u64;
+                }
                 // Plan4 proof-table pressure: a settled refutation is still a
                 // path-independent TT refutation, but a settled proof is only
                 // installed when this node exits proved (and, at an OR node,
@@ -991,6 +1006,8 @@ mod tests {
             sim_nodes: 0,
             aux_nodes: 0,
             aux_skipped: 0,
+            plain_children: 0,
+            group_children: 0,
             stop: None,
             sink: NullSink,
             guide: Guide::new(GuideConfig::none()),
@@ -1057,6 +1074,8 @@ mod tests {
             sim_nodes: 0,
             aux_nodes: 0,
             aux_skipped: 0,
+            plain_children: 0,
+            group_children: 0,
             stop: None,
             sink: NullSink,
             guide: Guide::new(GuideConfig::none()),

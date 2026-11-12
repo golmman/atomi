@@ -100,7 +100,9 @@ pub struct GuideConfig {
     /// Null-side threat replay.
     pub null_replay: bool,
     /// The item-15 attacker plain-move `GROUP` child (`--guide-group`,
-    /// default off; the kill-test flag).
+    /// default off; the kill-test flag). Plan-24 GROUP-V1 (score-free
+    /// members, default on) failed its gate: `deep-win` 0/3 at 120 s
+    /// (report24), so the group stays off and is never a product arm.
     pub group: bool,
     /// Plan-13 conformance probe: fresh disproof numbers are 1
     /// (`--guide-fresh-dn`, default off).

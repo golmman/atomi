@@ -132,6 +132,13 @@ fn group_plain_child_proves_and_is_deterministic() {
         let b = search::prove(&root, &lim, NullSink);
         assert_eq!(a.result.exit, Exit::Proved, "seed {seed}");
         assert!(a.result.length.is_some_and(|l| l >= 2));
+        // Plan-24 Phase A counters: the group is installed and carries at
+        // least one plain member.
+        assert!(a.result.group_children > 0, "seed {seed}");
+        assert!(
+            a.result.plain_children >= a.result.group_children,
+            "seed {seed}"
+        );
         assert_eq!(
             (
                 a.result.exit,
@@ -702,6 +709,7 @@ fn stats_are_observation_only() {
     // Off: every counter is zero.
     assert_eq!(a.unique_keys, 0);
     assert_eq!(a.re_expansions, 0);
+    assert_eq!((a.plain_children, a.group_children), (0, 0));
     assert_eq!(a.entry_would_return, 0);
     // On: the counters are internally consistent.
     assert!(b.unique_keys <= b.expansions);

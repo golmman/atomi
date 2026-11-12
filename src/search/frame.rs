@@ -897,13 +897,31 @@ mod tests {
             };
             for &(k, v) in &pending {
                 hits += 1;
-                let i = frame
+                assert!(matches!(v, Value::Proved { .. } | Value::Refuted { .. }));
+                // Plan-24 GROUP-V1: a settled *plain* child belongs to the
+                // virtual group, so its key lives on the member, not on the
+                // OR child list. The group slot borrows a member's key but
+                // carries the group's own adjusted value, so it is skipped.
+                // Either way the settled entry keeps the child's own key and
+                // the settled value.
+                let gidx = frame.group.as_ref().map(|g| g.index);
+                match frame
                     .keys
                     .iter()
-                    .position(|&x| x == k)
-                    .expect("pending key");
-                assert!(matches!(v, Value::Proved { .. } | Value::Refuted { .. }));
-                assert_eq!(frame.children[i].value, v);
+                    .enumerate()
+                    .position(|(i, &x)| x == k && Some(i) != gidx)
+                {
+                    Some(i) => assert_eq!(frame.children[i].value, v),
+                    None => {
+                        let g = frame.group.as_ref().expect("member key needs a group");
+                        let m = g
+                            .members
+                            .iter()
+                            .position(|m| m.key == k)
+                            .expect("pending key");
+                        assert_eq!(g.members[m].child.value, v);
+                    }
+                }
             }
         }
         eprintln!("settled children: {hits}");

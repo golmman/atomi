@@ -1,0 +1,51 @@
+{
+ "plan": "plan24",
+ "phase": "gate",
+ "seconds": 120,
+ "per": {
+  "core": {
+   "control_median_s": 8.48,
+   "candidate_median_s": 8.86,
+   "ratio": 1.045,
+   "ratio_max": 1.1,
+   "candidate_proved": "3/3",
+   "control_proved": "3/3",
+   "candidate_evals_per_exp": 29.81,
+   "control_evals_per_exp": 29.32,
+   "candidate_ns_per_exp": 24947.1,
+   "control_ns_per_exp": 24597.5,
+   "candidate_tree_factor": 1.022,
+   "pass": true
+  },
+  "easy-win": {
+   "control_median_s": 0.936,
+   "candidate_median_s": 0.808,
+   "ratio": 0.863,
+   "ratio_max": 1.1,
+   "candidate_proved": "3/3",
+   "control_proved": "3/3",
+   "candidate_evals_per_exp": 28.49,
+   "control_evals_per_exp": 26.75,
+   "candidate_ns_per_exp": 22676.5,
+   "control_ns_per_exp": 21731.6,
+   "candidate_tree_factor": 0.884,
+   "pass": true
+  },
+  "deep-win": {
+   "control_median_s": 105.032,
+   "candidate_median_s": 120.008,
+   "ratio": 1.143,
+   "ratio_max": 0.9,
+   "candidate_proved": "0/3",
+   "control_proved": "3/3",
+   "candidate_evals_per_exp": 27.82,
+   "control_evals_per_exp": 27.29,
+   "candidate_ns_per_exp": 21522.9,
+   "control_ns_per_exp": 19699.8,
+   "candidate_tree_factor": 1.057,
+   "pass": false
+  }
+ },
+ "verdict": "fail",
+ "rule": "deep-win candidate median <= 0.9x control; every cell <= 1.1x control; every candidate seed proved"
+}

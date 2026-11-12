@@ -285,6 +285,8 @@ mod tests {
         let flag = parse(&["--guide-group", "--guide", "hand"]);
         assert!(flag.guide.group);
         assert!(parse(&["--guide", "hand"]).guide == GuideConfig::hand());
+        // The plain-move group stays opt-in: plan-24 GROUP-V1 failed its
+        // gate on `deep-win` (report24), so `--guide hand` keeps it off.
         assert!(!parse(&["--guide", "hand"]).guide.group);
     }
 
