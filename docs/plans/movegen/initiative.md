@@ -13,10 +13,14 @@ identical tree") is **retired**: the stack was measured at 1.219× and not
 adopted ([`handoff1.md`](handoff1.md) §7, prover D40), so a per-node wall gate
 never was this initiative's decision to make.
 
-Current artifacts: **`handoff1.md`** (wishlist, live). The newest version in
-atomi's registry index is **2.4.0**, the baseline, so there is no release to
-adopt: no integration plan and no report exist, and that is the expected
-state, not a backlog item.
+Current artifacts: **`handoff1.md`** (the ask; history once answered) and
+**`plan1.md`** (2.6.0 adoption, drafted 2026-11-13 against the verified
+published tarball; **not yet executed**, so `report1.md` — the file that will
+carry the outcomes, D-MG7 — does not exist). 2.6.0 lands **13 of the 14** MG
+items (MG5 merged into MG3, MG7 withdrawn), none of them used at a call site
+yet, and is neutral on atomi's wall at an identical tree (plan1 §3). Integrating
+the new API is **`prover`** work in dedicated plans. Atomi's committed
+dependency is still published **2.4.0**.
 
 ## Goal
 
@@ -34,7 +38,7 @@ Success (all four; each is a process fact, not a performance hope):
 
 | # | Condition |
 | --- | --- |
-| S1 | Every atomi need appears in a **handoff** and has an upstream **outcome**: landed, rejected upstream with reasons, or withdrawn downstream. No need lives only in a plan or a report. |
+| S1 | Every atomi need is **filed** in a handoff (never only in a plan or a report), and every resolved ask records its **outcome** — landed, rejected upstream with reasons, or withdrawn downstream — either in the handoff that asked or in the integration `reportN.md` the ledger names for the release that answered it (D-MG7). |
 | S2 | The committed dependency is a **published** version — never a fork, never a `[patch]`, never a committed path dependency. A published release gets an **integration plan** within one plan of us noticing it, and the plan is executed, not parked. |
 | S3 | Every integration plan carries the same gate (see **Gates**): the crate's harness as published, the golden rules differential, `make test-full`, `make veto`, and a same-session bench. Any rules divergence or outcome regression is reverted in the same session and reported. |
 | S4 | The per-expansion cost is recorded per adopted version (`make pernode` + a 120 s bench row), so the P1 gap is a **trend line** with an owner, not an unexplained constant. |
@@ -56,16 +60,17 @@ produces none and needs no atomi action.
 
 | Step | Artifact | Where | Who | Notes |
 | --- | --- | --- | --- | --- |
-| 1. Wishlist | **`handoffN.md`** | `docs/plans/movegen/` | atomi sessions, addressed to upstream | Standalone: it must be readable in the `atomic-movegen` repo with no atomi context. `N` is a handoff number (never a plan number); a revised wishlist is a **new** handoff, and older ones stay as history |
+| 1. Wishlist | **`handoffN.md`** | `docs/plans/movegen/` | atomi sessions, addressed to upstream | Standalone: it must be readable in the `atomic-movegen` repo with no atomi context. `N` is a handoff number (never a plan number); a revised wishlist of **new** asks is a new handoff; a release that answers an existing one produces no new handoff (D-MG7) |
 | 2. Release | — | crates.io / the crate's repo | the owner | **No atomi action.** No branch, no patch, no path dependency in a commit |
 | 3. Integration plan | **`planN.md`** | `docs/plans/movegen/` | atomi sessions | One plan per adoption. Names the handoff it consumes, the version, the gate, the measurement and the keep/revert rule. Plan numbers are independent of handoff numbers (AGENTS.md); this initiative's first is `plan1.md` |
-| 4. Implementation report | **`reportN.md`** | `docs/plans/movegen/` | atomi sessions | Tools, problems, open parts, missing tests, next steps; the adopted version and ratios; a one-line history entry here |
+| 4. Implementation report | **`reportN.md`** | `docs/plans/movegen/` | atomi sessions | Tools, problems, open parts, missing tests, next steps; the adopted version, ratios and the release's **MG outcomes** (D-MG7); a one-line history entry here. It is also the kickoff context for the `prover` plans that integrate the new API |
 
 Ledger of the lifecycle:
 
 | Handoff | Release | Plan | Report | State |
 | --- | --- | --- | --- | --- |
 | [`handoff1.md`](handoff1.md) (2026-11-13) | 2.4.0 is the baseline; **no new release** | — | — | wishlist filed, awaiting a release |
+| [`handoff1.md`](handoff1.md) | **2.6.0** (published 2026-11-13; no 2.5.0 exists) | [`plan1.md`](plan1.md) | — | plan drafted against the verified tarball; **not executed** |
 
 A plan may be drafted **early** (to have the gate and the measurement script
 ready) but it is executed only against a published version. A pre-release
@@ -173,6 +178,7 @@ Every integration plan contains these, in this order (D-MG6):
 | D-MG4 | Dependency | The prover ships a published version; a path dependency is measurement-only |
 | D-MG5 | Generality test | Every MG item is justified by the shakmaty-replacement requirement set (handoff1 §2); atomi-only items are marked and never P0 |
 | D-MG6 | Lifecycle | Wishlist `handoffN.md` → release (no atomi action) → `planN.md` → `reportN.md`; the plan carries the Gates section verbatim and no commit depends on an unreleased crate |
+| D-MG7 | A handoff is an ask | A handoff is a **point-in-time ask**, not a living document: when a release answers it, it stays as history and is neither edited nor replaced by a "close-out" handoff. The release's outcomes are recorded in the integration report (2.6.0: 13 of 14 landed, MG5 merged into MG3, MG7 withdrawn). A handoff number is spent only when a session has **new** asks, so `handoff2.md` is unspent |
 
 ## Risks
 
@@ -202,3 +208,22 @@ Every integration plan contains these, in this order (D-MG6):
   scenario, MG8–MG14 (upstream value that atomi does not need today), and
   D-MG6. The wishlist became `handoff1.md`; the file structure is now
   `handoffN.md` → release → `planN.md` → `reportN.md` with a lifecycle ledger.
+- **2026-11-13** — `atomic-movegen` **2.6.0** is published (no 2.5.0; the list
+  goes 2.4.0 → 2.6.0) and S2 triggers: [`plan1.md`](plan1.md) is drafted. The
+  tarball was fetched and verified (sha256 matches the index, MIT, MSRV 1.85,
+  `src/zobrist.rs` byte-identical to 2.4.0, **no `Fixed` section**), and a
+  pre-plan probe showed the crate harness green, atomi compiling **unchanged**
+  (no call-site adaptation), atomi's 191 tests green on both versions, and an
+  **identical tree with a flat wall (1.002×)** on the `deep-win` 5 M probe — so
+  the adoption is neutral for the prover's rung and D40 stands. 2.6.0 lands
+  **13 of 14** MG items (MG1–MG6, MG8–MG14; MG7 withdrawn), including the
+  flagship MG3 (`EffectContext`/`MoveEffect`/`outcome_after`). Session note:
+  crates.io answers **403 without a `User-Agent`** — that, not a network block,
+  was what made a first draft of the plan call the release unreachable.
+- **2026-11-13** — lifecycle settled (D-MG7, S1 amended): a handoff is an
+  **ask**, and `handoff1.md` is not edited or superseded when a release answers
+  it. `plan1.md` notes what 2.6.0 contains (13/14), bumps, and checks for
+  regressions; `report1.md` records the implementation challenges, the 13/14
+  outcome and the verdict, and is the **kickoff context for the first `prover`
+  plan** — API integration belongs to that initiative, not to an adoption plan.
+  `handoff2.md` stays unspent until a session has a new ask.
