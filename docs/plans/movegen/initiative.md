@@ -13,11 +13,12 @@ identical tree") is **retired**: the stack was measured at 1.219× and not
 adopted ([`handoff1.md`](handoff1.md) §7, prover D40), so a per-node wall gate
 never was this initiative's decision to make.
 
-Current artifacts: **`handoff2.md`** (the live ask, MG15–MG18: child-view
-terminality, filed 2026-11-13 by prover plan29), **`handoff1.md`** (history
-now that 2.6.0 answered it), **`plan1.md`** (2.6.0 adoption, executed
-2026-11-13) and **`report1.md`** (the release's outcomes, D-MG7, and the
-kickoff context for the `prover` plans that integrate the new API). 2.6.0
+Current artifacts: **`handoff2.md`** (MG15–MG18: child-view terminality, filed
+2026-11-13 by prover plan29; answered 4/4 by 2.7.0 and now history), **`plan2.md`**
+(2.7.0 adoption, **drafted** 2026-11-13 for S2), **`handoff1.md`** (history now
+that 2.6.0 answered it), **`plan1.md`** (2.6.0 adoption, executed 2026-11-13) and
+**`report1.md`** (its outcomes, D-MG7, and the kickoff for the `prover` plans that
+integrate the new API). 2.6.0
 landed **13 of the 14** MG items (MG5 merged into MG3, MG7 withdrawn) and is
 **neutral** on atomi's wall at an identical tree (plan1 §3, report1 §2). MG3
 is now *measured* at a call site, not merely adopted: the prover's
@@ -79,7 +80,8 @@ Ledger of the lifecycle:
 | [`handoff1.md`](handoff1.md) | **2.6.0** (published 2026-11-13; no 2.5.0 exists) | [`plan1.md`](plan1.md) | — | superseded by the executed row below |
 | [`handoff1.md`](handoff1.md) | **2.6.0** | [`plan1.md`](plan1.md) | [`report1.md`](report1.md) | **executed 2026-11-13, kept** — 13/14 landed (MG5 merged, MG7 withdrawn), gates 1–4 green, wall flat (paired 0.9999, tree identical) |
 | [`handoff1.md`](handoff1.md) §4/MG3 | **2.6.0** | — (consumed by a `prover` plan) | — | **consumed and measured 2026-11-13** — the prover's EFFECT-CHILD-V1 is `no effect` (0.00 % decided, [`../prover/report29.md`](../prover/report29.md)); its differential is committed as `tests/effects_differential.rs` |
-| [`handoff2.md`](handoff2.md) (2026-11-13) | **no release yet** | — | — | wishlist filed (MG15–MG18), awaiting a release |
+| [`handoff2.md`](handoff2.md) (2026-11-13) | **no release yet** | — | — | superseded by the row below |
+| [`handoff2.md`](handoff2.md) | **2.7.0** (published 2026-11-13T16:20:30Z) | [`plan2.md`](plan2.md) | `report2.md` (on execution) | **plan drafted 2026-11-13** — 4/4 landed (MG15–MG18); pre-plan probe: crate harness green, atomi compiles unchanged incl. the frozen differential, tree identical, wall flat (1.006 `none` / 0.997 `hand`) |
 
 A plan may be drafted **early** (to have the gate and the measurement script
 ready) but it is executed only against a published version. A pre-release
@@ -136,8 +138,10 @@ private search design.
 ## Wishlist
 
 The live wishlist is [`handoff2.md`](handoff2.md) (MG15–MG18) plus every
-handoff1 item that has not landed; this table is the
-atomi-side index (evidence, priority, acceptance). Priorities are relative to
+handoff1 item that has not landed — as of **2.7.0** every row below has landed
+(MG7 withdrawn), so there is **no live ask** and the next `handoffN.md` is
+unspent (D-MG7); this table is the atomi-side index (evidence, priority,
+acceptance). Priorities are relative to
 *atomi's* next plan, not to the crate's roadmap.
 
 | # | Item | R | Why (evidence) | Risk | Acceptance | Pri |
@@ -237,6 +241,20 @@ Every integration plan contains these, in this order (D-MG6):
   outcome and the verdict, and is the **kickoff context for the first `prover`
   plan** — API integration belongs to that initiative, not to an adoption plan.
   `handoff2.md` stays unspent until a session has a new ask.
+- **2026-11-13** — `atomic-movegen` **2.7.0** is published (16:20Z, MIT, MSRV
+  1.85, `.crate` `cd69dc00…d38e1ad3`) and answers **all four** items of
+  [`handoff2.md`](handoff2.md): MG15 `terminal_after` (+ `is_terminal_after`,
+  `has_legal_move_after`), MG16 `AfterState`/`child_outcome`, MG17
+  `PostMove`/`effect_and_post`, MG18 `MoveClassification`/`classification`, plus
+  an unasked `CHILD_CASES`. S2 triggers: [`plan2.md`](plan2.md) is drafted. The
+  probe (one session, `/tmp` only) shows the crate harness green, atomi compiling
+  **unchanged** with its 193 tests green (frozen differential diff-empty), an
+  identical tree at 5 M evals on both stacks and a **flat** wall (1.006
+  `--guide none`, 0.997 `--guide hand`) — so, as with 2.6.0, the adoption is a
+  pin plus evidence, and the wall lever (21.3 % of hand-stack children built only
+  for terminality) is a `prover` claim. Also recorded there: handoff2 §3's >10 %
+  probe gate is **superseded, not passed** — MG15 decides every child, so its
+  successor is the probe's `needs_board` share.
 - **2026-11-13** — **plan1 executed, 2.6.0 kept.** Gates 1–4 green: tarball
   sha256 = index = `Cargo.lock` (`075cd3bf…`), crate harness 156 + 26 + 9
   green as published; the **frozen differential**

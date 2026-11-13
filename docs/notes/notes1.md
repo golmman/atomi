@@ -209,3 +209,8 @@ paired-control methodology in measurements/movegen/plan1/bench.py.
 Last session we finished with ...
 
 Create a new `atomic-movegen` wishlist in `docs/plans/movegen/handoff2.md`.
+
+---
+
+here is how i see it: handoff1 is merely the ask for 14 items. it does not lie, it was a wishlist. plan1 should note the changelog (only 13/14 landed) bump the version, check for regressions. report1 should document implementation challenges and give a final verdict and again should note that only 13/14 features landed in 2.6.0.  
+The actual integration of the new api should then happen in dedicated plans in the `prover` initiative. The report1 can be taken as the initial context needed to kickoff the first plan session there.
