@@ -1,0 +1,314 @@
+{
+  "probe": "atomi prove <cell> --seconds 600 --memory 192 --evals N --seed 0 --guide {hand,none} [--stats]; one run per config, one process at a time; control = git archive HEAD",
+  "control_binary": "/tmp/atomi-plan29-control/target/release/atomi",
+  "candidate_binary": "target/release/atomi",
+  "rows": [
+    {
+      "cell": "core",
+      "fen": "r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1",
+      "evals_cap": 1000000,
+      "guide": "hand",
+      "control": {
+        "child_evals": 1000000,
+        "expansions": 31326,
+        "exit": "evals",
+        "ms": 570
+      },
+      "candidate": {
+        "child_evals": 1000000,
+        "expansions": 31326,
+        "exit": "evals",
+        "ms": 629,
+        "effects": {
+          "effect_children": 1000000,
+          "effect_needs_board": 298553,
+          "effect_captures": 171808,
+          "effect_explosions": 0,
+          "effect_blast_hits": 0,
+          "effect_decided": 0,
+          "effect_extinction": 0,
+          "effect_clock": 0,
+          "effect_fallback": 298553,
+          "effect_no_qp": 0,
+          "effect_terminal": 273,
+          "effect_guide_needs_board": 0,
+          "effect_boards_saved": 0,
+          "decided_share_of_built": 0.0,
+          "terminal_share_of_built": 0.00091,
+          "saved_share_of_built": 0.0
+        }
+      },
+      "tree_identical": true,
+      "counters_deterministic": true
+    },
+    {
+      "cell": "core",
+      "fen": "r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1",
+      "evals_cap": 1000000,
+      "guide": "none",
+      "control": {
+        "child_evals": 1000032,
+        "expansions": 30786,
+        "exit": "evals",
+        "ms": 72
+      },
+      "candidate": {
+        "child_evals": 1000032,
+        "expansions": 30786,
+        "exit": "evals",
+        "ms": 106,
+        "effects": {
+          "effect_children": 1000032,
+          "effect_needs_board": 259981,
+          "effect_captures": 137997,
+          "effect_explosions": 2438,
+          "effect_blast_hits": 2438,
+          "effect_decided": 2438,
+          "effect_extinction": 2438,
+          "effect_clock": 0,
+          "effect_fallback": 257543,
+          "effect_no_qp": 0,
+          "effect_terminal": 441,
+          "effect_guide_needs_board": 0,
+          "effect_boards_saved": 2438,
+          "decided_share_of_built": 0.00938,
+          "terminal_share_of_built": 0.0017,
+          "saved_share_of_built": 0.00938
+        }
+      },
+      "tree_identical": true,
+      "counters_deterministic": true
+    },
+    {
+      "cell": "deep-win",
+      "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+      "evals_cap": 1000000,
+      "guide": "hand",
+      "control": {
+        "child_evals": 1000018,
+        "expansions": 33297,
+        "exit": "evals",
+        "ms": 452
+      },
+      "candidate": {
+        "child_evals": 1000018,
+        "expansions": 33297,
+        "exit": "evals",
+        "ms": 480,
+        "effects": {
+          "effect_children": 1000018,
+          "effect_needs_board": 178317,
+          "effect_captures": 69486,
+          "effect_explosions": 0,
+          "effect_blast_hits": 0,
+          "effect_decided": 0,
+          "effect_extinction": 0,
+          "effect_clock": 0,
+          "effect_fallback": 178317,
+          "effect_no_qp": 0,
+          "effect_terminal": 68,
+          "effect_guide_needs_board": 0,
+          "effect_boards_saved": 0,
+          "decided_share_of_built": 0.0,
+          "terminal_share_of_built": 0.00038,
+          "saved_share_of_built": 0.0
+        }
+      },
+      "tree_identical": true,
+      "counters_deterministic": true
+    },
+    {
+      "cell": "deep-win",
+      "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+      "evals_cap": 1000000,
+      "guide": "none",
+      "control": {
+        "child_evals": 1000002,
+        "expansions": 33680,
+        "exit": "evals",
+        "ms": 67
+      },
+      "candidate": {
+        "child_evals": 1000002,
+        "expansions": 33680,
+        "exit": "evals",
+        "ms": 95,
+        "effects": {
+          "effect_children": 1000002,
+          "effect_needs_board": 159594,
+          "effect_captures": 60548,
+          "effect_explosions": 3069,
+          "effect_blast_hits": 3069,
+          "effect_decided": 3069,
+          "effect_extinction": 3069,
+          "effect_clock": 0,
+          "effect_fallback": 156525,
+          "effect_no_qp": 0,
+          "effect_terminal": 636,
+          "effect_guide_needs_board": 0,
+          "effect_boards_saved": 3069,
+          "decided_share_of_built": 0.01923,
+          "terminal_share_of_built": 0.00399,
+          "saved_share_of_built": 0.01923
+        }
+      },
+      "tree_identical": true,
+      "counters_deterministic": true
+    },
+    {
+      "cell": "easy-win",
+      "fen": "rnbq1b1r/pp1p1kpp/2p1pp1n/8/3PP1P1/2N2N2/PPP2P1P/R1BQKB1R w KQ - 0 1",
+      "evals_cap": 1000000,
+      "guide": "hand",
+      "control": {
+        "child_evals": 1000027,
+        "expansions": 36995,
+        "exit": "evals",
+        "ms": 511
+      },
+      "candidate": {
+        "child_evals": 1000027,
+        "expansions": 36995,
+        "exit": "evals",
+        "ms": 549,
+        "effects": {
+          "effect_children": 1000027,
+          "effect_needs_board": 191732,
+          "effect_captures": 54992,
+          "effect_explosions": 0,
+          "effect_blast_hits": 0,
+          "effect_decided": 0,
+          "effect_extinction": 0,
+          "effect_clock": 0,
+          "effect_fallback": 191732,
+          "effect_no_qp": 0,
+          "effect_terminal": 277,
+          "effect_guide_needs_board": 0,
+          "effect_boards_saved": 0,
+          "decided_share_of_built": 0.0,
+          "terminal_share_of_built": 0.00144,
+          "saved_share_of_built": 0.0
+        }
+      },
+      "tree_identical": true,
+      "counters_deterministic": true
+    },
+    {
+      "cell": "easy-win",
+      "fen": "rnbq1b1r/pp1p1kpp/2p1pp1n/8/3PP1P1/2N2N2/PPP2P1P/R1BQKB1R w KQ - 0 1",
+      "evals_cap": 1000000,
+      "guide": "none",
+      "control": {
+        "child_evals": 1000001,
+        "expansions": 31710,
+        "exit": "evals",
+        "ms": 67
+      },
+      "candidate": {
+        "child_evals": 1000001,
+        "expansions": 31710,
+        "exit": "evals",
+        "ms": 91,
+        "effects": {
+          "effect_children": 1000001,
+          "effect_needs_board": 179569,
+          "effect_captures": 59454,
+          "effect_explosions": 2639,
+          "effect_blast_hits": 2639,
+          "effect_decided": 2639,
+          "effect_extinction": 2639,
+          "effect_clock": 0,
+          "effect_fallback": 176930,
+          "effect_no_qp": 0,
+          "effect_terminal": 310,
+          "effect_guide_needs_board": 0,
+          "effect_boards_saved": 2639,
+          "decided_share_of_built": 0.0147,
+          "terminal_share_of_built": 0.00173,
+          "saved_share_of_built": 0.0147
+        }
+      },
+      "tree_identical": true,
+      "counters_deterministic": true
+    },
+    {
+      "cell": "deep-win",
+      "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+      "evals_cap": 5000000,
+      "guide": "hand",
+      "control": {
+        "child_evals": 5000034,
+        "expansions": 168910,
+        "exit": "evals",
+        "ms": 2595
+      },
+      "candidate": {
+        "child_evals": 5000034,
+        "expansions": 168910,
+        "exit": "evals",
+        "ms": 2726,
+        "effects": {
+          "effect_children": 5000034,
+          "effect_needs_board": 1067066,
+          "effect_captures": 394969,
+          "effect_explosions": 0,
+          "effect_blast_hits": 0,
+          "effect_decided": 0,
+          "effect_extinction": 0,
+          "effect_clock": 0,
+          "effect_fallback": 1067066,
+          "effect_no_qp": 0,
+          "effect_terminal": 869,
+          "effect_guide_needs_board": 0,
+          "effect_boards_saved": 0,
+          "decided_share_of_built": 0.0,
+          "terminal_share_of_built": 0.00081,
+          "saved_share_of_built": 0.0
+        }
+      },
+      "tree_identical": true,
+      "counters_deterministic": true
+    },
+    {
+      "cell": "deep-win",
+      "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+      "evals_cap": 5000000,
+      "guide": "none",
+      "control": {
+        "child_evals": 5000013,
+        "expansions": 166379,
+        "exit": "evals",
+        "ms": 291
+      },
+      "candidate": {
+        "child_evals": 5000013,
+        "expansions": 166379,
+        "exit": "evals",
+        "ms": 397,
+        "effects": {
+          "effect_children": 5000013,
+          "effect_needs_board": 861939,
+          "effect_captures": 330069,
+          "effect_explosions": 16696,
+          "effect_blast_hits": 16696,
+          "effect_decided": 16696,
+          "effect_extinction": 16696,
+          "effect_clock": 0,
+          "effect_fallback": 845243,
+          "effect_no_qp": 0,
+          "effect_terminal": 5241,
+          "effect_guide_needs_board": 0,
+          "effect_boards_saved": 16696,
+          "decided_share_of_built": 0.01937,
+          "terminal_share_of_built": 0.00608,
+          "saved_share_of_built": 0.01937
+        }
+      },
+      "tree_identical": true,
+      "counters_deterministic": true
+    }
+  ],
+  "stop_rule": {
+    "decided_share_threshold": 0.1
+  }
+}

@@ -13,14 +13,20 @@ identical tree") is **retired**: the stack was measured at 1.219× and not
 adopted ([`handoff1.md`](handoff1.md) §7, prover D40), so a per-node wall gate
 never was this initiative's decision to make.
 
-Current artifacts: **`handoff1.md`** (the ask; history now that 2.6.0 answered
-it), **`plan1.md`** (2.6.0 adoption, executed 2026-11-13) and
-**`report1.md`** (the release's outcomes, D-MG7, and the kickoff context for
-the `prover` plans that integrate the new API). 2.6.0 landed **13 of the 14**
-MG items (MG5 merged into MG3, MG7 withdrawn), none of them used at a call
-site yet, and is **neutral** on atomi's wall at an identical tree (plan1
-§3, report1 §2). The adopted dependency is published **2.6.0** (owner
-commits); integrating the new API is **`prover`** work.
+Current artifacts: **`handoff2.md`** (the live ask, MG15–MG18: child-view
+terminality, filed 2026-11-13 by prover plan29), **`handoff1.md`** (history
+now that 2.6.0 answered it), **`plan1.md`** (2.6.0 adoption, executed
+2026-11-13) and **`report1.md`** (the release's outcomes, D-MG7, and the
+kickoff context for the `prover` plans that integrate the new API). 2.6.0
+landed **13 of the 14** MG items (MG5 merged into MG3, MG7 withdrawn) and is
+**neutral** on atomi's wall at an identical tree (plan1 §3, report1 §2). MG3
+is now *measured* at a call site, not merely adopted: the prover's
+EFFECT-CHILD-V1 ([`../prover/report29.md`](../prover/report29.md)) closed as
+`no effect` — the effect decided **0.00 %** of 1,067,066 built children on
+the `--guide hand` stack (ceiling 0.08 %) and 100 % of the fallback share is
+the mate/stalemate question MG15 asks about. The adopted dependency is
+published **2.6.0** (owner commits); integrating the new API is **`prover`**
+work.
 
 ## Goal
 
@@ -72,6 +78,8 @@ Ledger of the lifecycle:
 | [`handoff1.md`](handoff1.md) (2026-11-13) | 2.4.0 is the baseline; **no new release** | — | — | wishlist filed, awaiting a release |
 | [`handoff1.md`](handoff1.md) | **2.6.0** (published 2026-11-13; no 2.5.0 exists) | [`plan1.md`](plan1.md) | — | superseded by the executed row below |
 | [`handoff1.md`](handoff1.md) | **2.6.0** | [`plan1.md`](plan1.md) | [`report1.md`](report1.md) | **executed 2026-11-13, kept** — 13/14 landed (MG5 merged, MG7 withdrawn), gates 1–4 green, wall flat (paired 0.9999, tree identical) |
+| [`handoff1.md`](handoff1.md) §4/MG3 | **2.6.0** | — (consumed by a `prover` plan) | — | **consumed and measured 2026-11-13** — the prover's EFFECT-CHILD-V1 is `no effect` (0.00 % decided, [`../prover/report29.md`](../prover/report29.md)); its differential is committed as `tests/effects_differential.rs` |
+| [`handoff2.md`](handoff2.md) (2026-11-13) | **no release yet** | — | — | wishlist filed (MG15–MG18), awaiting a release |
 
 A plan may be drafted **early** (to have the gate and the measurement script
 ready) but it is executed only against a published version. A pre-release
@@ -127,7 +135,8 @@ private search design.
 
 ## Wishlist
 
-The live wishlist is [`handoff1.md`](handoff1.md) §4; this table is the
+The live wishlist is [`handoff2.md`](handoff2.md) (MG15–MG18) plus every
+handoff1 item that has not landed; this table is the
 atomi-side index (evidence, priority, acceptance). Priorities are relative to
 *atomi's* next plan, not to the crate's roadmap.
 

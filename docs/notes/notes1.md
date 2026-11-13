@@ -203,3 +203,9 @@ current tree at identical child_evals/expansions (5 M deep-win probe seed 0
 outcome_after vs the moved board on the new  
 tests/fixtures/movegen_2.4.0.tsv corpus. Baseline: 2,045 ns/expansion,  
 paired-control methodology in measurements/movegen/plan1/bench.py.
+
+---
+
+Last session we finished with ...
+
+Create a new `atomic-movegen` wishlist in `docs/plans/movegen/handoff2.md`.

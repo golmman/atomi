@@ -424,3 +424,30 @@ premise are the recorded starting point for the D21 kill review.
   Gates: `make test`, `make lint` green on the reverted tree. Data:
   [`measurements/plan28/`](measurements/plan28/README.md); report:
   [`report28.md`](report28.md); decision D40 closed.
+
+- **2026-11-13** — plan29 (item 36, EFFECT-CHILD-V1) executed and **closed
+  `no effect` at its Phase A stop rule**. The stack was C1 one
+  `EffectContext` per expanded node, C2 `rules::status_after` (extinction /
+  non-check clock / a one-sided queen-or-pawn material screen) and C3
+  build-last where the guide reads no child board. Phase A counters on a
+  tree-identical `--stats` build: the effect decides **0 of 1,067,066** built
+  children at 5 M `deep-win`, seed 0, `--guide hand` (0 of 298,553 / 191,732 /
+  178,317 at 1 M on `core` / `easy-win` / `deep-win`), and 0.94–1.94 % under
+  `--guide none` (all extinctions). The declared threshold was < 10 %, and the
+  **ceiling** — built children that are terminal at all — is 0.08 %, so the
+  zero is structural: under the hand guide 0 of 394,969 captures puts the
+  enemy commoner in its blast (the one-ply settle proves those children a ply
+  earlier), and 100 % of the fallback share is the mate/stalemate question
+  `outcome_after` answers by cloning and playing the move. C3 was not
+  implemented, G-E1 was not run, and there is no 120 s matrix, D14 claim or
+  `bench.md` row; the counters, `status_after` and its tests were reverted
+  (instrumentation verified counter-identical 8/8). Kept: the consumer-side
+  MG3 pin [`tests/effects_differential.rs`](../../../tests/effects_differential.rs)
+  (empty over the frozen fixture's 94 positions / 1,605 moves / 58 illegal
+  candidates) and the upstream ask
+  [`../movegen/handoff2.md`](../movegen/handoff2.md) (MG15 child-view
+  terminality, filed because the fallback share is 100 % against a 40 %
+  threshold). Gates: `make test`, `make lint`, `make test-full` + veto green
+  (8/8 accepted, 4/4 controls rejected). Data:
+  [`measurements/plan29/`](measurements/plan29/README.md); report:
+  [`report29.md`](report29.md); decision D41 closed.

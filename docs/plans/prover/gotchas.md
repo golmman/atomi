@@ -22,6 +22,33 @@ Referenced from `AGENTS.md` §Correctness.
   movegen's Zobrist tables are private; its test pins it against
   `hash_after_with(Legal)`.
 
+- **MG3 cannot decide a child that is not already over, and in our tree it
+  decides nothing at all.** `EffectContext::outcome_after` short-circuits only
+  extinction, the commoner-only draw and the non-check clock; everything else
+  clones and plays the move — the very build it promises to remove. Measured
+  (plan29): **0 of 1,067,066** built children decided under `--guide hand`
+  (1.9 % under `--guide none`, all extinctions), against a **ceiling of
+  0.08 %** (the share of built children that are terminal at all). Do not
+  re-propose effect-based child classification without a board-free
+  terminality API ([`handoff2`](../movegen/handoff2.md) MG15).
+- **`outcome_after` 's `None` conflates "illegal" with "open".** Its doc says
+  `None` = illegal, but a legal undecided child also returns `None`. Legality
+  comes from the parent's `generate_legal_with_state`/`is_legal`, never from
+  `None`.
+- **The checker-material clause is ours, not the crate's.** A child the
+  crate calls open can be `Failed` for us (the Lichess insufficient-material
+  rule), so any board-free status must screen it: a surviving **queen or
+  pawn** rules out `material_draw` exactly (no insufficient clause admits
+  either), while a surviving knight, rook or single bishop does **not** — the
+  "o has only its commoner" clauses admit them. A screen that treats
+  N/R/B as sufficient turns real material draws into `Open`, i.e. a false-win
+  surface. Without an exact screen, build the child.
+- **`Mover::effect` computes a key it discards for built children.** For the
+  captures among them (~40 % of `needs_board` children on `deep-win`), the
+  `hash_and_rule50_after` result is thrown away because the built child
+  supplies the key. Unmeasured, ~1 % wall class; a reordering needs its own
+  gate (plan29 §4.5).
+
 ## Allocation and performance
 
 - std's `alloc_zeroed` memsets any layout aligned above 16 bytes (no lazy
