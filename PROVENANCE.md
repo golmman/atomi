@@ -26,6 +26,14 @@ changed. Source sha256 is computed at copy time against the pinned commit
 
 ## Independent material (not copied)
 
+`tests/fixtures/movegen_2.4.0.tsv` is **generated** data
+(`tests/movegen_golden.rs`), not a copy: its FEN column is read at generation
+time from `tests/fixtures/{veto,terminal}.tsv`, `bench/corpus.json` and
+`src/testutil.rs` (already covered by the rows above), and every other field
+is computed by `atomic-movegen` on this host. Provenance (movegen plan1,
+2026-11-13): generated on published `atomic-movegen` **2.4.0** and verified
+byte-identical on **2.6.0**.
+
 `docs/plans/prover/measurements/plan3/run_guidance.py` and the plan3
 measurement files are new work for this repository. The census only records
 the output of the pinned `provari` binary run as an external process; no

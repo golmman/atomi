@@ -13,14 +13,14 @@ identical tree") is **retired**: the stack was measured at 1.219× and not
 adopted ([`handoff1.md`](handoff1.md) §7, prover D40), so a per-node wall gate
 never was this initiative's decision to make.
 
-Current artifacts: **`handoff1.md`** (the ask; history once answered) and
-**`plan1.md`** (2.6.0 adoption, drafted 2026-11-13 against the verified
-published tarball; **not yet executed**, so `report1.md` — the file that will
-carry the outcomes, D-MG7 — does not exist). 2.6.0 lands **13 of the 14** MG
-items (MG5 merged into MG3, MG7 withdrawn), none of them used at a call site
-yet, and is neutral on atomi's wall at an identical tree (plan1 §3). Integrating
-the new API is **`prover`** work in dedicated plans. Atomi's committed
-dependency is still published **2.4.0**.
+Current artifacts: **`handoff1.md`** (the ask; history now that 2.6.0 answered
+it), **`plan1.md`** (2.6.0 adoption, executed 2026-11-13) and
+**`report1.md`** (the release's outcomes, D-MG7, and the kickoff context for
+the `prover` plans that integrate the new API). 2.6.0 landed **13 of the 14**
+MG items (MG5 merged into MG3, MG7 withdrawn), none of them used at a call
+site yet, and is **neutral** on atomi's wall at an identical tree (plan1
+§3, report1 §2). The adopted dependency is published **2.6.0** (owner
+commits); integrating the new API is **`prover`** work.
 
 ## Goal
 
@@ -70,7 +70,8 @@ Ledger of the lifecycle:
 | Handoff | Release | Plan | Report | State |
 | --- | --- | --- | --- | --- |
 | [`handoff1.md`](handoff1.md) (2026-11-13) | 2.4.0 is the baseline; **no new release** | — | — | wishlist filed, awaiting a release |
-| [`handoff1.md`](handoff1.md) | **2.6.0** (published 2026-11-13; no 2.5.0 exists) | [`plan1.md`](plan1.md) | — | plan drafted against the verified tarball; **not executed** |
+| [`handoff1.md`](handoff1.md) | **2.6.0** (published 2026-11-13; no 2.5.0 exists) | [`plan1.md`](plan1.md) | — | superseded by the executed row below |
+| [`handoff1.md`](handoff1.md) | **2.6.0** | [`plan1.md`](plan1.md) | [`report1.md`](report1.md) | **executed 2026-11-13, kept** — 13/14 landed (MG5 merged, MG7 withdrawn), gates 1–4 green, wall flat (paired 0.9999, tree identical) |
 
 A plan may be drafted **early** (to have the gate and the measurement script
 ready) but it is executed only against a published version. A pre-release
@@ -227,3 +228,17 @@ Every integration plan contains these, in this order (D-MG6):
   outcome and the verdict, and is the **kickoff context for the first `prover`
   plan** — API integration belongs to that initiative, not to an adoption plan.
   `handoff2.md` stays unspent until a session has a new ask.
+- **2026-11-13** — **plan1 executed, 2.6.0 kept.** Gates 1–4 green: tarball
+  sha256 = index = `Cargo.lock` (`075cd3bf…`), crate harness 156 + 26 + 9
+  green as published; the **frozen differential**
+  `tests/fixtures/movegen_2.4.0.tsv` (94 positions, 1,605 legal moves, 4 perft
+  rows) generated on 2.4.0 is byte-identical on 2.6.0 (diff empty — no rules
+  change); `make test-full` and `make veto` (8/8 accepted, 4/4 controls
+  rejected) green. Same-session bench, both sides from the identical tree:
+  paired `m1/m0` geomean **0.9999** (tree identical 3/3), 5 M `deep-win`
+  probe **1.0152×** (flat, inside the ±2–3 % session spread),
+  per-expansion **2,045 ns** (`m0` 2,064) — the S4 trend point. Two dated
+  `prover/bench.md` rows (Cap 10 s / 120 s, bare stack) appended; data in
+  `measurements/movegen/plan1/`. No rung claimed (D30/D40 stand). Two atomi-
+  side fixes went with it: the broken `make pernode` target and a writer that
+  cannot silently repair the fixture (`report1.md` §4).

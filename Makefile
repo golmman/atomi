@@ -1,6 +1,10 @@
 PROVARI ?= /tmp/atomi-oracle/provari/target/release/provari
 PROVARI_STRETCH ?= /tmp/atomi-oracle/provari-v0.2.0/target/release/provari
 LEGACY_SOLVER ?= /tmp/atomic_solver-5f85133/target/release/atomic_solver
+PERNODE_CASES ?= core,1eb80b92f92c,db6a741c723f
+PERNODE_EVALS ?= 1000000,10000000
+PERNODE_MEMORY ?= 192
+PERNODE_OUT ?= /tmp/atomi-pernode.json
 
 .PHONY: test test-full test-lite lint oracle oracle-stretch veto bench pernode
 
@@ -37,4 +41,6 @@ bench:
 	  --atomi target/release/atomi
 
 pernode:
-	python3 bench/run_pernode.py --atomi target/release/atomi
+	python3 bench/run_pernode.py --atomi target/release/atomi \
+	  --cases $(PERNODE_CASES) --evals $(PERNODE_EVALS) \
+	  --memory $(PERNODE_MEMORY) --out $(PERNODE_OUT)

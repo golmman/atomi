@@ -12,9 +12,9 @@ dependencies = [
 
 [[package]]
 name = "atomic-movegen"
-version = "2.4.0"
+version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6a5008efae8bab2c7c9e499b0a2c4e1fe221dcd3d9bbf5df12fc8200bd3d946"
+checksum = "075cd3bf33dcd42718ce0b8e89babc1bf9aa85dcdf7dfed8e0c78cef2642336b"
 
 [[package]]
 name = "itoa"
