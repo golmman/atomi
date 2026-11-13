@@ -6,7 +6,7 @@ license = "MIT"
 description = "Attacker-only atomic chess win prover"
 
 [dependencies]
-atomic-movegen = "2.6"
+atomic-movegen = "2.7"
 serde_json = "1"
 
 [profile.release]

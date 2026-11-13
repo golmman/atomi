@@ -23,90 +23,18 @@
 //! For a pseudo-legal but illegal candidate: `is_legal` is false and
 //! `outcome_after` is `None`. (`leaves_own_commoner` is **not** a legality
 //! test: a pinned quiet move keeps its commoner and is still illegal.)
+//!
+//! The 2.7.0 *child* surface (`terminal_after`, `child_outcome`, `post_move`,
+//! `classification`) is pinned by `child_surface_differential.rs`; both read
+//! the fixture through `tests/common/mod.rs`.
+//!
+mod common;
 
 use atomic_movegen::board::{Board, StateInfo};
 use atomic_movegen::movegen::{generate_legal_with_state, generate_pseudo_legal};
 use atomic_movegen::types::{Move, MoveList, Outcome};
-use std::collections::HashMap;
-use std::path::Path;
 
-const FIXTURE: &str = "tests/fixtures/movegen_2.4.0.tsv";
-
-/// One `P` row: the position and its move lists.
-struct Position {
-    fen: String,
-    legal: Vec<String>,
-    pseudo: Vec<String>,
-}
-
-/// The `M` row fields the differential reads.
-struct Child {
-    outcome: Option<Outcome>,
-    rule50_after: u16,
-}
-
-fn parse_outcome(s: &str) -> Option<Outcome> {
-    match s {
-        "Some(Win)" => Some(Outcome::Win),
-        "Some(Loss)" => Some(Outcome::Loss),
-        "Some(Draw)" => Some(Outcome::Draw),
-        "None" => None,
-        other => panic!("unparsed child_outcome {other:?}"),
-    }
-}
-
-/// The fixture's `P` rows, keyed by row index.
-type Positions = Vec<(usize, Position)>;
-/// The fixture's `M` rows, keyed by `(row index, uci)`.
-type Children = HashMap<(usize, String), Child>;
-
-/// Parse the frozen tsv into `(positions, children)`.
-fn corpus() -> (Positions, Children) {
-    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(FIXTURE);
-    let text = std::fs::read_to_string(&path).expect("fixture missing");
-    let mut positions = Vec::new();
-    let mut children = HashMap::new();
-    for line in text.lines() {
-        if line.is_empty() || line.starts_with('#') {
-            continue;
-        }
-        let f: Vec<&str> = line.split('\t').collect();
-        match f[0] {
-            "P" => {
-                assert_eq!(f.len(), 15, "P row width");
-                let list = |col: &str| -> Vec<String> {
-                    if col == "-" {
-                        Vec::new()
-                    } else {
-                        col.split(',').map(str::to_string).collect()
-                    }
-                };
-                positions.push((
-                    f[1].parse().expect("P idx"),
-                    Position {
-                        fen: f[2].to_string(),
-                        pseudo: list(f[13]),
-                        legal: list(f[14]),
-                    },
-                ));
-            }
-            "M" => {
-                assert_eq!(f.len(), 9, "M row width");
-                children.insert(
-                    (f[1].parse().expect("M idx"), f[2].to_string()),
-                    Child {
-                        rule50_after: f[4].parse().expect("M rule50_after"),
-                        outcome: parse_outcome(f[8]),
-                    },
-                );
-            }
-            "N" => {}
-            other => panic!("unparsed row kind {other:?}"),
-        }
-    }
-    assert!(!positions.is_empty(), "empty fixture");
-    (positions, children)
-}
+use common::corpus;
 
 #[test]
 fn effect_context_matches_the_frozen_surface() {

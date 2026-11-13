@@ -15,10 +15,10 @@ never was this initiative's decision to make.
 
 Current artifacts: **`handoff2.md`** (MG15–MG18: child-view terminality, filed
 2026-11-13 by prover plan29; answered 4/4 by 2.7.0 and now history), **`plan2.md`**
-(2.7.0 adoption, **drafted** 2026-11-13 for S2), **`handoff1.md`** (history now
-that 2.6.0 answered it), **`plan1.md`** (2.6.0 adoption, executed 2026-11-13) and
-**`report1.md`** (its outcomes, D-MG7, and the kickoff for the `prover` plans that
-integrate the new API). 2.6.0
+(2.7.0 adoption, executed 2026-11-13) with **`report2.md`** (its outcomes,
+challenges, and the kickoff for the `prover` plans that integrate MG15–MG18),
+**`handoff1.md`** (history now that 2.6.0 answered it), **`plan1.md`** (2.6.0
+adoption, executed 2026-11-13) and **`report1.md`**. 2.6.0
 landed **13 of the 14** MG items (MG5 merged into MG3, MG7 withdrawn) and is
 **neutral** on atomi's wall at an identical tree (plan1 §3, report1 §2). MG3
 is now *measured* at a call site, not merely adopted: the prover's
@@ -26,8 +26,8 @@ EFFECT-CHILD-V1 ([`../prover/report29.md`](../prover/report29.md)) closed as
 `no effect` — the effect decided **0.00 %** of 1,067,066 built children on
 the `--guide hand` stack (ceiling 0.08 %) and 100 % of the fallback share is
 the mate/stalemate question MG15 asks about. The adopted dependency is
-published **2.6.0** (owner commits); integrating the new API is **`prover`**
-work.
+published **2.7.0** (owner commits; 2.6.0 answered handoff1, 2.7.0 answered
+handoff2); integrating the new API is **`prover`** work.
 
 ## Goal
 
@@ -81,7 +81,7 @@ Ledger of the lifecycle:
 | [`handoff1.md`](handoff1.md) | **2.6.0** | [`plan1.md`](plan1.md) | [`report1.md`](report1.md) | **executed 2026-11-13, kept** — 13/14 landed (MG5 merged, MG7 withdrawn), gates 1–4 green, wall flat (paired 0.9999, tree identical) |
 | [`handoff1.md`](handoff1.md) §4/MG3 | **2.6.0** | — (consumed by a `prover` plan) | — | **consumed and measured 2026-11-13** — the prover's EFFECT-CHILD-V1 is `no effect` (0.00 % decided, [`../prover/report29.md`](../prover/report29.md)); its differential is committed as `tests/effects_differential.rs` |
 | [`handoff2.md`](handoff2.md) (2026-11-13) | **no release yet** | — | — | superseded by the row below |
-| [`handoff2.md`](handoff2.md) | **2.7.0** (published 2026-11-13T16:20:30Z) | [`plan2.md`](plan2.md) | `report2.md` (on execution) | **plan drafted 2026-11-13** — 4/4 landed (MG15–MG18); pre-plan probe: crate harness green, atomi compiles unchanged incl. the frozen differential, tree identical, wall flat (1.006 `none` / 0.997 `hand`) |
+| [`handoff2.md`](handoff2.md) | **2.7.0** (published 2026-11-13T16:20:30Z) | [`plan2.md`](plan2.md) | [`report2.md`](report2.md) | **executed 2026-11-13, kept** — 4/4 landed (MG15–MG18), gates 1–4 green, frozen differential diff-empty, tree identical, wall flat (paired `m1/m0` 0.987, probe 0.9992) |
 
 A plan may be drafted **early** (to have the gate and the measurement script
 ready) but it is executed only against a published version. A pre-release
@@ -255,6 +255,21 @@ Every integration plan contains these, in this order (D-MG6):
   for terminality) is a `prover` claim. Also recorded there: handoff2 §3's >10 %
   probe gate is **superseded, not passed** — MG15 decides every child, so its
   successor is the probe's `needs_board` share.
+- **2026-11-13** — **plan2 executed, 2.7.0 kept.** Gates 1–4 green: tarball
+  sha256 = index = `Cargo.lock` (`cd69dc00…d38e1ad3`), crate harness as
+  published 163 + 45 + 12 green; the frozen differential is **byte-identical**
+  on 2.7.0 (the writer regenerates the same sha256); the new
+  `tests/child_surface_differential.rs` pins MG15–MG18 against our own built
+  child (94 positions + 2,620 play-out nodes, 51,334 children, every
+  `TerminalReason` branch, plus the crate-`MaterialDraw` → atomi-clause
+  mapping); `make test-full` (slow tier 4/4) and `make veto` (8/8 accepted,
+  4/4 controls rejected) green. Same-session bench, both sides from the
+  identical tree: paired `m1/m0` geomean **0.987** at tree identity 3/3,
+  5 M `deep-win` probe **0.9992×**, per-expansion **2,025 ns** (2.6.0's plan1
+  point 2,054, cross-session) — the S4 trend point. Two dated
+  `prover/bench.md` rows appended; data in `measurements/movegen/plan2/`. No
+  rung claimed (D30/D40 stand); the API integration is `prover` work, and
+  handoff2's §3 >10 % gate is superseded by the probe's `needs_board` share.
 - **2026-11-13** — **plan1 executed, 2.6.0 kept.** Gates 1–4 green: tarball
   sha256 = index = `Cargo.lock` (`075cd3bf…`), crate harness 156 + 26 + 9
   green as published; the **frozen differential**
