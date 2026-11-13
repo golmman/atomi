@@ -13,8 +13,11 @@ identical tree") is **retired**: the stack was measured at 1.219× and not
 adopted ([`handoff1.md`](handoff1.md) §7, prover D40), so a per-node wall gate
 never was this initiative's decision to make.
 
-Current artifacts: **`handoff2.md`** (MG15–MG18: child-view terminality, filed
-2026-11-13 by prover plan29; answered 4/4 by 2.7.0 and now history), **`plan2.md`**
+Current artifacts: **`handoff3.md`** (the live wishlist: MG19 the terminal
+state on `PostMove`, MG20 a specialised existential legality test, filed
+2026-11-13 by prover plan30 with the measured cost bars), **`handoff2.md`**
+(MG15–MG18: child-view terminality, filed 2026-11-13 by prover plan29;
+answered 4/4 by 2.7.0 and now history), **`plan2.md`**
 (2.7.0 adoption, executed 2026-11-13) with **`report2.md`** (its outcomes,
 challenges, and the kickoff for the `prover` plans that integrate MG15–MG18),
 **`handoff1.md`** (history now that 2.6.0 answered it), **`plan1.md`** (2.6.0
@@ -82,6 +85,7 @@ Ledger of the lifecycle:
 | [`handoff1.md`](handoff1.md) §4/MG3 | **2.6.0** | — (consumed by a `prover` plan) | — | **consumed and measured 2026-11-13** — the prover's EFFECT-CHILD-V1 is `no effect` (0.00 % decided, [`../prover/report29.md`](../prover/report29.md)); its differential is committed as `tests/effects_differential.rs` |
 | [`handoff2.md`](handoff2.md) (2026-11-13) | **no release yet** | — | — | superseded by the row below |
 | [`handoff2.md`](handoff2.md) | **2.7.0** (published 2026-11-13T16:20:30Z) | [`plan2.md`](plan2.md) | [`report2.md`](report2.md) | **executed 2026-11-13, kept** — 4/4 landed (MG15–MG18), gates 1–4 green, frozen differential diff-empty, tree identical, wall flat (paired `m1/m0` 0.987, probe 0.9992) |
+| [`handoff3.md`](handoff3.md) (2026-11-13) | **2.7.0 is the baseline; no release yet** | — | — | filed by prover plan30: MG19 `PostMove::terminal()` (+ the key on the same summary), MG20 specialised existential legality (≤ 12 ns bar); both P2, no plan until a release clears the cost bars |
 
 A plan may be drafted **early** (to have the gate and the measurement script
 ready) but it is executed only against a published version. A pre-release
@@ -137,11 +141,10 @@ private search design.
 
 ## Wishlist
 
-The live wishlist is [`handoff2.md`](handoff2.md) (MG15–MG18) plus every
-handoff1 item that has not landed — as of **2.7.0** every row below has landed
-(MG7 withdrawn), so there is **no live ask** and the next `handoffN.md` is
-unspent (D-MG7); this table is the atomi-side index (evidence, priority,
-acceptance). Priorities are relative to
+The live wishlist is [`handoff3.md`](handoff3.md) (MG19–MG20) plus every
+handoff1/handoff2 item that has not landed — as of **2.7.0** every row below has
+landed (MG7 withdrawn), so MG19–MG20 are the only live asks (D-MG7); this
+table is the atomi-side index (evidence, priority, acceptance). Priorities are relative to
 *atomi's* next plan, not to the crate's roadmap.
 
 | # | Item | R | Why (evidence) | Risk | Acceptance | Pri |
@@ -255,6 +258,19 @@ Every integration plan contains these, in this order (D-MG6):
   for terminality) is a `prover` claim. Also recorded there: handoff2 §3's >10 %
   probe gate is **superseded, not passed** — MG15 decides every child, so its
   successor is the probe's `needs_board` share.
+- **2026-11-13** — **handoff3 filed (MG19–MG20), triggered by a downstream
+  no-go.** The prover measured MG15's *cost* before integrating it
+  ([`../prover/report30.md`](../prover/report30.md)): `hash_and_rule50_after` +
+  `terminal_after` is **1.147×** today's `clone`+`do_move`+`outcome()`+key on
+  the class of child that needs it (1.29× on captures), because the view
+  movegen is not cheaper than `do_move` + the board movegen and `analyze` is
+  paid on top; `terminal_from` is private, so the best amortised composite a
+  consumer can assemble *is* `terminal_after`. The ask therefore narrows: MG19
+  `PostMove::terminal()` (+ the post-move key on the same summary) and MG20 a
+  specialised existential-legality test at **≤ 12 ns** per child — the pair,
+  not the API alone, is what could reach ≈0.84× the build. MG16–MG18 need
+  nothing further. No plan is drafted: a release must clear the two bars in
+  `handoff3` §2 first.
 - **2026-11-13** — **plan2 executed, 2.7.0 kept.** Gates 1–4 green: tarball
   sha256 = index = `Cargo.lock` (`cd69dc00…d38e1ad3`), crate harness as
   published 163 + 45 + 12 green; the frozen differential is **byte-identical**

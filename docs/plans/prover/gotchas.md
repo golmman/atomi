@@ -31,6 +31,18 @@ Referenced from `AGENTS.md` §Correctness.
   0.08 %** (the share of built children that are terminal at all). Do not
   re-propose effect-based child classification without a board-free
   terminality API ([`handoff2`](../movegen/handoff2.md) MG15).
+- **MG15's view movegen is not cheaper than building the child.**
+  `EffectContext::terminal_after` *re-derives* the post-move view (`analyze`,
+  18–36 ns) and then runs a view movegen (≈26 ns); measured on the
+  `built-ish` class that is **65.8 ns per child against today's 57.5**
+  (`clone`+`do_move`+`outcome()`+key), 1.147×, and 1.29× on captures
+  (plan30, [`measurements/plan30`](../../../measurements/plan30/README.md)).
+  `terminal_from` is **private**, so combining `post_move` with terminality
+  pays `analyze` twice, and `terminal_from` is the single implementation of
+  `terminal_after` — the best amortised composite *is* `terminal_after`, so
+  there is no cheaper board-free terminality to buy today. Do not re-propose
+  a frame swap onto `terminal_after`; a re-proposal needs a public
+  `PostMove::terminal()` **and** a measured gate.
 - **`outcome_after` 's `None` conflates "illegal" with "open".** Its doc says
   `None` = illegal, but a legal undecided child also returns `None`. Legality
   comes from the parent's `generate_legal_with_state`/`is_legal`, never from

@@ -229,3 +229,7 @@ split matters and mapping TerminalReason::MaterialDraw to atomi's own clause
 evals, same-session wall vs a control binary, make test-full + make veto,  
 proof trajectory unchanged; keep/revert with data. Read-only probes only, no  
 implementation in this session.
+
+---
+
+why did the last handoff iteration fail? how can we prevent missing details in the upstream handoff files in the future?

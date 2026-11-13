@@ -1,0 +1,244 @@
+{
+  "corpus": {
+    "positions": 1248,
+    "legal_moves": 39665,
+    "fens": 3,
+    "playouts_per_fen": 12,
+    "plies": 40,
+    "seed": "xorshift 0x9E3779B97F4A7C15",
+    "built_ish": 7864,
+    "built_ish_share": 0.1983
+  },
+  "harness": {
+    "timed_passes_per_variant": 5,
+    "reported": "best of 5",
+    "runs": {
+      "probe30": 5,
+      "api_costs": 3
+    },
+    "binary": "release, opt-level 3, lto, codegen-units 1",
+    "crate": "atomic-movegen 2.7.0 (=2.7.0)"
+  },
+  "probe30_main": {
+    "ns_per_built_child_median_of_runs": {
+      "built_ish": {
+        "today": 57.5,
+        "mg15": 65.8,
+        "build_only": 32.0,
+        "ratio": 1.147,
+        "n": 7864
+      },
+      "captures": {
+        "today": 64.8,
+        "mg15": 83.3,
+        "build_only": 42.4,
+        "ratio": 1.286,
+        "n": 3957
+      },
+      "quiet": {
+        "today": 42.6,
+        "mg15": 44.6,
+        "build_only": 16.4,
+        "ratio": 1.038,
+        "n": 31801
+      }
+    },
+    "runs": [
+      {
+        "built_ish": {
+          "n": 7864,
+          "today": 57.4,
+          "mg15": 62.8,
+          "build_only": 30.8,
+          "ratio": 1.095
+        },
+        "captures": {
+          "n": 3957,
+          "today": 61.2,
+          "mg15": 80.1,
+          "build_only": 41.0,
+          "ratio": 1.308
+        },
+        "quiet": {
+          "n": 31801,
+          "today": 42.6,
+          "mg15": 44.2,
+          "build_only": 16.8,
+          "ratio": 1.037
+        }
+      },
+      {
+        "built_ish": {
+          "n": 7864,
+          "today": 57.5,
+          "mg15": 64.0,
+          "build_only": 37.3,
+          "ratio": 1.113
+        },
+        "captures": {
+          "n": 3957,
+          "today": 69.1,
+          "mg15": 88.7,
+          "build_only": 42.4,
+          "ratio": 1.283
+        },
+        "quiet": {
+          "n": 31801,
+          "today": 42.6,
+          "mg15": 44.2,
+          "build_only": 16.3,
+          "ratio": 1.038
+        }
+      },
+      {
+        "built_ish": {
+          "n": 7864,
+          "today": 57.2,
+          "mg15": 65.8,
+          "build_only": 32.0,
+          "ratio": 1.15
+        },
+        "captures": {
+          "n": 3957,
+          "today": 70.3,
+          "mg15": 89.9,
+          "build_only": 55.0,
+          "ratio": 1.279
+        },
+        "quiet": {
+          "n": 31801,
+          "today": 41.8,
+          "mg15": 46.0,
+          "build_only": 16.4,
+          "ratio": 1.099
+        }
+      },
+      {
+        "built_ish": {
+          "n": 7864,
+          "today": 57.6,
+          "mg15": 67.7,
+          "build_only": 31.5,
+          "ratio": 1.175
+        },
+        "captures": {
+          "n": 3957,
+          "today": 62.3,
+          "mg15": 82.9,
+          "build_only": 42.0,
+          "ratio": 1.33
+        },
+        "quiet": {
+          "n": 31801,
+          "today": 43.3,
+          "mg15": 49.9,
+          "build_only": 16.6,
+          "ratio": 1.154
+        }
+      },
+      {
+        "built_ish": {
+          "n": 7864,
+          "today": 57.5,
+          "mg15": 65.9,
+          "build_only": 32.5,
+          "ratio": 1.147
+        },
+        "captures": {
+          "n": 3957,
+          "today": 64.8,
+          "mg15": 83.3,
+          "build_only": 43.4,
+          "ratio": 1.286
+        },
+        "quiet": {
+          "n": 31801,
+          "today": 44.8,
+          "mg15": 44.6,
+          "build_only": 16.4,
+          "ratio": 0.997
+        }
+      }
+    ]
+  },
+  "api_costs": {
+    "ns_per_built_child_median_of_runs": {
+      "today_node": 55.1,
+      "today_flat": 43.5,
+      "hash_node": 18.2,
+      "hash_flat": 10.6,
+      "post_move_node": 36.2,
+      "post_move_flat": 26.9,
+      "terminal_after_node": 62.2,
+      "terminal_after_flat": 53.6,
+      "mg15_node": 71.5,
+      "mg15_flat": 61.4,
+      "child_outcome_node": 66.4,
+      "child_outcome_flat": 58.4,
+      "has_legal_move_after_node": 61.8,
+      "has_legal_move_after_flat": 54.1,
+      "ratio_node": 1.294,
+      "ratio_flat": 1.423
+    },
+    "runs": [
+      {
+        "today_node": 55.1,
+        "today_flat": 43.5,
+        "hash_node": 22.6,
+        "hash_flat": 13.2,
+        "post_move_node": 41.0,
+        "post_move_flat": 28.6,
+        "terminal_after_node": 61.3,
+        "terminal_after_flat": 53.4,
+        "mg15_node": 71.4,
+        "mg15_flat": 61.9,
+        "child_outcome_node": 66.0,
+        "child_outcome_flat": 59.1,
+        "has_legal_move_after_node": 62.5,
+        "has_legal_move_after_flat": 53.2,
+        "ratio_node": 1.294,
+        "ratio_flat": 1.423
+      },
+      {
+        "today_node": 51.0,
+        "today_flat": 41.9,
+        "hash_node": 18.2,
+        "hash_flat": 10.6,
+        "post_move_node": 36.0,
+        "post_move_flat": 26.9,
+        "terminal_after_node": 62.2,
+        "terminal_after_flat": 53.6,
+        "mg15_node": 71.5,
+        "mg15_flat": 61.4,
+        "child_outcome_node": 66.4,
+        "child_outcome_flat": 58.4,
+        "has_legal_move_after_node": 61.4,
+        "has_legal_move_after_flat": 54.1,
+        "ratio_node": 1.401,
+        "ratio_flat": 1.465
+      },
+      {
+        "today_node": 59.3,
+        "today_flat": 52.4,
+        "hash_node": 18.1,
+        "hash_flat": 10.6,
+        "post_move_node": 36.2,
+        "post_move_flat": 26.8,
+        "terminal_after_node": 62.4,
+        "terminal_after_flat": 53.7,
+        "mg15_node": 71.6,
+        "mg15_flat": 61.0,
+        "child_outcome_node": 66.4,
+        "child_outcome_flat": 58.4,
+        "has_legal_move_after_node": 61.8,
+        "has_legal_move_after_flat": 54.1,
+        "ratio_node": 1.207,
+        "ratio_flat": 1.165
+      }
+    ]
+  },
+  "derived": {
+    "amortised_post_move_plus_terminal_from": "equals ctx.terminal_after: terminal_after = post_move (analyze) + terminal_from, and terminal_from is the private implementation of both; measured node 62.2 / flat 53.6 ns against today 55.1 / 43.5",
+    "verdict": "MG15 is strictly slower than today's build+outcome+key in every shape and class; stop rule (>= 1.0x) fired"
+  }
+}

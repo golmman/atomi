@@ -451,3 +451,24 @@ premise are the recorded starting point for the D21 kill review.
   (8/8 accepted, 4/4 controls rejected). Data:
   [`measurements/plan29/`](measurements/plan29/README.md); report:
   [`report29.md`](report29.md); decision D41 closed.
+
+- **2026-11-13** — plan30 (item 37, MG15 integration) executed as a **record
+  only**: the measurement fired the declared stop rule, so nothing was
+  integrated (no engine change, no flag, no default, no `bench.md` row, no
+  probe run on the tree). On 1,248 random play-out positions (39,665 legal
+  moves, **7,864 built-ish** children) from the three bench FENs, MG15
+  (`hash_and_rule50_after` + `ctx.terminal_after`) costs **65.8 ns per
+  built-ish child against today's 57.5** (`clone` + `do_move` + `outcome()` +
+  `Legal` key) — **1.147×**, 1.29× on captures, and ≥ 1.0× in all five runs;
+  the plan session measured 1.13×. Build-only is 32.0 ns. Mechanism: the view
+  movegen is not cheaper than `do_move` + the board movegen, `terminal_after`
+  pays `analyze` on top, and its `terminal_from` is **private**, so the best
+  amortised composite is `terminal_after` itself. Ceiling arithmetic: 21.3 %
+  `needs_board` × 29.6 children/expansion ≈ 6.3 builds/expansion ≈ 315 ns of
+  2,025 ns/expansion — and under `--guide hand` the guide reads every built
+  child, so the realisable share is ~0 %. The ask goes back upstream narrowed
+  to `PostMove::terminal()` + a specialised existential in
+  [`../movegen/handoff3.md`](../movegen/handoff3.md). Gates: `make test`,
+  `make lint`, `make test-full` + veto green on an unchanged engine. Data:
+  [`measurements/plan30/`](../../../measurements/plan30/README.md); report:
+  [`report30.md`](report30.md); decision D42 proposed, item 37 closed.
