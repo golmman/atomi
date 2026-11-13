@@ -189,3 +189,17 @@ The `atomic-movegen` crate is maintained by the owner of `atomi` so we can creat
 The handoff file was created to close the remaining gaps analysed in `docs/plans/prover/analysis2.md`, in particular P1.
 Let's refine the handoff by thinking about this imaginary scenario: What would provari need if it replaced `shakmaty` with `atomic-movegen`?
 
+---
+
+Read docs/plans/prover/initiative.md, docs/plans/prover/report28.md,  
+docs/plans/movegen/report1.md and measurements/movegen/plan1/README.md,  
+then write docs/plans/prover/plan29.md (plan session, ≤ 8 KB): adopt  
+atomic-movegen 2.6.0's MG3 (Board::effect_context / EffectContext::is_legal /  
+outcome_after) in the search's per-child classification, behind one named  
+stack and one wall gate. Replace per-child Board::outcome/has_legal_move with  
+outcome_after on a board-free child path; gate on same-session wall vs the  
+current tree at identical child_evals/expansions (5 M deep-win probe seed 0  
+= 168,910 expansions), make test-full + make veto, and a differential of  
+outcome_after vs the moved board on the new  
+tests/fixtures/movegen_2.4.0.tsv corpus. Baseline: 2,045 ns/expansion,  
+paired-control methodology in measurements/movegen/plan1/bench.py.
