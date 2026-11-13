@@ -1,6 +1,8 @@
-# atomic-movegen upstream handoff — requirements, hot-path API, release protocol
+# atomic-movegen upstream handoff 1 — requirements, hot-path API, release protocol
 
-**Status:** self-contained handoff for the upstream `atomic-movegen` repository.
+**Status:** self-contained, standalone wishlist for the upstream
+`atomic-movegen` repository. A new handoff (`handoffN.md`) supersedes it; this
+number is never reused.
 It gives (1) the requirements a *dependent engine* places on the crate, written
 from the point of view of an engine that replaces a GPL rules library with
 this one, (2) two measured, additive API prototypes, (3) the remaining
@@ -14,7 +16,8 @@ adoption gate was missed (1.219×), so the stack is **not adopted**; the
 upstream value is the API and the removed work, not a claimed speed-up. No
 upstream PR has been opened and nothing here is released.
 
-**How to read this.** §2 is the contract behind every request: a request that
+**How to read this.** Read it as a wishlist, not as a plan. §2 is the
+contract behind every request: a request that
 does not serve an R is an opinion, not a requirement. §3 is ready to review
 today. §4 is the design of the one item that matters most (MG3) and the rest
 of the list. §5 says what the downstream will do with a release, so the
@@ -259,9 +262,12 @@ not enough.
 
 ---
 
-## 5. Release and integration protocol (what the downstream will do)
+## 5. Release and adoption protocol (what the downstream will do)
 
-For any published version, in one session, in this order:
+A published version is adopted through exactly one integration plan in the
+downstream's `movegen` initiative (`planN.md`); this section is that plan's
+checklist and the upstream-side statement of the acceptance bar. For any
+published version, in one session, in this order:
 
 1. **Pin and lock.** Bump the dependency and `Cargo.lock`; confirm the crate's
    own harness passes as published (tests + perft).
@@ -310,7 +316,7 @@ version — no fork, no `[patch]`, no committed path dependency.
   upstream wants a performance claim, add a small benchmark or ask for a
   re-run after release.
 - **Single owner on both sides.** Review is thin by construction. The
-  independent checks are the frozen differential (IG1) and the external
+  independent checks are the golden rules differential and the external
   checker, not a second reviewer.
 
 ---

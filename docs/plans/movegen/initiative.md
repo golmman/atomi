@@ -10,29 +10,33 @@ and terminality. The crate is MIT, maintained by the same owner; this
 initiative is the **feedback loop**, not a fork and not a second engine
 project. The previous success clause ("the S1–S3 stack reaches ≥1.5× at an
 identical tree") is **retired**: the stack was measured at 1.219× and not
-adopted ([`handoff.md`](handoff.md) §7, prover D40), so a per-node wall gate
+adopted ([`handoff1.md`](handoff1.md) §7, prover D40), so a per-node wall gate
 never was this initiative's decision to make.
+
+Current artifacts: **`handoff1.md`** (wishlist, live). The newest version in
+atomi's registry index is **2.4.0**, the baseline, so there is no release to
+adopt: no integration plan and no report exist, and that is the expected
+state, not a backlog item.
 
 ## Goal
 
-Two halves, one owner, two work queues:
+Two halves, one owner, one lifecycle:
 
 1. **Requirements — find out what we need.** Derive the prover's needs from
    measurement (profile, probe, differential), state them as a *generally
-   useful* upstream specification, and file them. Upstream requests are
+   useful* upstream specification, and file them as a handoff. Requests are
    numbered **MG\***; each must cite the requirement it serves
-   ([`handoff.md`](handoff.md) §2, R1–R8).
+   ([`handoff1.md`](handoff1.md) §2, R1–R8).
 2. **Integration — adopt a release deliberately.** When the crate publishes a
-   version, bump, differential, gate, measure, then keep or revert **with
-   data**. atomi-side integration work is numbered **IG\***.
+   version, plan the adoption, execute it, and keep or revert **with data**.
 
 Success (all four; each is a process fact, not a performance hope):
 
 | # | Condition |
 | --- | --- |
-| S1 | Every atomi need has an upstream **outcome**: landed, rejected upstream with reasons, or withdrawn downstream. No need lives only in atomi's docs. |
-| S2 | The committed dependency is a **published** version — never a fork, never a `[patch]`, never a committed path dependency. A published release is evaluated within one plan of us noticing it (normally the next plan). |
-| S3 | Every bump passes one gate: the crate's harness as published (tests + perft), **IG1** (atomi's golden rules differential), `make test-full` and `make veto`, and a same-session bench. Any rules divergence or outcome regression is reverted in the same session and recorded. |
+| S1 | Every atomi need appears in a **handoff** and has an upstream **outcome**: landed, rejected upstream with reasons, or withdrawn downstream. No need lives only in a plan or a report. |
+| S2 | The committed dependency is a **published** version — never a fork, never a `[patch]`, never a committed path dependency. A published release gets an **integration plan** within one plan of us noticing it, and the plan is executed, not parked. |
+| S3 | Every integration plan carries the same gate (see **Gates**): the crate's harness as published, the golden rules differential, `make test-full`, `make veto`, and a same-session bench. Any rules divergence or outcome regression is reverted in the same session and reported. |
 | S4 | The per-expansion cost is recorded per adopted version (`make pernode` + a 120 s bench row), so the P1 gap is a **trend line** with an owner, not an unexplained constant. |
 
 **Not success.** Moving a rung from atomi's side by squeezing the dependency:
@@ -45,12 +49,34 @@ prover's tree is not this initiative's gain.
 formulation decision; the prover may measure with a local checkout
 (measurement only) and adopt after the release.
 
+## Flow and file structure
+
+Four steps, in this order. Only steps 1, 3 and 4 produce a file here; step 2
+produces none and needs no atomi action.
+
+| Step | Artifact | Where | Who | Notes |
+| --- | --- | --- | --- | --- |
+| 1. Wishlist | **`handoffN.md`** | `docs/plans/movegen/` | atomi sessions, addressed to upstream | Standalone: it must be readable in the `atomic-movegen` repo with no atomi context. `N` is a handoff number (never a plan number); a revised wishlist is a **new** handoff, and older ones stay as history |
+| 2. Release | — | crates.io / the crate's repo | the owner | **No atomi action.** No branch, no patch, no path dependency in a commit |
+| 3. Integration plan | **`planN.md`** | `docs/plans/movegen/` | atomi sessions | One plan per adoption. Names the handoff it consumes, the version, the gate, the measurement and the keep/revert rule. Plan numbers are independent of handoff numbers (AGENTS.md); this initiative's first is `plan1.md` |
+| 4. Implementation report | **`reportN.md`** | `docs/plans/movegen/` | atomi sessions | Tools, problems, open parts, missing tests, next steps; the adopted version and ratios; a one-line history entry here |
+
+Ledger of the lifecycle:
+
+| Handoff | Release | Plan | Report | State |
+| --- | --- | --- | --- | --- |
+| [`handoff1.md`](handoff1.md) (2026-11-13) | 2.4.0 is the baseline; **no new release** | — | — | wishlist filed, awaiting a release |
+
+A plan may be drafted **early** (to have the gate and the measurement script
+ready) but it is executed only against a published version. A pre-release
+measurement is a probe inside the plan, never an adoption.
+
 ## Division of work
 
 | Who | Does | Does not |
 | --- | --- | --- |
-| atomi sessions (this initiative) | Profile; write the requirement, the differential and the measurement; specify MG\* (the handoff is the filed form); run IG\* | Edit the crate's repo, commit a path dependency, or open the upstream PR |
-| The crate's owner (same owner) | Implement MG\* upstream, decide the API name and release | Ask atomi to carry a fork |
+| atomi sessions (this initiative) | Profile; write the requirement, the differential and the measurement; write `handoffN.md`; plan and execute integrations | Edit the crate's repo, commit a path dependency, or open the upstream PR |
+| The crate's owner (same owner) | Implement the handoff upstream, decide API names and release | Ask atomi to carry a fork |
 | atomi sessions (prover) | Consume the published version; measure the effect; keep or revert | Depend on an unreleased crate |
 
 ## Non-goals
@@ -58,9 +84,9 @@ formulation decision; the prover may measure with a local checkout
 - No provari, shakmaty or other GPL code, dependency, binary or text — and
   **no GPL interop types in the crate either**: an MIT crate must not depend
   on a GPL crate, so interchange with such libraries stays data-level (FEN,
-  UCI, SAN, piece lists). See [`handoff.md`](handoff.md) R9.
+  UCI, SAN, piece lists). See [`handoff1.md`](handoff1.md) R9.
 - No rules change without a differential against the previous version and
-  atomi's fixture corpus (D-MG1, IG1).
+  atomi's fixture corpus (D-MG1, Gates).
 - No atomi-only API (D-MG5): an item must be wanted by a second consumer of
   the same class — concretely, an engine that replaces a GPL rules library
   with this crate.
@@ -82,7 +108,7 @@ per-node lever is upstream. Measurements use a local checkout through a
 Every MG item is tested against one question: **what would a prover-class
 engine need if it replaced its GPL rules library with `atomic-movegen` and
 kept everything else?** The answer is written down as R1–R8 in
-[`handoff.md`](handoff.md) §2; each MG row cites its R. The three verdicts:
+[`handoff1.md`](handoff1.md) §2; each MG row cites its R. The three verdicts:
 
 | Verdict | Means | Examples |
 | --- | --- | --- |
@@ -95,14 +121,15 @@ private search design.
 
 ## Wishlist
 
-Priorities are relative to *atomi's* next plan, not to the crate's roadmap.
-"Ready" means a measured prototype exists in a local checkout.
+The live wishlist is [`handoff1.md`](handoff1.md) §4; this table is the
+atomi-side index (evidence, priority, acceptance). Priorities are relative to
+*atomi's* next plan, not to the crate's roadmap.
 
 | # | Item | R | Why (evidence) | Risk | Acceptance | Pri |
 | --- | --- | --- | --- | --- | --- | --- |
 | MG1 | `Board::null_for(attacker)` | R4 | `null_board` does `fen_with` → split/join → `from_fen` per null replay; ~1.6 % + allocator; also needed by any null-move search | low | Differential: same key, side, ep, clock as the FEN path; no rules change | P0 |
 | MG2 | public `for_each_pseudo_legal` (callback + early exit) | R3 | `generate_pseudo_legal` is 21 % of atomi's wall; scans materialise a `MoveList` | low | Same order as `generate_pseudo_legal`; differential + early-exit test | P0 |
-| MG3 | **Node effect context** + per-move effect query (optionally `outcome_after`) | R3 | Per-child `outcome` runs `has_legal_move`; ~15–20 % of atomi's wall; the flagship — see handoff §2/R3 and §4 | **high** | Differential vs `legal`/`outcome` on the corpus, the three bench cells and random play-outs; no divergence | P1 |
+| MG3 | **Node effect context** + per-move effect query (optionally `outcome_after`) | R3 | Per-child `outcome` runs `has_legal_move`; ~15–20 % of atomi's wall; the flagship — see handoff1 §2/R3 and §4 | **high** | Differential vs `legal`/`outcome` on the corpus, the three bench cells and random play-outs; no divergence | P1 |
 | MG4 | Expand the trivial-legality ladder (captures/checks) | R3 | `Board::legal` is 8.4 % of atomi's wall; the fast path covers only quiet, non-capture, non-check, non-pinned moves | **high** | Differential vs `legal` on the corpus; no divergence | P2 |
 | MG5 | `Board::legal` / node-constant attack data | R3 | Same as MG4 | high | Differential | P2 — **merge into MG3** unless a separate measurement says otherwise |
 | MG6 | `generate_pseudo_legal` micro-optimisation | R3 | Still the largest movegen symbol | medium | Perft + movegen differential; same order | P2 |
@@ -115,13 +142,26 @@ Priorities are relative to *atomi's* next plan, not to the crate's roadmap.
 | MG13 | Conformance corpus as data (FEN → moves, outcome, key) | R7 | Every downstream differential needs a reference set; it is also the crate's own regression net | low | Corpus published in-repo with a generator and a checker | P2 |
 | MG14 | Engineering contract: `Clone`, `Send + Sync`, no hidden allocation, semver policy | R8 | A threaded or copy-make consumer relies on all four; none is stated | low | Static assertions + a doc section | P2 |
 
-## Integration work (atomi side)
+## Gates
 
-| # | Item | Status |
-| --- | --- | --- |
-| IG1 | **Golden rules differential.** Freeze the crate's observable output for a fixed corpus (perft to depth 4–5, full legal move lists in order, `outcome`, `is_terminal`, `hash`/`hash_with`, `rule50`/`game_ply` after every legal move) and diff on every bump. atomi has no perft test today; this is the only guard that a *rules* change does not ride in on a "performance" release. Replaced by MG13's published corpus once it exists. | **proposed — the gate for S3** |
-| IG2 | **Bump protocol.** Update `Cargo.toml` + `Cargo.lock`, run IG1, `make test-full`, `make veto`, same-session bench (three cells at Cap 120, plus a 10 s `T_4` row), `make pernode`; record under `measurements/<plan>/` with `env.json`; adopt or revert with a one-line history entry here. | protocol ready (D-MG6) |
-| IG3 | **Need intake.** Turn a profile/probe into an MG row with evidence and an R tag; the handoff is the durable form. | standing |
+Every integration plan contains these, in this order (D-MG6):
+
+1. **Pin and lock** — bump `Cargo.toml` + `Cargo.lock`; run the crate's harness
+   as published (tests + perft).
+2. **Golden rules differential** — freeze and diff the crate's observable
+   behaviour: perft to depth 4–5, full legal move lists *in order*, `outcome`,
+   `is_terminal`, `hash`/`hash_with`, `rule50`/`game_ply` after every legal
+   move, on a fixed corpus. Any difference that is not an announced rules fix
+   is a **veto**, not a note. atomi has no perft test today, so the first
+   integration plan **adds this differential**; MG13 would replace the frozen
+   data with the crate's own corpus.
+3. **Downstream gates** — `make test-full` and `make veto` (an independent
+   rules implementation).
+4. **Measure** — same-session bench at the standard cap, a 10 s row, and
+   per-expansion cost; three repeats, alternating builds, one process at a
+   time; parsed results only, under `measurements/<plan>/` with `env.json`.
+5. **Keep or revert with data** — one line: version, gate result, ratios,
+   reason. A regression, a divergence or a missing harness is a revert.
 
 ## Decisions
 
@@ -129,21 +169,21 @@ Priorities are relative to *atomi's* next plan, not to the crate's roadmap.
 | --- | --- | --- |
 | D-MG1 | Scope | Performance and API only; no rules change without a differential |
 | D-MG2 | GPL boundary | Ideas only; no provari/shakmaty code, dependency or text; no GPL interop types in the crate |
-| D-MG3 | Release gate | The crate's tests + perft + IG1 + the prover's `make test-full` + veto |
+| D-MG3 | Adoption gate | The crate's tests + perft + the golden rules differential + the prover's `make test-full` + veto |
 | D-MG4 | Dependency | The prover ships a published version; a path dependency is measurement-only |
-| D-MG5 | Generality test | Every MG item is justified by the shakmaty-replacement requirement set (handoff §2); atomi-only items are marked and never P0 |
-| D-MG6 | Bump protocol | IG2: bump → IG1 → `make test-full` → `make veto` → same-session bench + `make pernode` → keep or revert with data, in one session |
-| D-MG7 | Two queues | MG\* = upstream requests, IG\* = atomi work; no atomi commit may depend on an unreleased crate |
+| D-MG5 | Generality test | Every MG item is justified by the shakmaty-replacement requirement set (handoff1 §2); atomi-only items are marked and never P0 |
+| D-MG6 | Lifecycle | Wishlist `handoffN.md` → release (no atomi action) → `planN.md` → `reportN.md`; the plan carries the Gates section verbatim and no commit depends on an unreleased crate |
 
 ## Risks
 
 | Risk | Mitigation |
 | --- | --- |
-| A performance release changes rules silently | IG1 freezes moves, perft, keys and outcomes; a divergence is a veto, not a bench note |
+| A performance release changes rules silently | The golden rules differential freezes moves, perft, keys and outcomes; a divergence is a veto, not a bench note |
 | The wishlist becomes atomi's private API | D-MG5 and R1–R8; every row cites its requirement |
 | atomi blocks on an upstream release | Measurement-only checkout; the prover's next plan never depends on a release date (D-MG4) |
-| The crate's own harness is not run | S3 names it explicitly, including perft, before atomi's gates |
-| The owner is both sides, so review is thin | The handoff is written for an outside reader; IG1 and the prover's veto are independent checks |
+| Handoffs and plans drift apart | The ledger above names handoff → release → plan → report; a plan that does not name its handoff is rejected |
+| The crate's own harness is not run | Gate 1 names it explicitly, including perft, before atomi's gates |
+| The owner is both sides, so review is thin | The handoff is written for an outside reader; the golden differential and the prover's veto are independent checks |
 
 ## History
 
@@ -154,11 +194,11 @@ Priorities are relative to *atomi's* next plan, not to the crate's roadmap.
   prover's S1+S2+S3 stack. The stack was tree-identical but reached only
   1.219×, below the prover's 1.5× gate, so the prover did not adopt it and MG3
   was not started. The prototypes remain unreleased; the prover dependency
-  stays on published 2.4.0. Standalone upstream handoff:
-  [`handoff.md`](handoff.md).
+  stays on published 2.4.0. Standalone upstream wishlist:
+  [`handoff1.md`](handoff1.md).
 - **2026-11-13** — goal revised: the initiative is now **requirements +
   integration**, not a performance gate (S1–S4). Added the generality test
-  (D-MG5) and the requirement set R1–R8 derived from the shakmaty-replacement
-  scenario, MG8–MG14 (upstream value that atomi does not need today), the
-  integration queue IG1–IG3, D-MG6/D-MG7, and MG5 marked for merge into MG3.
-  `handoff.md` rewritten around §2.
+  (D-MG5), the requirement set R1–R8 derived from the shakmaty-replacement
+  scenario, MG8–MG14 (upstream value that atomi does not need today), and
+  D-MG6. The wishlist became `handoff1.md`; the file structure is now
+  `handoffN.md` → release → `planN.md` → `reportN.md` with a lifecycle ledger.
