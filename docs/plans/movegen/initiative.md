@@ -1,103 +1,164 @@
-# Initiative: `movegen` — upstream performance and API work for `atomic-movegen`
+# Initiative: `movegen` — upstream feedback and deliberate integration of `atomic-movegen`
 
 ## Status
 
-**Open (2026-11-12).** Created from the `prover` hot-path profile
-([`../prover/plan28.md`](../prover/plan28.md)): atomi spends 15.5 µs per
-expansion against provari's 1.42 µs per node, and ~54 % of the wall is
-movegen, legality and terminality. The crate is MIT; this initiative is the
-upstream wishlist, not a fork.
+**Open (2026-11-12; goal revised 2026-11-13).** Created from the `prover`
+hot-path profile ([`../prover/plan28.md`](../prover/plan28.md)) and
+[`../prover/analysis2.md`](../prover/analysis2.md) §5: atomi spends 15.5 µs per
+expansion against provari's 1.42 µs per node, ~54 % of it in movegen, legality
+and terminality. The crate is MIT, maintained by the same owner; this
+initiative is the **feedback loop**, not a fork and not a second engine
+project. The previous success clause ("the S1–S3 stack reaches ≥1.5× at an
+identical tree") is **retired**: the stack was measured at 1.219× and not
+adopted ([`handoff.md`](handoff.md) §7, prover D40), so a per-node wall gate
+never was this initiative's decision to make.
 
 ## Goal
 
-Make `atomic-movegen` the fastest correct atomic rules crate for
-prover-style workloads, and expose the minimal API a hot-path prover needs,
-**without changing rules semantics**.
+Two halves, one owner, two work queues:
 
-Success: the prover's S1–S3 stack reaches ≥1.5× per-expansion at an
-identical tree, and the published crate is the dependency the prover ships.
+1. **Requirements — find out what we need.** Derive the prover's needs from
+   measurement (profile, probe, differential), state them as a *generally
+   useful* upstream specification, and file them. Upstream requests are
+   numbered **MG\***; each must cite the requirement it serves
+   ([`handoff.md`](handoff.md) §2, R1–R8).
+2. **Integration — adopt a release deliberately.** When the crate publishes a
+   version, bump, differential, gate, measure, then keep or revert **with
+   data**. atomi-side integration work is numbered **IG\***.
+
+Success (all four; each is a process fact, not a performance hope):
+
+| # | Condition |
+| --- | --- |
+| S1 | Every atomi need has an upstream **outcome**: landed, rejected upstream with reasons, or withdrawn downstream. No need lives only in atomi's docs. |
+| S2 | The committed dependency is a **published** version — never a fork, never a `[patch]`, never a committed path dependency. A published release is evaluated within one plan of us noticing it (normally the next plan). |
+| S3 | Every bump passes one gate: the crate's harness as published (tests + perft), **IG1** (atomi's golden rules differential), `make test-full` and `make veto`, and a same-session bench. Any rules divergence or outcome regression is reverted in the same session and recorded. |
+| S4 | The per-expansion cost is recorded per adopted version (`make pernode` + a 120 s bench row), so the P1 gap is a **trend line** with an owner, not an unexplained constant. |
+
+**Not success.** Moving a rung from atomi's side by squeezing the dependency:
+the prover's rung decisions are its own (D30); this initiative supplies the
+per-node lever or the measurement, it does not claim the rung. A release that
+lands MG1–MG3 is valuable even if no rung moves, and a rung that moves on the
+prover's tree is not this initiative's gain.
+
+**Not success, second form — waiting.** A release does not block the prover
+formulation decision; the prover may measure with a local checkout
+(measurement only) and adopt after the release.
+
+## Division of work
+
+| Who | Does | Does not |
+| --- | --- | --- |
+| atomi sessions (this initiative) | Profile; write the requirement, the differential and the measurement; specify MG\* (the handoff is the filed form); run IG\* | Edit the crate's repo, commit a path dependency, or open the upstream PR |
+| The crate's owner (same owner) | Implement MG\* upstream, decide the API name and release | Ask atomi to carry a fork |
+| atomi sessions (prover) | Consume the published version; measure the effect; keep or revert | Depend on an unreleased crate |
 
 ## Non-goals
 
-- No provari, shakmaty or other GPL code, dependency, binary or text. Ideas
-  only, in our own words (the prover's D12 boundary).
+- No provari, shakmaty or other GPL code, dependency, binary or text — and
+  **no GPL interop types in the crate either**: an MIT crate must not depend
+  on a GPL crate, so interchange with such libraries stays data-level (FEN,
+  UCI, SAN, piece lists). See [`handoff.md`](handoff.md) R9.
 - No rules change without a differential against the previous version and
-  the prover's fixture corpus.
-- No atomi-specific API that only one caller can use; every item must be
-  generally useful.
+  atomi's fixture corpus (D-MG1, IG1).
+- No atomi-only API (D-MG5): an item must be wanted by a second consumer of
+  the same class — concretely, an engine that replaces a GPL rules library
+  with this crate.
+- No framework scope: no variant system, tablebase probing, eval/NNUE, UCI
+  loop, threads, `async`.
 - No `unsafe` without a measured win and a `// SAFETY:` argument.
 - No network, model or tablebase work.
 
 ## Relationship to `prover`
 
-The prover initiative consumes the crate. The wishlist is driven by the
-prover's `perf` profile and by the `prover` plan that needs the API. The
-prover may use a **local checkout** for measurement, but the committed
-dependency stays on a published version; a path dependency is never
-committed.
+`prover` consumes the crate; this initiative changes the crate's supply. The
+prover's per-node line is closed (D40) as a *micro* line, so the only remaining
+per-node lever is upstream. Measurements use a local checkout through a
+**measurement-only** path dependency; the committed dependency stays published
+(D-MG4).
+
+## Generality test (D-MG5)
+
+Every MG item is tested against one question: **what would a prover-class
+engine need if it replaced its GPL rules library with `atomic-movegen` and
+kept everything else?** The answer is written down as R1–R8 in
+[`handoff.md`](handoff.md) §2; each MG row cites its R. The three verdicts:
+
+| Verdict | Means | Examples |
+| --- | --- | --- |
+| both | atomi needs it *and* the requirement set wants it | MG1, MG2, MG3, MG10, MG11 |
+| upstream value | the second consumer wants it, atomi does not — filed, never a blocker | MG8, MG9, MG12, MG13 |
+| `atomi-only` | only atomi wants it — filed as a comment, never P0 | none today |
+
+This is the cheapest defence against the wishlist drifting into atomi's
+private search design.
 
 ## Wishlist
 
-| # | Item | Why (evidence) | API / behaviour | Risk | Acceptance | Priority |
+Priorities are relative to *atomi's* next plan, not to the crate's roadmap.
+"Ready" means a measured prototype exists in a local checkout.
+
+| # | Item | R | Why (evidence) | Risk | Acceptance | Pri |
 | --- | --- | --- | --- | --- | --- | --- |
-| MG1 | `Board::null_for(attacker)` (or `with_side_to_move` + `clear_ep`) | `null_board` does `fen_with` → split/join → `from_fen` every null replay; ~1.6 % direct + allocator | Cheap field mutation; no FEN | low | Differential: same key, side, ep, clock as the FEN path; no rules change | P0 |
-| MG2 | Public `for_each_pseudo_legal` (or iterator) | `generate_pseudo_legal` is 21 % of the prover's wall; guide paths materialise a `MoveList` | Callback/iterator in the same order; early exit | low | Same order as `generate_pseudo_legal`; differential | P0 |
-| MG3 | `Board::outcome_after(m, state)` / effect-based terminality | Per-child `outcome` runs `has_legal_move`; ~15–20 % of the prover's wall | Decide explosion/check/mate from the move effect; full legal search only where stalemate is possible | **high** | Differential vs `outcome` on the fixture corpus and the three bench cells; no divergence | P1 |
-| MG4 | Expand `TrivialLegality` (captures/checks) | `Board::legal` is 8.4 % of the prover's wall; the fast path only covers quiet non-capture, non-check, non-pinned moves | More trivially-legal classes | **high** | Differential vs `legal` on the corpus; no divergence | P2 |
-| MG5 | `Board::legal` fast path / precomputed attack info | Same as MG4 | Reuse node-constant attack data | high | Differential | P2 |
-| MG6 | `generate_pseudo_legal` micro-optimisation | 21 % of the prover's wall | Bitboard/loop work, no API change | medium | Perft + movegen differential; same order | P2 |
-| MG7 | `from_fen`/`fen_with` performance | Only if MG1 does not land | Parser/serialiser | low | Round-trip differential | P3 |
+| MG1 | `Board::null_for(attacker)` | R4 | `null_board` does `fen_with` → split/join → `from_fen` per null replay; ~1.6 % + allocator; also needed by any null-move search | low | Differential: same key, side, ep, clock as the FEN path; no rules change | P0 |
+| MG2 | public `for_each_pseudo_legal` (callback + early exit) | R3 | `generate_pseudo_legal` is 21 % of atomi's wall; scans materialise a `MoveList` | low | Same order as `generate_pseudo_legal`; differential + early-exit test | P0 |
+| MG3 | **Node effect context** + per-move effect query (optionally `outcome_after`) | R3 | Per-child `outcome` runs `has_legal_move`; ~15–20 % of atomi's wall; the flagship — see handoff §2/R3 and §4 | **high** | Differential vs `legal`/`outcome` on the corpus, the three bench cells and random play-outs; no divergence | P1 |
+| MG4 | Expand the trivial-legality ladder (captures/checks) | R3 | `Board::legal` is 8.4 % of atomi's wall; the fast path covers only quiet, non-capture, non-check, non-pinned moves | **high** | Differential vs `legal` on the corpus; no divergence | P2 |
+| MG5 | `Board::legal` / node-constant attack data | R3 | Same as MG4 | high | Differential | P2 — **merge into MG3** unless a separate measurement says otherwise |
+| MG6 | `generate_pseudo_legal` micro-optimisation | R3 | Still the largest movegen symbol | medium | Perft + movegen differential; same order | P2 |
+| MG7 | `from_fen` / `fen_with` performance | R1 | Fallback only if MG1 does not land | low | Round-trip differential | P3 |
+| MG8 | SAN parse/format | R1 | Any engine with a lines/PV surface needs it; atomi does not | low | Round-trip + ambiguity cases vs UCI | P3 |
+| MG9 | Construction/inspection from a piece list (`Setup`-like) | R1 | Interchange without a FEN string; needed to build from another library's types | low | Round-trip through FEN for every piece set | P3 |
+| MG10 | Terminal reason (extinction / no-moves-in-check / stalemate / material / clock) | R6 | `Outcome` is WDL only; a consumer reporting why has to re-derive the rules | low | Every rule branch covered by a fixture | P2 |
+| MG11 | Key contract: FSF parity, stability across versions, ep modes | R5 | A consumer that migrates keeps its key space; a silent Zobrist change invalidates stored data | low | Documented; a cross-version test in the crate | P1 |
+| MG12 | Generation order as a public contract | R3 | Proofs, transcripts and golden tests depend on it; today it is only internal tests | low | Documented order + existing golden tests as the guard | P2 |
+| MG13 | Conformance corpus as data (FEN → moves, outcome, key) | R7 | Every downstream differential needs a reference set; it is also the crate's own regression net | low | Corpus published in-repo with a generator and a checker | P2 |
+| MG14 | Engineering contract: `Clone`, `Send + Sync`, no hidden allocation, semver policy | R8 | A threaded or copy-make consumer relies on all four; none is stated | low | Static assertions + a doc section | P2 |
 
-## Rules
-
-- Every change is performance-only unless a rules bug is found; a rules bug
-  is a separate item with its own differential.
-- The crate's own test suite, perft, and a differential against the previous
-  version are the gate. The prover's `make test-full` + veto is the
-  integration gate.
-- No GPL source is read while writing the code; the prover's profile and the
-  atomic rules are the design inputs.
-- Measurements are same-session ratios, one process at a time; drivers and
-  parsed results live under `measurements/` (never raw transcripts).
-
-## Backlog
+## Integration work (atomi side)
 
 | # | Item | Status |
 | --- | --- | --- |
-| MG1 | `null_for` | prototype measured (plan28), not released; upstream handoff written |
-| MG2 | public `for_each_pseudo_legal` | prototype measured (plan28), not released; upstream handoff written |
-| MG3 | `outcome_after` | proposed (plan28 Phase D, not started: G-H1 missed) |
-| MG4 | `TrivialLegality` expansion | proposed (after MG3) |
-| MG5 | `legal` fast path | proposed (after MG4) |
-| MG6 | movegen micro-optimisation | proposed (after MG2) |
-| MG7 | FEN performance | fallback only |
+| IG1 | **Golden rules differential.** Freeze the crate's observable output for a fixed corpus (perft to depth 4–5, full legal move lists in order, `outcome`, `is_terminal`, `hash`/`hash_with`, `rule50`/`game_ply` after every legal move) and diff on every bump. atomi has no perft test today; this is the only guard that a *rules* change does not ride in on a "performance" release. Replaced by MG13's published corpus once it exists. | **proposed — the gate for S3** |
+| IG2 | **Bump protocol.** Update `Cargo.toml` + `Cargo.lock`, run IG1, `make test-full`, `make veto`, same-session bench (three cells at Cap 120, plus a 10 s `T_4` row), `make pernode`; record under `measurements/<plan>/` with `env.json`; adopt or revert with a one-line history entry here. | protocol ready (D-MG6) |
+| IG3 | **Need intake.** Turn a profile/probe into an MG row with evidence and an R tag; the handoff is the durable form. | standing |
 
 ## Decisions
 
 | # | Decision | Resolution |
 | --- | --- | --- |
 | D-MG1 | Scope | Performance and API only; no rules change without a differential |
-| D-MG2 | GPL boundary | Ideas only; no provari/shakmaty code, dependency or text |
-| D-MG3 | Release gate | The crate's tests + perft + differential + the prover's `make test-full` + veto |
+| D-MG2 | GPL boundary | Ideas only; no provari/shakmaty code, dependency or text; no GPL interop types in the crate |
+| D-MG3 | Release gate | The crate's tests + perft + IG1 + the prover's `make test-full` + veto |
 | D-MG4 | Dependency | The prover ships a published version; a path dependency is measurement-only |
+| D-MG5 | Generality test | Every MG item is justified by the shakmaty-replacement requirement set (handoff §2); atomi-only items are marked and never P0 |
+| D-MG6 | Bump protocol | IG2: bump → IG1 → `make test-full` → `make veto` → same-session bench + `make pernode` → keep or revert with data, in one session |
+| D-MG7 | Two queues | MG\* = upstream requests, IG\* = atomi work; no atomi commit may depend on an unreleased crate |
 
 ## Risks
 
 | Risk | Mitigation |
 | --- | --- |
-| A performance change alters rules | Differential against the previous version and the prover's fixture corpus |
-| The API is too atomi-specific | Every item must be generally useful; review before release |
-| The prover blocks on a release | The prover plan measures with a local checkout; the committed change waits |
-| GPL contamination | Ideas only; the licence gate stays in the prover repo |
+| A performance release changes rules silently | IG1 freezes moves, perft, keys and outcomes; a divergence is a veto, not a bench note |
+| The wishlist becomes atomi's private API | D-MG5 and R1–R8; every row cites its requirement |
+| atomi blocks on an upstream release | Measurement-only checkout; the prover's next plan never depends on a release date (D-MG4) |
+| The crate's own harness is not run | S3 names it explicitly, including perft, before atomi's gates |
+| The owner is both sides, so review is thin | The handoff is written for an outside reader; IG1 and the prover's veto are independent checks |
 
 ## History
 
 - **2026-11-12** — initiative created from the `prover` hot-path profile
   ([`../prover/plan28.md`](../prover/plan28.md)); MG1–MG7 proposed.
 - **2026-11-12** — plan28 prototyped MG1 (`Board::null_for`) and MG2
-  (public `for_each_pseudo_legal`) in a local checkout and measured them in
-  the prover's S1+S2+S3 stack. The stack was tree-identical but reached only
-  1.219× on the 5 M `deep-win` probe, below the prover's 1.5× gate, so the
-  prover did not adopt it and MG3 was not started. The prototypes remain
-  unreleased; the prover dependency stays on published 2.4.0. Standalone
-  upstream handoff: [`handoff.md`](handoff.md).
+  (`for_each_pseudo_legal`) in a local checkout and measured them in the
+  prover's S1+S2+S3 stack. The stack was tree-identical but reached only
+  1.219×, below the prover's 1.5× gate, so the prover did not adopt it and MG3
+  was not started. The prototypes remain unreleased; the prover dependency
+  stays on published 2.4.0. Standalone upstream handoff:
+  [`handoff.md`](handoff.md).
+- **2026-11-13** — goal revised: the initiative is now **requirements +
+  integration**, not a performance gate (S1–S4). Added the generality test
+  (D-MG5) and the requirement set R1–R8 derived from the shakmaty-replacement
+  scenario, MG8–MG14 (upstream value that atomi does not need today), the
+  integration queue IG1–IG3, D-MG6/D-MG7, and MG5 marked for merge into MG3.
+  `handoff.md` rewritten around §2.

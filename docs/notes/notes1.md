@@ -178,3 +178,14 @@ Should we add this to the regular kill reviews?
 
 Analysis:
 At each expansion we do the same conceptual work provari does, but with more board copies, more movegen, and more auxiliary passes. The M0 baseline was ≈ 5.18 µs per expansion; provari's equivalent is a fraction of that. That's why the initiative says the remaining wall is per-expansion cost, not tree size — and why the closed "per-node micro-line" (NULL-V1/V2) was trying to shave exactly this number.
+
+---
+
+Let's align the goals and handoff in the `movegen` initiative.
+
+The main goal in `movegen` should be to provide feedback and properly integrate the dependency `atomic-movegen`.
+The `atomic-movegen` crate is maintained by the owner of `atomi` so we can create "wishlists" which will then be integrated upstream. So the tasks from `atomi` perspective: find out what we need here, integrate a new version when it is released.
+
+The handoff file was created to close the remaining gaps analysed in `docs/plans/prover/analysis2.md`, in particular P1.
+Let's refine the handoff by thinking about this imaginary scenario: What would provari need if it replaced `shakmaty` with `atomic-movegen`?
+
