@@ -214,3 +214,18 @@ Create a new `atomic-movegen` wishlist in `docs/plans/movegen/handoff2.md`.
 
 here is how i see it: handoff1 is merely the ask for 14 items. it does not lie, it was a wishlist. plan1 should note the changelog (only 13/14 landed) bump the version, check for regressions. report1 should document implementation challenges and give a final verdict and again should note that only 13/14 features landed in 2.6.0.  
 The actual integration of the new api should then happen in dedicated plans in the `prover` initiative. The report1 can be taken as the initial context needed to kickoff the first plan session there.
+
+---
+
+Plan session — prover plan30 (MG15 integration, kickoff from movegen report2 §7).  
+Read docs/plans/prover/initiative.md, gotchas.md, report29.md, analysis2.md §5,  
+docs/plans/prover/bench.md (reading rules), docs/plans/movegen/report2.md §5/§7 and  
+measurements/movegen/plan2/README.md (flat wall, 2,025 ns/expansion, 21.3 % needs_board).  
+Then write docs/plans/prover/plan30.md (<= 8 KB, one sitting): replace the  
+clone + do_move + terminal fallback in src/classify.rs and src/mover.rs with  
+EffectContext::terminal_after, keeping child_outcome where the Illegal/Undecided  
+split matters and mapping TerminalReason::MaterialDraw to atomi's own clause  
+(tests/child_surface_differential.rs pins both). Gate: tree identity at fixed  
+evals, same-session wall vs a control binary, make test-full + make veto,  
+proof trajectory unchanged; keep/revert with data. Read-only probes only, no  
+implementation in this session.
