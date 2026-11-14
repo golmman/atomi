@@ -540,3 +540,29 @@ premise are the recorded starting point for the D21 kill review.
   The goal question goes to the owner (plan34 B/C/D); no plan 35+ in the micro
   mould. Data: [`measurements/plan34/`](../../../measurements/plan34/README.md);
   report: [`report34.md`](report34.md).
+
+- **2026-11-14 — plan35, item 43 (SHAPE-DIFF), read-only**: the reference's node
+  body counted at the oracle pin (a count-only instrumented build in `/tmp`, no
+  clock, no atomics, 39 counters at 35 sites, nothing from it in the repo) and
+  priced at **our** per-op lower bounds (report34 §4 verbatim; no reference
+  timing). 3/3 identical counts per cell, tree identical to the unpatched pin
+  2/2, the mapping reproduces **37.004 s** on our own census counts
+  (−0.0027 %), unmapped 5.74 % of the op budget. `deep-win`: **2,099,100 node
+  bodies** (reported nodes 3,024,117 — the difference is 926,564 replay steps,
+  so the denominator is the body), 2.39 list generations, 74.0 pseudo / 36.4
+  legal moves, 18.2 children decided, 9.0 probes, 1.00 `hand_eval`, 0.22 null
+  uses per body. `M` = **1,786 ns/exp**
+  (`core` 2,117) against the **1,723 ns/exp** `T_4` allows ⇒ **NOT FUNDED**,
+  `M/1,723` **1.036×**, addressable **80.69 pp** vs 81.3 needed (56 ns short);
+  the ±15 % band [1,518, 2,054] **flips** the verdict, and the sign rests on one
+  rate (the per-child decide: 19.1 ns ⇒ `M` 1,448, 56.8 ns ⇒ 2,134). Cross-check
+  that prices nothing: the reference's own body is ≈2.10 µs, of which the mapping
+  recovers 84–85 %, so `T_4`'s bar is *below* a perfect port of its shape on our
+  tree (≈12.2 s = 4.4×). Addressable pp concentrate in movegen 10.27, status
+  9.39, `hand_eval` 5.77, proof probe 4.61; the "12.2 pp guide stack" is 9.5 pp
+  (the reference still evaluates once per body). Two plan slips recorded
+  (`R` = 16,651 ns ≈ 180 pp, not 31.03; "≳20 moves" prices a move where 85 ns is
+  per list). No engine/flag/default/`bench.md` change, no plan 36; the owner
+  rules on plan34's C/D. Data:
+  [`measurements/plan35/`](../../../measurements/plan35/README.md); report:
+  [`report35.md`](report35.md).

@@ -1,0 +1,1236 @@
+{
+ "plan": "35",
+ "item": 43,
+ "cells": {
+  "deep-win": {
+   "cell": "deep-win",
+   "bodies": 2099100,
+   "rows": [
+    {
+     "leaf": "movegen (legal)",
+     "pp": 12.48,
+     "ns_per_op": 85.393,
+     "ours_per_expansion": 13.508,
+     "unit": "one move list generated",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 2.3911,
+     "counters": {
+      "list_generations": 5019161
+     },
+     "ns": 204.18,
+     "ratio": 5.649,
+     "below_ours": false,
+     "addressable_pp": 10.27
+    },
+    {
+     "leaf": "closure: frame pass-1 settle+screen",
+     "pp": 11.55,
+     "ns_per_op": 37.712,
+     "ours_per_expansion": 28.311,
+     "unit": "one child decided from bit tests",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 18.2011,
+     "counters": {
+      "child_decisions": 38205943
+     },
+     "ns": 686.41,
+     "ratio": 1.555,
+     "below_ours": false,
+     "addressable_pp": 4.12
+    },
+    {
+     "leaf": "legality/status/terminality",
+     "pp": 9.49,
+     "ns_per_op": 19.127,
+     "ours_per_expansion": 45.856,
+     "unit": "one terminality/status query",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.493,
+     "counters": {
+      "terminality_queries": 199643,
+      "mate_tests": 125845,
+      "body_check_queries": 709328,
+      "status_queries": 1
+     },
+     "ns": 9.43,
+     "ratio": 93.018,
+     "below_ours": false,
+     "addressable_pp": 9.39
+    },
+    {
+     "leaf": "guide hand_eval",
+     "pp": 7.92,
+     "ns_per_op": 198.649,
+     "ours_per_expansion": 3.684,
+     "unit": "one hand evaluation of a body",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.9997,
+     "counters": {
+      "hand_evals": 2098415
+     },
+     "ns": 198.58,
+     "ratio": 3.685,
+     "below_ours": false,
+     "addressable_pp": 5.77
+    },
+    {
+     "leaf": "proof probe",
+     "pp": 5.2,
+     "ns_per_op": 10.364,
+     "ours_per_expansion": 46.37,
+     "unit": "one proof-store probe",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 5.2196,
+     "counters": {
+      "proof_probes": 10956517
+     },
+     "ns": 54.1,
+     "ratio": 8.884,
+     "below_ours": false,
+     "addressable_pp": 4.61
+    },
+    {
+     "leaf": "closure: replay/simulation",
+     "pp": 4.48,
+     "ns_per_op": 291.835,
+     "ours_per_expansion": 1.42,
+     "unit": "one proof replay",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.4414,
+     "counters": {
+      "replay_calls": 926564
+     },
+     "ns": 128.82,
+     "ratio": 3.217,
+     "below_ours": false,
+     "addressable_pp": 3.09
+    },
+    {
+     "leaf": "guide class + start numbers",
+     "pp": 3.59,
+     "ns_per_op": 5.269,
+     "ours_per_expansion": 62.95,
+     "unit": "one guide number pass",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.9997,
+     "counters": {
+      "guide_steps": 2098415
+     },
+     "ns": 5.27,
+     "ratio": 62.97,
+     "below_ours": false,
+     "addressable_pp": 3.53
+    },
+    {
+     "leaf": "do_move/undo_move/clone",
+     "pp": 3.43,
+     "ns_per_op": 2.466,
+     "ours_per_expansion": 128.789,
+     "unit": "one child board built",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 3.5585,
+     "counters": {
+      "child_builds": 7469701
+     },
+     "ns": 8.77,
+     "ratio": 36.192,
+     "below_ours": false,
+     "addressable_pp": 3.34
+    },
+    {
+     "leaf": "closure: null pass-2 reply test",
+     "pp": 2.74,
+     "ns_per_op": 18.255,
+     "ours_per_expansion": 13.876,
+     "unit": "folded: the reply scan is our closure, absent there",
+     "inside": [],
+     "folded": true,
+     "p_ops_per_body": 0.0,
+     "ns": 0.0,
+     "ratio": null,
+     "addressable_pp": 2.74,
+     "counters": {}
+    },
+    {
+     "leaf": "MID select/node_value",
+     "pp": 1.87,
+     "ns_per_op": 43.295,
+     "ours_per_expansion": 4.0,
+     "unit": "one child set combined",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 2.029,
+     "counters": {
+      "selection_steps": 4259095
+     },
+     "ns": 87.85,
+     "ratio": 1.971,
+     "below_ours": false,
+     "addressable_pp": 0.92
+    },
+    {
+     "leaf": "key/rule50",
+     "pp": 1.52,
+     "ns_per_op": 1.911,
+     "ours_per_expansion": 73.759,
+     "unit": "one child hash/effect",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 40.0471,
+     "counters": {
+      "effect_computations": 45710866,
+      "effect_hash_computations": 38352079
+     },
+     "ns": 76.53,
+     "ratio": 1.842,
+     "below_ours": false,
+     "addressable_pp": 0.69
+    },
+    {
+     "leaf": "table store",
+     "pp": 1.18,
+     "ns_per_op": 36.473,
+     "ours_per_expansion": 2.991,
+     "unit": "one table store",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.9974,
+     "counters": {
+      "table_stores": 2093595
+     },
+     "ns": 36.38,
+     "ratio": 2.998,
+     "below_ours": false,
+     "addressable_pp": 0.79
+    },
+    {
+     "leaf": "legality/status/terminality (needs-board/check test)",
+     "pp": 1.06,
+     "ns_per_op": 3.659,
+     "ours_per_expansion": 26.75,
+     "unit": "one per-move screen",
+     "inside": [
+      "quiet_tests",
+      "blast_capture_tests",
+      "exposing_tests",
+      "move_check_tests",
+      "threat_tests",
+      "heavy_legality_tests",
+      "evasion_scans",
+      "material_tests"
+     ],
+     "folded": false,
+     "p_ops_per_body": 59.2346,
+     "counters": {
+      "legality_screens": 124339298
+     },
+     "ns": 216.74,
+     "ratio": 0.452,
+     "below_ours": true,
+     "addressable_pp": 0.0
+    },
+    {
+     "leaf": "repetition scan",
+     "pp": 0.67,
+     "ns_per_op": 2.577,
+     "ours_per_expansion": 24.206,
+     "unit": "one repetition test",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 17.6343,
+     "counters": {
+      "repetition_tests": 37016136
+     },
+     "ns": 45.44,
+     "ratio": 1.373,
+     "below_ours": false,
+     "addressable_pp": 0.18
+    },
+    {
+     "leaf": "exposed-limit cache",
+     "pp": 0.63,
+     "ns_per_op": 2.021,
+     "ours_per_expansion": 28.648,
+     "unit": "folded: ours is a cache of our own scan",
+     "inside": [],
+     "folded": true,
+     "p_ops_per_body": 0.0,
+     "ns": 0.0,
+     "ratio": null,
+     "addressable_pp": 0.63,
+     "counters": {}
+    },
+    {
+     "leaf": "allocator",
+     "pp": 0.59,
+     "ns_per_op": 3.273,
+     "ours_per_expansion": 16.795,
+     "unit": "folded: reuses its vectors",
+     "inside": [],
+     "folded": true,
+     "p_ops_per_body": 0.0,
+     "ns": 0.0,
+     "ratio": null,
+     "addressable_pp": 0.59,
+     "counters": {}
+    },
+    {
+     "leaf": "null board (`null_for`)",
+     "pp": 0.33,
+     "ns_per_op": 52.159,
+     "ours_per_expansion": 0.591,
+     "unit": "one null board",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.2169,
+     "counters": {
+      "null_builds": 455361
+     },
+     "ns": 11.31,
+     "ratio": 2.726,
+     "below_ours": false,
+     "addressable_pp": 0.21
+    },
+    {
+     "leaf": "prefetch hint",
+     "pp": 0.18,
+     "ns_per_op": 0.373,
+     "ours_per_expansion": 44.755,
+     "unit": "one prefetch hint",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 18.2707,
+     "counters": {
+      "prefetch_hints": 38352079
+     },
+     "ns": 6.82,
+     "ratio": 2.45,
+     "below_ours": false,
+     "addressable_pp": 0.11
+    },
+    {
+     "leaf": "TT probe",
+     "pp": 0.04,
+     "ns_per_op": 0.178,
+     "ours_per_expansion": 22.263,
+     "unit": "one small-table lookup",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 3.7567,
+     "counters": {
+      "table_lookups": 7885687
+     },
+     "ns": 0.67,
+     "ratio": 5.926,
+     "below_ours": false,
+     "addressable_pp": 0.03
+    },
+    {
+     "leaf": "key/rule50 (Mover::new)",
+     "pp": 0.01,
+     "ns_per_op": 0.517,
+     "ours_per_expansion": 1.0,
+     "unit": "one mover setup",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 2.3907,
+     "counters": {
+      "mover_setups": 5018320
+     },
+     "ns": 1.24,
+     "ratio": 0.418,
+     "below_ours": true,
+     "addressable_pp": 0.0
+    },
+    {
+     "leaf": "filter probe",
+     "pp": 0.0,
+     "ns_per_op": 0.161,
+     "ours_per_expansion": 2.137,
+     "unit": "one filter bit test",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 45.5178,
+     "counters": {
+      "filter_bit_tests": 95546362
+     },
+     "ns": 7.34,
+     "ratio": 0.047,
+     "below_ours": true,
+     "addressable_pp": 0.0
+    }
+   ],
+   "M_ns": 1785.88,
+   "M_over_T4": 1.0364,
+   "headroom_ns": -62.7,
+   "addressable_pp": 51.01,
+   "addressable_pp_needed": 81.3,
+   "M_plus_R_constant_ns": 4654.9,
+   "M_plus_R_scaled_ns": 2589.5,
+   "M_plus_R_literal_ns": 18436.9,
+   "band_ns": [
+    1518.0,
+    2053.8
+   ],
+   "band_flips": true,
+   "unmapped_pp": 3.96,
+   "unmapped_share_of_op_budget": 5.74,
+   "ns_per_pp": 92.46,
+   "seconds": 120,
+   "runs": 3,
+   "counters_identical": true,
+   "reference": {
+    "first_mate_ms": 4374,
+    "found": true,
+    "mate": 19,
+    "memory_mb": 192,
+    "ms": 4528,
+    "nodes": 3024117,
+    "seconds": 120.0
+   },
+   "counters": {
+    "bodies": 2099100,
+    "list_generations": 5019161,
+    "moves_yielded": 155344770,
+    "legality_screens": 124339298,
+    "legality_passes": 76385077,
+    "effect_computations": 45710866,
+    "effect_hash_computations": 38352079,
+    "child_decisions": 38205943,
+    "child_builds": 7469701,
+    "proof_probes": 10956517,
+    "table_lookups": 7885687,
+    "filter_bit_tests": 95546362,
+    "table_stores": 2093595,
+    "hand_evals": 2098415,
+    "guide_steps": 2098415,
+    "terminality_queries": 199643,
+    "body_check_queries": 709328,
+    "mate_tests": 125845,
+    "null_uses": 455361,
+    "null_builds": 455361,
+    "replay_calls": 926564,
+    "replay_defence_calls": 624924,
+    "selection_steps": 4259095,
+    "repetition_marks": 2610653,
+    "repetition_tests": 37016136,
+    "prefetch_hints": 38352079,
+    "blast_capture_tests": 40020886,
+    "exposing_tests": 45523472,
+    "move_check_tests": 33211535,
+    "quiet_tests": 68397338,
+    "threat_tests": 9284634,
+    "heavy_legality_tests": 69425579,
+    "status_queries": 1,
+    "table_reads": 7885687,
+    "attacking_bodies": 1050172,
+    "defending_bodies": 1048928,
+    "mover_setups": 5018320,
+    "evasion_scans": 1489183,
+    "material_tests": 0
+   },
+   "counters_not_priced": {
+    "bodies": 2099100,
+    "moves_yielded": 155344770,
+    "legality_passes": 76385077,
+    "null_uses": 455361,
+    "replay_defence_calls": 624924,
+    "repetition_marks": 2610653,
+    "table_reads": 7885687,
+    "attacking_bodies": 1050172,
+    "defending_bodies": 1048928
+   },
+   "unpriced_note": "reported for G-35a only: list sizes, legality passes, the repetition marking and the null use are inputs to a priced family's unit or free; none is priced"
+  },
+  "core": {
+   "cell": "core",
+   "bodies": 189751,
+   "rows": [
+    {
+     "leaf": "movegen (legal)",
+     "pp": 12.48,
+     "ns_per_op": 85.393,
+     "ours_per_expansion": 13.508,
+     "unit": "one move list generated",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 2.9957,
+     "counters": {
+      "list_generations": 568434
+     },
+     "ns": 255.81,
+     "ratio": 4.509,
+     "below_ours": false,
+     "addressable_pp": 9.71
+    },
+    {
+     "leaf": "closure: frame pass-1 settle+screen",
+     "pp": 11.55,
+     "ns_per_op": 37.712,
+     "ours_per_expansion": 28.311,
+     "unit": "one child decided from bit tests",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 20.1515,
+     "counters": {
+      "child_decisions": 3823765
+     },
+     "ns": 759.96,
+     "ratio": 1.405,
+     "below_ours": false,
+     "addressable_pp": 3.33
+    },
+    {
+     "leaf": "legality/status/terminality",
+     "pp": 9.49,
+     "ns_per_op": 19.127,
+     "ours_per_expansion": 45.856,
+     "unit": "one terminality/status query",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.7992,
+     "counters": {
+      "terminality_queries": 33268,
+      "mate_tests": 21811,
+      "body_check_queries": 96567,
+      "status_queries": 1
+     },
+     "ns": 15.29,
+     "ratio": 57.378,
+     "below_ours": false,
+     "addressable_pp": 9.32
+    },
+    {
+     "leaf": "guide hand_eval",
+     "pp": 7.92,
+     "ns_per_op": 198.649,
+     "ours_per_expansion": 3.684,
+     "unit": "one hand evaluation of a body",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.9992,
+     "counters": {
+      "hand_evals": 189605
+     },
+     "ns": 198.5,
+     "ratio": 3.687,
+     "below_ours": false,
+     "addressable_pp": 5.77
+    },
+    {
+     "leaf": "proof probe",
+     "pp": 5.2,
+     "ns_per_op": 10.364,
+     "ours_per_expansion": 46.37,
+     "unit": "one proof-store probe",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 6.3049,
+     "counters": {
+      "proof_probes": 1196369
+     },
+     "ns": 65.35,
+     "ratio": 7.355,
+     "below_ours": false,
+     "addressable_pp": 4.49
+    },
+    {
+     "leaf": "closure: replay/simulation",
+     "pp": 4.48,
+     "ns_per_op": 291.835,
+     "ours_per_expansion": 1.42,
+     "unit": "one proof replay",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.805,
+     "counters": {
+      "replay_calls": 152751
+     },
+     "ns": 234.93,
+     "ratio": 1.764,
+     "below_ours": false,
+     "addressable_pp": 1.94
+    },
+    {
+     "leaf": "guide class + start numbers",
+     "pp": 3.59,
+     "ns_per_op": 5.269,
+     "ours_per_expansion": 62.95,
+     "unit": "one guide number pass",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.9992,
+     "counters": {
+      "guide_steps": 189605
+     },
+     "ns": 5.27,
+     "ratio": 62.998,
+     "below_ours": false,
+     "addressable_pp": 3.53
+    },
+    {
+     "leaf": "do_move/undo_move/clone",
+     "pp": 3.43,
+     "ns_per_op": 2.466,
+     "ours_per_expansion": 128.789,
+     "unit": "one child board built",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 4.8573,
+     "counters": {
+      "child_builds": 921674
+     },
+     "ns": 11.98,
+     "ratio": 26.515,
+     "below_ours": false,
+     "addressable_pp": 3.3
+    },
+    {
+     "leaf": "closure: null pass-2 reply test",
+     "pp": 2.74,
+     "ns_per_op": 18.255,
+     "ours_per_expansion": 13.876,
+     "unit": "folded: the reply scan is our closure, absent there",
+     "inside": [],
+     "folded": true,
+     "p_ops_per_body": 0.0,
+     "ns": 0.0,
+     "ratio": null,
+     "addressable_pp": 2.74,
+     "counters": {}
+    },
+    {
+     "leaf": "MID select/node_value",
+     "pp": 1.87,
+     "ns_per_op": 43.295,
+     "ours_per_expansion": 4.0,
+     "unit": "one child set combined",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 2.0288,
+     "counters": {
+      "selection_steps": 384976
+     },
+     "ns": 87.84,
+     "ratio": 1.972,
+     "below_ours": false,
+     "addressable_pp": 0.92
+    },
+    {
+     "leaf": "key/rule50",
+     "pp": 1.52,
+     "ns_per_op": 1.911,
+     "ours_per_expansion": 73.759,
+     "unit": "one child hash/effect",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 44.9497,
+     "counters": {
+      "effect_computations": 4681944,
+      "effect_hash_computations": 3847304
+     },
+     "ns": 85.9,
+     "ratio": 1.641,
+     "below_ours": false,
+     "addressable_pp": 0.59
+    },
+    {
+     "leaf": "table store",
+     "pp": 1.18,
+     "ns_per_op": 36.473,
+     "ours_per_expansion": 2.991,
+     "unit": "one table store",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.9798,
+     "counters": {
+      "table_stores": 185912
+     },
+     "ns": 35.74,
+     "ratio": 3.052,
+     "below_ours": false,
+     "addressable_pp": 0.79
+    },
+    {
+     "leaf": "legality/status/terminality (needs-board/check test)",
+     "pp": 1.06,
+     "ns_per_op": 3.659,
+     "ours_per_expansion": 26.75,
+     "unit": "one per-move screen",
+     "inside": [
+      "quiet_tests",
+      "blast_capture_tests",
+      "exposing_tests",
+      "move_check_tests",
+      "threat_tests",
+      "heavy_legality_tests",
+      "evasion_scans",
+      "material_tests"
+     ],
+     "folded": false,
+     "p_ops_per_body": 76.7308,
+     "counters": {
+      "legality_screens": 14559737
+     },
+     "ns": 280.75,
+     "ratio": 0.349,
+     "below_ours": true,
+     "addressable_pp": 0.0
+    },
+    {
+     "leaf": "repetition scan",
+     "pp": 0.67,
+     "ns_per_op": 2.577,
+     "ours_per_expansion": 24.206,
+     "unit": "one repetition test",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 19.5108,
+     "counters": {
+      "repetition_tests": 3702197
+     },
+     "ns": 50.28,
+     "ratio": 1.241,
+     "below_ours": false,
+     "addressable_pp": 0.13
+    },
+    {
+     "leaf": "exposed-limit cache",
+     "pp": 0.63,
+     "ns_per_op": 2.021,
+     "ours_per_expansion": 28.648,
+     "unit": "folded: ours is a cache of our own scan",
+     "inside": [],
+     "folded": true,
+     "p_ops_per_body": 0.0,
+     "ns": 0.0,
+     "ratio": null,
+     "addressable_pp": 0.63,
+     "counters": {}
+    },
+    {
+     "leaf": "allocator",
+     "pp": 0.59,
+     "ns_per_op": 3.273,
+     "ours_per_expansion": 16.795,
+     "unit": "folded: reuses its vectors",
+     "inside": [],
+     "folded": true,
+     "p_ops_per_body": 0.0,
+     "ns": 0.0,
+     "ratio": null,
+     "addressable_pp": 0.59,
+     "counters": {}
+    },
+    {
+     "leaf": "null board (`null_for`)",
+     "pp": 0.33,
+     "ns_per_op": 52.159,
+     "ours_per_expansion": 0.591,
+     "unit": "one null board",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 0.2294,
+     "counters": {
+      "null_builds": 43520
+     },
+     "ns": 11.96,
+     "ratio": 2.578,
+     "below_ours": false,
+     "addressable_pp": 0.2
+    },
+    {
+     "leaf": "prefetch hint",
+     "pp": 0.18,
+     "ns_per_op": 0.373,
+     "ours_per_expansion": 44.755,
+     "unit": "one prefetch hint",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 20.2755,
+     "counters": {
+      "prefetch_hints": 3847304
+     },
+     "ns": 7.57,
+     "ratio": 2.207,
+     "below_ours": false,
+     "addressable_pp": 0.1
+    },
+    {
+     "leaf": "TT probe",
+     "pp": 0.04,
+     "ns_per_op": 0.178,
+     "ours_per_expansion": 22.263,
+     "unit": "one small-table lookup",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 3.3264,
+     "counters": {
+      "table_lookups": 631193
+     },
+     "ns": 0.59,
+     "ratio": 6.693,
+     "below_ours": false,
+     "addressable_pp": 0.03
+    },
+    {
+     "leaf": "key/rule50 (Mover::new)",
+     "pp": 0.01,
+     "ns_per_op": 0.517,
+     "ours_per_expansion": 1.0,
+     "unit": "one mover setup",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 2.9952,
+     "counters": {
+      "mover_setups": 568347
+     },
+     "ns": 1.55,
+     "ratio": 0.334,
+     "below_ours": true,
+     "addressable_pp": 0.0
+    },
+    {
+     "leaf": "filter probe",
+     "pp": 0.0,
+     "ns_per_op": 0.161,
+     "ours_per_expansion": 2.137,
+     "unit": "one filter bit test",
+     "inside": [],
+     "folded": false,
+     "p_ops_per_body": 50.1824,
+     "counters": {
+      "filter_bit_tests": 9522170
+     },
+     "ns": 8.09,
+     "ratio": 0.043,
+     "below_ours": true,
+     "addressable_pp": 0.0
+    }
+   ],
+   "M_ns": 2117.34,
+   "M_over_T4": 1.2287,
+   "headroom_ns": -394.2,
+   "addressable_pp": 48.11,
+   "addressable_pp_needed": 81.3,
+   "M_plus_R_constant_ns": 4986.4,
+   "M_plus_R_scaled_ns": 3070.1,
+   "M_plus_R_literal_ns": 18768.3,
+   "band_ns": [
+    1799.7,
+    2434.9
+   ],
+   "band_flips": true,
+   "unmapped_pp": 3.96,
+   "unmapped_share_of_op_budget": 5.74,
+   "ns_per_pp": 92.46,
+   "seconds": 10,
+   "runs": 3,
+   "counters_identical": true,
+   "reference": {
+    "first_mate_ms": 470,
+    "found": true,
+    "mate": 17,
+    "memory_mb": 192,
+    "ms": 517,
+    "nodes": 342289,
+    "seconds": 10.0
+   },
+   "counters": {
+    "bodies": 189751,
+    "list_generations": 568434,
+    "moves_yielded": 18197694,
+    "legality_screens": 14559737,
+    "legality_passes": 7389621,
+    "effect_computations": 4681944,
+    "effect_hash_computations": 3847304,
+    "child_decisions": 3823765,
+    "child_builds": 921674,
+    "proof_probes": 1196369,
+    "table_lookups": 631193,
+    "filter_bit_tests": 9522170,
+    "table_stores": 185912,
+    "hand_evals": 189605,
+    "guide_steps": 189605,
+    "terminality_queries": 33268,
+    "body_check_queries": 96567,
+    "mate_tests": 21811,
+    "null_uses": 43520,
+    "null_builds": 43520,
+    "replay_calls": 152751,
+    "replay_defence_calls": 108651,
+    "selection_steps": 384976,
+    "repetition_marks": 237712,
+    "repetition_tests": 3702197,
+    "prefetch_hints": 3847304,
+    "blast_capture_tests": 4017384,
+    "exposing_tests": 4650171,
+    "move_check_tests": 3299464,
+    "quiet_tests": 6474270,
+    "threat_tests": 960352,
+    "heavy_legality_tests": 9639525,
+    "status_queries": 1,
+    "table_reads": 631193,
+    "attacking_bodies": 92756,
+    "defending_bodies": 96995,
+    "mover_setups": 568347,
+    "evasion_scans": 175317,
+    "material_tests": 0
+   },
+   "counters_not_priced": {
+    "bodies": 189751,
+    "moves_yielded": 18197694,
+    "legality_passes": 7389621,
+    "null_uses": 43520,
+    "replay_defence_calls": 108651,
+    "repetition_marks": 237712,
+    "table_reads": 631193,
+    "attacking_bodies": 92756,
+    "defending_bodies": 96995
+   },
+   "unpriced_note": "reported for G-35a only: list sizes, legality passes, the repetition marking and the null use are inputs to a priced family's unit or free; none is priced"
+  }
+ },
+ "our_side": {
+  "op_total_s_census": 37.005,
+  "op_total_s_from_counts": 37.004,
+  "relative_error": -2.7e-05,
+  "bar": "\u00b12 %",
+  "pass": true,
+  "rows": [
+   {
+    "bucket": [
+     "mg_legal@enter",
+     "mg_legal@mid",
+     "mg_legal@null_p2",
+     "mg_legal@replay"
+    ],
+    "s_census": 6.694,
+    "s_from_counts": 6.694,
+    "deviation": 0.0,
+    "calls_per_expansion": 13.508,
+    "ns_per_call": 85.393
+   },
+   {
+    "bucket": [
+     "closure_frame@enter"
+    ],
+    "s_census": 6.196,
+    "s_from_counts": 6.196,
+    "deviation": 0.0,
+    "calls_per_expansion": 28.311,
+    "ns_per_call": 37.712
+   },
+   {
+    "bucket": [
+     "status@enter",
+     "status@null_p1",
+     "status@replay",
+     "legality@null_p2",
+     "legality@replay"
+    ],
+    "s_census": 5.09,
+    "s_from_counts": 5.09,
+    "deviation": 0.0,
+    "calls_per_expansion": 45.856,
+    "ns_per_call": 19.127
+   },
+   {
+    "bucket": [
+     "guide_eval@enter"
+    ],
+    "s_census": 4.247,
+    "s_from_counts": 4.247,
+    "deviation": 0.0,
+    "calls_per_expansion": 3.684,
+    "ns_per_call": 198.649
+   },
+   {
+    "bucket": [
+     "proof_probe@enter",
+     "proof_probe@null_p1",
+     "proof_probe@replay"
+    ],
+    "s_census": 2.789,
+    "s_from_counts": 2.789,
+    "deviation": 0.0,
+    "calls_per_expansion": 46.37,
+    "ns_per_call": 10.364
+   },
+   {
+    "bucket": [
+     "closure_replay@replay"
+    ],
+    "s_census": 2.405,
+    "s_from_counts": 2.405,
+    "deviation": 0.0,
+    "calls_per_expansion": 1.42,
+    "ns_per_call": 291.835
+   },
+   {
+    "bucket": [
+     "guide_class@enter"
+    ],
+    "s_census": 1.925,
+    "s_from_counts": 1.925,
+    "deviation": -0.0,
+    "calls_per_expansion": 62.95,
+    "ns_per_call": 5.269
+   },
+   {
+    "bucket": [
+     "do_move@enter",
+     "do_move@mid",
+     "do_move@null_p1",
+     "do_move@null_p2",
+     "do_move@replay",
+     "undo_move@null_p1",
+     "undo_move@null_p2",
+     "clone@enter",
+     "clone@mid",
+     "clone@null_p2",
+     "clone@replay"
+    ],
+    "s_census": 1.843,
+    "s_from_counts": 1.843,
+    "deviation": 0.0,
+    "calls_per_expansion": 128.789,
+    "ns_per_call": 2.466
+   },
+   {
+    "bucket": [
+     "closure_null_p2@null_p2"
+    ],
+    "s_census": 1.47,
+    "s_from_counts": 1.47,
+    "deviation": 0.0,
+    "calls_per_expansion": 13.876,
+    "ns_per_call": 18.255
+   },
+   {
+    "bucket": [
+     "select@mid"
+    ],
+    "s_census": 1.005,
+    "s_from_counts": 1.005,
+    "deviation": 0.0,
+    "calls_per_expansion": 4.0,
+    "ns_per_call": 43.295
+   },
+   {
+    "bucket": [
+     "key@enter",
+     "key@null_p1",
+     "key@null_p2",
+     "key@replay"
+    ],
+    "s_census": 0.818,
+    "s_from_counts": 0.818,
+    "deviation": 0.0,
+    "calls_per_expansion": 73.759,
+    "ns_per_call": 1.911
+   },
+   {
+    "bucket": [
+     "store@mid"
+    ],
+    "s_census": 0.633,
+    "s_from_counts": 0.633,
+    "deviation": 0.0,
+    "calls_per_expansion": 2.991,
+    "ns_per_call": 36.473
+   },
+   {
+    "bucket": [
+     "mover_check@enter"
+    ],
+    "s_census": 0.568,
+    "s_from_counts": 0.568,
+    "deviation": 0.0,
+    "calls_per_expansion": 26.75,
+    "ns_per_call": 3.659
+   },
+   {
+    "bucket": [
+     "repetition@enter"
+    ],
+    "s_census": 0.362,
+    "s_from_counts": 0.362,
+    "deviation": 0.0,
+    "calls_per_expansion": 24.206,
+    "ns_per_call": 2.577
+   },
+   {
+    "bucket": [
+     "null_cache@null_p2"
+    ],
+    "s_census": 0.336,
+    "s_from_counts": 0.336,
+    "deviation": 0.0,
+    "calls_per_expansion": 28.648,
+    "ns_per_call": 2.021
+   },
+   {
+    "bucket": [
+     "alloc@enter",
+     "alloc@mid",
+     "alloc@replay",
+     "dealloc@enter",
+     "dealloc@mid",
+     "dealloc@replay"
+    ],
+    "s_census": 0.319,
+    "s_from_counts": 0.319,
+    "deviation": 0.0,
+    "calls_per_expansion": 16.795,
+    "ns_per_call": 3.273
+   },
+   {
+    "bucket": [
+     "null_board@mid"
+    ],
+    "s_census": 0.179,
+    "s_from_counts": 0.179,
+    "deviation": 0.0,
+    "calls_per_expansion": 0.591,
+    "ns_per_call": 52.159
+   },
+   {
+    "bucket": [
+     "prefetch@enter",
+     "prefetch@null_p1"
+    ],
+    "s_census": 0.097,
+    "s_from_counts": 0.097,
+    "deviation": 0.0,
+    "calls_per_expansion": 44.755,
+    "ns_per_call": 0.373
+   },
+   {
+    "bucket": [
+     "tt_probe@enter"
+    ],
+    "s_census": 0.023,
+    "s_from_counts": 0.023,
+    "deviation": 0.0,
+    "calls_per_expansion": 22.263,
+    "ns_per_call": 0.178
+   },
+   {
+    "bucket": [
+     "mover_new@enter"
+    ],
+    "s_census": 0.003,
+    "s_from_counts": 0.003,
+    "deviation": 0.0,
+    "calls_per_expansion": 1.0,
+    "ns_per_call": 0.517
+   },
+   {
+    "bucket": [
+     "filter@enter"
+    ],
+    "s_census": 0.002,
+    "s_from_counts": 0.002,
+    "deviation": 0.0,
+    "calls_per_expansion": 2.137,
+    "ns_per_call": 0.161
+   }
+  ]
+ },
+ "decode": {
+  "denominator": "node bodies (one count at the node body entry), not the reported `nodes`",
+  "deep-win": {
+   "bodies": 2099100,
+   "reported_nodes": 3024117,
+   "ratio": 1.4407,
+   "replay_steps": 926564,
+   "early_returns_before_the_node_tick": 1547
+  }
+ },
+ "gates": {
+  "G-35a": {
+   "bar": "unmapped share of our op budget \u2264 20 %",
+   "deep-win": 5.74,
+   "body_vs_nodes": {
+    "bodies": 2099100,
+    "reported_nodes": 3024117,
+    "ratio": 1.4407,
+    "replay_steps": 926564,
+    "early_returns_before_the_node_tick": 1547
+   },
+   "pass": true
+  },
+  "G-35b": {
+   "bar": "3 identical runs give identical counts",
+   "identical": {
+    "deep-win": true,
+    "core": true
+   },
+   "pass": true
+  },
+  "G-35c": {
+   "bar": "the mapping reproduces 37.005 s \u00b1 2 % on our counts",
+   "error": -2.7e-05,
+   "pass": true
+  },
+  "G-35d": {
+   "bar": "M \u2264 1,723 ns/exp (the wall T_4 allows)",
+   "M_ns": 1785.88,
+   "M_over_T4": 1.0364,
+   "band_ns": [
+    1518.0,
+    2053.8
+   ],
+   "band_flips": true,
+   "verdict": "NOT FUNDED"
+  }
+ },
+ "cross_check": {
+  "unpatched": {
+   "deep-win": {
+    "first_mate_ms": 4279,
+    "found": true,
+    "mate": 19,
+    "memory_mb": 192,
+    "ms": 4432,
+    "nodes": 3024117,
+    "seconds": 120.0
+   },
+   "core": {
+    "first_mate_ms": 465,
+    "found": true,
+    "mate": 17,
+    "memory_mb": 192,
+    "ms": 511,
+    "nodes": 342289,
+    "seconds": 10.0
+   }
+  },
+  "tree_identical": true,
+  "reference_ms_unpatched": 4432,
+  "reference_ms_instrumented": 4528,
+  "ns_per_body": 2111.4,
+  "M_share_of_its_own_body": 0.8458,
+  "uncounted_share_ns": 325.5,
+  "our_uncounted_ns": 2869.0,
+  "T4_ns": 1723.2,
+  "note": "the reference's own per-body wall, unpatched build, one run: the counted families recover M/that share of it. A check on the mapping's completeness; it prices nothing (the verdict stands on M alone)."
+ },
+ "env": {
+  "host": "Linux-7.2.13-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "cpu": "",
+  "binary": "/tmp/atomi-plan35/provari/target/release/provari",
+  "binary_sha256": "e4f242851d77df9e625051406e2bfe90ed9f9cdaf69c521d0ea969a945de04ff",
+  "census": "measurements/plan34/census_120s.json",
+  "census_sha256": "373f3267fbab70fb48b09a5d437accc3eeb59b544f3d28cce1effb3cc6c861f0"
+ }
+}
