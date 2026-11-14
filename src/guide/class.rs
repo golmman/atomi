@@ -123,7 +123,7 @@ pub fn classify(
     if gives_check || explosion_threat {
         if let Some(c) = child
             && c.side_to_move() == them
-            && crate::guide::threat::immediate_explosion(c, them).is_some()
+            && crate::guide::threat::has_explosion(c, them)
         {
             return MoveClass::WeakThreat;
         }

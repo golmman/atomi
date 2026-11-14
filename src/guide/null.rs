@@ -5,11 +5,12 @@
 //! then replays its proof on every still-open defence: a defence that parries
 //! the threat starts lower, one that does not is proven outright.
 //!
-//! The null board is **ephemeral**. It is built from the current FEN with the
-//! side to move and the en-passant square replaced, used for one exact ply,
-//! and dropped. It is never keyed, looked up, stored, put on `line` or
-//! emitted; the position keys and proofs that leave this module are the real
-//! children of the current node.
+//! The null board is **ephemeral**. It is derived from the current board with
+//! the side to move replaced and the en-passant square cleared
+//! ([`Board::null_for`], plan 31 F2), used for one exact ply, and dropped. It
+//! is never keyed, looked up, stored, put on `line` or emitted; the position
+//! keys and proofs that leave this module are the real children of the
+//! current node.
 //!
 //! This is deliberately narrower than provari's null replay: it finds an
 //! immediate explosion/mate, a move into a stored proof, or an exposed
@@ -21,8 +22,9 @@ use crate::rules;
 use crate::search::value::Value;
 use crate::table::{CachedLimit, NullCache, Tables};
 use atomic_movegen::board::{Board, StateInfo};
-use atomic_movegen::movegen::{generate_legal, generate_pseudo_legal};
-use atomic_movegen::types::{Color, EnPassantMode, Move, MoveList};
+use atomic_movegen::movegen::{for_each_legal_with_state, generate_legal};
+use atomic_movegen::types::{Color, Move, MoveList};
+use std::ops::ControlFlow;
 
 /// A winning move for the attacker in the null position, with its proof.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,17 +39,16 @@ pub struct NullWin {
 }
 
 /// Build the null counterpart of `board`: the same pieces with `attacker` to
-/// move and no en-passant target. Returns `None` if the FEN cannot be parsed
-/// (defensive; the input FEN came from a valid board).
-pub fn null_board(board: &Board, attacker: Color) -> Option<Board> {
-    let fen = board.fen_with(EnPassantMode::Legal);
-    let mut parts: Vec<&str> = fen.split_whitespace().collect();
-    if parts.len() < 6 {
-        return None;
-    }
-    parts[1] = if attacker == Color::White { "w" } else { "b" };
-    parts[3] = "-";
-    Board::from_fen(&parts.join(" ")).ok()
+/// move and no en-passant target.
+///
+/// Plan 31 F2: [`Board::null_for`] replaces the FEN round-trip (write → split
+/// → join → parse). The result is the same board the round-trip produced —
+/// pieces, castling rights, cleared ep square, half-move clock, fullmove
+/// number and the derived game ply — checked in
+/// `tests/explosion_differential.rs`. It stays ephemeral either way: never
+/// keyed, looked up, stored, put on `line` or emitted.
+pub fn null_board(board: &Board, attacker: Color) -> Board {
+    board.null_for(attacker)
 }
 
 /// The work a null replay spent. `moves` is the existing auxiliary work
@@ -74,7 +75,7 @@ pub fn null_win(
     if board.side_to_move() == attacker {
         return None;
     }
-    let null = null_board(board, attacker)?;
+    let null = null_board(board, attacker);
     let mut moves = MoveList::new();
     generate_legal(&null, &mut moves);
     work.moves = u64::from(moves.len() as u32);
@@ -171,20 +172,19 @@ fn exposed_limit(
     result
 }
 
-/// The uncached body of [`exposed_limit`] (plan-26 EARLY-REPLY).
+/// The uncached body of [`exposed_limit`] (plan-26 EARLY-REPLY, plan-31 F3).
 ///
-/// The pseudo-legal stream is filtered lazily: the first illegal reply is
-/// skipped, and the first legal reply that is not accepted ends the scan.
-/// The result is order-independent (all accepted vs one rejected; `limit`
-/// is a max over accepted replies), so the tree is unchanged.
+/// The replies come from the **legal stream**
+/// ([`for_each_legal_with_state`]) instead of a materialised pseudo-legal
+/// list: the first reply that is not accepted ends the scan with
+/// [`ControlFlow::Break`], and no list is built. The stream visits exactly
+/// what `generate_legal` collects, in the same order, so the result and the
+/// reply count are the ones the list path computed; `limit` is a max over the
+/// accepted replies, i.e. order-free anyway.
 fn exposed_limit_uncached(child: &Board, attacker: Color, work: &mut NullWork) -> Option<u8> {
-    let mut replies = MoveList::new();
-    generate_pseudo_legal(child, &mut replies);
-    if replies.is_empty() {
-        return None;
-    }
-    // Two states: one for the child's legality predicate, one for the
-    // scratch make/unmake. Sharing them diverged in the plan-26 probe.
+    // Two populated states: one for the child's own counts (the stream reads
+    // `commoners_count`), one reused by the scratch make/unmake. Sharing them
+    // diverged in the plan-26 probe.
     let mut child_state = StateInfo::new();
     child.populate_state(&mut child_state);
     let defender = attacker.flip();
@@ -192,15 +192,14 @@ fn exposed_limit_uncached(child: &Board, attacker: Color, work: &mut NullWork) -
     let mut scratch = child.clone();
     let mut state = StateInfo::new();
     let mut any_legal = false;
-    for &reply in replies.as_slice() {
-        if !child.is_legal_with_state(reply, &child_state) {
-            continue;
-        }
+    let mut rejected = false;
+    let _ = for_each_legal_with_state(child, &child_state, &mut |reply| {
         any_legal = true;
         work.replies += 1;
         scratch.do_move(reply, &mut state);
         if scratch.rule50() >= 100 {
-            return None;
+            rejected = true;
+            return ControlFlow::Break(());
         }
         // The closure must agree with `rules::status` + `immediate_explosion`:
         // a defender self-explosion is `Won`; a missing attacker commoner, a
@@ -211,17 +210,19 @@ fn exposed_limit_uncached(child: &Board, attacker: Color, work: &mut NullWork) -
         } else if scratch.commoners(attacker).is_empty() || rules::material_draw(&scratch) {
             false
         } else {
-            threat::immediate_explosion_bits(&scratch, attacker).is_some()
+            threat::has_explosion(&scratch, attacker)
         };
         if !accepted {
-            return None;
+            rejected = true;
+            return ControlFlow::Break(());
         }
         if scratch.rule50() == 0 {
             limit = 98;
         }
         scratch.undo_move(reply, &state);
-    }
-    if !any_legal {
+        ControlFlow::Continue(())
+    });
+    if rejected || !any_legal {
         return None;
     }
     Some(limit)
@@ -279,7 +280,7 @@ mod tests {
         if board.side_to_move() == attacker {
             return None;
         }
-        let null = null_board(board, attacker)?;
+        let null = null_board(board, attacker);
         let mut moves = MoveList::new();
         generate_legal(&null, &mut moves);
         let mut work = NullWork {
@@ -355,7 +356,7 @@ mod tests {
     #[test]
     fn null_board_flips_the_mover_and_clears_ep() {
         let b = board("4k3/8/8/2pP4/8/8/8/4K3 w - c6 0 2");
-        let n = null_board(&b, Color::Black).expect("null board");
+        let n = null_board(&b, Color::Black);
         assert_eq!(n.side_to_move(), Color::Black);
         assert_eq!(n.legal_ep_square(), None);
     }
@@ -382,7 +383,7 @@ mod tests {
         // explosion and no exposed mate in two).
         let b = board("7k/7p/8/8/8/8/8/R3K3 b - - 0 1");
         let mut tables = Tables::new(16, true);
-        let null = null_board(&b, Color::White).unwrap();
+        let null = null_board(&b, Color::White);
         let mv = null.move_from_uci("a1a8").unwrap();
         let mut child = null.clone();
         child.do_move(mv, &mut StateInfo::new());
@@ -415,7 +416,7 @@ mod tests {
         // The null board is built and dropped: the tables stay empty.
         let b = board("k7/p7/8/8/8/8/8/R3K3 b - - 0 1");
         let tables = Tables::new(16, true);
-        let null = null_board(&b, Color::White).unwrap();
+        let null = null_board(&b, Color::White);
         assert!(tables.lookup(rules::key(&null), null.rule50()).is_none());
     }
 
@@ -507,7 +508,7 @@ mod tests {
             for &m in moves.as_slice() {
                 let mut scratch = b.clone();
                 let before = (
-                    scratch.fen_with(EnPassantMode::Legal),
+                    scratch.fen_with(atomic_movegen::types::EnPassantMode::Legal),
                     rules::key(&scratch),
                     scratch.rule50(),
                     scratch.side_to_move(),
@@ -518,7 +519,7 @@ mod tests {
                 scratch.do_move(m, &mut state);
                 scratch.undo_move(m, &state);
                 let after = (
-                    scratch.fen_with(EnPassantMode::Legal),
+                    scratch.fen_with(atomic_movegen::types::EnPassantMode::Legal),
                     rules::key(&scratch),
                     scratch.rule50(),
                     scratch.side_to_move(),

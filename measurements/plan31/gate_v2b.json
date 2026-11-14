@@ -1,0 +1,154 @@
+{
+  "label": "G-V2b + D21 ablations at 5 M (deep-win, seed 0)",
+  "evals_cap": 5000000,
+  "seconds": 0,
+  "repeats": 3,
+  "guide": "hand",
+  "extra": [],
+  "control_side": "control",
+  "rows": [
+    {
+      "cell": "deep-win",
+      "seed": 0,
+      "evals": 5000000,
+      "seconds": 0,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            5000034,
+            5000034,
+            5000034
+          ],
+          "expansions": [
+            168910,
+            168910,
+            168910
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            2562,
+            2522,
+            2546
+          ],
+          "median_ms": 2546,
+          "min_ms": 2522,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "f1",
+          "child_evals": [
+            5000034,
+            5000034,
+            5000034
+          ],
+          "expansions": [
+            168910,
+            168910,
+            168910
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            2271,
+            2312,
+            2261
+          ],
+          "median_ms": 2271,
+          "min_ms": 2261,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.892
+        },
+        {
+          "side": "f2",
+          "child_evals": [
+            5000034,
+            5000034,
+            5000034
+          ],
+          "expansions": [
+            168910,
+            168910,
+            168910
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            2440,
+            2454,
+            2415
+          ],
+          "median_ms": 2440,
+          "min_ms": 2415,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.9584
+        },
+        {
+          "side": "f3",
+          "child_evals": [
+            5000034,
+            5000034,
+            5000034
+          ],
+          "expansions": [
+            168910,
+            168910,
+            168910
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            2369,
+            2384,
+            2357
+          ],
+          "median_ms": 2369,
+          "min_ms": 2357,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.9305
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            5000034,
+            5000034,
+            5000034
+          ],
+          "expansions": [
+            168910,
+            168910,
+            168910
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            1979,
+            1970,
+            1979
+          ],
+          "median_ms": 1979,
+          "min_ms": 1970,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7773
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "label": "G-V2a: 1 M counters (control vs F1+F2+F3)",
+  "evals_cap": 1000000,
+  "seconds": 0,
+  "repeats": 3,
+  "guide": "hand",
+  "extra": [],
+  "control_side": "control",
+  "rows": [
+    {
+      "cell": "core",
+      "seed": 0,
+      "evals": 1000000,
+      "seconds": 0,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "expansions": [
+            31326,
+            31326,
+            31326
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            556,
+            555,
+            555
+          ],
+          "median_ms": 555,
+          "min_ms": 555,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "expansions": [
+            31326,
+            31326,
+            31326
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            420,
+            419,
+            441
+          ],
+          "median_ms": 420,
+          "min_ms": 419,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7568
+        }
+      ]
+    },
+    {
+      "cell": "easy-win",
+      "seed": 0,
+      "evals": 1000000,
+      "seconds": 0,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            1000027,
+            1000027,
+            1000027
+          ],
+          "expansions": [
+            36995,
+            36995,
+            36995
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            502,
+            500,
+            516
+          ],
+          "median_ms": 502,
+          "min_ms": 500,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            1000027,
+            1000027,
+            1000027
+          ],
+          "expansions": [
+            36995,
+            36995,
+            36995
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            377,
+            361,
+            385
+          ],
+          "median_ms": 377,
+          "min_ms": 361,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.751
+        }
+      ]
+    },
+    {
+      "cell": "deep-win",
+      "seed": 0,
+      "evals": 1000000,
+      "seconds": 0,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            1000018,
+            1000018,
+            1000018
+          ],
+          "expansions": [
+            33297,
+            33297,
+            33297
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            455,
+            448,
+            450
+          ],
+          "median_ms": 450,
+          "min_ms": 448,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            1000018,
+            1000018,
+            1000018
+          ],
+          "expansions": [
+            33297,
+            33297,
+            33297
+          ],
+          "exit": [
+            "evals",
+            "evals",
+            "evals"
+          ],
+          "ms": [
+            334,
+            320,
+            322
+          ],
+          "median_ms": 322,
+          "min_ms": 320,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7156
+        }
+      ]
+    }
+  ]
+}

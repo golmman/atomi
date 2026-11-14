@@ -1,0 +1,569 @@
+{
+  "label": "G-V2c: 120 s x seeds 0-2 (control vs F1+F2+F3)",
+  "evals_cap": 0,
+  "seconds": 120,
+  "repeats": 3,
+  "guide": "hand",
+  "extra": [],
+  "control_side": "control",
+  "rows": [
+    {
+      "cell": "core",
+      "seed": 0,
+      "evals": 0,
+      "seconds": 120,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            12439376,
+            12439376,
+            12439376
+          ],
+          "expansions": [
+            424249,
+            424249,
+            424249
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            6878,
+            6976,
+            6880
+          ],
+          "median_ms": 6880,
+          "min_ms": 6878,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            12439376,
+            12439376,
+            12439376
+          ],
+          "expansions": [
+            424249,
+            424249,
+            424249
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            5137,
+            5238,
+            5160
+          ],
+          "median_ms": 5160,
+          "min_ms": 5137,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.75
+        }
+      ]
+    },
+    {
+      "cell": "core",
+      "seed": 1,
+      "evals": 0,
+      "seconds": 120,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            10097702,
+            10097702,
+            10097702
+          ],
+          "expansions": [
+            344750,
+            344750,
+            344750
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            5701,
+            5706,
+            5699
+          ],
+          "median_ms": 5701,
+          "min_ms": 5699,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            10097702,
+            10097702,
+            10097702
+          ],
+          "expansions": [
+            344750,
+            344750,
+            344750
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            4284,
+            4278,
+            4295
+          ],
+          "median_ms": 4284,
+          "min_ms": 4278,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7514
+        }
+      ]
+    },
+    {
+      "cell": "core",
+      "seed": 2,
+      "evals": 0,
+      "seconds": 120,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            9850365,
+            9850365,
+            9850365
+          ],
+          "expansions": [
+            333878,
+            333878,
+            333878
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            5557,
+            5803,
+            5690
+          ],
+          "median_ms": 5690,
+          "min_ms": 5557,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            9850365,
+            9850365,
+            9850365
+          ],
+          "expansions": [
+            333878,
+            333878,
+            333878
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            4177,
+            4192,
+            4304
+          ],
+          "median_ms": 4192,
+          "min_ms": 4177,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7367
+        }
+      ]
+    },
+    {
+      "cell": "easy-win",
+      "seed": 0,
+      "evals": 0,
+      "seconds": 120,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            1016547,
+            1016547,
+            1016547
+          ],
+          "expansions": [
+            37999,
+            37999,
+            37999
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            521,
+            530,
+            524
+          ],
+          "median_ms": 524,
+          "min_ms": 521,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            1016547,
+            1016547,
+            1016547
+          ],
+          "expansions": [
+            37999,
+            37999,
+            37999
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            384,
+            381,
+            394
+          ],
+          "median_ms": 384,
+          "min_ms": 381,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7328
+        }
+      ]
+    },
+    {
+      "cell": "easy-win",
+      "seed": 1,
+      "evals": 0,
+      "seconds": 120,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            1177648,
+            1177648,
+            1177648
+          ],
+          "expansions": [
+            43071,
+            43071,
+            43071
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            609,
+            597,
+            605
+          ],
+          "median_ms": 605,
+          "min_ms": 597,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            1177648,
+            1177648,
+            1177648
+          ],
+          "expansions": [
+            43071,
+            43071,
+            43071
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            445,
+            442,
+            435
+          ],
+          "median_ms": 442,
+          "min_ms": 435,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7306
+        }
+      ]
+    },
+    {
+      "cell": "easy-win",
+      "seed": 2,
+      "evals": 0,
+      "seconds": 120,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            1803483,
+            1803483,
+            1803483
+          ],
+          "expansions": [
+            67674,
+            67674,
+            67674
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            940,
+            944,
+            923
+          ],
+          "median_ms": 940,
+          "min_ms": 923,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            1803483,
+            1803483,
+            1803483
+          ],
+          "expansions": [
+            67674,
+            67674,
+            67674
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            679,
+            679,
+            671
+          ],
+          "median_ms": 679,
+          "min_ms": 671,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7223
+        }
+      ]
+    },
+    {
+      "cell": "deep-win",
+      "seed": 0,
+      "evals": 0,
+      "seconds": 120,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            155236740,
+            155236740,
+            155236740
+          ],
+          "expansions": [
+            5803257,
+            5803257,
+            5803257
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            77335,
+            77711,
+            77861
+          ],
+          "median_ms": 77711,
+          "min_ms": 77335,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            155236740,
+            155236740,
+            155236740
+          ],
+          "expansions": [
+            5803257,
+            5803257,
+            5803257
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            58291,
+            59369,
+            58600
+          ],
+          "median_ms": 58600,
+          "min_ms": 58291,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7541
+        }
+      ]
+    },
+    {
+      "cell": "deep-win",
+      "seed": 1,
+      "evals": 0,
+      "seconds": 120,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            146712125,
+            146712125,
+            146712125
+          ],
+          "expansions": [
+            5376491,
+            5376491,
+            5376491
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            71781,
+            72408,
+            72356
+          ],
+          "median_ms": 72356,
+          "min_ms": 71781,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            146712125,
+            146712125,
+            146712125
+          ],
+          "expansions": [
+            5376491,
+            5376491,
+            5376491
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            53988,
+            53873,
+            54021
+          ],
+          "median_ms": 53988,
+          "min_ms": 53873,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7461
+        }
+      ]
+    },
+    {
+      "cell": "deep-win",
+      "seed": 2,
+      "evals": 0,
+      "seconds": 120,
+      "sides": [
+        {
+          "side": "control",
+          "child_evals": [
+            107672243,
+            107672243,
+            107672243
+          ],
+          "expansions": [
+            3862476,
+            3862476,
+            3862476
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            52659,
+            52455,
+            52540
+          ],
+          "median_ms": 52540,
+          "min_ms": 52455,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 1.0
+        },
+        {
+          "side": "all",
+          "child_evals": [
+            107672243,
+            107672243,
+            107672243
+          ],
+          "expansions": [
+            3862476,
+            3862476,
+            3862476
+          ],
+          "exit": [
+            "proved",
+            "proved",
+            "proved"
+          ],
+          "ms": [
+            39532,
+            39085,
+            39028
+          ],
+          "median_ms": 39085,
+          "min_ms": 39028,
+          "tree_identical_to_control": true,
+          "ratio_vs_control": 0.7439
+        }
+      ]
+    }
+  ]
+}

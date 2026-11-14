@@ -376,7 +376,7 @@ mod tests {
         // Black to move; if Black passes, White's Rxa7 blasts the commoner
         // on a8. After Kb8 the same move still blasts it.
         let b = board("k7/p7/8/8/8/8/8/R3K3 b - - 0 1");
-        let null = crate::guide::null::null_board(&b, Color::White).unwrap();
+        let null = crate::guide::null::null_board(&b, Color::White);
         let mv = null.move_from_uci("a1a7").unwrap();
         let mut child = b.clone();
         child.do_move(b.move_from_uci("a8b8").unwrap(), &mut StateInfo::new());
@@ -402,7 +402,7 @@ mod tests {
     #[test]
     fn a_parrying_defence_refuses_the_null_guide_proof() {
         let b = board("k7/p7/8/8/8/8/8/R3K3 b - - 0 1");
-        let null = crate::guide::null::null_board(&b, Color::White).unwrap();
+        let null = crate::guide::null::null_board(&b, Color::White);
         let mv = null.move_from_uci("a1a7").unwrap();
         let mut child = b.clone();
         child.do_move(b.move_from_uci("a7a6").unwrap(), &mut StateInfo::new());

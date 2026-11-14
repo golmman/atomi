@@ -1,0 +1,451 @@
+{
+ "provenance": {
+  "date": "2026-11-14",
+  "host": "e10de197da58",
+  "platform": "Linux-7.2.13-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "cpu_model": "AMD Ryzen 9 5950X 16-Core Processor",
+  "cpu_count": 32,
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "atomic_movegen": "2.8.0",
+  "atomi": {
+   "version": "atomi 0.1.0 (7f3728d96354d330b490143cff5c1ef737cd4dfe)",
+   "binary_sha256": "3b6b3f6beb0b4baef25d92c1f8df96e7291c2fc426b00d359f6c44cc664bfec8",
+   "binary": "target/release/atomi"
+  },
+  "repo_head": "7f3728d96354d330b490143cff5c1ef737cd4dfe",
+  "repo_dirty": true,
+  "provari": {
+   "commit": "48686bc6c786d6ea70568f0b2ad4002cf0520206",
+   "guide": "hand",
+   "version": "provari 0.1.0",
+   "binary": "/tmp/atomi-oracle/provari/target/release/provari"
+  },
+  "provari_stretch": {
+   "commit": "unknown",
+   "guide": "hand",
+   "version": null,
+   "binary": null
+  },
+  "legacy": {
+   "commit": "unknown",
+   "binary": null
+  },
+  "stacks": {
+   "atomi": {
+    "hand": [
+     "--guide",
+     "hand"
+    ]
+   },
+   "legacy": {}
+  },
+  "budgets": {
+   "seconds": 120.0,
+   "memory_mb": 192,
+   "repeats": 3
+  },
+  "corpus": {
+   "path": "/workspace/atomi/bench/corpus.json",
+   "sha256": "9cd0169a30bb7d5b162b6a1ec119fe194b776c8a24a46cdf1582c07062847d0e"
+  },
+  "proof_verdicts": {
+   "atomi:hand": {
+    "core": "accepted",
+    "1eb80b92f92c": "accepted",
+    "db6a741c723f": "accepted"
+   }
+  }
+ },
+ "runs": [
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 0.525,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342290,
+   "ms": 497
+  },
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 0.542,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342290,
+   "ms": 513
+  },
+  {
+   "case": "core",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 0.527,
+   "returncode": 0,
+   "win": true,
+   "mate": 17,
+   "nodes": 342290,
+   "ms": 498
+  },
+  {
+   "case": "core",
+   "side": "atomi:hand",
+   "run": 1,
+   "wall_s": 5.267,
+   "returncode": 0,
+   "win": true,
+   "length": 15,
+   "exit": "proved",
+   "child_evals": 12439376,
+   "expansions": 424249,
+   "ms": 5264,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "core",
+   "side": "atomi:hand",
+   "run": 2,
+   "wall_s": 5.313,
+   "returncode": 0,
+   "win": true,
+   "length": 15,
+   "exit": "proved",
+   "child_evals": 12439376,
+   "expansions": 424249,
+   "ms": 5310,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "core",
+   "side": "atomi:hand",
+   "run": 3,
+   "wall_s": 5.288,
+   "returncode": 0,
+   "win": true,
+   "length": 15,
+   "exit": "proved",
+   "child_evals": 12439376,
+   "expansions": 424249,
+   "ms": 5284,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 0.135,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 105
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 0.133,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 104
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 0.136,
+   "returncode": 0,
+   "win": true,
+   "mate": 15,
+   "nodes": 72523,
+   "ms": 108
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:hand",
+   "run": 1,
+   "wall_s": 0.388,
+   "returncode": 0,
+   "win": true,
+   "length": 19,
+   "exit": "proved",
+   "child_evals": 1016547,
+   "expansions": 37999,
+   "ms": 385,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:hand",
+   "run": 2,
+   "wall_s": 0.389,
+   "returncode": 0,
+   "win": true,
+   "length": 19,
+   "exit": "proved",
+   "child_evals": 1016547,
+   "expansions": 37999,
+   "ms": 385,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "1eb80b92f92c",
+   "side": "atomi:hand",
+   "run": 3,
+   "wall_s": 0.386,
+   "returncode": 0,
+   "win": true,
+   "length": 19,
+   "exit": "proved",
+   "child_evals": 1016547,
+   "expansions": 37999,
+   "ms": 383,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 1,
+   "wall_s": 4.446,
+   "returncode": 0,
+   "win": true,
+   "mate": 19,
+   "nodes": 3024117,
+   "ms": 4415
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 2,
+   "wall_s": 4.459,
+   "returncode": 0,
+   "win": true,
+   "mate": 19,
+   "nodes": 3024117,
+   "ms": 4429
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "provari-hand",
+   "run": 3,
+   "wall_s": 4.505,
+   "returncode": 0,
+   "win": true,
+   "mate": 19,
+   "nodes": 3024117,
+   "ms": 4477
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:hand",
+   "run": 1,
+   "wall_s": 58.379,
+   "returncode": 0,
+   "win": true,
+   "length": 36,
+   "exit": "proved",
+   "child_evals": 155236740,
+   "expansions": 5803257,
+   "ms": 58376,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:hand",
+   "run": 2,
+   "wall_s": 58.439,
+   "returncode": 0,
+   "win": true,
+   "length": 36,
+   "exit": "proved",
+   "child_evals": 155236740,
+   "expansions": 5803257,
+   "ms": 58436,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  },
+  {
+   "case": "db6a741c723f",
+   "side": "atomi:hand",
+   "run": 3,
+   "wall_s": 59.266,
+   "returncode": 0,
+   "win": true,
+   "length": 36,
+   "exit": "proved",
+   "child_evals": 155236740,
+   "expansions": 5803257,
+   "ms": 59262,
+   "flags": [
+    "--guide",
+    "hand"
+   ]
+  }
+ ],
+ "ledger": {
+  "cells": {
+   "core": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 0.527,
+     "win": true,
+     "nodes": 342290,
+     "mate": 17,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "hand": {
+     "runs": 3,
+     "wall_s": 5.288,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 12439376,
+     "exit": "proved",
+     "returncodes": [
+      0
+     ],
+     "proof_run": {
+      "wall_s": 5.234,
+      "returncode": 0,
+      "exit": "proved",
+      "child_evals": 12439376,
+      "proof": "written",
+      "proof_positions": 16991,
+      "proof_length": 15
+     },
+     "proof_verdict": "accepted",
+     "factor": 10.034,
+     "note": "shared win"
+    }
+   },
+   "1eb80b92f92c": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 0.135,
+     "win": true,
+     "nodes": 72523,
+     "mate": 15,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "hand": {
+     "runs": 3,
+     "wall_s": 0.388,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 1016547,
+     "exit": "proved",
+     "returncodes": [
+      0
+     ],
+     "proof_run": {
+      "wall_s": 0.399,
+      "returncode": 0,
+      "exit": "proved",
+      "child_evals": 1016547,
+      "proof": "written",
+      "proof_positions": 2980,
+      "proof_length": 19
+     },
+     "proof_verdict": "accepted",
+     "factor": 2.874,
+     "note": "shared win"
+    }
+   },
+   "db6a741c723f": {
+    "reference": {
+     "runs": 3,
+     "wall_s": 4.459,
+     "win": true,
+     "nodes": 3024117,
+     "mate": 19,
+     "evals": null,
+     "child_evals": null,
+     "exit": null,
+     "returncodes": [
+      0
+     ]
+    },
+    "hand": {
+     "runs": 3,
+     "wall_s": 58.439,
+     "win": true,
+     "nodes": null,
+     "mate": null,
+     "evals": null,
+     "child_evals": 155236740,
+     "exit": "proved",
+     "returncodes": [
+      0
+     ],
+     "proof_run": {
+      "wall_s": 58.749,
+      "returncode": 0,
+      "exit": "proved",
+      "child_evals": 155236740,
+      "proof": "written",
+      "proof_positions": 93092,
+      "proof_length": 36
+     },
+     "proof_verdict": "accepted",
+     "factor": 13.106,
+     "note": "shared win"
+    }
+   }
+  },
+  "summary": {
+   "hand": {
+    "shared_cells": [
+     "core",
+     "1eb80b92f92c",
+     "db6a741c723f"
+    ],
+    "shared_count": 3,
+    "geomean_factor": 7.23,
+    "coverage_reference": 3,
+    "coverage_candidate": 3,
+    "censored_cells": []
+   }
+  }
+ }
+}

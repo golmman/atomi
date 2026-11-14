@@ -106,6 +106,22 @@ Referenced from `AGENTS.md` §Correctness.
 - An exact-replay path that proves a child by an immediate explosion must
   return the **child's own** one-move proof entry, not just the length; the
   writer walks real positions and fails `missing` otherwise (plan18 D14).
+- **The explosion question has two forms, and only one may change per site.**
+  `threat::immediate_explosion(_bits)` returns the **witness move** (proof
+  entry, `line`, the parent's selected move): its body and pseudo-legal order
+  are frozen. `threat::has_explosion` answers *existence* only and is used at
+  the two existence-only sites (the `WeakThreat` class question and the null
+  reply test). Three facts make the fast form exact and must survive any
+  rewrite: a **commoner capture is never legal** (the capturer dies at ground
+  zero), so commoners are masked out of the attackers; **`Board::legal` still
+  accepts a capture when our commoner is gone** while `generate_legal` emits
+  nothing, so the extinction screen is mandatory; and this movegen does **not**
+  prune pinned attackers, so the blast and `Board::legal` decide, never a pin
+  rule of our own. Pinned by `tests/explosion_differential.rs` (85 k positions
+  + 91 k children) — a boolean disagreement there is a tree change.
+- **`Board::legal` is not a legality oracle on terminal positions** (see
+  above): pair it with the crate's extinction rule whenever it replaces a
+  move list.
 
 ## Tree size
 

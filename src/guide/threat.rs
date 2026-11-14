@@ -13,7 +13,7 @@
 
 use atomic_movegen::board::{Board, StateInfo};
 use atomic_movegen::movegen::generate_pseudo_legal;
-use atomic_movegen::types::{Bitboard, Color, Move, MoveList};
+use atomic_movegen::types::{Bitboard, Color, Move, MoveList, PieceType, Square};
 
 /// A side's immediate explosion threats.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -103,6 +103,86 @@ pub fn immediate_explosion(board: &Board, side: Color) -> Option<Move> {
         }
     }
     None
+}
+
+/// Does `side` (to move) have a legal capture that removes the opponent's
+/// commoner? The **existence-only** form of [`immediate_explosion`] (plan 31
+/// F1): no legal move list, no child board.
+///
+/// Candidates are read off the board: a capture explodes the enemy commoner
+/// only from a square in its blast zone (the zone is symmetric, so
+/// `to ∈ blast_zone(commoner)` ⟺ `commoner ∈ blast_zone(to)`), and only an
+/// enemy-occupied square can be a destination. For each such target the
+/// attackers are one [`Board::attackers_to_color`] lookup, the casualties one
+/// [`Board::blast_casualties`], and the pin and self-explosion questions the
+/// exact [`Board::legal`] predicate — the same facts the shipped path reads
+/// off the list, so the answer is *identical*, never merely likely. An
+/// extinct position (either commoner gone) has no legal move and answers
+/// `false` up front: `Board::legal` alone does not apply the movegen's
+/// extinction rule.
+///
+/// Commoners are masked out of the attackers: the capturer stands at ground
+/// zero and is destroyed by its own blast, so every commoner capture loses
+/// our commoner and `Board::legal` rejects it — masking is exact (the
+/// differential checks it on every corpus position and child). En passant
+/// (the victim is not on the destination square) and promotion-capable pawn
+/// attackers (the [`Move`] would need a promotion piece) fall back to
+/// [`immediate_explosion`], which is exact by construction.
+///
+/// Callers that need the *witness* move keep calling [`immediate_explosion`]:
+/// the witness reaches proofs and the emitted line, a boolean does not.
+pub fn has_explosion(board: &Board, side: Color) -> bool {
+    debug_assert_eq!(board.side_to_move(), side);
+    let enemy_commoners = board.commoners(side.flip());
+    // The movegen emits nothing once either commoner is gone (extinction);
+    // `Board::legal` alone would still accept a capture, so screen first.
+    if enemy_commoners.is_empty() || board.commoners(side).is_empty() {
+        return false;
+    }
+    if board.legal_ep_square().is_some() {
+        return immediate_explosion(board, side).is_some();
+    }
+    let targets = Board::blast_zone(enemy_commoners.lsb()) & board.pieces_color(side.flip());
+    if targets.is_empty() {
+        return false;
+    }
+    let occ = board.occupied();
+    let capture_floor = board.pieces_color(side) & !board.commoners(side);
+    let mut state = StateInfo::new();
+    board.populate_state(&mut state);
+    let mut remaining = targets;
+    while !remaining.is_empty() {
+        let to = remaining.pop_lsb();
+        let mut attackers = board.attackers_to_color(to, side, occ) & capture_floor;
+        while !attackers.is_empty() {
+            let from = attackers.pop_lsb();
+            if promotes(board, from, to, side) {
+                return immediate_explosion(board, side).is_some();
+            }
+            let mv = Move::make_move(from, to);
+            if (board.blast_casualties(mv).all() & enemy_commoners).is_empty() {
+                continue;
+            }
+            if board.legal(mv, &state) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// `true` when the move `from → to` is a pawn move onto the last rank, i.e. a
+/// move whose [`Move`] needs a promotion piece (the one candidate shape the
+/// existence test cannot build without a promotion choice).
+fn promotes(board: &Board, from: Square, to: Square, side: Color) -> bool {
+    if board.piece_on(from).type_of() != Some(PieceType::Pawn) {
+        return false;
+    }
+    match side {
+        Color::White => to as u8 >= 56,
+        Color::Black => (to as u8) < 8,
+        _ => false,
+    }
 }
 
 /// The board-free one-ply explosion closure (plan-20 R11, item 28):

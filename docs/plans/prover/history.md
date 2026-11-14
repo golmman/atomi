@@ -472,3 +472,24 @@ premise are the recorded starting point for the D21 kill review.
   `make lint`, `make test-full` + veto green on an unchanged engine. Data:
   [`measurements/plan30/`](../../../measurements/plan30/README.md); report:
   [`report30.md`](report30.md); decision D42 proposed, item 37 closed.
+
+- **2026-11-14**: plan31 (item 38, HOTPATH-V2) executed and **adopted** (D43).
+  Phase 0 re-derived the per-expansion attribution on 2.8.0 at 1 M and 5 M
+  evals (`deep-win` 5 M: 26.2 explosion-test calls/expansion, each scanning a
+  full 38.2-move list, = **66 %** of all list moves read; reply streams 28 %,
+  null board 3.4 %; `generate_pseudo_legal_in_view` 21 % of wall), so the
+  plan's arithmetic closed. `threat::has_explosion` replaced the list at the
+  two existence-only sites (commoners masked — a commoner capture is never
+  legal — with an en-passant/promotion fallback and an extinction screen that
+  the differential caught: `Board::legal` still answers where `generate_legal`
+  emits nothing), `Board::null_for` replaced the FEN round-trip, and the null
+  reply test walks the legal stream with `ControlFlow::Break`. Witness
+  functions untouched. Gates: existence differential 85,819 positions +
+  91,249 children with 0 disagreements (100 promotion-capture and 184
+  en-passant sweep positions, 57,214 null boards equal); G-V2b **0.7773×** at
+  5 M (tree identical); ablations `{F1}` 0.8920 / `{F2}` 0.9584 / `{F3}`
+  0.9305; G-V2c 0.7223–0.7541× over 9 x 120 s (cell, seed) pairs, counters
+  identical; D14 9/9 both checkers; `make test-full` + VETO PASS. Cap-120 row:
+  geomean **7.23** (3/3 claimed), `deep-win` 77.4 → **58.4 s**, `T_4` distance
+  5.84×. Data: [`measurements/plan31/`](../../../measurements/plan31/README.md);
+  report: [`report31.md`](report31.md).

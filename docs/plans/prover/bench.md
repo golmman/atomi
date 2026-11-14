@@ -188,6 +188,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
 | `movegen plan2`[^mg2] | 2026-11-13 | `e10de197da58` | atomi **bare** (`--guide none`), 2.7.0 | **33.881** | **13.603** | censored | **21.468** (2) | 120 s |
 | `movegen plan3`[^mg3] | 2026-11-14 | `e10de197da58` | atomi **bare** (`--guide none`), 2.8.0 | censored | **13.587** | censored | **13.587** (1) | 10 s |
 | `movegen plan3`[^mg3] | 2026-11-14 | `e10de197da58` | atomi **bare** (`--guide none`), 2.8.0 | **34.913** | **14.226** | censored | **22.286** (2) | 120 s |
+| `plan31`[^p31] | 2026-11-14 | `e10de197da58` | atomi **HOTPATH-V2** (`--guide hand`, D43) | **10.034** | **2.874** | **13.106** | **7.23** (3) | 120 s |
 
 [^host]: the plan's `env.json` machine id. Factors are same-session ratios, so a
     row is valid on its own host and never against another row's (rule 1).
@@ -355,6 +356,31 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     with `provari check` agreeing. Numbers:
     [`measurements/movegen/plan3/`](measurements/movegen/plan3/README.md).
 
+[^p31]: **plan31 — HOTPATH-V2** (item 38, D43): the guide's per-expansion
+    multiplicity removed by three tree-neutral rewrites — the one-ply explosion
+    test answered by existence (`threat::has_explosion`: blast-zone candidates
+    from `blast_zone`/`attackers_to_color`, confirmed by `blast_casualties` and
+    `Board::legal`, with an en-passant/promotion fallback to the list path), the
+    null board from `Board::null_for` instead of a FEN round-trip, and the null
+    reply test on the legal stream with `ControlFlow::Break`. The stack is
+    **unconditional** (no flag), so this is a product row under rule 4; the
+    hand guide itself stays opt-in. At Cap 120 s all three cells are claimed:
+    `core` 5.288 s (12,439,376 child evals), `easy-win` 0.388 s (1,016,547),
+    `deep-win` **58.439 s** (155,236,740); the same-session reference is 0.527 /
+    0.135 / 4.459 s (342,290 / 72,523 / 3,024,117 nodes), so the factors are
+    10.034 / 2.874 / 13.106 and the geomean is **7.23** over 3 claimed cells.
+    **3/3 D14 proofs** matched `child_evals` and were accepted by `atomi
+    validate` and `provari check` (16,991 / 2,980 / 93,092 positions, lengths
+    15 / 19 / 36). Tree identity: `child_evals`/`expansions` identical to a
+    `git archive` control on 3 cells at 1 M evals, on the 5 M `deep-win` probe
+    (5,000,034 / 168,910) and on 9 x 120 s (cell, seed) pairs, where the stack
+    is 0.7223–0.7541× the control; the 5 M probe ratio is 0.7773× and the D21
+    ablations are `{F1}` 0.8920 / `{F2}` 0.9584 / `{F3}` 0.9305. `deep-win`
+    77.442 s (plan27) → 58.439 s on essentially the same reference (4.413 s),
+    i.e. `T_4` distance 5.84×; rows are never rewritten, so the cross-row
+    difference is stated with each row's own reference. Numbers:
+    [`measurements/plan31/`](../../../measurements/plan31/README.md).
+
 **One engine per table (D10 amendment, 2026-11-11).** Only `atomi@*` rows form
 a series. The legacy `solver@5f85133` controls measured in plan1 (`default`
 45.358, 1/3; `opt` 6.322, 2/3) are a frozen one-session baseline of a different
@@ -380,6 +406,7 @@ They left the table because a mixed series invites exactly that comparison.
 | `atomi@9617f9b+d` | `9617f9b3c3feebded778892f7b29da57305c0679` | `movegen plan1` |
 | `atomi@f88533e+d` | `f88533eb8135cdfb81d89aa2de9fbf9102f1c8d9` | `movegen plan2` |
 | `atomi@d675701+d` | `d675701fe9c00c5deb5b643ab5c7340e29b96794` | `movegen plan3` |
+| `atomi@7f3728d+d` | `7f3728d96354d330b490143cff5c1ef737cd4dfe` | `plan31` |
 | `provari-v0.1.0` | `48686bc6c786d6ea70568f0b2ad4002cf0520206` | the 1.000 side of every factor |
 | `solver@5f85133` | `5f85133ea9d751368a682e53e354bd3fc0016d00` | the frozen legacy control of the [plan1 note](#plan1), not a row |
 

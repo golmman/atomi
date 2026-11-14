@@ -243,3 +243,7 @@ Unfortunately the performance goals were not met.
 
 We tested `shakmaty` versus `atomic-movegen` and found that `atomic-movegen` is significantly faster.
 So where exactly is the gap now? How can we close it?
+
+---
+
+Plan session — prover plan32 (item 39, PROOF-FILTER). Read initiative.md (item 39, D43, D39), report31.md §5–§7, gotchas.md, and measurements/plan31/ (profile_candidate.json: Tables::lookup_with_source 16.6 % self). Measure the proof-probe hit rate on the --guide hand tree before writing the plan (5 M deep-win, --stats counters, read-only probe): how often is the ~144 MB proof table probed for a child that only has a TT entry? Then write plan32.md ≤ 8 KB: a second negative-exact bit filter over proof-table keys, gate tree-identical child_evals/expansions, same-session ≤ 0.92× on the three 120 s cells, cache accounted inside the 192 MB label (filter slack first), make test-full + veto + D14 9/9. No implementation this session; stop and report if the measured hit rate puts the ceiling below the gate.

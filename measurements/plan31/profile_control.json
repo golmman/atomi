@@ -1,0 +1,159 @@
+{
+  "label": "control",
+  "binary": "/tmp/atomi-plan31-control/target/release/atomi",
+  "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+  "evals_cap": 5000000,
+  "wall_ms": 2577,
+  "child_evals": 5000034,
+  "expansions": 168910,
+  "rows": [
+    {
+      "self_percent": 21.01,
+      "symbol": "atomic_movegen::movegen::generate_pseudo_legal_in_view"
+    },
+    {
+      "self_percent": 12.16,
+      "symbol": "<atomi::table::Tables>::lookup_with_source"
+    },
+    {
+      "self_percent": 7.44,
+      "symbol": "atomi::guide::threat::immediate_explosion_bits"
+    },
+    {
+      "self_percent": 6.96,
+      "symbol": "atomic_movegen::position::legal_with_counts"
+    },
+    {
+      "self_percent": 5.84,
+      "symbol": "<atomic_movegen::board::Board>::do_move"
+    },
+    {
+      "self_percent": 4.88,
+      "symbol": "<atomic_movegen::position::PositionView>::checkers"
+    },
+    {
+      "self_percent": 4.84,
+      "symbol": "<atomi::search::frame::Frame>::enter"
+    },
+    {
+      "self_percent": 3.32,
+      "symbol": "atomi::guide::null::null_win"
+    },
+    {
+      "self_percent": 3.24,
+      "symbol": "<atomic_movegen::board::Board>::attackers_to_color"
+    },
+    {
+      "self_percent": 2.45,
+      "symbol": "<atomic_movegen::board::Board>::populate_state"
+    },
+    {
+      "self_percent": 2.34,
+      "symbol": "atomi::guide::eval::hand_eval"
+    },
+    {
+      "self_percent": 2.32,
+      "symbol": "atomic_movegen::attacks::attacks_from"
+    },
+    {
+      "self_percent": 2.02,
+      "symbol": "<atomi::mover::Mover>::effect"
+    },
+    {
+      "self_percent": 1.43,
+      "symbol": "<atomic_movegen::board::FastLegality>::is_legal_widened"
+    },
+    {
+      "self_percent": 1.43,
+      "symbol": "atomic_movegen::movegen::has_legal_move_in_view"
+    },
+    {
+      "self_percent": 1.32,
+      "symbol": "<atomic_movegen::board::Board>::from_fen"
+    },
+    {
+      "self_percent": 1.28,
+      "symbol": "atomic_movegen::movegen::generate_legal_in_view"
+    },
+    {
+      "self_percent": 1.2,
+      "symbol": "<atomi::guide::Guide>::start_numbers"
+    },
+    {
+      "self_percent": 1.09,
+      "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid"
+    },
+    {
+      "self_percent": 1.05,
+      "symbol": "__memmove_avx_unaligned_erms"
+    },
+    {
+      "self_percent": 1.01,
+      "symbol": "<atomic_movegen::board::Board>::undo_move"
+    },
+    {
+      "self_percent": 0.83,
+      "symbol": "atomi::search::node_value"
+    },
+    {
+      "self_percent": 0.82,
+      "symbol": "atomi::guide::class::classify_exact"
+    },
+    {
+      "self_percent": 0.72,
+      "symbol": "malloc"
+    },
+    {
+      "self_percent": 0.63,
+      "symbol": "<atomi::table::Tables>::store"
+    },
+    {
+      "self_percent": 0.63,
+      "symbol": "<atomic_movegen::board::Board>::fen_with"
+    },
+    {
+      "self_percent": 0.6,
+      "symbol": "atomi::guide::class::defence_likely_to_refute"
+    },
+    {
+      "self_percent": 0.59,
+      "symbol": "atomic_movegen::board::castling_rights_after"
+    },
+    {
+      "self_percent": 0.57,
+      "symbol": "__memset_avx2_unaligned_erms"
+    },
+    {
+      "self_percent": 0.56,
+      "symbol": "<atomi::mover::Mover>::gives_check"
+    },
+    {
+      "self_percent": 0.53,
+      "symbol": "<atomic_movegen::board::Board>::outcome"
+    },
+    {
+      "self_percent": 0.52,
+      "symbol": "<atomic_movegen::board::Board>::is_pseudo_legal"
+    },
+    {
+      "self_percent": 0.48,
+      "symbol": "atomi::guide::threat::immediate_explosion"
+    },
+    {
+      "self_percent": 0.41,
+      "symbol": "cfree@GLIBC_2.2.5"
+    },
+    {
+      "self_percent": 0.34,
+      "symbol": "<atomic_movegen::board::Board>::is_pseudo_legal_pawn"
+    },
+    {
+      "self_percent": 0.33,
+      "symbol": "<atomic_movegen::board::Board>::recompute_hash"
+    },
+    {
+      "self_percent": 0.31,
+      "symbol": "<atomic_movegen::board::Board>::legal_ep_square"
+    }
+  ]
+}
