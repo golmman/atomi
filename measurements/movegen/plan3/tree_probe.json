@@ -1,0 +1,98 @@
+{
+ "plan": "docs/plans/movegen/plan3.md",
+ "cell": "deep-win",
+ "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+ "cap": {
+  "kind": "evals",
+  "value": 5000000,
+  "seed": 0,
+  "memory_mb": 192
+ },
+ "control_expansions": 168910,
+ "sides": {
+  "m0": {
+   "runs": [
+    {
+     "wall_s": 2.638,
+     "returncode": 0,
+     "child_evals": 5000034,
+     "expansions": 168910,
+     "ms": 2633,
+     "exit": "evals"
+    },
+    {
+     "wall_s": 2.668,
+     "returncode": 0,
+     "child_evals": 5000034,
+     "expansions": 168910,
+     "ms": 2664,
+     "exit": "evals"
+    },
+    {
+     "wall_s": 2.619,
+     "returncode": 0,
+     "child_evals": 5000034,
+     "expansions": 168910,
+     "ms": 2614,
+     "exit": "evals"
+    }
+   ],
+   "median_ms": 2633,
+   "child_evals": [
+    5000034
+   ],
+   "expansions": [
+    168910
+   ],
+   "tree_matches_plan28_control": true
+  },
+  "m1": {
+   "runs": [
+    {
+     "wall_s": 2.637,
+     "returncode": 0,
+     "child_evals": 5000034,
+     "expansions": 168910,
+     "ms": 2632,
+     "exit": "evals"
+    },
+    {
+     "wall_s": 2.593,
+     "returncode": 0,
+     "child_evals": 5000034,
+     "expansions": 168910,
+     "ms": 2588,
+     "exit": "evals"
+    },
+    {
+     "wall_s": 2.652,
+     "returncode": 0,
+     "child_evals": 5000034,
+     "expansions": 168910,
+     "ms": 2647,
+     "exit": "evals"
+    }
+   ],
+   "median_ms": 2632,
+   "child_evals": [
+    5000034
+   ],
+   "expansions": [
+    168910
+   ],
+   "tree_matches_plan28_control": true
+  }
+ },
+ "tree_identical": true,
+ "m1_over_m0": 0.9996,
+ "binaries": {
+  "m0": {
+   "path": "/tmp/atomi-m0-plan3/target/release/atomi",
+   "sha256": "ec24604fb7f68d30844693bbba9c227951a07051ca41ff4f4b3bf354cbf4f30a"
+  },
+  "m1": {
+   "path": "target/release/atomi",
+   "sha256": "d35cd0f839e87cbde6dc07e25764ecbbfe15498ea5a834f37f6e969c5188cb14"
+  }
+ }
+}

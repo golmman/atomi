@@ -31,6 +31,16 @@
 //! included), `is_terminal_after` its `is_terminal()`, `has_legal_move_after`
 //! its `has_legal_move()`, `outcome_after` its `outcome()` for legal moves.
 //!
+//! 2.8.0 (movegen [`plan3`](../../docs/plans/movegen/plan3.md) step 3) adds two
+//! queries to the same contract: `PostMove::terminal()` — the child's
+//! `Terminal` on an already derived summary, precedence and reason included —
+//! and `post_move_and_key()`, the child's Zobrist key from the same derivation.
+//! Both are pinned here too: `post.terminal()` equals the built child's
+//! `terminal()` (illegal moves included, where it describes the *unreachable*
+//! child) and the key is exactly `child.hash()` (`EnPassantMode::Always`) and
+//! exactly atomi's `Legal`-identity key plus the derived `rules::ep_key(file)`
+//! when the child stores an en-passant target no one can legally capture.
+//!
 //! The second test is plan2 §9 question 1: `Terminal::MaterialDraw` is the
 //! crate's *commoner-only* draw while atomi's `rules::material_draw` is the
 //! broader Lichess clause, so a prover call site must map the **reason**. The
@@ -46,7 +56,9 @@ use atomic_movegen::effects::AfterState;
 use atomic_movegen::movegen::{
     generate_legal, generate_legal_with_state, generate_pseudo_legal, has_legal_move,
 };
-use atomic_movegen::types::{Color, MoveList, Outcome, PieceType, Square, TerminalReason};
+use atomic_movegen::types::{
+    Color, EnPassantMode, MoveList, Outcome, PieceType, Square, TerminalReason, file_of,
+};
 
 use common::{Children, corpus, opt_sq, squares};
 
@@ -70,7 +82,17 @@ struct Tally {
     /// Illegal pseudo-legal moves whose child is already decided: the exact
     /// case MG16 exists for (a self-explosion has an extinct child).
     illegal_decided: usize,
+    /// Children that store an en-passant target nobody can legally capture
+    /// (2.8.0 key: the two identity modes differ by `ep_key(file)`).
+    stored_ep: usize,
+    /// Children where both identity modes agree.
+    no_ep: usize,
     reasons: std::collections::BTreeMap<String, usize>,
+}
+
+/// atomi's derived en-passant file key for `file`.
+fn ep_file_key(file: atomic_movegen::types::File) -> u64 {
+    atomi::rules::ep_key(file as usize)
 }
 
 /// A deterministic 64-bit LCG (no dependency, no `rand`): play-outs must be
@@ -161,9 +183,58 @@ fn check_child_surface(board: &Board, tally: &mut Tally) {
             (effect, Some(post)),
             "{fen} {uci}: effect_and_post is the two separate queries"
         );
+        // 2.8.0 MG19: the terminal state on the summary is the child's own,
+        // reason included — and it *is* `terminal_after`, one derivation.
+        assert_eq!(
+            post.terminal(),
+            child.terminal(),
+            "{fen} {uci}: post.terminal vs the built child"
+        );
+        // 2.8.0: the child key from the same derivation. `post_move_and_key`
+        // promises `Board::hash_after` = the cloned child's `hash()` (Always
+        // mode); atomi's identity is the `Legal` mode plus `rules::ep_key`.
+        let (post_key, key) = ctx
+            .post_move_and_key(board, m)
+            .unwrap_or_else(|| panic!("{fen} {uci}: no summary+key"));
+        assert_eq!(post_key, post, "{fen} {uci}: post_move_and_key summary");
+        assert_eq!(
+            key,
+            child.hash(),
+            "{fen} {uci}: post_move_and_key vs the built child hash"
+        );
+        assert_eq!(key, board.hash_after(m), "{fen} {uci}: vs hash_after");
+        let legal_key = child.hash_with(EnPassantMode::Legal);
+        assert_eq!(
+            legal_key,
+            board.hash_after_with(m, EnPassantMode::Legal),
+            "{fen} {uci}: Legal-mode child key vs hash_after_with"
+        );
+        match child.ep_square() {
+            // Stored but not legal: exactly the move class `mover.rs` builds a
+            // child for. The two keys differ by the ep file key alone.
+            Some(sq) if child.legal_ep_square().is_none() => {
+                assert_eq!(
+                    key ^ legal_key,
+                    ep_file_key(file_of(sq)),
+                    "{fen} {uci}: derived ep key"
+                );
+                tally.stored_ep += 1;
+            }
+            // Otherwise the two identity modes agree, so a call site may read
+            // either one.
+            _ => {
+                assert_eq!(key, legal_key, "{fen} {uci}: keys without ep fate");
+                tally.no_ep += 1;
+            }
+        }
         // MG15: child terminality is the built child's own answer.
         let terminal = ctx.terminal_after(board, m);
         assert_eq!(terminal, child.terminal(), "{fen} {uci}: terminal_after");
+        assert_eq!(
+            post.terminal(),
+            terminal,
+            "{fen} {uci}: post.terminal vs terminal_after"
+        );
         assert_eq!(
             terminal.map(|t| t.outcome),
             child.outcome(),
@@ -289,7 +360,8 @@ fn child_surface_matches_the_built_child() {
     }
     eprintln!(
         "child surface: positions={} playout_nodes={nodes} children={} \
-         legal={} illegal={} illegal_decided={} terminal={} undecided={} reasons={:?}",
+         legal={} illegal={} illegal_decided={} terminal={} undecided={} \
+         stored_ep={} no_ep={} reasons={:?}",
         positions.len(),
         tally.moves,
         tally.legal,
@@ -297,6 +369,8 @@ fn child_surface_matches_the_built_child() {
         tally.illegal_decided,
         tally.terminal,
         tally.undecided,
+        tally.stored_ep,
+        tally.no_ep,
         tally.reasons
     );
     assert!(positions.len() >= 94, "only {} positions", positions.len());
@@ -308,6 +382,11 @@ fn child_surface_matches_the_built_child() {
         tally.illegal_decided > 0,
         "no illegal move with a decided child"
     );
+    // Both sides of the 2.8.0 key split are exercised: a child that stores an
+    // en-passant target nobody can capture (the derived-key arm) and one where
+    // the two identity modes agree.
+    assert!(tally.stored_ep > 0, "no stored-illegal ep child");
+    assert!(tally.no_ep > 0, "no plain child");
     // Every `TerminalReason` branch the corpus can reach must actually appear,
     // or the differential is not guarding the reason field.
     for reason in ["Extinction", "NoMovesInCheck", "Stalemate", "MaterialDraw"] {

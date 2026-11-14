@@ -13,8 +13,9 @@ identical tree") is **retired**: the stack was measured at 1.219× and not
 adopted ([`handoff1.md`](handoff1.md) §7, prover D40), so a per-node wall gate
 never was this initiative's decision to make.
 
-Current artifacts: **`plan3.md`** (2.8.0 adoption, drafted 2026-11-13: a pin —
-MG19/MG20 shipped but missed both cost bars, so no `prover` plan follows),
+Current artifacts: **`plan3.md`** (2.8.0 adoption, executed 2026-11-14) with
+**`report3.md`** (kept: a pin — MG19/MG20 shipped but missed both cost bars, so
+no `prover` plan follows),
 **`handoff3.md`** (answered by 2.8.0 and now history: MG19 the terminal state on
 `PostMove`, MG20 a specialised existential legality test, filed 2026-11-13 by
 prover plan30 with the measured cost bars), **`handoff2.md`**
@@ -88,7 +89,7 @@ Ledger of the lifecycle:
 | [`handoff2.md`](handoff2.md) (2026-11-13) | **no release yet** | — | — | superseded by the row below |
 | [`handoff2.md`](handoff2.md) | **2.7.0** (published 2026-11-13T16:20:30Z) | [`plan2.md`](plan2.md) | [`report2.md`](report2.md) | **executed 2026-11-13, kept** — 4/4 landed (MG15–MG18), gates 1–4 green, frozen differential diff-empty, tree identical, wall flat (paired `m1/m0` 0.987, probe 0.9992) |
 | [`handoff3.md`](handoff3.md) (2026-11-13) | **2.7.0** is the baseline | — | — | filed by prover plan30: MG19 `PostMove::terminal()` (+ the key on the same summary), MG20 specialised existential legality (≤ 12 ns bar); both P2 |
-| [`handoff3.md`](handoff3.md) | **2.8.0** (published 2026-11-13T22:45:11Z, `.crate` `ac68cf10…f2006b`) | [`plan3.md`](plan3.md) | — | **drafted 2026-11-13, not executed** — MG19/MG20 landed as API, **0 of 2 met the cost bar** (MG20 25–30 ns against ≤ 12 ns; with the key the composite is 1.24× built-ish), so the prover stack stays unauthorised (handoff3 §3): the plan is a pin, not an integration |
+| [`handoff3.md`](handoff3.md) | **2.8.0** (published 2026-11-13T22:45:11Z, `.crate` `ac68cf10…f2006b`) | [`plan3.md`](plan3.md) | [`report3.md`](report3.md) | **executed 2026-11-14, kept** — MG19/MG20 landed as API, **0 of 2 met the cost bar** (MG20 25–30 ns against ≤ 12 ns; with the key the composite is 1.24× built-ish), so the prover stack stays unauthorised (handoff3 §3): the plan is a pin, not an integration. Gates 1–4 green (crate harness 173 + 51 + 16, frozen differential diff-empty, the extended child-surface and new legality-screen differentials mutation-checked, slow tier 4/4, veto 8/8), tree identical 3/3, wall flat (paired `m1/m0` 1.0025, probe 0.9996) |
 
 A plan may be drafted **early** (to have the gate and the measurement script
 ready) but it is executed only against a published version. A pre-release
@@ -319,3 +320,23 @@ Every integration plan contains these, in this order (D-MG6):
   0.986, medians 2551 vs 2587 ms). Note the screen is the first pin with a
   plausible wall effect: it serves `has_legal_move_with_state`, which
   `rules::status` reaches through `Board::outcome()`.
+- **2026-11-14** — **`plan3` executed: 2.8.0 adopted and kept.** The pin is
+  `Cargo.toml` + `Cargo.lock`, nothing else; gate 2's frozen surface
+  regenerates its committed sha256 `b8badd09…` byte-identically, so no move
+  order, perft value, key, clock or outcome moved. Gate 3: `make test` 196
+  passed / 5 ignored, `make lint` green, slow tier 4/4, `make veto` 8/8
+  accepted / 4/4 controls rejected with `provari check` agreeing. Two test
+  additions pin the new surface: `PostMove::terminal()` and
+  `post_move_and_key`'s key against our built child (51,334 children; the key
+  is the `Always`-mode child hash and equals atomi's `Legal` identity plus
+  `rules::ep_key(file)` exactly on the 2,866 children that store an
+  uncapturable ep target), and the MG20 screen **against `generate_legal`**
+  (51,633 children, 2,859 parents; new `tests/legality_screen_differential.rs`)
+  — the screen could turn a `Legal` into a `Stalemate`, so it is never compared
+  with itself. Measurement: `deep-win` 5 M tree identical (168,910 expansions),
+  `m1/m0` 0.9996; paired bench geomean **1.0025** at tree identity 3/3;
+  per-expansion 1,999.7 ns (`m0` 2,006.1) — flat, so the screen does not move
+  the wall. Two dated `prover/bench.md` rows; data in
+  `measurements/movegen/plan3/`. No rung claimed; **no `prover` plan follows**
+  (handoff3 §3's gate stays failed), and `handoff4.md` stays unspent until a
+  formulation that does not read the child board exists (`report3.md` §7).

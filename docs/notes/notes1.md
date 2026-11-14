@@ -236,5 +236,7 @@ why did the last handoff iteration fail? how can we prevent missing details in t
 
 ---
 
+Last session
+
 we tested `shakmaty` versus `atomic-movegen` and found that `atomic-movegen` is significantly faster.
 so where exactly is the gap now?

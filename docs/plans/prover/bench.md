@@ -186,6 +186,8 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
 | `movegen plan1`[^mg1] | 2026-11-13 | `e10de197da58` | atomi **bare** (`--guide none`), 2.6.0 | **35.103** | **14.403** | censored | **22.485** (2) | 120 s |
 | `movegen plan2`[^mg2] | 2026-11-13 | `e10de197da58` | atomi **bare** (`--guide none`), 2.7.0 | censored | **14.046** | censored | **14.046** (1) | 10 s |
 | `movegen plan2`[^mg2] | 2026-11-13 | `e10de197da58` | atomi **bare** (`--guide none`), 2.7.0 | **33.881** | **13.603** | censored | **21.468** (2) | 120 s |
+| `movegen plan3`[^mg3] | 2026-11-14 | `e10de197da58` | atomi **bare** (`--guide none`), 2.8.0 | censored | **13.587** | censored | **13.587** (1) | 10 s |
+| `movegen plan3`[^mg3] | 2026-11-14 | `e10de197da58` | atomi **bare** (`--guide none`), 2.8.0 | **34.913** | **14.226** | censored | **22.286** (2) | 120 s |
 
 [^host]: the plan's `env.json` machine id. Factors are same-session ratios, so a
     row is valid on its own host and never against another row's (rule 1).
@@ -331,6 +333,28 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     `provari check` agreeing. Numbers:
     [`measurements/movegen/plan2/`](measurements/movegen/plan2/README.md).
 
+[^mg3]: **`movegen` plan3 — a dependency-only adoption**, not a prover stack:
+    `atomic-movegen` 2.7.0 → 2.8.0 with no call-site change (the release adds
+    MG19 `PostMove::terminal()` / `post_move_and_key` and MG20 a positive
+    existence screen; atomi calls none of them, and handoff3 §3's cost gate is
+    failed, so no `prover` plan follows), so the tree is identical by
+    construction and the wall is expected flat. Both caps are measured against
+    a **control built from the same source tree on published 2.7.0** (`m0`), in
+    the same session, alternating per repeat. Cap 120 s: `core` 18.246 s (`m0`)
+    / 18.364 s (`m1`), `easy-win` 1.887 / 1.892, `deep-win` censored on both.
+    Cap 10 s: `easy-win` 1.878 / 1.875, `core`/`deep-win` censored on both.
+    Paired cells (`easy-win`@10 s, `core`@120 s, `easy-win`@120 s): `m1/m0`
+    geomean **1.0025**, tree identical 3/3. A 5 M-eval `deep-win` probe
+    (`--guide hand`, seed 0) reproduces the plan28 control tree (168,910
+    expansions) on both sides at **0.9996×**; per-expansion (`make pernode`,
+    `core` 10 M, 192 MB) **1,999.7 ns** (`m0` in the same session: 2,006.1;
+    the plan2 point for 2.7.0 was 2,025, cross-session). The stack is the
+    **bare** tree (D28) and is not compared with the hand-stack rows (rule 4);
+    the censoring matches the plan2 row of the same stack, so coverage did not
+    move. No D14 claim (no proof or search change); `make veto` 8/8 accepted
+    with `provari check` agreeing. Numbers:
+    [`measurements/movegen/plan3/`](measurements/movegen/plan3/README.md).
+
 **One engine per table (D10 amendment, 2026-11-11).** Only `atomi@*` rows form
 a series. The legacy `solver@5f85133` controls measured in plan1 (`default`
 45.358, 1/3; `opt` 6.322, 2/3) are a frozen one-session baseline of a different
@@ -355,6 +379,7 @@ They left the table because a mixed series invites exactly that comparison.
 | `atomi@7cc3494+d` | `7cc34948a65566790bab77d0f9c8a0c1ffb91838` | plan27 |
 | `atomi@9617f9b+d` | `9617f9b3c3feebded778892f7b29da57305c0679` | `movegen plan1` |
 | `atomi@f88533e+d` | `f88533eb8135cdfb81d89aa2de9fbf9102f1c8d9` | `movegen plan2` |
+| `atomi@d675701+d` | `d675701fe9c00c5deb5b643ab5c7340e29b96794` | `movegen plan3` |
 | `provari-v0.1.0` | `48686bc6c786d6ea70568f0b2ad4002cf0520206` | the 1.000 side of every factor |
 | `solver@5f85133` | `5f85133ea9d751368a682e53e354bd3fc0016d00` | the frozen legacy control of the [plan1 note](#plan1), not a row |
 
