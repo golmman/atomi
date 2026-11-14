@@ -1,0 +1,143 @@
+{
+ "label": "control",
+ "binary": "target/release/atomi",
+ "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+ "seconds": 120,
+ "wall_ms": 59005,
+ "child_evals": 155236740,
+ "expansions": 5803257,
+ "rows": [
+  {
+   "self_percent": 21.55,
+   "symbol": "<atomi::table::Tables>::lookup_with_source"
+  },
+  {
+   "self_percent": 8.4,
+   "symbol": "<atomi::search::frame::Frame>::enter"
+  },
+  {
+   "self_percent": 7.25,
+   "symbol": "<atomic_movegen::board::Board>::do_move"
+  },
+  {
+   "self_percent": 7.24,
+   "symbol": "atomic_movegen::movegen::generate_pseudo_legal_in_view"
+  },
+  {
+   "self_percent": 5.71,
+   "symbol": "<atomic_movegen::board::Board>::attackers_to_color"
+  },
+  {
+   "self_percent": 5.58,
+   "symbol": "<atomic_movegen::position::PositionView>::checkers"
+  },
+  {
+   "self_percent": 5.33,
+   "symbol": "atomi::guide::null::null_win"
+  },
+  {
+   "self_percent": 5.3,
+   "symbol": "atomic_movegen::position::legal_with_counts"
+  },
+  {
+   "self_percent": 3.35,
+   "symbol": "atomi::guide::eval::hand_eval"
+  },
+  {
+   "self_percent": 3.14,
+   "symbol": "atomic_movegen::attacks::attacks_from"
+  },
+  {
+   "self_percent": 2.71,
+   "symbol": "<atomi::mover::Mover>::effect"
+  },
+  {
+   "self_percent": 2.69,
+   "symbol": "<atomic_movegen::board::Board>::populate_state"
+  },
+  {
+   "self_percent": 2.24,
+   "symbol": "<atomic_movegen::board::FastLegality>::is_legal_widened"
+  },
+  {
+   "self_percent": 1.65,
+   "symbol": "atomic_movegen::movegen::has_legal_move_in_view"
+  },
+  {
+   "self_percent": 1.57,
+   "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid"
+  },
+  {
+   "self_percent": 1.45,
+   "symbol": "<atomic_movegen::board::Board>::undo_move"
+  },
+  {
+   "self_percent": 1.41,
+   "symbol": "atomic_movegen::movegen::generate_legal_in_view"
+  },
+  {
+   "self_percent": 1.36,
+   "symbol": "atomi::search::node_value"
+  },
+  {
+   "self_percent": 1.34,
+   "symbol": "<atomi::guide::Guide>::start_numbers"
+  },
+  {
+   "self_percent": 0.98,
+   "symbol": "__memmove_avx_unaligned_erms"
+  },
+  {
+   "self_percent": 0.95,
+   "symbol": "atomi::guide::class::classify_exact"
+  },
+  {
+   "self_percent": 0.81,
+   "symbol": "<atomi::mover::Mover>::gives_check"
+  },
+  {
+   "self_percent": 0.74,
+   "symbol": "atomi::guide::class::defence_likely_to_refute"
+  },
+  {
+   "self_percent": 0.71,
+   "symbol": "<atomi::table::Tables>::store"
+  },
+  {
+   "self_percent": 0.64,
+   "symbol": "atomic_movegen::movegen::for_each_legal_in_view::<(), atomi::guide::null::exposed_limit_uncached::{closure#0}>::{closure#0}"
+  },
+  {
+   "self_percent": 0.63,
+   "symbol": "atomi::guide::threat::has_explosion"
+  },
+  {
+   "self_percent": 0.59,
+   "symbol": "atomic_movegen::board::castling_rights_after"
+  },
+  {
+   "self_percent": 0.56,
+   "symbol": "<atomic_movegen::board::Board>::outcome"
+  },
+  {
+   "self_percent": 0.49,
+   "symbol": "<atomic_movegen::board::Board>::blast_casualties"
+  },
+  {
+   "self_percent": 0.45,
+   "symbol": "malloc"
+  },
+  {
+   "self_percent": 0.43,
+   "symbol": "atomi::guide::threat::immediate_explosion"
+  },
+  {
+   "self_percent": 0.39,
+   "symbol": "<atomic_movegen::board::Board>::legal_ep_square"
+  },
+  {
+   "self_percent": 0.33,
+   "symbol": "atomi::guide::threat::signature_for"
+  }
+ ]
+}

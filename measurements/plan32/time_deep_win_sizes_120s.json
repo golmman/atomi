@@ -1,0 +1,42 @@
+{
+ "deep-win": {
+  "control_ms": [
+   57942
+  ],
+  "variants": {
+   "G1+pf512k_proof": {
+    "env": {
+     "ATOMI_PF_KB": "512",
+     "ATOMI_PF_FROM": "proof",
+     "ATOMI_PF_DROP": "50"
+    },
+    "ms": [
+     57315
+    ],
+    "ratio": [
+     0.9892
+    ],
+    "tree_identical": [
+     true
+    ]
+   },
+   "G1+pf4m_proof": {
+    "env": {
+     "ATOMI_PF_MB": "4",
+     "ATOMI_PF_FROM": "proof",
+     "ATOMI_PF_DROP": "50"
+    },
+    "ms": [
+     60180
+    ],
+    "ratio": [
+     1.0386
+    ],
+    "tree_identical": [
+     true
+    ]
+   }
+  },
+  "control_median_ms": 57942
+ }
+}

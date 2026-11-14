@@ -1,0 +1,85 @@
+{
+ "deep-win": {
+  "control_ms": [
+   58290,
+   58182
+  ],
+  "variants": {
+   "G1": {
+    "env": {
+     "ATOMI_PF_MB": "0"
+    },
+    "ms": [
+     57251,
+     56688
+    ],
+    "ratio": [
+     0.9822,
+     0.9743
+    ],
+    "tree_identical": [
+     true,
+     true
+    ]
+   },
+   "G1+pf256k_proof": {
+    "env": {
+     "ATOMI_PF_KB": "256",
+     "ATOMI_PF_FROM": "proof",
+     "ATOMI_PF_DROP": "50"
+    },
+    "ms": [
+     56829,
+     56858
+    ],
+    "ratio": [
+     0.9749,
+     0.9772
+    ],
+    "tree_identical": [
+     true,
+     true
+    ]
+   },
+   "G1+pf2m_proof": {
+    "env": {
+     "ATOMI_PF_MB": "2",
+     "ATOMI_PF_FROM": "proof",
+     "ATOMI_PF_DROP": "50"
+    },
+    "ms": [
+     58341,
+     59125
+    ],
+    "ratio": [
+     1.0009,
+     1.0162
+    ],
+    "tree_identical": [
+     true,
+     true
+    ]
+   },
+   "G1+pf2m_tt": {
+    "env": {
+     "ATOMI_PF_MB": "2",
+     "ATOMI_PF_FROM": "tt",
+     "ATOMI_PF_DROP": "50"
+    },
+    "ms": [
+     42788,
+     43194
+    ],
+    "ratio": [
+     0.7341,
+     0.7424
+    ],
+    "tree_identical": [
+     false,
+     false
+    ]
+   }
+  },
+  "control_median_ms": 58236.0
+ }
+}
