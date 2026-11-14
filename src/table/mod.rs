@@ -231,6 +231,13 @@ impl Tables {
         self.proofs.prefetch(key);
     }
 
+    /// Prefetch only the proof run's first slot of `key` — the proof half of
+    /// [`Tables::prefetch`], for a site that will call [`Tables::proved`] and
+    /// never the TT (plan 33, NULL-PIPE).
+    pub fn prefetch_proved(&self, key: u64) {
+        self.proofs.prefetch(key);
+    }
+
     /// The usable stored value for `key` at `counter`: a usable proof-table
     /// entry first, then a usable TT entry; `None` = fresh.
     pub fn lookup(&self, key: u64, counter: u16) -> Option<Value> {

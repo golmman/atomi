@@ -1,0 +1,60 @@
+{
+ "deep-win": {
+  "control_median_ms": 54130,
+  "candidate_median_ms": 50122,
+  "ratios": [
+   0.9257,
+   0.926,
+   0.9334
+  ],
+  "median_ratio": 0.926,
+  "max_ratio": 0.9334,
+  "runs": [
+   {
+    "seed": 0,
+    "control_ms": 58481,
+    "candidate_ms": 54134,
+    "ratio": 0.9257,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 155236740,
+     "expansions": 5803257,
+     "proof_entries": 5716874,
+     "found": true,
+     "length": 36
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 1,
+    "control_ms": 54130,
+    "candidate_ms": 50122,
+    "ratio": 0.926,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 146712125,
+     "expansions": 5376491,
+     "proof_entries": 5275565,
+     "found": true,
+     "length": 37
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 2,
+    "control_ms": 38961,
+    "candidate_ms": 36367,
+    "ratio": 0.9334,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 107672243,
+     "expansions": 3862476,
+     "proof_entries": 4179903,
+     "found": true,
+     "length": 29
+    },
+    "found_equal": true
+   }
+  ]
+ }
+}

@@ -493,3 +493,26 @@ premise are the recorded starting point for the D21 kill review.
   geomean **7.23** (3/3 claimed), `deep-win` 77.4 → **58.4 s**, `T_4` distance
   5.84×. Data: [`measurements/plan31/`](../../../measurements/plan31/README.md);
   report: [`report31.md`](report31.md).
+
+- **2026-11-14**: plan33 (item 40, NULL-PIPE) executed and **adopted** (D46).
+  `null_win`'s pass 1 keys, prefetches and probes in chunks of `K = 16`
+  instead of byte-serially; exact by construction (proof reads are pure and
+  pass 1 stores nothing, so the least firing index and its witness cannot
+  move) and pinned by a new differential at K = 1/8/16 over the fixtures and
+  every seeded playout position with the defender to move, plus a test that
+  seeds a proof on every child index of four boards (`K-1`/`K`/`K+1`/the tail
+  chunk, a proof below a `Won`, an unusable and a non-firing proof). Tree
+  identical 3/3 at 1 M, at the 5 M `deep-win` probe (5,000,034 / 168,910 /
+  215,267) and 9/9 at 120 s. Wall vs a same-session `git archive` control of
+  `01ee0fe` (`78f0c3cb…` vs `110ffc23…`): `deep-win` @120 s **0.926×**
+  (n = 3), the 5 M probe **0.9227×**; `core` 0.9257× / `easy-win` 0.9593×
+  informational. Tuning at 5 M (n = 4): K = 8 0.940, K = 16 0.931, K = 32
+  0.921, K = 8 without the prefetch 0.939 — **the batch pays, the hint does
+  not** (plan32's asymmetry again). Cap-120 row: geomean **6.606** (3/3
+  claimed), `deep-win` 56.7 → **53.4 s**, `T_4` distance **5.34×**; D14 9/9
+  both checkers, `make test-full` + VETO PASS. G-40f (rdtsc profile of pass 1
+  at 120 s): pass 1 is **13.2 pp** of the wall — `rules::status` 6.10,
+  `do_move`+`undo` 4.35, proof probe 2.10, clone 0.38, `key` 0.26 — so the
+  probe line is closed and item 41's ≥ 2 pp bar is measured as met on our
+  side. Data: [`measurements/plan33/`](../../../measurements/plan33/README.md);
+  report: [`report33.md`](report33.md).

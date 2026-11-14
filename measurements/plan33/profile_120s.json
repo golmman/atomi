@@ -1,0 +1,61 @@
+{
+ "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+ "seed": 0,
+ "seconds": 120,
+ "wall_s": 53.0,
+ "instrumented_wall_s": 54.837,
+ "expansions": 5803257,
+ "child_evals": 155236740,
+ "null_calls": 3431807,
+ "moves_scanned": 123171039,
+ "moves_per_call": 35.89,
+ "tsc_hz": 3400013000.0,
+ "rdtsc_overhead_ns": 3.68,
+ "rows": {
+  "status": {
+   "raw_s": 4.14,
+   "corrected_s": 3.234,
+   "pp_of_wall": 6.1,
+   "ns_per_move": 26.26,
+   "ns_per_expansion": 557.27
+  },
+  "keyfn": {
+   "raw_s": 1.046,
+   "corrected_s": 0.14,
+   "pp_of_wall": 0.26,
+   "ns_per_move": 1.14,
+   "ns_per_expansion": 24.12
+  },
+  "probe": {
+   "raw_s": 2.021,
+   "corrected_s": 1.115,
+   "pp_of_wall": 2.1,
+   "ns_per_move": 9.05,
+   "ns_per_expansion": 192.13
+  },
+  "clone": {
+   "raw_s": 0.229,
+   "corrected_s": 0.204,
+   "pp_of_wall": 0.38,
+   "ns_per_move": 1.66,
+   "ns_per_expansion": 35.15
+  },
+  "do_move+undo": {
+   "raw_s": 2.303,
+   "corrected_s": 2.303,
+   "pp_of_wall": 4.35,
+   "ns_per_move": 18.7,
+   "ns_per_expansion": 396.85
+  },
+  "pass1_total": {
+   "corrected_s": 6.996,
+   "pp_of_wall": 13.2,
+   "ns_per_expansion": 1205.55
+  },
+  "rest": {
+   "corrected_s": 46.004,
+   "pp_of_wall": 86.8,
+   "ns_per_expansion": 7927.25
+  }
+ }
+}

@@ -1,0 +1,60 @@
+{
+ "deep-win": {
+  "control_median_ms": 1848,
+  "candidate_median_ms": 1728,
+  "ratios": [
+   0.9124,
+   0.9227,
+   0.9556
+  ],
+  "median_ratio": 0.9227,
+  "max_ratio": 0.9556,
+  "runs": [
+   {
+    "seed": 0,
+    "control_ms": 1894,
+    "candidate_ms": 1728,
+    "ratio": 0.9124,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 5000034,
+     "expansions": 168910,
+     "proof_entries": 215267,
+     "found": false,
+     "length": null
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 1,
+    "control_ms": 1812,
+    "candidate_ms": 1672,
+    "ratio": 0.9227,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 5000041,
+     "expansions": 167568,
+     "proof_entries": 207400,
+     "found": false,
+     "length": null
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 2,
+    "control_ms": 1848,
+    "candidate_ms": 1766,
+    "ratio": 0.9556,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 5000038,
+     "expansions": 168661,
+     "proof_entries": 192266,
+     "found": false,
+     "length": null
+    },
+    "found_equal": true
+   }
+  ]
+ }
+}

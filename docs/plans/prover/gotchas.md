@@ -127,6 +127,22 @@ Referenced from `AGENTS.md` §Correctness.
   Plan 28's S2 therefore routes only `exposed_limit_uncached` through the
   callback stream; a future `null_win` early exit needs a separate tree-identity
   proof ([report28](report28.md)).
+- **`null_win`'s pass 1 is pipelined in chunks of `K = 16`, and `K` has no
+  correctness effect** (plan 33, NULL-PIPE). A chunk is keyed first (make →
+  `rules::status` → `key`/`rule50` → unmake), then its proof runs are
+  prefetched, then the keys are probed in move order; the least firing index
+  and its witness are the ones the byte-serial scan returns, for any `K >= 1`,
+  because proof reads are pure and pass 1 stores nothing
+  (`null::tests::pipelined_pass1_matches_reference`, K = 1/8/16 over the
+  fixtures and every seeded playout position). A change that *stores*, caches
+  or reorders **decisions** inside pass 1 is not this mechanism. The D25 rule
+  above still binds: `work.moves` is the full legal count set before pass 1 and
+  `work.replies` belongs to pass 2. Measured 0.926× on `deep-win` @120 s, tree
+  identical 9/9; the gain is the **batch**, not the hint (no-prefetch 0.939× vs
+  0.940× with it at K = 8, 5 M, one session). Corollary for tests: a
+  differential that compares `work.replies` must disable the null cache
+  (`Tables::with_share_and_cache(.., 0)`), or the side that runs second answers
+  from the cache the first one filled ([report33](report33.md)).
 - An exact-replay path that proves a child by an immediate explosion must
   return the **child's own** one-move proof entry, not just the length; the
   writer walks real positions and fails `missing` otherwise (plan18 D14).

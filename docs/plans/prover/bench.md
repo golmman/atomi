@@ -190,6 +190,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
 | `movegen plan3`[^mg3] | 2026-11-14 | `e10de197da58` | atomi **bare** (`--guide none`), 2.8.0 | **34.913** | **14.226** | censored | **22.286** (2) | 120 s |
 | `plan31`[^p31] | 2026-11-14 | `e10de197da58` | atomi **HOTPATH-V2** (`--guide hand`, D43) | **10.034** | **2.874** | **13.106** | **7.23** (3) | 120 s |
 | `plan32`[^p32] | 2026-11-14 | `e10de197da58` | atomi **HOTPATH-V2 + G1** (`--guide hand`, D43) | **9.735** | **2.835** | **12.773** | **7.064** (3) | 120 s |
+| `plan33`[^p33] | 2026-11-14 | `e10de197da58` | atomi **HOTPATH-V2 + G1 + NULL-PIPE** (`--guide hand`, D43/D46) | **9.219** | **2.648** | **11.811** | **6.606** (3) | 120 s |
 
 [^host]: the plan's `env.json` machine id. Factors are same-session ratios, so a
     row is valid on its own host and never against another row's (rule 1).
@@ -395,6 +396,22 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     proofs** matched `child_evals` and were accepted by `atomi validate` and
     `provari check` (9/9 over seeds 0–2 in `d14.json`). Numbers:
     [`measurements/plan32/`](../../../measurements/plan32/README.md).
+
+[^p33]: **plan33 — NULL-PIPE** (`null_win`'s pass 1 keyed, prefetched and probed
+    in chunks of 16 instead of byte-serially; exact, no flag, no memory
+    change). At Cap 120 s all three cells are 3/3: `core` 4.923 s, `easy-win`
+    0.376 s, `deep-win` 53.420 s against a same-session reference of 0.534 /
+    0.142 / 4.523 s, so the factors are 9.219 / 2.648 / 11.811 and the geomean
+    is **6.606** over 3 claimed cells (`deep-win` `T_4` distance **5.34×**).
+    The tree is **unchanged**: `child_evals` 12,439,376 / 1,016,547 /
+    155,236,740 are the plan31/plan32 values, and `expansions` /
+    `proof_entries` / `found` / `length` were equal in 9/9 interleaved 120 s
+    (cell, seed) pairs plus 3/3 at 1 M and the 5 M `deep-win` probe. Measured
+    same-session against a `git archive` build of `01ee0fe`: `deep-win` @120 s
+    median **0.926×** (3 pairs), the 5 M probe **0.9227×**. **3/3 D14 proofs**
+    accepted by `atomi validate` and `provari check` (9/9 over seeds 0–2 in
+    `d14.json`). Numbers:
+    [`measurements/plan33/`](../../../measurements/plan33/README.md).
 
 **One engine per table (D10 amendment, 2026-11-11).** Only `atomi@*` rows form
 a series. The legacy `solver@5f85133` controls measured in plan1 (`default`

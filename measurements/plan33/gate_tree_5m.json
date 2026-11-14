@@ -1,0 +1,19 @@
+{
+ "deep-win": {
+  "control": {
+   "child_evals": 5000034,
+   "expansions": 168910,
+   "proof_entries": 215267,
+   "found": false,
+   "length": null
+  },
+  "candidate": {
+   "child_evals": 5000034,
+   "expansions": 168910,
+   "proof_entries": 215267,
+   "found": false,
+   "length": null
+  },
+  "identical": true
+ }
+}
