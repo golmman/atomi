@@ -236,7 +236,10 @@ why did the last handoff iteration fail? how can we prevent missing details in t
 
 ---
 
-Last session
+We are still trying to get on par with `provari` via the `prover` initiative.
 
-we tested `shakmaty` versus `atomic-movegen` and found that `atomic-movegen` is significantly faster.
-so where exactly is the gap now?
+Last session we bumped `atomic-movegen` to version 2.8.0 (`docs/plans/movegen/report3.md`) after the last wishlist `docs/plans/movegen/handoff3.md` was implemented.
+Unfortunately the performance goals were not met.
+
+We tested `shakmaty` versus `atomic-movegen` and found that `atomic-movegen` is significantly faster.
+So where exactly is the gap now? How can we close it?
