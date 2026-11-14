@@ -254,10 +254,10 @@ Read docs/plans/prover/initiative.md, docs/plans/prover/report32.md §7 and docs
 
 ---
 
-* plan33
-* kill review
-* movegen ask
-* formulation fork?
+- plan33
+- kill review
+- movegen ask
+- formulation fork?
 
 ---
 
@@ -265,4 +265,18 @@ I don't see the contradiction. You say "parity requires the formulation change",
 
 ---
 
-Perform a fresh `prover` gap analysis and store your results as `docs/plans/prover/analysis3.md`.
+I would answer your question
+"is 5.34× reachable at all in this design base, and if not, what are we actually optimising for?"
+like so:
+
+We experimented so much that the design base is most probably the issue.
+Solution: re-shape so we get closer to the `provari` design.
+To get there we could run a fresh `prover` gap analysis and learn from it.
+
+What do your think?
+
+and store your results as `docs/plans/prover/analysis3.md`.
+
+---
+
+Read docs/plans/prover/plan34.md, report34.md, analysis2.md §5–§6 and docs/plans/prover/gotchas.md. Write a plan session (≤ 8 KB, plan35.md) for G-35, the shape differential: in a scratch clone outside the repo, tabulate counts only from provari's node body (moves, lists, probes, guide numbers per move, child builds, null scans) and map each to our measured ns/op from the plan34 census, producing a summed addressable-pp figure and a predicted µs/expansion for a re-shaped node body. Do not read or copy code into the repo. Output the decision: reshape is funded (≥ 81.3 pp / ≤ 1.7 µs/exp reachable) or it is not (⇒ options C/D for the owner).
