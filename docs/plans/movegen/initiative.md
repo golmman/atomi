@@ -13,9 +13,11 @@ identical tree") is **retired**: the stack was measured at 1.219× and not
 adopted ([`handoff1.md`](handoff1.md) §7, prover D40), so a per-node wall gate
 never was this initiative's decision to make.
 
-Current artifacts: **`handoff3.md`** (the live wishlist: MG19 the terminal
-state on `PostMove`, MG20 a specialised existential legality test, filed
-2026-11-13 by prover plan30 with the measured cost bars), **`handoff2.md`**
+Current artifacts: **`plan3.md`** (2.8.0 adoption, drafted 2026-11-13: a pin —
+MG19/MG20 shipped but missed both cost bars, so no `prover` plan follows),
+**`handoff3.md`** (answered by 2.8.0 and now history: MG19 the terminal state on
+`PostMove`, MG20 a specialised existential legality test, filed 2026-11-13 by
+prover plan30 with the measured cost bars), **`handoff2.md`**
 (MG15–MG18: child-view terminality, filed 2026-11-13 by prover plan29;
 answered 4/4 by 2.7.0 and now history), **`plan2.md`**
 (2.7.0 adoption, executed 2026-11-13) with **`report2.md`** (its outcomes,
@@ -85,7 +87,8 @@ Ledger of the lifecycle:
 | [`handoff1.md`](handoff1.md) §4/MG3 | **2.6.0** | — (consumed by a `prover` plan) | — | **consumed and measured 2026-11-13** — the prover's EFFECT-CHILD-V1 is `no effect` (0.00 % decided, [`../prover/report29.md`](../prover/report29.md)); its differential is committed as `tests/effects_differential.rs` |
 | [`handoff2.md`](handoff2.md) (2026-11-13) | **no release yet** | — | — | superseded by the row below |
 | [`handoff2.md`](handoff2.md) | **2.7.0** (published 2026-11-13T16:20:30Z) | [`plan2.md`](plan2.md) | [`report2.md`](report2.md) | **executed 2026-11-13, kept** — 4/4 landed (MG15–MG18), gates 1–4 green, frozen differential diff-empty, tree identical, wall flat (paired `m1/m0` 0.987, probe 0.9992) |
-| [`handoff3.md`](handoff3.md) (2026-11-13) | **2.7.0 is the baseline; no release yet** | — | — | filed by prover plan30: MG19 `PostMove::terminal()` (+ the key on the same summary), MG20 specialised existential legality (≤ 12 ns bar); both P2, no plan until a release clears the cost bars |
+| [`handoff3.md`](handoff3.md) (2026-11-13) | **2.7.0** is the baseline | — | — | filed by prover plan30: MG19 `PostMove::terminal()` (+ the key on the same summary), MG20 specialised existential legality (≤ 12 ns bar); both P2 |
+| [`handoff3.md`](handoff3.md) | **2.8.0** (published 2026-11-13T22:45:11Z, `.crate` `ac68cf10…f2006b`) | [`plan3.md`](plan3.md) | — | **drafted 2026-11-13, not executed** — MG19/MG20 landed as API, **0 of 2 met the cost bar** (MG20 25–30 ns against ≤ 12 ns; with the key the composite is 1.24× built-ish), so the prover stack stays unauthorised (handoff3 §3): the plan is a pin, not an integration |
 
 A plan may be drafted **early** (to have the gate and the measurement script
 ready) but it is executed only against a published version. A pre-release
@@ -300,3 +303,19 @@ Every integration plan contains these, in this order (D-MG6):
   `measurements/movegen/plan1/`. No rung claimed (D30/D40 stand). Two atomi-
   side fixes went with it: the broken `make pernode` target and a writer that
   cannot silently repair the fixture (`report1.md` §4).
+- **2026-11-13** — **`atomic-movegen` 2.8.0 is published** (22:45:11Z, MIT, MSRV
+  1.85, `.crate` `ac68cf10…f2006b`) and answers **both** items of
+  [`handoff3.md`](handoff3.md) as API — `PostMove::terminal()`,
+  `post_move_and_key()` (+ `rule50()`), and a positive screen in front of the
+  unchanged `has_legal_move` ladder — while its own `Measured` section, and a
+  probe in this session on atomi's corpus, show **neither cost bar is met**
+  (MG20 25–30 ns against ≤ 12 ns; composite **with** the key 1.24× on the
+  crate's built-ish class / 0.97× on atomi's fixture corpus). S2 triggers, so
+  [`plan3.md`](plan3.md) is **drafted as a pin,** not an integration: handoff3
+  §3's stack gate is **failed, not superseded**, and no `prover` plan follows.
+  The probe (one session, `/tmp` only): crate harness green (173 + 51 + 16),
+  atomi compiling unchanged with 195 passed / 5 ignored and the frozen
+  differential green, `deep-win` 5 M tree identical and wall flat (`m1/m0`
+  0.986, medians 2551 vs 2587 ms). Note the screen is the first pin with a
+  plausible wall effect: it serves `has_legal_move_with_state`, which
+  `rules::status` reaches through `Board::outcome()`.
