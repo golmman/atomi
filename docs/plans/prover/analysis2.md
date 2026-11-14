@@ -74,8 +74,8 @@ analysis1 §2), so a row's gap is a local reading, not a share of the total.
 
 | # | Idea | provari spec | atomi state | Gap |
 | --- | --- | --- | --- | --- |
-| P1 | Decide a child from the move's *effect*, not a built board | ~1.42 µs/node | ~15.5 µs/expansion | **open — 11.5–15.5×** (D36) |
-| P2 | Movegen/legality/terminality on the hot path | ~54 % of atomi's wall is movegen + legality + terminality | | **open** — target of the movegen initiative (MG3–MG7) |
+| P1 | Decide a child from the move's *effect*, not a built board | ~1.42 µs/node | **9.25 µs/expansion at 120 s** (measured, plan34 census: 26.75 child evals/expansion) | **open — 6.4×** (D36) |
+| P2 | Movegen/legality/terminality on the hot path | **23.0 pp** of atomi's wall is movegen (12.48) + legality/status/terminality (9.49) + the move effect test (1.06); the rest is the guide's own passes (`Frame::enter` 51.8 pp, null replay 45.0 pp) | | **open** — target of the movegen initiative (MG3–MG7); the ceiling is 23.0 pp ⇒ 1.30× (plan34 census) |
 | P3 | Per-node micro-optimisation | | NULL-V1 0.796×, NULL-V2 0.8631×, HOTPATH-V1 1.219× | **closed** — per-node line closed for good (D40) |
 
 ## 6. The gap in one place

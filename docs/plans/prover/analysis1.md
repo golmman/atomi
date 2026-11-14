@@ -107,8 +107,8 @@ wrong spec, **add** = absent, **skip** = out of scope by decision.
 | R20 | 1+ε widening | `second + 1 + second/8` | ✓ | keep |
 | R21 | Child thresholds from the parent's sum | `ctdn = tdn−dn+cdn`, `ctpn = min(tpn, widen(second))` | ✓ | keep |
 | R22 | Node-entry early return on stored numbers | `proof_within` + `lookup` at entry | ✗ `--stats` only; measured 45 of 153 k expansions would return | skip |
-| R23 | Proof store: full keys, shortest/higher-limit domination, no eviction, refuse at 90 % | 12-byte entries, 64 MB at 10 s | ✓ 16-byte, fixed 25 % share (48 MB) | keep |
-| R24 | Table: 4-slot clusters, least-work replacement, sparse filter | | ✓ | keep |
+| R23 | Proof store: full keys, shortest/higher-limit domination, no eviction, refuse at 90 % | 12-byte entries, 64 MB at 10 s | ✓ 16-byte, 75 % share by default (D35); **measured 5.20 pp** of the `deep-win` wall (269.1 M probes = 23.7/expansion, 10 ns each; plan34 census) | keep |
+| R24 | Table: 4-slot clusters, least-work replacement, sparse filter | | ✓; TT probe **0.04 pp**, filter probe 0.00 pp, store 1.18 pp (plan34, lower bounds — cheap ops clamp against the 7.6–8.3 ns per-interval tax) | keep |
 | R25 | Length-limited passes (`--most`, key salted by moves left), `--shorten` | off by default | ✗ absent (plan13's ply cap was a different thing) | skip for now |
 | R26 | Network/model guide, tablebases, threads, virtual numbers (v0.4) | | ✗ | skip (D6/D7/D8) |
 

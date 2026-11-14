@@ -262,3 +262,7 @@ Read docs/plans/prover/initiative.md, docs/plans/prover/report32.md §7 and docs
 ---
 
 I don't see the contradiction. You say "parity requires the formulation change", which is not true since `provari` successfully does it via df-pn.
+
+---
+
+Perform a fresh `prover` gap analysis and store your results as `docs/plans/prover/analysis3.md`.

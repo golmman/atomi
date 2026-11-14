@@ -516,3 +516,27 @@ premise are the recorded starting point for the D21 kill review.
   probe line is closed and item 41's ≥ 2 pp bar is measured as met on our
   side. Data: [`measurements/plan33/`](../../../measurements/plan33/README.md);
   report: [`report33.md`](report33.md).
+
+- **2026-11-14 — plan34, item 42 (EXPANSION-CENSUS), read-only**: an
+  exhaustive-bucket rdtsc census of one 120 s `deep-win` seed-0 run
+  (5,803,257 expansions in **10/10** runs, no engine/flag/default/`bench.md`
+  change). Three-level design (scratch builds outside the repo): 10 inclusive
+  region aggregates (the exhaustive partition), one leaf group per build (7
+  `--only` builds, exact call counts) and an in-situ empty-interval tax
+  (7.6–8.3 ns) — the naive one-build census inflates the wall 53.66 → 90.32 s
+  and its aggregates 1.6–1.8×, and per-expansion sampling is biased here, both
+  recorded as method findings. Nine exclusive regions sum to **100.00 %** of
+  the 53.656 s wall, `outside` **2.58 pp < 10 pp** (gate PASS); `Frame::enter`
+  **51.77 pp** (pass 1 36.91) + null replay **45.04 pp** (pass 1 17.49, pass 2
+  15.85) are the wall, in two flat loops. Per-op lower bounds (68.97 pp /
+  37.0 s): legal movegen 12.48 pp, frame closure 11.55, status/legality 10.55,
+  `hand_eval` 7.92, proof probe 5.20, replay closure 4.48; **no bucket ≥ 15
+  pp**. Counts per expansion: 26.75 child evals, 53.08 legal moves (2.06
+  lists) + 237.07 pseudo (7.53 lists) = **290 moves**, 8.17 children built,
+  46 probes, 44.76 prefetches, 0.59 null calls (21.22 null moves), 3.68
+  `hand_eval`s. **Stop rule fires**: `T_4` needs **≥ 81.3 pp = 43.62 s**
+  removed, the whole op budget is 37.0 s (**3.22×** if free), so no
+  arrangement of the measured per-node work reaches 5.34×; `T_5` needs 84.9 pp.
+  The goal question goes to the owner (plan34 B/C/D); no plan 35+ in the micro
+  mould. Data: [`measurements/plan34/`](../../../measurements/plan34/README.md);
+  report: [`report34.md`](report34.md).
