@@ -251,3 +251,14 @@ Plan session — prover plan32 (item 39, PROOF-FILTER). Read initiative.md (item
 ---
 
 Read docs/plans/prover/initiative.md, docs/plans/prover/report32.md §7 and docs/plans/prover/gotchas.md, then run a plan session for item 40 — option (b) null-reply probe pipelining (keys → prefetch → probe in null_win's pass 1), estimating the gain, the work.moves/witness exactness proof required and its tree-identity gate; write docs/plans/prover/plan33.md (≤ 8 KB).
+
+---
+
+* plan33
+* kill review
+* movegen ask
+* formulation fork?
+
+---
+
+I don't see the contradiction. You say "parity requires the formulation change", which is not true since `provari` successfully does it via df-pn.

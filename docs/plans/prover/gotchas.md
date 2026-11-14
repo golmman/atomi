@@ -155,3 +155,19 @@ Referenced from `AGENTS.md` §Correctness.
   thresholds are lower than the stored pair. Measured on `deep-win` at 20 M:
   53 of 668,608 expansions (0.0079 %, plan12). Do not re-propose entry reuse
   without new data.
+
+## Scope (not a correctness gotcha, but binding on plans)
+
+- **No formulation change is proposable in `prover`** (D45, owner decision
+  2026-11-14). The recurrent "next decision is the formulation fork" line is
+  dead: provari reaches the goal in the **same** base (DF-PN with
+  proof/disproof numbers, 1.42 µs/node, [`analysis2`](analysis2.md) §5 B1), so
+  the gap is implementation inside a formulation the reference proves
+  sufficient — tree at parity (D36) and ≈11.3 µs per expansion against
+  1.42 µs (≈8×) after plans 31–32. PDS-PN/PN², TT move ordering and restarts
+  would replace the base the hand-guide stack is shaped around (D31) and are
+  **standing-rejected** here; a goal re-pin (D30) is not proposable while
+  progress is measured. A plan may not list one in its options or next steps,
+  and no item may be created for one. If implementation **plateaus** with a
+  large multiple still missing, the goal question goes to a **kill review**.
+  Measure against ≈8×, not D36's pre-plan31 11.5–15.5×.
