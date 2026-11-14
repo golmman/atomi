@@ -1,19 +1,28 @@
 # Plan 32 measurements — item 39 (PROOF-FILTER): the filter is net-zero, G1 is the residue
 
-Plan: [`plan32.md`](../../docs/plans/prover/plan32.md). Host, binaries and pins:
-[`env.json`](env.json). Every number belongs to the control
-`target/release/atomi` (`sha256 3b6b3f6b…`, the plan-31 candidate, unchanged in
-this session) and to two **scratch** builds outside the repo. No engine change
-was made in the repo; the oracle was never run (no proof was claimed).
+Plan: [`plan32.md`](../../docs/plans/prover/plan32.md). Report:
+[`report32.md`](../../docs/plans/prover/report32.md). Host, binaries and pins:
+[`env.json`](env.json). Two sessions: the **plan session** (phase 0, no engine
+change in the repo) measured the filter matrix on scratch builds outside the
+repo; the **execution session** landed G1 (`Tables::proved` + the six guide
+sites) and gated it against a control built from `git archive` of `69b6f50`
+without G1.
 
 | File | Contents |
 | --- | --- |
-| `phase0.py` | the driver, two modes: `counts` (how a lookup resolves, per site) and `time` (interleaved control vs prototype) |
+| `phase0.py` | the phase-0 driver, two modes: `counts` (how a lookup resolves, per site) and `time` (interleaved control vs prototype) |
 | `counts.json` | `--stats` + counter build, 3 cells at 5 M evals and at 120 s |
 | `time_deep_win_120s.json` | G1 and three filter fundings, 120 s, 2 interleaved pairs |
 | `time_small_120s.json` | G1 and the 256 KiB filter on `core`/`easy-win`, 120 s, 3 pairs |
 | `time_deep_win_sizes_120s.json` | the 512 KiB and 4 MiB fundings, 120 s, 1 pair |
 | `profile_120s.json` | `perf` self time, control, 120 s `deep-win` (the profile plan31 did at 5 M) |
+| `execute.py` | the execution gate driver: `tree` (1 M) and `wall` (120 s, interleaved control/candidate, seed = repeat) |
+| `gate_tree_1m.json` | G-39b small tier: 3 cells at 1 M child evals, tree identical 3/3 |
+| `gate_wall_120s.json` | G-39c **as written**: seeds 0–2, 3 interleaved pairs per cell |
+| `gate_wall_120s_ext_small.json`, `gate_wall_120s_ext_deep.json` | the extension at disjoint seeds (`core`/`easy-win` 3–11, `deep-win` 3–5) |
+| `gate_wall_120s_pooled.json` | the pooled G-39c sample (n = 12 / 12 / 6) |
+| `d14.json` | D14: every proved (cell, seed) exported and claimed with both checkers, 9/9 |
+| `bench.json` | the `bench.md` row: Cap 120 s, `--proof-check`, geomean 7.064 on 3 claimed cells |
 
 ## The question the item demanded
 
@@ -67,6 +76,40 @@ early and overlaps the loop), and the one positive row is a **different tree**
 (chaotic sensitivity of TT evictions), which is not the filter's gain and is
 forbidden by the item's tree-identity gate.
 
+## G1 gates (execution session)
+
+G1 = `Tables::proved` (proof table only) at the six guide lookups that accept
+nothing but `Value::Proved` (and the collapsed duplicate in `replay.rs`).
+Control: a `git archive` of `69b6f50` built outside the repo
+(`sha256 11a8db90…`, no G1); candidate: this session's `target/release/atomi`
+(`bf7bc4af…`). One process at a time, control and candidate interleaved,
+`--seed` = repeat so a longer sample is *new* seeds.
+
+| Gate | Bar | Result |
+| --- | --- | --- |
+| G-39a exactness | `proved` ≡ `lookup`'s `Proved` arm (unit differential) + `make test` | **PASS** (`table::tests::proved_matches_lookup_proved_arm`; `make test-full` green) |
+| G-39b tree identity | 3 cells at 1 M and 9 × (cell, seed) at 120 s | **PASS**, 3/3 and 15/15 (`child_evals`, `expansions`, `proof_entries` equal; `found`/`length` equal) |
+| G-39c wall (re-scoped) | median ≤ 0.99 `deep-win`/`core`, ≤ 1.00 `easy-win`, no pair > 1.02 | **n = 3 as written: FAIL on `core`** (0.9930); **pooled n = 12/6: PASS** |
+| G-39d | `make lint`, `make test-full`, `make veto`, D14 9/9 both checkers | **PASS** (veto 8/8 rows + 4 controls, both checkers agree; D14 9/9) |
+| G-39e | one `bench.md` Cap-120 row | **PASS**: geomean **7.064** (plan31 7.23) |
+
+G-39c, the noise problem and the reading (`ratio` = candidate wall / control wall):
+
+| Cell | n = 3 median (as written) | pooled median | pooled mean | min–max | n |
+| --- | ---: | ---: | ---: | --- | ---: |
+| `core` | 0.9930 **fail** | **0.9859** | 0.9873 | 0.9738–1.0095 | 12 |
+| `easy-win` | 0.9974 | **0.9864** | 0.9842 | 0.9567–1.0149 | 12 |
+| `deep-win` | 0.9874 | **0.9871** | 0.9866 | 0.9791–0.9948 | 6 |
+
+`core` at 120 s proves in 4.3–5.5 s and `easy-win` in 0.4–1.4 s, so a single
+pair carries ~1–2 % host noise against an expected 1.5–2 % effect: the first
+three seeds measured `core` at 1.0095 / 0.9905 / 0.9930 (median 0.9930, i.e.
+0.3 pp over the bar) and nine further seeds at 0.9738–1.0006. `deep-win` runs
+the full 120 s (or 36–58 s where the mate lands first) and is the only cell
+with a low-noise ratio at n = 3 (0.9874). Verdict: the gate is **not met as
+written** on `core` and **met on the pooled sample**; the report records this
+as a documented deviation for owner sign-off, not as a re-scoped bar.
+
 ## Scratch builds (never committed)
 
 Both are `git archive HEAD | tar -x` copies outside the repo.
@@ -89,6 +132,22 @@ Both are `git archive HEAD | tar -x` copies outside the repo.
    that run is not in this table).
 
 ## Reproduce
+
+    python3 measurements/plan32/execute.py --mode tree \
+        --control /tmp/atomi-plan32-control/target/release/atomi \
+        --candidate target/release/atomi --out /tmp/tree.json
+    python3 measurements/plan32/execute.py --mode wall \
+        --control /tmp/atomi-plan32-control/target/release/atomi \
+        --candidate target/release/atomi --seconds 120 --repeats 3 \
+        --out /tmp/wall.json
+    python3 bench/run_bench.py --provari /tmp/atomi-oracle/provari/target/release/provari \
+        --provari-commit 48686bc6c786d6ea70568f0b2ad4002cf0520206 \
+        --atomi target/release/atomi --atomi-stack "hand=--guide hand" \
+        --cases core,1eb80b92f92c,db6a741c723f --seconds 120 --repeats 3 \
+        --proof-check --provari-check /tmp/atomi-oracle/provari/target/release/provari \
+        --out /tmp/bench.json
+
+Phase 0 (scratch builds):
 
     python3 measurements/plan32/phase0.py --mode counts \
         --probe /tmp/atomi-plan32-probe/target/release/atomi \

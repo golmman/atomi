@@ -19,7 +19,6 @@
 
 use crate::guide::threat;
 use crate::rules;
-use crate::search::value::Value;
 use crate::table::{ProofEntry, Tables};
 use atomic_movegen::board::{Board, StateInfo};
 use atomic_movegen::movegen::generate_legal;
@@ -27,6 +26,16 @@ use atomic_movegen::types::{Color, Move, MoveList};
 
 /// The default replay budget (attacker nodes visited per sibling).
 pub const REPLAY_BUDGET: u32 = 1000;
+
+/// The winning move of a proof entry: `0` bits is a defender proof (no move),
+/// which is never a usable guide move. `Move::from_bits(0)` would decode to
+/// `Move::NONE`, so the zero case is handled first.
+fn proof_move(pe: ProofEntry) -> Option<Move> {
+    match pe.mv {
+        0 => None,
+        bits => Move::from_bits(bits),
+    }
+}
 
 /// A defender-side replay result: `(length, limit, proofs)`.
 type Reached = (u16, u8, Vec<(u64, ProofEntry)>);
@@ -121,19 +130,18 @@ fn simulate_inner(
     }
     let key = rules::key(pos);
     let counter = pos.rule50();
-    if let Some(Value::Proved { length, limit, .. }) = tables.lookup(key, counter)
-        && length <= remaining
+    // G1: this site only accepts a proof, so the TT probe is skipped.
+    if let Some(pe) = tables.proved(key, counter)
+        && pe.length <= remaining
     {
         // Already proved: no new proof, but the caller needs a move.
-        if let Some(Value::Proved { mv: Some(mv), .. }) = tables.lookup(key, counter) {
-            return Some(ReplayProof {
-                length,
-                limit,
-                mv,
-                proofs: Vec::new(),
-            });
-        }
-        return None;
+        let mv = proof_move(pe)?;
+        return Some(ReplayProof {
+            length: pe.length,
+            limit: pe.limit,
+            mv,
+            proofs: Vec::new(),
+        });
     }
     if *budget == 0 || remaining == 0 || line.contains(&key) || search_line.contains(&key) {
         return None;
@@ -149,10 +157,8 @@ fn simulate_inner(
         None => {
             let gkey = rules::key(guide);
             let gcounter = guide.rule50();
-            match tables.lookup(gkey, gcounter) {
-                Some(Value::Proved { mv: Some(mv), .. }) => mv,
-                _ => return None,
-            }
+            // G1: the guide's move comes from a proof (or nothing).
+            tables.proved(gkey, gcounter).and_then(proof_move)?
         }
     };
     if !pos.is_legal(gmv) {
@@ -216,10 +222,11 @@ fn simulate_defences(
     }
     let key = rules::key(pos);
     let counter = pos.rule50();
-    if let Some(Value::Proved { length, limit, .. }) = tables.lookup(key, counter)
-        && length <= remaining
+    // G1: only a proof is accepted here.
+    if let Some(pe) = tables.proved(key, counter)
+        && pe.length <= remaining
     {
-        return Some((length, limit, Vec::new()));
+        return Some((pe.length, pe.limit, Vec::new()));
     }
     if counter >= 100 || line.contains(&key) || search_line.contains(&key) {
         return None;
@@ -245,9 +252,10 @@ fn simulate_defences(
             rules::Status::Open => {
                 let nkey = rules::key(&next);
                 let ncounter = next.rule50();
-                if let Some(Value::Proved { length, limit, .. }) = tables.lookup(nkey, ncounter) {
-                    if length <= remaining {
-                        (length, limit, Vec::new())
+                // G1: only a proof is accepted here.
+                if let Some(pe) = tables.proved(nkey, ncounter) {
+                    if pe.length <= remaining {
+                        (pe.length, pe.limit, Vec::new())
                     } else {
                         line.pop();
                         return None;
@@ -312,6 +320,7 @@ fn simulate_defences(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::search::value::Value;
     use crate::table::Tables;
 
     fn board(fen: &str) -> Board {

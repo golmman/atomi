@@ -68,9 +68,33 @@ Referenced from `AGENTS.md` §Correctness.
   peak RSS of a mate-in-1 after touching `alloc.rs`.
 - `unsafe` sites (lazy allocator, `_mm_prefetch`, `madvise(MADV_HUGEPAGE)`)
   each carry `// SAFETY:` and a measured keep rule (D20).
+- **A second bit filter over proof-table keys is net zero at every size that
+  keeps the tree** (plan32, item 39 closed `no effect`). A filter probe is a
+  *dependent* random access (its answer selects the next probe and a branch),
+  while the probe it skips is issued early and overlaps the loop body; the
+  measured marginal value of a skipped probe is ≈14 ns (G1 removed 137.7 M of
+  538 M probes for 1.9 s of 58.2 s) against 12–18 ns per filter probe at a
+  10 %→34 % false-positive rate on 5.7 M keys. Measured same-session, all
+  tree-identical: 256 KiB (the label's free slack) 0.975–1.011×, 512 KiB
+  0.989–1.004×, 2 MiB from the proof table 1.001–1.016×, 4 MiB 1.026–1.039×.
+  The existing filter pays only because it replaces **two** probes and fits in
+  L2 while it lives. Do not re-propose a label-funded proof filter at any
+  size; a re-proposal needs a mechanism-level claim
+  ([`report32`](report32.md)).
 
 ## Determinism and the guide
 
+- **A guide site that only accepts `Value::Proved` must call
+  `Tables::proved`, never `lookup`** (plan32, G1). Proofs never live in the
+  TT, so `lookup`'s `Proved` arm *is* `proofs.get`; at 120 s `deep-win` only
+  2.8 % of lookups hit a proof and 90.6 % hit nothing, so the TT probe there
+  can never answer. `proved` is exact iff the site rejects every non-`Proved`
+  value — a site that also accepts `Open`/`Refuted` silently loses them. Pinned
+  by `table::tests::proved_matches_lookup_proved_arm`. Corollary: a proof
+  entry's `mv == 0` is a **defender** proof, and `Move::from_bits(0)` decodes
+  to `Some(Move::NONE)`, not `None` — decode only non-zero bits
+  (`guide/replay.rs::proof_move`), or a defender proof becomes a "winning"
+  null move.
 - The search is deterministic: same binary + FEN + flags (+ `--seed`) gives
   the same counters. `--proof-out` never changes the trajectory.
 - `--guide none --seed 0` must stay counter-identical to m1: the guide's fresh

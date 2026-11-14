@@ -237,6 +237,18 @@ impl Tables {
         self.lookup_with_source(key, counter).map(|(v, _)| v)
     }
 
+    /// The usable proof-table entry for `key` at `counter`, **without** the
+    /// TT probe (plan 32, G1 PROOF-PROBE-TRIM).
+    ///
+    /// Only correct where the caller accepts `Value::Proved` and nothing
+    /// else: proofs never live in the TT, so [`Tables::lookup`]'s `Proved`
+    /// arm *is* `proofs.get`, and terminal wins (`length 0`) are never
+    /// inserted. The differential test `proved_matches_lookup_proved_arm`
+    /// pins that.
+    pub fn proved(&self, key: u64, counter: u16) -> Option<ProofEntry> {
+        self.proofs.get(key, counter)
+    }
+
     /// Like [`Tables::lookup`], but also reports which table served the hit
     /// (the plan-12 attribution counters).
     pub(crate) fn lookup_with_source(
@@ -461,6 +473,96 @@ mod tests {
                 from: 10
             })
         ));
+    }
+
+    /// xorshift64* — deterministic, no dependency.
+    fn rng(state: &mut u64) -> u64 {
+        let mut x = *state;
+        x ^= x >> 12;
+        x ^= x << 25;
+        x ^= x >> 27;
+        *state = x;
+        x.wrapping_mul(0x2545_F491_4F6C_DD1D)
+    }
+
+    #[test]
+    fn proved_matches_lookup_proved_arm() {
+        // G1 exactness: `proved` must be byte-equal to `lookup`'s `Proved`
+        // arm over every `(key, counter)` of a randomised table carrying
+        // defender proofs (mv 0), attacker proofs, dominating re-inserts
+        // that become no-ops, tombstoning inserts and unusable limits.
+        let mut t = Tables::new(16, true);
+        let mut s = 0x9E37_79B9_7F4A_7C15u64;
+        let keys: Vec<u64> = (0..64).map(|_| rng(&mut s)).collect();
+        for _ in 0..400 {
+            let key = keys[(rng(&mut s) as usize) % keys.len()];
+            let entry = ProofEntry {
+                mv: if rng(&mut s).is_multiple_of(3) {
+                    0
+                } else {
+                    (rng(&mut s) % 0x1000 + 1) as u16
+                },
+                length: (rng(&mut s) % 6 + 1) as u16,
+                limit: (rng(&mut s) % 101) as u8,
+            };
+            let mv = if entry.mv == 0 {
+                None
+            } else {
+                Move::from_bits(entry.mv)
+            };
+            // Also push TT entries under the same keys: they must never be
+            // returned by `proved`.
+            match rng(&mut s) % 3 {
+                0 => t.store(key, &Value::Open { pn: 3, dn: 4 }, 0),
+                1 => t.store(
+                    key,
+                    &Value::Refuted {
+                        cycle: ANY,
+                        from: 0,
+                    },
+                    0,
+                ),
+                _ => {}
+            }
+            t.store(
+                key,
+                &Value::Proved {
+                    length: entry.length,
+                    limit: entry.limit,
+                    mv,
+                },
+                0,
+            );
+        }
+        assert!(t.proofs().live() > 0, "the differential table is empty");
+        let mut proved_seen = 0usize;
+        for &key in &keys {
+            for counter in 0u16..=100 {
+                let want = match t.lookup(key, counter) {
+                    Some(Value::Proved { length, limit, mv }) => Some((length, limit, mv)),
+                    _ => None,
+                };
+                let got = t.proved(key, counter).map(|e| {
+                    (
+                        e.length,
+                        e.limit,
+                        if e.mv == 0 {
+                            None
+                        } else {
+                            Move::from_bits(e.mv)
+                        },
+                    )
+                });
+                assert_eq!(got, want, "key {key:#x} counter {counter}");
+                proved_seen += usize::from(got.is_some());
+            }
+        }
+        assert!(proved_seen > 100, "too few proving hits: {proved_seen}");
+        // A TT-only key is found by `lookup` and must not be by `proved`.
+        let tt_only = 0xDEAD_BEEF_0BAD_F00Du64;
+        t.store(tt_only, &Value::Open { pn: 1, dn: 1 }, 0);
+        assert_eq!(t.lookup(tt_only, 0), Some(Value::Open { pn: 1, dn: 1 }));
+        assert_eq!(t.proved(tt_only, 0), None);
     }
 
     #[test]

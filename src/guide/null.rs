@@ -19,7 +19,6 @@
 
 use crate::guide::threat;
 use crate::rules;
-use crate::search::value::Value;
 use crate::table::{CachedLimit, NullCache, Tables};
 use atomic_movegen::board::{Board, StateInfo};
 use atomic_movegen::movegen::{for_each_legal_with_state, generate_legal};
@@ -99,19 +98,20 @@ pub fn null_win(
         }
         let key = rules::key(&scratch);
         let counter = scratch.rule50();
-        if let Some(Value::Proved { length, limit, .. }) = tables.lookup(key, counter)
-            && length <= remaining
+        // G1: this site only accepts a proof, so the TT probe is skipped.
+        if let Some(pe) = tables.proved(key, counter)
+            && pe.length <= remaining
         {
             let limit = if scratch.rule50() == 0 {
                 99
             } else {
-                limit.saturating_sub(1).min(99)
+                pe.limit.saturating_sub(1).min(99)
             };
             return Some((
                 null,
                 NullWin {
                     mv: m,
-                    length: length.saturating_add(1),
+                    length: pe.length.saturating_add(1),
                     limit,
                 },
             ));
@@ -231,6 +231,7 @@ fn exposed_limit_uncached(child: &Board, attacker: Color, work: &mut NullWork) -
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::search::value::Value;
 
     fn board(fen: &str) -> Board {
         Board::from_fen(fen).unwrap()
@@ -303,19 +304,20 @@ mod tests {
             }
             let key = rules::key(&child);
             let counter = child.rule50();
-            if let Some(Value::Proved { length, limit, .. }) = tables.lookup(key, counter)
-                && length <= remaining
+            // G1: this reference site only accepts a proof.
+            if let Some(pe) = tables.proved(key, counter)
+                && pe.length <= remaining
             {
                 let limit = if child.rule50() == 0 {
                     99
                 } else {
-                    limit.saturating_sub(1).min(99)
+                    pe.limit.saturating_sub(1).min(99)
                 };
                 return Some((
                     null,
                     NullWin {
                         mv: m,
-                        length: length.saturating_add(1),
+                        length: pe.length.saturating_add(1),
                         limit,
                     },
                     work,

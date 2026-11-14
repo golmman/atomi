@@ -1,0 +1,232 @@
+{
+  "seconds": 120,
+  "rows": [
+    {
+      "cell": "core",
+      "seed": 0,
+      "wall_ms": 5236,
+      "found": true,
+      "exit": "proved",
+      "length": 15,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan32-proofs/core-s0.jsonl",
+        "valid": true,
+        "positions": 16991,
+        "length": 15,
+        "header_moves": 15,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 15,
+        "proof": "/tmp/atomi-plan32-proofs/core-s0.jsonl",
+        "valid": true,
+        "won_positions": 16991
+      },
+      "claim": true
+    },
+    {
+      "cell": "core",
+      "seed": 1,
+      "wall_ms": 4318,
+      "found": true,
+      "exit": "proved",
+      "length": 26,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan32-proofs/core-s1.jsonl",
+        "valid": true,
+        "positions": 16512,
+        "length": 26,
+        "header_moves": 26,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 26,
+        "proof": "/tmp/atomi-plan32-proofs/core-s1.jsonl",
+        "valid": true,
+        "won_positions": 16512
+      },
+      "claim": true
+    },
+    {
+      "cell": "core",
+      "seed": 2,
+      "wall_ms": 4214,
+      "found": true,
+      "exit": "proved",
+      "length": 20,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan32-proofs/core-s2.jsonl",
+        "valid": true,
+        "positions": 13751,
+        "length": 20,
+        "header_moves": 20,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 20,
+        "proof": "/tmp/atomi-plan32-proofs/core-s2.jsonl",
+        "valid": true,
+        "won_positions": 13751
+      },
+      "claim": true
+    },
+    {
+      "cell": "easy-win",
+      "seed": 0,
+      "wall_ms": 396,
+      "found": true,
+      "exit": "proved",
+      "length": 19,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan32-proofs/easy-win-s0.jsonl",
+        "valid": true,
+        "positions": 2980,
+        "length": 19,
+        "header_moves": 19,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 19,
+        "proof": "/tmp/atomi-plan32-proofs/easy-win-s0.jsonl",
+        "valid": true,
+        "won_positions": 2980
+      },
+      "claim": true
+    },
+    {
+      "cell": "easy-win",
+      "seed": 1,
+      "wall_ms": 432,
+      "found": true,
+      "exit": "proved",
+      "length": 19,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan32-proofs/easy-win-s1.jsonl",
+        "valid": true,
+        "positions": 2794,
+        "length": 19,
+        "header_moves": 19,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 19,
+        "proof": "/tmp/atomi-plan32-proofs/easy-win-s1.jsonl",
+        "valid": true,
+        "won_positions": 2794
+      },
+      "claim": true
+    },
+    {
+      "cell": "easy-win",
+      "seed": 2,
+      "wall_ms": 705,
+      "found": true,
+      "exit": "proved",
+      "length": 16,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan32-proofs/easy-win-s2.jsonl",
+        "valid": true,
+        "positions": 4100,
+        "length": 16,
+        "header_moves": 16,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 16,
+        "proof": "/tmp/atomi-plan32-proofs/easy-win-s2.jsonl",
+        "valid": true,
+        "won_positions": 4100
+      },
+      "claim": true
+    },
+    {
+      "cell": "deep-win",
+      "seed": 0,
+      "wall_ms": 56578,
+      "found": true,
+      "exit": "proved",
+      "length": 36,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan32-proofs/deep-win-s0.jsonl",
+        "valid": true,
+        "positions": 93092,
+        "length": 36,
+        "header_moves": 36,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 36,
+        "proof": "/tmp/atomi-plan32-proofs/deep-win-s0.jsonl",
+        "valid": true,
+        "won_positions": 93092
+      },
+      "claim": true
+    },
+    {
+      "cell": "deep-win",
+      "seed": 1,
+      "wall_ms": 52357,
+      "found": true,
+      "exit": "proved",
+      "length": 37,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan32-proofs/deep-win-s1.jsonl",
+        "valid": true,
+        "positions": 72787,
+        "length": 37,
+        "header_moves": 37,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 37,
+        "proof": "/tmp/atomi-plan32-proofs/deep-win-s1.jsonl",
+        "valid": true,
+        "won_positions": 72787
+      },
+      "claim": true
+    },
+    {
+      "cell": "deep-win",
+      "seed": 2,
+      "wall_ms": 37913,
+      "found": true,
+      "exit": "proved",
+      "length": 29,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan32-proofs/deep-win-s2.jsonl",
+        "valid": true,
+        "positions": 60691,
+        "length": 29,
+        "header_moves": 29,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 29,
+        "proof": "/tmp/atomi-plan32-proofs/deep-win-s2.jsonl",
+        "valid": true,
+        "won_positions": 60691
+      },
+      "claim": true
+    }
+  ],
+  "claimed": 9,
+  "runs": 9
+}

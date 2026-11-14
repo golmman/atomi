@@ -1,0 +1,158 @@
+{
+ "core": {
+  "control_median_ms": 4405,
+  "candidate_median_ms": 4363,
+  "ratios": [
+   1.0095,
+   0.9905,
+   0.993
+  ],
+  "median_ratio": 0.993,
+  "max_ratio": 1.0095,
+  "runs": [
+   {
+    "seed": 0,
+    "control_ms": 5171,
+    "candidate_ms": 5220,
+    "ratio": 1.0095,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 12439376,
+     "expansions": 424249,
+     "proof_entries": 926706
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 1,
+    "control_ms": 4405,
+    "candidate_ms": 4363,
+    "ratio": 0.9905,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 10097702,
+     "expansions": 344750,
+     "proof_entries": 737504
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 2,
+    "control_ms": 4276,
+    "candidate_ms": 4246,
+    "ratio": 0.993,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 9850365,
+     "expansions": 333878,
+     "proof_entries": 702526
+    },
+    "found_equal": true
+   }
+  ]
+ },
+ "easy-win": {
+  "control_median_ms": 457,
+  "candidate_median_ms": 451,
+  "ratios": [
+   0.9974,
+   0.9869,
+   1.0149
+  ],
+  "median_ratio": 0.9974,
+  "max_ratio": 1.0149,
+  "runs": [
+   {
+    "seed": 0,
+    "control_ms": 389,
+    "candidate_ms": 388,
+    "ratio": 0.9974,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 1016547,
+     "expansions": 37999,
+     "proof_entries": 65425
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 1,
+    "control_ms": 457,
+    "candidate_ms": 451,
+    "ratio": 0.9869,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 1177648,
+     "expansions": 43071,
+     "proof_entries": 66771
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 2,
+    "control_ms": 671,
+    "candidate_ms": 681,
+    "ratio": 1.0149,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 1803483,
+     "expansions": 67674,
+     "proof_entries": 96028
+    },
+    "found_equal": true
+   }
+  ]
+ },
+ "deep-win": {
+  "control_median_ms": 54128,
+  "candidate_median_ms": 53845,
+  "ratios": [
+   0.9874,
+   0.9948,
+   0.9868
+  ],
+  "median_ratio": 0.9874,
+  "max_ratio": 0.9948,
+  "runs": [
+   {
+    "seed": 0,
+    "control_ms": 58415,
+    "candidate_ms": 57677,
+    "ratio": 0.9874,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 155236740,
+     "expansions": 5803257,
+     "proof_entries": 5716874
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 1,
+    "control_ms": 54128,
+    "candidate_ms": 53845,
+    "ratio": 0.9948,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 146712125,
+     "expansions": 5376491,
+     "proof_entries": 5275565
+    },
+    "found_equal": true
+   },
+   {
+    "seed": 2,
+    "control_ms": 38803,
+    "candidate_ms": 38289,
+    "ratio": 0.9868,
+    "tree_identical": true,
+    "tree": {
+     "child_evals": 107672243,
+     "expansions": 3862476,
+     "proof_entries": 4179903
+    },
+    "found_equal": true
+   }
+  ]
+ }
+}

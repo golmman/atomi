@@ -1,0 +1,107 @@
+{
+ "note": "pooled G-39c sample: the plan's 3 interleaved repeats (seeds 0-2) plus an extension at disjoint seeds, same protocol, same session",
+ "cells": {
+  "core": {
+   "n": 12,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "ratios": [
+    1.0095,
+    0.9905,
+    0.993,
+    0.9829,
+    0.9773,
+    0.9805,
+    0.9822,
+    0.9738,
+    0.9889,
+    0.9905,
+    0.9785,
+    1.0006
+   ],
+   "median": 0.9859,
+   "mean": 0.9873,
+   "min": 0.9738,
+   "max": 1.0095,
+   "tree_identical": true,
+   "found_equal": true,
+   "gate_n3_median": 0.993
+  },
+  "deep-win": {
+   "n": 6,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "ratios": [
+    0.9874,
+    0.9948,
+    0.9868,
+    0.9836,
+    0.9791,
+    0.988
+   ],
+   "median": 0.9871,
+   "mean": 0.9866,
+   "min": 0.9791,
+   "max": 0.9948,
+   "tree_identical": true,
+   "found_equal": true,
+   "gate_n3_median": 0.9874
+  },
+  "easy-win": {
+   "n": 12,
+   "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "ratios": [
+    0.9974,
+    0.9869,
+    1.0149,
+    1.0021,
+    0.9787,
+    0.9567,
+    0.9861,
+    0.9762,
+    0.9632,
+    1.0026,
+    0.9592,
+    0.9867
+   ],
+   "median": 0.9864,
+   "mean": 0.9842,
+   "min": 0.9567,
+   "max": 1.0149,
+   "tree_identical": true,
+   "found_equal": true,
+   "gate_n3_median": 0.9974
+  }
+ }
+}

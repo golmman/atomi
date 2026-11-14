@@ -1,0 +1,41 @@
+{
+ "core": {
+  "control": {
+   "child_evals": 1000000,
+   "expansions": 31326,
+   "proof_entries": 60911
+  },
+  "candidate": {
+   "child_evals": 1000000,
+   "expansions": 31326,
+   "proof_entries": 60911
+  },
+  "identical": true
+ },
+ "easy-win": {
+  "control": {
+   "child_evals": 1000027,
+   "expansions": 36995,
+   "proof_entries": 64904
+  },
+  "candidate": {
+   "child_evals": 1000027,
+   "expansions": 36995,
+   "proof_entries": 64904
+  },
+  "identical": true
+ },
+ "deep-win": {
+  "control": {
+   "child_evals": 1000018,
+   "expansions": 33297,
+   "proof_entries": 33418
+  },
+  "candidate": {
+   "child_evals": 1000018,
+   "expansions": 33297,
+   "proof_entries": 33418
+  },
+  "identical": true
+ }
+}

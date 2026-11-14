@@ -189,6 +189,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
 | `movegen plan3`[^mg3] | 2026-11-14 | `e10de197da58` | atomi **bare** (`--guide none`), 2.8.0 | censored | **13.587** | censored | **13.587** (1) | 10 s |
 | `movegen plan3`[^mg3] | 2026-11-14 | `e10de197da58` | atomi **bare** (`--guide none`), 2.8.0 | **34.913** | **14.226** | censored | **22.286** (2) | 120 s |
 | `plan31`[^p31] | 2026-11-14 | `e10de197da58` | atomi **HOTPATH-V2** (`--guide hand`, D43) | **10.034** | **2.874** | **13.106** | **7.23** (3) | 120 s |
+| `plan32`[^p32] | 2026-11-14 | `e10de197da58` | atomi **HOTPATH-V2 + G1** (`--guide hand`, D43) | **9.735** | **2.835** | **12.773** | **7.064** (3) | 120 s |
 
 [^host]: the plan's `env.json` machine id. Factors are same-session ratios, so a
     row is valid on its own host and never against another row's (rule 1).
@@ -381,6 +382,20 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     difference is stated with each row's own reference. Numbers:
     [`measurements/plan31/`](../../../measurements/plan31/README.md).
 
+[^p32]: **plan32 — G1 PROOF-PROBE-TRIM** (guide sites that only accept
+    `Value::Proved` probe the proof table instead of `lookup`; item 39's
+    PROOF-FILTER is closed `no effect`, nothing added). At Cap 120 s all three
+    cells are 3/3: `core` 5.101 s, `easy-win` 0.377 s, `deep-win` 56.663 s
+    against a same-session reference of 0.524 / 0.133 / 4.436 s, so the factors
+    are 9.735 / 2.835 / 12.773 and the geomean is 7.064 over 3 claimed cells.
+    The tree is **byte-identical** to plan31's (`child_evals` 12,439,376 /
+    1,016,547 / 155,236,740, `expansions` and `proof_entries` equal), so the
+    row's delta against plan31 is the probe trim alone, measured same-session
+    at 0.986–0.987× on the three cells (n = 6–12 interleaved pairs). **3/3 D14
+    proofs** matched `child_evals` and were accepted by `atomi validate` and
+    `provari check` (9/9 over seeds 0–2 in `d14.json`). Numbers:
+    [`measurements/plan32/`](../../../measurements/plan32/README.md).
+
 **One engine per table (D10 amendment, 2026-11-11).** Only `atomi@*` rows form
 a series. The legacy `solver@5f85133` controls measured in plan1 (`default`
 45.358, 1/3; `opt` 6.322, 2/3) are a frozen one-session baseline of a different
@@ -407,6 +422,7 @@ They left the table because a mixed series invites exactly that comparison.
 | `atomi@f88533e+d` | `f88533eb8135cdfb81d89aa2de9fbf9102f1c8d9` | `movegen plan2` |
 | `atomi@d675701+d` | `d675701fe9c00c5deb5b643ab5c7340e29b96794` | `movegen plan3` |
 | `atomi@7f3728d+d` | `7f3728d96354d330b490143cff5c1ef737cd4dfe` | `plan31` |
+| `atomi@69b6f50+d` | `69b6f501fa7f4179f235e6c866f0f1fa78d3c42b` | `plan32` |
 | `provari-v0.1.0` | `48686bc6c786d6ea70568f0b2ad4002cf0520206` | the 1.000 side of every factor |
 | `solver@5f85133` | `5f85133ea9d751368a682e53e354bd3fc0016d00` | the frozen legacy control of the [plan1 note](#plan1), not a row |
 
