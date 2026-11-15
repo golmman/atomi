@@ -304,3 +304,18 @@ Merge and move the `measurements/` to their respective initiative directory, i.e
 ---
 
 Read docs/plans/prover/report38.md and plan38.md. Scope Phase B: an opt-in iterative-deepening. Take inspiration from `atomic_solver` where iterative deepening was extensively explored.
+
+---
+
+We can think out of the box though.
+Clean room design is done by two independent teams. The first analyses the target software in detail and writes the spec. the second uses this spec to implement it. We don't have two independent teams here so we can improvise.
+E.g.: set up a cargo example or even workspace which is GPL-licensed, make our copy experiments there, learn from it and write the spec, adopt from the spec to atomi.
+
+---
+
+Here is my plan:
+* new initiative
+* fork this repo
+* change the forks license to GPL
+* run the experiments there
+* return with a specification and handoff to this repo
