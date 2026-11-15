@@ -2,7 +2,7 @@
 
 Plan: [`plan36.md`](plan36.md) (item 45 + the plans 34–35 kill review).
 Initiative: [`initiative.md`](initiative.md), D30/D36/D40/D43–D47, proposed
-D48. Data: [`measurements/plan36/`](../../../measurements/plan36/README.md).
+D48. Data: [`measurements/plan36/`](measurements/plan36/README.md).
 **No engine, flag, default, test or `bench.md` row changed**; no `ns` that
 prices anything is the reference's (every rate is ours, report34 §4 verbatim);
 nothing from the clone entered the repo — it was started as a process and its

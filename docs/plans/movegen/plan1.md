@@ -96,7 +96,7 @@ Every integration plan contains these, in this order (D-MG6):
    rules implementation).
 4. **Measure** — same-session bench at the standard cap, a 10 s row, and
    per-expansion cost; three repeats, alternating builds, one process at a
-   time; parsed results only, under `measurements/<plan>/` with `env.json`.
+   time; parsed results only, under `docs/plans/<initiative>/measurements/<plan>/` with `env.json`.
 5. **Keep or revert with data** — one line: version, gate result, ratios,
    reason. A regression, a divergence or a missing harness is a revert.
 

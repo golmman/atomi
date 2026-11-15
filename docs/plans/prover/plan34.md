@@ -1,7 +1,7 @@
 # Plan 34 — kill review (plans 32–33) and item 42 (proposed): the expansion census
 
 Read only: the plan33 row of [`bench.md`](bench.md), reports 31–33 and their
-[`measurements`](../../../measurements/plan32/README.md), [`analysis1`](analysis1.md) §3,
+[`measurements`](measurements/plan32/README.md), [`analysis1`](analysis1.md) §3,
 [`analysis2`](analysis2.md) §5–§6, D40/D43–D45, [`gotchas.md`](gotchas.md) scope.
 Pins: oracle `48686bc`, `atomic-movegen` 2.8.0 (crates.io max).
 

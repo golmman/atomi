@@ -2,7 +2,7 @@
 
 Plan: [`plan37.md`](plan37.md) (item 46). Initiative:
 [`initiative.md`](initiative.md), D22/D36/D40/D43–D45. Data:
-[`measurements/plan37/`](../../../measurements/plan37/README.md). **No engine,
+[`measurements/plan37/`](measurements/plan37/README.md). **No engine,
 flag, default, test or `bench.md` row changed**; the `debug = 1` build is a
 scratch copy under `/tmp/atomi-plan37/`; the oracle was not used.
 
@@ -54,7 +54,7 @@ Two plan defects are recorded, not fixed:
 - **Scratch `debug = 1` build** (`git archive HEAD` + `[profile.release]
   debug = 1`): wall **52.606 s** vs release 53.721 s (−2.1 %), tree identical.
   Used only for the line-level timed/untimed split.
-- **Penalties measured** by [`latency.c`](../../../measurements/plan37/latency.c):
+- **Penalties measured** by [`latency.c`](measurements/plan37/latency.c):
   branch mispredict **16.2 cycles** (8.143 cycles/iter ÷ 0.502 misses/iter);
   pointer-chase L1 **4.0**, L2 **10.6**, L3 **37.0**, DRAM **197.0** cycles.
   The L2-miss penalty is **33.5 cycles**, derived from the cycle budget

@@ -1,7 +1,7 @@
 # Report 29 — item 36: EFFECT-CHILD-V1 stops at Phase A (`no effect`)
 
 Plan: [`plan29.md`](plan29.md). Data:
-[`measurements/plan29/`](../../../measurements/plan29/README.md) (`probe.py`,
+[`measurements/plan29/`](measurements/plan29/README.md) (`probe.py`,
 `phase_a.json`, `env.json`, README). Decisions: D2, D11, D19, D21, D24, D26,
 D30, D34, D36, D38, D39, proposed D41. Host: Ryzen 9 5950X (4 vCPU
 container), one process at a time. Repo dirty at `atomi@5b8d7a8`; the owner

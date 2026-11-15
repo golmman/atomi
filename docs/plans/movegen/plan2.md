@@ -51,7 +51,7 @@ Trees equal the plan1/plan29 controls, ratios inside the ±2–3 % session sprea
 | 2 | **Bump** `"2.6"` → `"2.7"` + lock; frozen differential unchanged (veto on diff); `make test`, `make lint` | pin |
 | 3 | **Extend** `tests/effects_differential.rs`: `terminal_after`/`child_outcome` vs our built child's `legal`+terminal, `post_move` vs its bitboards/clocks, `classification` vs `effect`; fixture corpus, bench cells, random play-outs. Test only | differential, own commit |
 | 4 | `make test-full`, `make veto`, counters unmoved at fixed evals | gate 3 |
-| 5 | Bench m0 vs m1 (10 s + 120 s × 3 cells × 3 repeats), `make pernode`, JSONs + `env.json` in `measurements/movegen/plan2/`, dated `prover/bench.md` row | gate 4 / S4 |
+| 5 | Bench m0 vs m1 (10 s + 120 s × 3 cells × 3 repeats), `make pernode`, JSONs + `env.json` in `measurements/plan2/`, dated `prover/bench.md` row | gate 4 / S4 |
 | 6 | Keep/revert line, ledger, history, `report2.md` (4/4, challenges, prover kickoff) | decision |
 
 Step 3 is the judgement call: atomi calls none of the new API, so the frozen
@@ -77,7 +77,7 @@ Every integration plan contains these, in this order (D-MG6):
    rules implementation).
 4. **Measure** — same-session bench at the standard cap, a 10 s row, and
    per-expansion cost; three repeats, alternating builds, one process at a
-   time; parsed results only, under `measurements/<plan>/` with `env.json`.
+   time; parsed results only, under `docs/plans/<initiative>/measurements/<plan>/` with `env.json`.
 5. **Keep or revert with data** — one line: version, gate result, ratios,
    reason. A regression, a divergence or a missing harness is a revert.
 
@@ -98,7 +98,7 @@ Every integration plan contains these, in this order (D-MG6):
 - **B (formulation change).** Stop building children for terminality:
   `terminal_after` replaces the `clone + do_move + terminal` fallback in
   `classify.rs`/`mover.rs`. Addressable share = the probe's `needs_board` share
-  ([`plan29/phase_a.json`](../../../measurements/plan29/phase_a.json)): **21.3 %**
+  ([`plan29/phase_a.json`](../prover/measurements/plan29/phase_a.json)): **21.3 %**
   of 5,000,034 `deep-win` hand-stack children (29.9 % `core` 1 M) — ~10–15 % of the
   wall **if** far cheaper than a build. Cheapest experiment: a prover counter build
   at 1 M/5 M on `core` + `deep-win`, tree + wall.
@@ -122,7 +122,7 @@ the `prover` plan. No rung claimed (D30/D40 stand).
 
 **Done** when: pin = `Cargo.toml` + `Cargo.lock` only; the frozen differential
 byte-identical; step 3 green and trajectory-neutral; `make test-full` + `make veto`
-green; `measurements/movegen/plan2/` holds `env.json`, bench, pernode and README; a
+green; `measurements/plan2/` holds `env.json`, bench, pernode and README; a
 `prover/bench.md` row appended; `report2.md` carries the 4/4 outcome, challenges and
 keep/revert line; ledger and history updated.
 

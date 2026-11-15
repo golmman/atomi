@@ -3,7 +3,7 @@
 Plan: [`plan34.md`](plan34.md) (item 42, proposed; the kill review is §1–§4 of
 the plan and is not re-argued here). Initiative: [`initiative.md`](initiative.md),
 D30/D36/D40/D43–D45. Measurements:
-[`measurements/plan34/`](../../../measurements/plan34/README.md). **No engine
+[`measurements/plan34/`](measurements/plan34/README.md). **No engine
 change, no flag, no default, no `bench.md` row**: the census is read-only and
 every number comes from scratch builds outside the repo (GPL boundary: provari
 was not run, read or linked this session).
@@ -33,7 +33,7 @@ the micro mould**.
 
 ## 2. Method (three kinds of run, one process at a time)
 
-Scratch builds from [`instrument.py`](../../../measurements/plan34/instrument.py)
+Scratch builds from [`instrument.py`](measurements/plan34/instrument.py)
 (`src/probe.rs` + 78 `timed!` sites: 67 leaves, 11 region aggregates; nothing enters the repo):
 
 - **reference** — the shipped binary, `--guide hand --memory 192 --seconds 120

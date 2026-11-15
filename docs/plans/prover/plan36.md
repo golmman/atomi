@@ -1,7 +1,7 @@
 # Plan 36 — kill review (plans 34–35) and item 45 (proposed, M-REMAP): `M` in like units
 
 Read only: [`report34`](report34.md)/[`report35`](report35.md) and their
-[`measurements`](../../../measurements/plan34/README.md),
+[`measurements`](measurements/plan34/README.md),
 [`analysis1`](analysis1.md) §3, [`analysis2`](analysis2.md) §5–§6,
 [`gotchas`](gotchas.md) §Scope, D30/D36/D40/D43–D46, [`bench.md`](bench.md)
 cells. Pins: oracle `48686bc` (provari 0.1.0, `/tmp/atomi-oracle/provari`),

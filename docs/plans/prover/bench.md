@@ -328,7 +328,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     (rule 4); the censoring matches the plan11/plan15 bare rows, so coverage
     did not move. No D14 claim (no proof or search change); `make veto`
     8/8 accepted with `provari check` agreeing. Numbers:
-    [`measurements/movegen/plan1/`](measurements/movegen/plan1/README.md).
+    [`../movegen/measurements/plan1/`](../movegen/measurements/plan1/README.md).
 
 [^mg2]: **`movegen` plan2 — a dependency-only adoption**, not a prover stack:
     `atomic-movegen` 2.6.0 → 2.7.0 with no call-site change (the release adds
@@ -350,7 +350,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     matches the plan1 row of the same stack, so coverage did not move. No D14
     claim (no proof or search change); `make veto` 8/8 accepted with
     `provari check` agreeing. Numbers:
-    [`measurements/movegen/plan2/`](measurements/movegen/plan2/README.md).
+    [`../movegen/measurements/plan2/`](../movegen/measurements/plan2/README.md).
 
 [^mg3]: **`movegen` plan3 — a dependency-only adoption**, not a prover stack:
     `atomic-movegen` 2.7.0 → 2.8.0 with no call-site change (the release adds
@@ -372,7 +372,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     the censoring matches the plan2 row of the same stack, so coverage did not
     move. No D14 claim (no proof or search change); `make veto` 8/8 accepted
     with `provari check` agreeing. Numbers:
-    [`measurements/movegen/plan3/`](measurements/movegen/plan3/README.md).
+    [`../movegen/measurements/plan3/`](../movegen/measurements/plan3/README.md).
 
 [^p31]: **plan31 — HOTPATH-V2** (item 38, D43): the guide's per-expansion
     multiplicity removed by three tree-neutral rewrites — the one-ply explosion
@@ -397,7 +397,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     77.442 s (plan27) → 58.439 s on essentially the same reference (4.413 s),
     i.e. `T_4` distance 5.84×; rows are never rewritten, so the cross-row
     difference is stated with each row's own reference. Numbers:
-    [`measurements/plan31/`](../../../measurements/plan31/README.md).
+    [`measurements/plan31/`](measurements/plan31/README.md).
 
 [^p32]: **plan32 — G1 PROOF-PROBE-TRIM** (guide sites that only accept
     `Value::Proved` probe the proof table instead of `lookup`; item 39's
@@ -411,7 +411,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     at 0.986–0.987× on the three cells (n = 6–12 interleaved pairs). **3/3 D14
     proofs** matched `child_evals` and were accepted by `atomi validate` and
     `provari check` (9/9 over seeds 0–2 in `d14.json`). Numbers:
-    [`measurements/plan32/`](../../../measurements/plan32/README.md).
+    [`measurements/plan32/`](measurements/plan32/README.md).
 
 [^p33]: **plan33 — NULL-PIPE** (`null_win`'s pass 1 keyed, prefetched and probed
     in chunks of 16 instead of byte-serially; exact, no flag, no memory
@@ -427,7 +427,7 @@ re-measured per row inside its own 10 s budget. Decisions append no row.
     median **0.926×** (3 pairs), the 5 M probe **0.9227×**. **3/3 D14 proofs**
     accepted by `atomi validate` and `provari check` (9/9 over seeds 0–2 in
     `d14.json`). Numbers:
-    [`measurements/plan33/`](../../../measurements/plan33/README.md).
+    [`measurements/plan33/`](measurements/plan33/README.md).
 
 **One engine per table (D10 amendment, 2026-11-11).** Only `atomi@*` rows form
 a series. The legacy `solver@5f85133` controls measured in plan1 (`default`

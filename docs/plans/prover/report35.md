@@ -2,7 +2,7 @@
 
 Plan: [`plan35.md`](plan35.md) (item 43). Initiative: [`initiative.md`](initiative.md),
 D36/D40/D43–D46, plan34's B/C/D. Data:
-[`measurements/plan35/`](../../../measurements/plan35/README.md). **No engine
+[`measurements/plan35/`](measurements/plan35/README.md). **No engine
 change, no flag, no default, no `bench.md` row**: counts only, the reference
 read and patched **only** in `/tmp` (GPL boundary, `PROVENANCE.md` untouched),
 and no `ns` that prices anything is the reference's — every rate is ours

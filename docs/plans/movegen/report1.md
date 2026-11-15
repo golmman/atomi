@@ -2,7 +2,7 @@
 
 Plan: [`plan1.md`](plan1.md). Initiative: [`initiative.md`](initiative.md),
 D-MG1–D-MG7. Handoff answered: [`handoff1.md`](handoff1.md) (R1–R9,
-MG1–MG14). Data: [`measurements/movegen/plan1/`](../../../measurements/movegen/plan1/README.md)
+MG1–MG14). Data: [`measurements/plan1/`](measurements/plan1/README.md)
 (`bench.py`/`bench.json`, `tree_probe.py`/`tree_probe.json`, `pernode.json`,
 `pernode_make.json`, `env.json`, README). Host: Ryzen 9 5950X (4 vCPU
 container), one process at a time. Repo dirty at `atomi@9617f9b`.
@@ -106,7 +106,7 @@ used at an atomi call site yet.**
 3. **`measurements/planN/` collides across initiatives** —
    `prover/bench.md` already refers to `measurements/plan1/` for the
    *prover's* plan1 baseline. Movegen data lives in
-   `measurements/movegen/plan1/`; the AGENTS.md wording (`measurements/
+   `measurements/plan1/`; the AGENTS.md wording (`measurements/
    planN/`) should say `<initiative>/planN/` for the second initiative. Owner
    to confirm.
 4. **crates.io needs a `User-Agent`** (403 without), as the initiative
@@ -186,6 +186,6 @@ commits so commit 2 stays `Cargo.toml` + `Cargo.lock` only:
 3. `build: make pernode runnable again` — `Makefile`.
 4. `docs(movegen): report1, measurements and bench rows` —
    `docs/plans/movegen/{report1,initiative}.md`, `docs/plans/README.md`,
-   `docs/plans/prover/bench.md`, `measurements/movegen/plan1/`.
+   `docs/plans/prover/bench.md`, `measurements/plan1/`.
 
 Squashing 1 into 2 destroys gate 2's only independent evidence.

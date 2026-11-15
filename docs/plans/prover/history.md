@@ -470,7 +470,7 @@ premise are the recorded starting point for the D21 kill review.
   to `PostMove::terminal()` + a specialised existential in
   [`../movegen/handoff3.md`](../movegen/handoff3.md). Gates: `make test`,
   `make lint`, `make test-full` + veto green on an unchanged engine. Data:
-  [`measurements/plan30/`](../../../measurements/plan30/README.md); report:
+  [`measurements/plan30/`](measurements/plan30/README.md); report:
   [`report30.md`](report30.md); decision D42 proposed, item 37 closed.
 
 - **2026-11-14**: plan31 (item 38, HOTPATH-V2) executed and **adopted** (D43).
@@ -491,7 +491,7 @@ premise are the recorded starting point for the D21 kill review.
   0.9305; G-V2c 0.7223–0.7541× over 9 x 120 s (cell, seed) pairs, counters
   identical; D14 9/9 both checkers; `make test-full` + VETO PASS. Cap-120 row:
   geomean **7.23** (3/3 claimed), `deep-win` 77.4 → **58.4 s**, `T_4` distance
-  5.84×. Data: [`measurements/plan31/`](../../../measurements/plan31/README.md);
+  5.84×. Data: [`measurements/plan31/`](measurements/plan31/README.md);
   report: [`report31.md`](report31.md).
 
 - **2026-11-14**: plan33 (item 40, NULL-PIPE) executed and **adopted** (D46).
@@ -514,7 +514,7 @@ premise are the recorded starting point for the D21 kill review.
   at 120 s): pass 1 is **13.2 pp** of the wall — `rules::status` 6.10,
   `do_move`+`undo` 4.35, proof probe 2.10, clone 0.38, `key` 0.26 — so the
   probe line is closed and item 41's ≥ 2 pp bar is measured as met on our
-  side. Data: [`measurements/plan33/`](../../../measurements/plan33/README.md);
+  side. Data: [`measurements/plan33/`](measurements/plan33/README.md);
   report: [`report33.md`](report33.md).
 
 - **2026-11-14 — plan34, item 42 (EXPANSION-CENSUS), read-only**: an
@@ -538,7 +538,7 @@ premise are the recorded starting point for the D21 kill review.
   removed, the whole op budget is 37.0 s (**3.22×** if free), so no
   arrangement of the measured per-node work reaches 5.34×; `T_5` needs 84.9 pp.
   The goal question goes to the owner (plan34 B/C/D); no plan 35+ in the micro
-  mould. Data: [`measurements/plan34/`](../../../measurements/plan34/README.md);
+  mould. Data: [`measurements/plan34/`](measurements/plan34/README.md);
   report: [`report34.md`](report34.md).
 
 - **2026-11-14 — plan35, item 43 (SHAPE-DIFF), read-only**: the reference's node
@@ -564,7 +564,7 @@ premise are the recorded starting point for the D21 kill review.
   (`R` = 16,651 ns ≈ 180 pp, not 31.03; "≳20 moves" prices a move where 85 ns is
   per list). No engine/flag/default/`bench.md` change, no plan 36; the owner
   rules on plan34's C/D. Data:
-  [`measurements/plan35/`](../../../measurements/plan35/README.md); report:
+  [`measurements/plan35/`](measurements/plan35/README.md); report:
   [`report35.md`](report35.md).
 
 - **2026-11-14 — plan36, kill review of plans 34–35 + item 45 (M-REMAP),
@@ -592,7 +592,7 @@ premise are the recorded starting point for the D21 kill review.
   9,246 ns/exp against 2,111 ns/body) and corrected the ≈8×/11.3 µs figures
   `initiative.md`, `decisions.md`'s D45 row and `gotchas.md` §Scope still
   quoted. No engine/flag/default/test/`bench.md` change. Data:
-  [`measurements/plan36/`](../../../measurements/plan36/README.md); report:
+  [`measurements/plan36/`](measurements/plan36/README.md); report:
   [`report36.md`](report36.md).
 
 - **2026-11-15**: owner rulings on the open decisions. **D42, D43, D44, D46
@@ -627,5 +627,5 @@ premise are the recorded starting point for the D21 kill review.
   1.384 s) while the true outside is 2.328 s and the mid site leaves are
   2.735 s; G-46d passes for `enter`/`null` and fails for `outside`. No engine,
   flag, default, test or `bench.md` change; the oracle was not used. Data:
-  [`measurements/plan37/`](../../../measurements/plan37/README.md); report:
+  [`measurements/plan37/`](measurements/plan37/README.md); report:
   [`report37.md`](report37.md).

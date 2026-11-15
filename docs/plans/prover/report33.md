@@ -2,7 +2,7 @@
 
 Plan: [`plan33.md`](plan33.md). Initiative: [`initiative.md`](initiative.md),
 item 40, decisions D37/D39/D43/D44/D45, proposed **D46**. Measurements:
-[`measurements/plan33/`](../../../measurements/plan33/README.md). Engine
+[`measurements/plan33/`](measurements/plan33/README.md). Engine
 change: `src/guide/null.rs` (pass 1 chunked; `null_win` keeps its signature,
 the body moves into a `const K`-generic `null_win_pipelined`),
 `src/table/mod.rs` (`Tables::prefetch_proved`, +7 lines), and the two new

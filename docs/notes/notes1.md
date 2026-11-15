@@ -298,4 +298,9 @@ Read docs/plans/prover/plan34.md, report34.md, analysis2.md §5–§6 and docs/p
 
 ---
 
+House-keeping session.
+Merge and move the `measurements/` to their respective initiative directory, i.e. `docs/plans/prover/measurements/` and `docs/plans/movegen/measurements/`.
+
+---
+
 Read docs/plans/prover/report38.md and plan38.md. Scope Phase B: an opt-in iterative-deepening. Take inspiration from `atomic_solver` where iterative deepening was extensively explored.

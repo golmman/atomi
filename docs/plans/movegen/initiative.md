@@ -185,7 +185,7 @@ Every integration plan contains these, in this order (D-MG6):
    rules implementation).
 4. **Measure** — same-session bench at the standard cap, a 10 s row, and
    per-expansion cost; three repeats, alternating builds, one process at a
-   time; parsed results only, under `measurements/<plan>/` with `env.json`.
+   time; parsed results only, under `docs/plans/<initiative>/measurements/<plan>/` with `env.json`.
 5. **Keep or revert with data** — one line: version, gate result, ratios,
    reason. A regression, a divergence or a missing harness is a revert.
 
@@ -287,7 +287,7 @@ Every integration plan contains these, in this order (D-MG6):
   identical tree: paired `m1/m0` geomean **0.987** at tree identity 3/3,
   5 M `deep-win` probe **0.9992×**, per-expansion **2,025 ns** (2.6.0's plan1
   point 2,054, cross-session) — the S4 trend point. Two dated
-  `prover/bench.md` rows appended; data in `measurements/movegen/plan2/`. No
+  `prover/bench.md` rows appended; data in `measurements/plan2/`. No
   rung claimed (D30/D40 stand); the API integration is `prover` work, and
   handoff2's §3 >10 % gate is superseded by the probe's `needs_board` share.
 - **2026-11-13** — **plan1 executed, 2.6.0 kept.** Gates 1–4 green: tarball
@@ -301,7 +301,7 @@ Every integration plan contains these, in this order (D-MG6):
   probe **1.0152×** (flat, inside the ±2–3 % session spread),
   per-expansion **2,045 ns** (`m0` 2,064) — the S4 trend point. Two dated
   `prover/bench.md` rows (Cap 10 s / 120 s, bare stack) appended; data in
-  `measurements/movegen/plan1/`. No rung claimed (D30/D40 stand). Two atomi-
+  `measurements/plan1/`. No rung claimed (D30/D40 stand). Two atomi-
   side fixes went with it: the broken `make pernode` target and a writer that
   cannot silently repair the fixture (`report1.md` §4).
 - **2026-11-13** — **`atomic-movegen` 2.8.0 is published** (22:45:11Z, MIT, MSRV
@@ -337,6 +337,6 @@ Every integration plan contains these, in this order (D-MG6):
   `m1/m0` 0.9996; paired bench geomean **1.0025** at tree identity 3/3;
   per-expansion 1,999.7 ns (`m0` 2,006.1) — flat, so the screen does not move
   the wall. Two dated `prover/bench.md` rows; data in
-  `measurements/movegen/plan3/`. No rung claimed; **no `prover` plan follows**
+  `measurements/plan3/`. No rung claimed; **no `prover` plan follows**
   (handoff3 §3's gate stays failed), and `handoff4.md` stays unspent until a
   formulation that does not read the child board exists (`report3.md` §7).

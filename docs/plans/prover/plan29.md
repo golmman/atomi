@@ -6,7 +6,7 @@ D2, D11, D14, D19, D21, D24, D26, D30, D34, D36, D38, D39. Upstream:
 `EffectContext::{effect,is_legal,outcome_after}`),
 [`../movegen/report1.md`](../movegen/report1.md) §7.1; drafted 2026-11-13 after
 [`report28`](report28.md) and
-[`measurements/movegen/plan1/`](../../../measurements/movegen/plan1/README.md).
+[`../movegen/measurements/plan1/`](../movegen/measurements/plan1/README.md).
 
 ## Kill review (fixed prompt)
 
@@ -89,7 +89,7 @@ behind that test plus counter identity at `--evals 1000000` × three cells.
 
 **C — G-E1.** `measurements/plan29/probe.py` (plan28's probe shape, own
 `--evals` command; parsing via `bench/run_bench.py`) writes `gate_e1.json`.
-Baseline **2,045 ns/expansion** (`measurements/movegen/plan1/pernode.json`);
+Baseline **2,045 ns/expansion** (`../movegen/measurements/plan1/pernode.json`);
 the control read 2.558 s (plan28) / 2.610 s (movegen plan1), so every ratio is
 **re-measured same-session**.
 

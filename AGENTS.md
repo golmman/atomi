@@ -105,8 +105,8 @@ of the D30 staircase. T_5 (goal): all three cells proved at 10 s, geomean wall
 - **Docs budget:** plans ≤ 8 KB, reports ≤ 12 KB, this file ≤ 6 KiB, one-line
   status entries. If docs outgrow the code, cut docs, not tests.
 - **Measurements:** one process at a time, same-session ratios, reading rules
-  in `bench.md`; commit drivers, parsed results, `env.json` and READMEs under
-  `measurements/planN/`; never raw transcripts, provari artifacts or
+  in `bench.md`; commit drivers, results, `env.json`, READMEs in
+  `docs/plans/<i>/measurements/planN/`; never raw transcripts, provari artifacts or
   `__pycache__`.
 - **Closure:** end with `SESSION COMPLETE`, deliverables and follow-up
   options, option 1 a copy-pasteable kickoff prompt.

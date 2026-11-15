@@ -51,7 +51,7 @@ Referenced from `AGENTS.md` §Correctness.
   18–36 ns) and then runs a view movegen (≈26 ns); measured on the
   `built-ish` class that is **65.8 ns per child against today's 57.5**
   (`clone`+`do_move`+`outcome()`+key), 1.147×, and 1.29× on captures
-  (plan30, [`measurements/plan30`](../../../measurements/plan30/README.md)).
+  (plan30, [`measurements/plan30`](measurements/plan30/README.md)).
   `terminal_from` is **private**, so combining `post_move` with terminality
   pays `analyze` twice, and `terminal_from` is the single implementation of
   `terminal_after` — the best amortised composite *is* `terminal_after`, so

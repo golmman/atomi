@@ -71,7 +71,7 @@ plan is written from this release**.
 | 2 | **Bump** `"2.7"` → `"2.8"` + lock; frozen differential unchanged (any diff = veto); `make test`, `make lint` | pin |
 | 3 | **Extend** `tests/child_surface_differential.rs`: `post_move(..).terminal()` (reason included) and `post_move_and_key`'s key vs our built child over the existing 51,334-child corpus; and, the only rules-adjacent change, **`has_legal_move` / `_with_state` / `_after` vs `!generate_legal(..).is_empty()`** — the screen against the generator, not itself. Test only | differential |
 | 4 | `make test-full`, `make veto`, counters unmoved at fixed evals | gate 3 |
-| 5 | m0 vs m1 (10 s + 120 s × 3 cells × 3 repeats), `make pernode`, JSONs + `env.json` under `measurements/movegen/plan3/`, dated `prover/bench.md` row | gate 4 / S4 |
+| 5 | m0 vs m1 (10 s + 120 s × 3 cells × 3 repeats), `make pernode`, JSONs + `env.json` under `measurements/plan3/`, dated `prover/bench.md` row | gate 4 / S4 |
 | 6 | Keep/revert line, ledger, history, `report3.md` | decision |
 
 **Commits** (owner): (1) `deps: atomic-movegen 2.8.0` — `Cargo.toml` +
@@ -96,7 +96,7 @@ Every integration plan contains these, in this order (D-MG6):
    rules implementation).
 4. **Measure** — same-session bench at the standard cap, a 10 s row, and
    per-expansion cost; three repeats, alternating builds, one process at a
-   time; parsed results only, under `measurements/<plan>/` with `env.json`.
+   time; parsed results only, under `docs/plans/<initiative>/measurements/<plan>/` with `env.json`.
 5. **Keep or revert with data** — one line: version, gate result, ratios,
    reason. A regression, a divergence or a missing harness is a revert.
 
@@ -133,7 +133,7 @@ that does not read the child board.
 
 **Done** when: pin = `Cargo.toml` + `Cargo.lock` only; frozen differential
 byte-identical; step 3 green, trajectory-neutral; gates 3–4 green;
-`measurements/movegen/plan3/` holds `env.json`, bench, pernode and README; a
+`measurements/plan3/` holds `env.json`, bench, pernode and README; a
 `prover/bench.md` row; `report3.md` carries the outcome, challenges and
 keep/revert line; ledger and history updated.
 

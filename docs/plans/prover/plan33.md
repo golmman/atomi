@@ -2,7 +2,7 @@
 
 Plan session, item 40 (re-scoped, §0.2), decisions D37/D39/D43/D44/D45.
 Phase-0 numbers re-read from
-[`measurements/plan32/counts.json`](../../../measurements/plan32/README.md) (no
+[`measurements/plan32/counts.json`](measurements/plan32/README.md) (no
 new run). Oracle = external process (GPL). Read-only pass over
 `src/guide/null.rs`, `src/table/{mod,proofs}.rs`, `src/search/mod.rs`.
 

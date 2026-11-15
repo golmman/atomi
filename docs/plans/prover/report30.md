@@ -2,7 +2,7 @@
 
 Plan: [`plan30.md`](plan30.md). Initiative: [`initiative.md`](initiative.md),
 item 37, proposed D42. Measurements:
-[`measurements/plan30/`](../../../measurements/plan30/README.md). Read-only
+[`measurements/plan30/`](measurements/plan30/README.md). Read-only
 session: **no engine change, no flag, no default, no `bench.md` row, no probe
 run on the tree.**
 
@@ -84,7 +84,7 @@ unchanged** on the untouched engine; the grouped-engine `make test-full`
 includes the oracle veto (all claims accepted, 4/4 controls rejected, checker
 agrees). `tests/child_surface_differential.rs` remains the 2.7.0 crate pin;
 `tests/effects_differential.rs` keeps MG3 pinned. Verdicts in
-[`env.json`](../../../measurements/plan30/env.json).
+[`env.json`](measurements/plan30/env.json).
 
 ## 5. Problems and open parts
 

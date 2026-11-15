@@ -2,7 +2,7 @@
 
 Plan: [`plan32.md`](plan32.md). Initiative: [`initiative.md`](initiative.md),
 item 39, decisions **D39/D43**, proposed **D44**. Measurements:
-[`measurements/plan32/`](../../../measurements/plan32/README.md). Engine
+[`measurements/plan32/`](measurements/plan32/README.md). Engine
 change: `src/table/mod.rs` (`Tables::proved` + one unit test),
 `src/guide/{null,replay}.rs` (six proof-only guide lookups, one collapsed
 duplicate). Nothing here came from provari source; the oracle was an external

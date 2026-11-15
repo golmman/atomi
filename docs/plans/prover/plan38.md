@@ -1,7 +1,7 @@
 # Plan 38 — kill review (plans 36–37) and item 52 (proposed, SHORT-PASS): price proof length before more per-node work
 
 Read only: [`report36`](report36.md)–[`report37`](report37.md) and their
-[`measurements`](../../../measurements/plan36/README.md), the plan33 row of
+[`measurements`](measurements/plan36/README.md), the plan33 row of
 [`bench.md`](bench.md), [`analysis1`](analysis1.md) §3, [`analysis2`](analysis2.md)
 §5–§6, D45–D49, [`gotchas`](gotchas.md). Pins unchanged: oracle `48686bc`
 (v0.1.0), idea source `bceb1ee` (v0.4.0), `atomic-movegen` 2.8.0.

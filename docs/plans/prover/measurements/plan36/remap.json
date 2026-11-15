@@ -1,0 +1,1381 @@
+{
+ "plan": "36",
+ "item": 45,
+ "name": "M-REMAP",
+ "cell": "deep-win",
+ "units": {
+  "reference_denominator": "one node body",
+  "our_denominator": "one expansion",
+  "bodies": 2099100,
+  "expansions": 5803257,
+  "reference_reported_nodes": 3024117,
+  "expansions_per_body": 2.7646,
+  "wall_ns_per_expansion": 9245.8,
+  "ns_per_pp": 92.46,
+  "op_budget_pp": 68.97,
+  "T4_ns": 1723.17,
+  "addressable_pp_needed": 81.3
+ },
+ "families": [
+  {
+   "family": "bodies",
+   "counter": 2099100,
+   "per_body": 1.0,
+   "role": "denominator",
+   "our_bucket": null,
+   "unit": "the node body (not one reported node)"
+  },
+  {
+   "family": "list_generations",
+   "counter": 5019161,
+   "per_body": 2.3911,
+   "role": "priced",
+   "our_bucket": "movegen (legal)",
+   "unit": "one move list generated",
+   "our_per_expansion": 13.508,
+   "our_ns_per_op": 85.393,
+   "ratio": 5.649,
+   "charge_A_ns": 204.18
+  },
+  {
+   "family": "moves_yielded",
+   "counter": 155344770,
+   "per_body": 74.0054,
+   "role": "inside",
+   "our_bucket": "movegen (legal)",
+   "unit": "moves per list: the size of the priced unit, not a cost"
+  },
+  {
+   "family": "mover_setups",
+   "counter": 5018320,
+   "per_body": 2.3907,
+   "role": "priced",
+   "our_bucket": "key/rule50 (Mover::new)",
+   "unit": "one mover setup",
+   "our_per_expansion": 1.0,
+   "our_ns_per_op": 0.517,
+   "ratio": 0.418,
+   "charge_A_ns": 1.24
+  },
+  {
+   "family": "legality_screens",
+   "counter": 124339298,
+   "per_body": 59.2346,
+   "role": "priced",
+   "our_bucket": "legality/status/terminality (needs-board/check test)",
+   "unit": "one per-move legality screen",
+   "our_per_expansion": 26.75,
+   "our_ns_per_op": 3.659,
+   "ratio": 0.452,
+   "charge_A_ns": 216.74
+  },
+  {
+   "family": "legality_passes",
+   "counter": 76385077,
+   "per_body": 36.3894,
+   "role": "inside",
+   "our_bucket": "legality/status/terminality (needs-board/check test)",
+   "unit": "passes over a list: the shape of a screen, not a cost"
+  },
+  {
+   "family": "child_decisions",
+   "counter": 38205943,
+   "per_body": 18.2011,
+   "role": "priced",
+   "our_bucket": "closure: frame pass-1 settle+screen",
+   "unit": "one child decided from bit tests",
+   "our_per_expansion": 28.311,
+   "our_ns_per_op": 37.712,
+   "ratio": 1.555,
+   "charge_A_ns": 686.41
+  },
+  {
+   "family": "effect_computations",
+   "counter": 45710866,
+   "per_body": 21.7764,
+   "role": "priced",
+   "our_bucket": "key/rule50",
+   "unit": "one child hash/effect",
+   "our_per_expansion": 73.759,
+   "our_ns_per_op": 1.911,
+   "ratio": 3.387,
+   "charge_A_ns": 76.53
+  },
+  {
+   "family": "effect_hash_computations",
+   "counter": 38352079,
+   "per_body": 18.2707,
+   "role": "priced",
+   "our_bucket": "key/rule50",
+   "unit": "one child hash/effect (the same unit, charged once)",
+   "our_per_expansion": 73.759,
+   "our_ns_per_op": 1.911,
+   "ratio": 4.037
+  },
+  {
+   "family": "child_builds",
+   "counter": 7469701,
+   "per_body": 3.5585,
+   "role": "priced",
+   "our_bucket": "do_move/undo_move/clone",
+   "unit": "one child board built",
+   "our_per_expansion": 128.789,
+   "our_ns_per_op": 2.466,
+   "ratio": 36.192,
+   "charge_A_ns": 8.77
+  },
+  {
+   "family": "proof_probes",
+   "counter": 10956517,
+   "per_body": 5.2196,
+   "role": "priced",
+   "our_bucket": "proof probe",
+   "unit": "one proof-store probe",
+   "our_per_expansion": 46.37,
+   "our_ns_per_op": 10.364,
+   "ratio": 8.884,
+   "charge_A_ns": 54.1
+  },
+  {
+   "family": "table_lookups",
+   "counter": 7885687,
+   "per_body": 3.7567,
+   "role": "priced",
+   "our_bucket": "TT probe",
+   "unit": "one small-table lookup",
+   "our_per_expansion": 22.263,
+   "our_ns_per_op": 0.178,
+   "ratio": 5.926,
+   "charge_A_ns": 0.67
+  },
+  {
+   "family": "table_reads",
+   "counter": 7885687,
+   "per_body": 3.7567,
+   "role": "inside",
+   "our_bucket": "TT probe",
+   "unit": "the read half of a lookup, charged with it"
+  },
+  {
+   "family": "filter_bit_tests",
+   "counter": 95546362,
+   "per_body": 45.5178,
+   "role": "priced",
+   "our_bucket": "filter probe",
+   "unit": "one filter bit test",
+   "our_per_expansion": 2.137,
+   "our_ns_per_op": 0.161,
+   "ratio": 0.047,
+   "charge_A_ns": 7.34
+  },
+  {
+   "family": "table_stores",
+   "counter": 2093595,
+   "per_body": 0.9974,
+   "role": "priced",
+   "our_bucket": "table store",
+   "unit": "one table store",
+   "our_per_expansion": 2.991,
+   "our_ns_per_op": 36.473,
+   "ratio": 2.998,
+   "charge_A_ns": 36.38
+  },
+  {
+   "family": "hand_evals",
+   "counter": 2098415,
+   "per_body": 0.9997,
+   "role": "priced",
+   "our_bucket": "guide hand_eval",
+   "unit": "one hand evaluation of a body",
+   "our_per_expansion": 3.684,
+   "our_ns_per_op": 198.649,
+   "ratio": 3.685,
+   "charge_A_ns": 198.58
+  },
+  {
+   "family": "guide_steps",
+   "counter": 2098415,
+   "per_body": 0.9997,
+   "role": "priced",
+   "our_bucket": "guide class + start numbers",
+   "unit": "one guide number pass",
+   "our_per_expansion": 62.95,
+   "our_ns_per_op": 5.269,
+   "ratio": 62.97,
+   "charge_A_ns": 5.27
+  },
+  {
+   "family": "terminality_queries",
+   "counter": 199643,
+   "per_body": 0.0951,
+   "role": "priced",
+   "our_bucket": "legality/status/terminality",
+   "unit": "one terminality/status query",
+   "our_per_expansion": 45.856,
+   "our_ns_per_op": 19.127,
+   "ratio": 482.145,
+   "charge_A_ns": 9.43
+  },
+  {
+   "family": "mate_tests",
+   "counter": 125845,
+   "per_body": 0.06,
+   "role": "inside",
+   "our_bucket": "legality/status/terminality",
+   "unit": "a mate test inside the terminality family"
+  },
+  {
+   "family": "body_check_queries",
+   "counter": 709328,
+   "per_body": 0.3379,
+   "role": "inside",
+   "our_bucket": "legality/status/terminality",
+   "unit": "a check query inside the terminality family"
+  },
+  {
+   "family": "status_queries",
+   "counter": 1,
+   "per_body": 0.0,
+   "role": "inside",
+   "our_bucket": "legality/status/terminality",
+   "unit": "the root's own status query"
+  },
+  {
+   "family": "null_uses",
+   "counter": 455361,
+   "per_body": 0.2169,
+   "role": "inside",
+   "our_bucket": "null board (`null_for`)",
+   "unit": "the null move itself; its board is the priced unit"
+  },
+  {
+   "family": "null_builds",
+   "counter": 455361,
+   "per_body": 0.2169,
+   "role": "priced",
+   "our_bucket": "null board (`null_for`)",
+   "unit": "one null board",
+   "our_per_expansion": 0.591,
+   "our_ns_per_op": 52.159,
+   "ratio": 2.726,
+   "charge_A_ns": 11.31
+  },
+  {
+   "family": "replay_calls",
+   "counter": 926564,
+   "per_body": 0.4414,
+   "role": "priced",
+   "our_bucket": "closure: replay/simulation",
+   "unit": "one proof replay",
+   "our_per_expansion": 1.42,
+   "our_ns_per_op": 291.835,
+   "ratio": 3.217,
+   "charge_A_ns": 128.82
+  },
+  {
+   "family": "replay_defence_calls",
+   "counter": 624924,
+   "per_body": 0.2977,
+   "role": "inside",
+   "our_bucket": "closure: replay/simulation",
+   "unit": "per-defence work inside the priced replay"
+  },
+  {
+   "family": "selection_steps",
+   "counter": 4259095,
+   "per_body": 2.029,
+   "role": "priced",
+   "our_bucket": "MID select/node_value",
+   "unit": "one child set combined",
+   "our_per_expansion": 4.0,
+   "our_ns_per_op": 43.295,
+   "ratio": 1.971,
+   "charge_A_ns": 87.85
+  },
+  {
+   "family": "repetition_tests",
+   "counter": 37016136,
+   "per_body": 17.6343,
+   "role": "priced",
+   "our_bucket": "repetition scan",
+   "unit": "one repetition test",
+   "our_per_expansion": 24.206,
+   "our_ns_per_op": 2.577,
+   "ratio": 1.373,
+   "charge_A_ns": 45.44
+  },
+  {
+   "family": "repetition_marks",
+   "counter": 2610653,
+   "per_body": 1.2437,
+   "role": "inside",
+   "our_bucket": "repetition scan",
+   "unit": "the marking half of a repetition test"
+  },
+  {
+   "family": "prefetch_hints",
+   "counter": 38352079,
+   "per_body": 18.2707,
+   "role": "priced",
+   "our_bucket": "prefetch hint",
+   "unit": "one prefetch hint",
+   "our_per_expansion": 44.755,
+   "our_ns_per_op": 0.373,
+   "ratio": 2.45,
+   "charge_A_ns": 6.82
+  },
+  {
+   "family": "quiet_tests",
+   "counter": 68397338,
+   "per_body": 32.5841,
+   "role": "inside",
+   "our_bucket": "closure: frame pass-1 settle+screen",
+   "unit": "a per-child quiet test"
+  },
+  {
+   "family": "exposing_tests",
+   "counter": 45523472,
+   "per_body": 21.6871,
+   "role": "inside",
+   "our_bucket": "closure: frame pass-1 settle+screen",
+   "unit": "a per-child exposure test"
+  },
+  {
+   "family": "move_check_tests",
+   "counter": 33211535,
+   "per_body": 15.8218,
+   "role": "inside",
+   "our_bucket": "closure: frame pass-1 settle+screen",
+   "unit": "a per-child check test"
+  },
+  {
+   "family": "blast_capture_tests",
+   "counter": 40020886,
+   "per_body": 19.0657,
+   "role": "inside",
+   "our_bucket": "closure: frame pass-1 settle+screen",
+   "unit": "a per-child blast-capture test"
+  },
+  {
+   "family": "threat_tests",
+   "counter": 9284634,
+   "per_body": 4.4231,
+   "role": "inside",
+   "our_bucket": "closure: frame pass-1 settle+screen",
+   "unit": "a per-child threat test"
+  },
+  {
+   "family": "evasion_scans",
+   "counter": 1489183,
+   "per_body": 0.7094,
+   "role": "inside",
+   "our_bucket": "closure: frame pass-1 settle+screen",
+   "unit": "a per-child evasion scan"
+  },
+  {
+   "family": "material_tests",
+   "counter": 0,
+   "per_body": 0.0,
+   "role": "inside",
+   "our_bucket": "closure: frame pass-1 settle+screen",
+   "unit": "a per-child material test (0 calls on this cell)"
+  },
+  {
+   "family": "heavy_legality_tests",
+   "counter": 69425579,
+   "per_body": 33.074,
+   "role": "inside",
+   "our_bucket": "closure: frame pass-1 settle+screen",
+   "unit": "the heavy per-child legality test: the unit report35's status row missed"
+  },
+  {
+   "family": "attacking_bodies",
+   "counter": 1050172,
+   "per_body": 0.5003,
+   "role": "inside",
+   "our_bucket": "denominator",
+   "unit": "a classification of the body, not a cost"
+  },
+  {
+   "family": "defending_bodies",
+   "counter": 1048928,
+   "per_body": 0.4997,
+   "role": "inside",
+   "our_bucket": "denominator",
+   "unit": "a classification of the body, not a cost"
+  }
+ ],
+ "rows": [
+  {
+   "row": "movegen (legal)",
+   "pp": 12.48,
+   "ns_per_op": 85.393,
+   "ours_per_expansion": 13.508,
+   "theirs_per_body_A": 2.3911,
+   "theirs_per_body_like": 2.3911,
+   "ratio_A": 5.649,
+   "ratio_like": 5.649,
+   "ns_A": 204.18,
+   "ns_like": 204.18,
+   "addr_pp_A": 10.27,
+   "addr_pp_like": 10.27,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "closure: frame pass-1 settle+screen",
+   "pp": 11.55,
+   "ns_per_op": 37.712,
+   "ours_per_expansion": 28.311,
+   "theirs_per_body_A": 18.2011,
+   "theirs_per_body_like": 18.2011,
+   "ratio_A": 1.555,
+   "ratio_like": 1.555,
+   "ns_A": 686.41,
+   "ns_like": 686.41,
+   "addr_pp_A": 4.12,
+   "addr_pp_like": 4.13,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "legality/status/terminality",
+   "pp": 9.49,
+   "ns_per_op": 19.127,
+   "ours_per_expansion": 45.856,
+   "theirs_per_body_A": 0.493,
+   "theirs_per_body_like": 33.567,
+   "ratio_A": 93.018,
+   "ratio_like": 1.366,
+   "ns_A": 9.43,
+   "ns_like": 642.04,
+   "addr_pp_A": 9.39,
+   "addr_pp_like": 2.55,
+   "folded": false,
+   "refuted": true,
+   "refuted_reason": "the 93x ratio is a unit artifact: the reference's per-reply legality is heavy_legality_tests (33.07 per body, 0.97x of our 34.08 per expansion), so the 0.49-query row prices one database query and not the work; in like units the row's addressable share falls from 9.39 pp to 2.55 pp",
+   "units": [
+    {
+     "theirs": 33.074,
+     "counters": [
+      "heavy_legality_tests"
+     ],
+     "ours_per_expansion": 34.075,
+     "matched_unit": "our per-reply legality screen (20.20 + 13.88 = 34.08 per expansion)"
+    },
+    {
+     "theirs": 0.493,
+     "counters": [
+      "terminality_queries",
+      "mate_tests",
+      "body_check_queries",
+      "status_queries"
+     ],
+     "ours_per_expansion": 11.781,
+     "matched_unit": "our remaining status queries (6.97 + 3.67 + 1.15 = 11.78 per expansion)"
+    }
+   ]
+  },
+  {
+   "row": "guide hand_eval",
+   "pp": 7.92,
+   "ns_per_op": 198.649,
+   "ours_per_expansion": 3.684,
+   "theirs_per_body_A": 0.9997,
+   "theirs_per_body_like": 0.9997,
+   "ratio_A": 3.685,
+   "ratio_like": 3.685,
+   "ns_A": 198.58,
+   "ns_like": 198.58,
+   "addr_pp_A": 5.77,
+   "addr_pp_like": 5.77,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "proof probe",
+   "pp": 5.2,
+   "ns_per_op": 10.364,
+   "ours_per_expansion": 46.37,
+   "theirs_per_body_A": 5.2196,
+   "theirs_per_body_like": 5.2196,
+   "ratio_A": 8.884,
+   "ratio_like": 8.884,
+   "ns_A": 54.1,
+   "ns_like": 54.1,
+   "addr_pp_A": 4.61,
+   "addr_pp_like": 4.61,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "closure: replay/simulation",
+   "pp": 4.48,
+   "ns_per_op": 291.835,
+   "ours_per_expansion": 1.42,
+   "theirs_per_body_A": 0.4414,
+   "theirs_per_body_like": 0.4414,
+   "ratio_A": 3.217,
+   "ratio_like": 3.217,
+   "ns_A": 128.82,
+   "ns_like": 128.82,
+   "addr_pp_A": 3.09,
+   "addr_pp_like": 3.09,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "guide class + start numbers",
+   "pp": 3.59,
+   "ns_per_op": 5.269,
+   "ours_per_expansion": 62.95,
+   "theirs_per_body_A": 0.9997,
+   "theirs_per_body_like": 0.9997,
+   "ratio_A": 62.97,
+   "ratio_like": 62.969,
+   "ns_A": 5.27,
+   "ns_like": 5.27,
+   "addr_pp_A": 3.53,
+   "addr_pp_like": 3.53,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "do_move/undo_move/clone",
+   "pp": 3.43,
+   "ns_per_op": 2.466,
+   "ours_per_expansion": 128.789,
+   "theirs_per_body_A": 3.5585,
+   "theirs_per_body_like": 3.5585,
+   "ratio_A": 36.192,
+   "ratio_like": 36.192,
+   "ns_A": 8.77,
+   "ns_like": 8.77,
+   "addr_pp_A": 3.34,
+   "addr_pp_like": 3.34,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "closure: null pass-2 reply test",
+   "pp": 2.74,
+   "ns_per_op": 18.255,
+   "ours_per_expansion": 13.876,
+   "theirs_per_body_A": 0.0,
+   "theirs_per_body_like": 0.0,
+   "ratio_A": null,
+   "ratio_like": null,
+   "ns_A": 0.0,
+   "ns_like": 0.0,
+   "addr_pp_A": 2.74,
+   "addr_pp_like": 2.74,
+   "folded": true,
+   "refuted": false
+  },
+  {
+   "row": "MID select/node_value",
+   "pp": 1.87,
+   "ns_per_op": 43.295,
+   "ours_per_expansion": 4.0,
+   "theirs_per_body_A": 2.029,
+   "theirs_per_body_like": 2.029,
+   "ratio_A": 1.971,
+   "ratio_like": 1.971,
+   "ns_A": 87.85,
+   "ns_like": 87.85,
+   "addr_pp_A": 0.92,
+   "addr_pp_like": 0.92,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "key/rule50",
+   "pp": 1.52,
+   "ns_per_op": 1.911,
+   "ours_per_expansion": 73.759,
+   "theirs_per_body_A": 40.0471,
+   "theirs_per_body_like": 40.0471,
+   "ratio_A": 1.842,
+   "ratio_like": 1.842,
+   "ns_A": 76.53,
+   "ns_like": 76.53,
+   "addr_pp_A": 0.69,
+   "addr_pp_like": 0.69,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "table store",
+   "pp": 1.18,
+   "ns_per_op": 36.473,
+   "ours_per_expansion": 2.991,
+   "theirs_per_body_A": 0.9974,
+   "theirs_per_body_like": 0.9974,
+   "ratio_A": 2.998,
+   "ratio_like": 2.999,
+   "ns_A": 36.38,
+   "ns_like": 36.38,
+   "addr_pp_A": 0.79,
+   "addr_pp_like": 0.79,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "legality/status/terminality (needs-board/check test)",
+   "pp": 1.06,
+   "ns_per_op": 3.659,
+   "ours_per_expansion": 26.75,
+   "theirs_per_body_A": 59.2346,
+   "theirs_per_body_like": 59.2346,
+   "ratio_A": 0.452,
+   "ratio_like": 0.452,
+   "ns_A": 216.74,
+   "ns_like": 216.74,
+   "addr_pp_A": 0.0,
+   "addr_pp_like": 0.0,
+   "folded": false,
+   "refuted": false,
+   "reclassified": "the seven per-child test families are inside `child_decisions`, not inside this row: they sum to 127.4 per body (7.00 per child decided) against this row's 59.2 screens per body, so one counter cannot contain them",
+   "per_child_tests": {
+    "quiet_tests": 32.584,
+    "exposing_tests": 21.687,
+    "move_check_tests": 15.822,
+    "blast_capture_tests": 19.066,
+    "threat_tests": 4.423,
+    "evasion_scans": 0.709,
+    "material_tests": 0.0,
+    "heavy_legality_tests": 33.074
+   },
+   "per_child_tests_per_child_decided": 7.0
+  },
+  {
+   "row": "repetition scan",
+   "pp": 0.67,
+   "ns_per_op": 2.577,
+   "ours_per_expansion": 24.206,
+   "theirs_per_body_A": 17.6343,
+   "theirs_per_body_like": 17.6343,
+   "ratio_A": 1.373,
+   "ratio_like": 1.373,
+   "ns_A": 45.44,
+   "ns_like": 45.44,
+   "addr_pp_A": 0.18,
+   "addr_pp_like": 0.18,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "exposed-limit cache",
+   "pp": 0.63,
+   "ns_per_op": 2.021,
+   "ours_per_expansion": 28.648,
+   "theirs_per_body_A": 0.0,
+   "theirs_per_body_like": 0.0,
+   "ratio_A": null,
+   "ratio_like": null,
+   "ns_A": 0.0,
+   "ns_like": 0.0,
+   "addr_pp_A": 0.63,
+   "addr_pp_like": 0.63,
+   "folded": true,
+   "refuted": false
+  },
+  {
+   "row": "allocator",
+   "pp": 0.59,
+   "ns_per_op": 3.273,
+   "ours_per_expansion": 16.795,
+   "theirs_per_body_A": 0.0,
+   "theirs_per_body_like": 0.0,
+   "ratio_A": null,
+   "ratio_like": null,
+   "ns_A": 0.0,
+   "ns_like": 0.0,
+   "addr_pp_A": 0.59,
+   "addr_pp_like": 0.59,
+   "folded": true,
+   "refuted": false
+  },
+  {
+   "row": "null board (`null_for`)",
+   "pp": 0.33,
+   "ns_per_op": 52.159,
+   "ours_per_expansion": 0.591,
+   "theirs_per_body_A": 0.2169,
+   "theirs_per_body_like": 0.2169,
+   "ratio_A": 2.726,
+   "ratio_like": 2.725,
+   "ns_A": 11.31,
+   "ns_like": 11.31,
+   "addr_pp_A": 0.21,
+   "addr_pp_like": 0.21,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "prefetch hint",
+   "pp": 0.18,
+   "ns_per_op": 0.373,
+   "ours_per_expansion": 44.755,
+   "theirs_per_body_A": 18.2707,
+   "theirs_per_body_like": 18.2707,
+   "ratio_A": 2.45,
+   "ratio_like": 2.45,
+   "ns_A": 6.82,
+   "ns_like": 6.82,
+   "addr_pp_A": 0.11,
+   "addr_pp_like": 0.11,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "TT probe",
+   "pp": 0.04,
+   "ns_per_op": 0.178,
+   "ours_per_expansion": 22.263,
+   "theirs_per_body_A": 3.7567,
+   "theirs_per_body_like": 3.7567,
+   "ratio_A": 5.926,
+   "ratio_like": 5.926,
+   "ns_A": 0.67,
+   "ns_like": 0.67,
+   "addr_pp_A": 0.03,
+   "addr_pp_like": 0.03,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "key/rule50 (Mover::new)",
+   "pp": 0.01,
+   "ns_per_op": 0.517,
+   "ours_per_expansion": 1.0,
+   "theirs_per_body_A": 2.3907,
+   "theirs_per_body_like": 2.3907,
+   "ratio_A": 0.418,
+   "ratio_like": 0.418,
+   "ns_A": 1.24,
+   "ns_like": 1.24,
+   "addr_pp_A": 0.0,
+   "addr_pp_like": 0.0,
+   "folded": false,
+   "refuted": false
+  },
+  {
+   "row": "filter probe",
+   "pp": 0.0,
+   "ns_per_op": 0.161,
+   "ours_per_expansion": 2.137,
+   "theirs_per_body_A": 45.5178,
+   "theirs_per_body_like": 45.5178,
+   "ratio_A": 0.047,
+   "ratio_like": 0.047,
+   "ns_A": 7.34,
+   "ns_like": 7.34,
+   "addr_pp_A": 0.0,
+   "addr_pp_like": 0.0,
+   "folded": false,
+   "refuted": false
+  }
+ ],
+ "buckets": [
+  {
+   "bucket": "movegen (legal)",
+   "pp": 12.48,
+   "leaves": [
+    "mg_legal@enter",
+    "mg_legal@mid",
+    "mg_legal@null_p2",
+    "mg_legal@replay"
+   ],
+   "calls_per_expansion": 13.508,
+   "ns_per_op": 85.393,
+   "ns_per_expansion": 1153.5,
+   "role": "priced",
+   "charge_A_ns": 204.18,
+   "charge_like_ns": 204.18,
+   "in_region_C": false
+  },
+  {
+   "bucket": "closure: frame pass-1 settle+screen",
+   "pp": 11.55,
+   "leaves": [
+    "closure_frame@enter"
+   ],
+   "calls_per_expansion": 28.311,
+   "ns_per_op": 37.712,
+   "ns_per_expansion": 1067.7,
+   "role": "priced",
+   "charge_A_ns": 686.41,
+   "charge_like_ns": 686.41,
+   "in_region_C": true
+  },
+  {
+   "bucket": "legality/status/terminality",
+   "pp": 9.49,
+   "leaves": [
+    "status@enter",
+    "status@null_p1",
+    "status@replay",
+    "legality@null_p2",
+    "legality@replay"
+   ],
+   "calls_per_expansion": 45.856,
+   "ns_per_op": 19.127,
+   "ns_per_expansion": 877.1,
+   "role": "priced",
+   "charge_A_ns": 9.43,
+   "charge_like_ns": 642.04,
+   "in_region_C": true
+  },
+  {
+   "bucket": "guide hand_eval",
+   "pp": 7.92,
+   "leaves": [
+    "guide_eval@enter"
+   ],
+   "calls_per_expansion": 3.684,
+   "ns_per_op": 198.649,
+   "ns_per_expansion": 731.8,
+   "role": "priced",
+   "charge_A_ns": 198.58,
+   "charge_like_ns": 198.58,
+   "in_region_C": false
+  },
+  {
+   "bucket": "proof probe",
+   "pp": 5.2,
+   "leaves": [
+    "proof_probe@enter",
+    "proof_probe@null_p1",
+    "proof_probe@replay"
+   ],
+   "calls_per_expansion": 46.37,
+   "ns_per_op": 10.364,
+   "ns_per_expansion": 480.6,
+   "role": "priced",
+   "charge_A_ns": 54.1,
+   "charge_like_ns": 54.1,
+   "in_region_C": false
+  },
+  {
+   "bucket": "closure: replay/simulation",
+   "pp": 4.48,
+   "leaves": [
+    "closure_replay@replay"
+   ],
+   "calls_per_expansion": 1.42,
+   "ns_per_op": 291.835,
+   "ns_per_expansion": 414.4,
+   "role": "priced",
+   "charge_A_ns": 128.82,
+   "charge_like_ns": 128.82,
+   "in_region_C": false
+  },
+  {
+   "bucket": "guide class + start numbers",
+   "pp": 3.59,
+   "leaves": [
+    "guide_class@enter"
+   ],
+   "calls_per_expansion": 62.95,
+   "ns_per_op": 5.269,
+   "ns_per_expansion": 331.7,
+   "role": "priced",
+   "charge_A_ns": 5.27,
+   "charge_like_ns": 5.27,
+   "in_region_C": false
+  },
+  {
+   "bucket": "do_move/undo_move/clone",
+   "pp": 3.43,
+   "leaves": [
+    "do_move@enter",
+    "do_move@mid",
+    "do_move@null_p1",
+    "do_move@null_p2",
+    "do_move@replay",
+    "undo_move@null_p1",
+    "undo_move@null_p2",
+    "clone@enter",
+    "clone@mid",
+    "clone@null_p2",
+    "clone@replay"
+   ],
+   "calls_per_expansion": 128.789,
+   "ns_per_op": 2.466,
+   "ns_per_expansion": 317.6,
+   "role": "priced",
+   "charge_A_ns": 8.77,
+   "charge_like_ns": 8.77,
+   "in_region_C": false
+  },
+  {
+   "bucket": "closure: null pass-2 reply test",
+   "pp": 2.74,
+   "leaves": [
+    "closure_null_p2@null_p2"
+   ],
+   "calls_per_expansion": 13.876,
+   "ns_per_op": 18.255,
+   "ns_per_expansion": 253.3,
+   "role": "folded",
+   "charge_A_ns": 0.0,
+   "charge_like_ns": 0.0,
+   "in_region_C": false
+  },
+  {
+   "bucket": "MID select/node_value",
+   "pp": 1.87,
+   "leaves": [
+    "select@mid"
+   ],
+   "calls_per_expansion": 4.0,
+   "ns_per_op": 43.295,
+   "ns_per_expansion": 173.2,
+   "role": "priced",
+   "charge_A_ns": 87.85,
+   "charge_like_ns": 87.85,
+   "in_region_C": false
+  },
+  {
+   "bucket": "key/rule50",
+   "pp": 1.52,
+   "leaves": [
+    "key@enter",
+    "key@null_p1",
+    "key@null_p2",
+    "key@replay"
+   ],
+   "calls_per_expansion": 73.759,
+   "ns_per_op": 1.911,
+   "ns_per_expansion": 141.0,
+   "role": "priced",
+   "charge_A_ns": 76.53,
+   "charge_like_ns": 76.53,
+   "in_region_C": true
+  },
+  {
+   "bucket": "table store",
+   "pp": 1.18,
+   "leaves": [
+    "store@mid"
+   ],
+   "calls_per_expansion": 2.991,
+   "ns_per_op": 36.473,
+   "ns_per_expansion": 109.1,
+   "role": "priced",
+   "charge_A_ns": 36.38,
+   "charge_like_ns": 36.38,
+   "in_region_C": false
+  },
+  {
+   "bucket": "legality/status/terminality (needs-board/check test)",
+   "pp": 1.06,
+   "leaves": [
+    "mover_check@enter"
+   ],
+   "calls_per_expansion": 26.75,
+   "ns_per_op": 3.659,
+   "ns_per_expansion": 97.9,
+   "role": "priced",
+   "charge_A_ns": 216.74,
+   "charge_like_ns": 216.74,
+   "in_region_C": true
+  },
+  {
+   "bucket": "repetition scan",
+   "pp": 0.67,
+   "leaves": [
+    "repetition@enter"
+   ],
+   "calls_per_expansion": 24.206,
+   "ns_per_op": 2.577,
+   "ns_per_expansion": 62.4,
+   "role": "priced",
+   "charge_A_ns": 45.44,
+   "charge_like_ns": 45.44,
+   "in_region_C": false
+  },
+  {
+   "bucket": "exposed-limit cache",
+   "pp": 0.63,
+   "leaves": [
+    "null_cache@null_p2"
+   ],
+   "calls_per_expansion": 28.648,
+   "ns_per_op": 2.021,
+   "ns_per_expansion": 57.9,
+   "role": "folded",
+   "charge_A_ns": 0.0,
+   "charge_like_ns": 0.0,
+   "in_region_C": false
+  },
+  {
+   "bucket": "allocator",
+   "pp": 0.59,
+   "leaves": [
+    "alloc@enter",
+    "alloc@mid",
+    "alloc@replay",
+    "dealloc@enter",
+    "dealloc@mid",
+    "dealloc@replay"
+   ],
+   "calls_per_expansion": 16.795,
+   "ns_per_op": 3.273,
+   "ns_per_expansion": 55.0,
+   "role": "folded",
+   "charge_A_ns": 0.0,
+   "charge_like_ns": 0.0,
+   "in_region_C": false
+  },
+  {
+   "bucket": "null board (`null_for`)",
+   "pp": 0.33,
+   "leaves": [
+    "null_board@mid"
+   ],
+   "calls_per_expansion": 0.591,
+   "ns_per_op": 52.159,
+   "ns_per_expansion": 30.8,
+   "role": "priced",
+   "charge_A_ns": 11.31,
+   "charge_like_ns": 11.31,
+   "in_region_C": false
+  },
+  {
+   "bucket": "prefetch hint",
+   "pp": 0.18,
+   "leaves": [
+    "prefetch@enter",
+    "prefetch@null_p1"
+   ],
+   "calls_per_expansion": 44.755,
+   "ns_per_op": 0.373,
+   "ns_per_expansion": 16.7,
+   "role": "priced",
+   "charge_A_ns": 6.82,
+   "charge_like_ns": 6.82,
+   "in_region_C": false
+  },
+  {
+   "bucket": "TT probe",
+   "pp": 0.04,
+   "leaves": [
+    "tt_probe@enter"
+   ],
+   "calls_per_expansion": 22.263,
+   "ns_per_op": 0.178,
+   "ns_per_expansion": 4.0,
+   "role": "priced",
+   "charge_A_ns": 0.67,
+   "charge_like_ns": 0.67,
+   "in_region_C": false
+  },
+  {
+   "bucket": "key/rule50 (Mover::new)",
+   "pp": 0.01,
+   "leaves": [
+    "mover_new@enter"
+   ],
+   "calls_per_expansion": 1.0,
+   "ns_per_op": 0.517,
+   "ns_per_expansion": 0.5,
+   "role": "priced",
+   "charge_A_ns": 1.24,
+   "charge_like_ns": 1.24,
+   "in_region_C": false
+  },
+  {
+   "bucket": "filter probe",
+   "pp": 0.0,
+   "leaves": [
+    "filter@enter"
+   ],
+   "calls_per_expansion": 2.137,
+   "ns_per_op": 0.161,
+   "ns_per_expansion": 0.3,
+   "role": "priced",
+   "charge_A_ns": 7.34,
+   "charge_like_ns": 7.34,
+   "in_region_C": false
+  }
+ ],
+ "partition": {
+  "priced": 65.005,
+  "folded": 3.96,
+  "unhashable": 0,
+  "inside": 0,
+  "total": 68.965,
+  "total_of_parts": 68.965
+ },
+ "conventions": {
+  "A": {
+   "M_ns": 1785.88,
+   "M_over_T4": 1.0364,
+   "headroom_or_shortfall_ns": -62.7,
+   "addressable_pp_wall_minus_M": 80.68,
+   "charges": {
+    "movegen (legal)": 204.18,
+    "closure: frame pass-1 settle+screen": 686.41,
+    "legality/status/terminality": 9.43,
+    "guide hand_eval": 198.58,
+    "proof probe": 54.1,
+    "closure: replay/simulation": 128.82,
+    "guide class + start numbers": 5.27,
+    "do_move/undo_move/clone": 8.77,
+    "closure: null pass-2 reply test": 0.0,
+    "MID select/node_value": 87.85,
+    "key/rule50": 76.53,
+    "table store": 36.38,
+    "legality/status/terminality (needs-board/check test)": 216.74,
+    "repetition scan": 45.44,
+    "exposed-limit cache": 0.0,
+    "allocator": 0.0,
+    "null board (`null_for`)": 11.31,
+    "prefetch hint": 6.82,
+    "TT probe": 0.67,
+    "key/rule50 (Mover::new)": 1.24,
+    "filter probe": 7.34
+   },
+   "definition": "report35 verbatim: every counted family at our bucket rate, the folded buckets at 0"
+  },
+  "B": {
+   "M_ns": 1678.6,
+   "M_over_T4": 0.9741,
+   "headroom_or_shortfall_ns": 44.6,
+   "addressable_pp_wall_minus_M": 81.84,
+   "definition": "A, but each per-child/per-move test family charged excess-only at our cheapest matching rate (nothing priced twice)",
+   "variables": [
+    {
+     "label": "B0 \u2014 the screen excess at our per-move screen rate (the convention)",
+     "rate_leaf": "mover_check@enter",
+     "rate_ns": 3.66,
+     "screens": {
+      "theirs_per_body": 59.2346,
+      "ours_per_expansion": 26.75,
+      "excess": 32.4846,
+      "charge_ns": 118.89
+     },
+     "heavy_legality": {
+      "theirs_per_body": 33.074,
+      "ours_per_expansion": 34.075,
+      "excess": 0.0,
+      "charge_ns": 0.0
+     },
+     "terminality": {
+      "theirs_per_body": 0.493,
+      "ours_per_expansion": 11.781,
+      "excess": 0.0,
+      "charge_ns": 0.0
+     },
+     "M_ns": 1678.6
+    },
+    {
+     "label": "B1 \u2014 the screen excess at our cheapest test rate",
+     "rate_leaf": "repetition@enter",
+     "rate_ns": 2.58,
+     "screens": {
+      "theirs_per_body": 59.2346,
+      "ours_per_expansion": 26.75,
+      "excess": 32.4846,
+      "charge_ns": 83.81
+     },
+     "heavy_legality": {
+      "theirs_per_body": 33.074,
+      "ours_per_expansion": 34.075,
+      "excess": 0.0,
+      "charge_ns": 0.0
+     },
+     "terminality": {
+      "theirs_per_body": 0.493,
+      "ours_per_expansion": 11.781,
+      "excess": 0.0,
+      "charge_ns": 0.0
+     },
+     "M_ns": 1643.52
+    },
+    {
+     "label": "B2 \u2014 the screen counter cannot be put in our unit (charged 0: the generosity floor)",
+     "rate_leaf": null,
+     "rate_ns": 0.0,
+     "screens": {
+      "theirs_per_body": 59.2346,
+      "ours_per_expansion": 26.75,
+      "excess": 32.4846,
+      "charge_ns": 0.0
+     },
+     "heavy_legality": {
+      "theirs_per_body": 33.074,
+      "ours_per_expansion": 34.075,
+      "excess": 0.0,
+      "charge_ns": 0.0
+     },
+     "terminality": {
+      "theirs_per_body": 0.493,
+      "ours_per_expansion": 11.781,
+      "excess": 0.0,
+      "charge_ns": 0.0
+     },
+     "M_ns": 1559.71
+    }
+   ],
+   "charges": {
+    "legality/status/terminality (needs-board/check test)": 118.89,
+    "legality/status/terminality": 0.0,
+    "movegen (legal)": 204.18,
+    "closure: frame pass-1 settle+screen": 686.41,
+    "guide hand_eval": 198.58,
+    "proof probe": 54.1,
+    "closure: replay/simulation": 128.82,
+    "guide class + start numbers": 5.27,
+    "do_move/undo_move/clone": 8.77,
+    "closure: null pass-2 reply test": 0.0,
+    "MID select/node_value": 87.85,
+    "key/rule50": 76.53,
+    "table store": 36.38,
+    "repetition scan": 45.44,
+    "exposed-limit cache": 0.0,
+    "allocator": 0.0,
+    "null board (`null_for`)": 11.31,
+    "prefetch hint": 6.82,
+    "TT probe": 0.67,
+    "key/rule50 (Mover::new)": 1.24,
+    "filter probe": 7.34
+   },
+   "note": "the screens row is repriced excess-only; the status row's two like-unit families both have zero excess, so it is charged 0"
+  },
+  "C": {
+   "M_ns": 2200.66,
+   "M_over_T4": 1.2771,
+   "headroom_or_shortfall_ns": -477.5,
+   "addressable_pp_wall_minus_M": 76.2,
+   "charges": {
+    "movegen (legal)": 204.18,
+    "closure: frame pass-1 settle+screen": 1403.89,
+    "legality/status/terminality": 0.0,
+    "guide hand_eval": 198.58,
+    "proof probe": 54.1,
+    "closure: replay/simulation": 128.82,
+    "guide class + start numbers": 5.27,
+    "do_move/undo_move/clone": 8.77,
+    "closure: null pass-2 reply test": 0.0,
+    "MID select/node_value": 87.85,
+    "key/rule50": 0.0,
+    "table store": 36.38,
+    "legality/status/terminality (needs-board/check test)": 0.0,
+    "repetition scan": 45.44,
+    "exposed-limit cache": 0.0,
+    "allocator": 0.0,
+    "null board (`null_for`)": 11.31,
+    "prefetch hint": 6.82,
+    "TT probe": 0.67,
+    "key/rule50 (Mover::new)": 1.24,
+    "filter probe": 7.34
+   },
+   "definition": "B, but the decide loop reconciled to our region and charged once at the region's own rate",
+   "region": {
+    "buckets": [
+     "closure: frame pass-1 settle+screen",
+     "legality/status/terminality (needs-board/check test)",
+     "legality/status/terminality",
+     "key/rule50"
+    ],
+    "our_ns_per_expansion": 2183.7,
+    "our_children_decided_per_expansion": 28.311,
+    "our_region_ns_per_child": 77.13,
+    "their_children_decided_per_body": 18.2011,
+    "charge_ns": 1403.89,
+    "note": "at our region's 77.1 ns per child decided, a port that decided 18.2 children the way we decide one would spend 1,403.9 ns/exp of the 1,723 the rung allows; the screens row is inside this region and is not charged twice"
+   }
+  }
+ },
+ "addressable": {
+  "needed_pp": 81.3,
+  "report35_leaf_wise_pp": 51.01,
+  "like_unit_leaf_wise_pp": 44.17,
+  "like_unit_delta_pp": -6.84,
+  "wall_minus_M_pp": {
+   "A": 80.68,
+   "B": 81.84,
+   "C": 76.2
+  },
+  "note": "leaf-wise = our bucket's own cost minus what the reference spends on the same work at our rate; wall-minus-M = what a body costing exactly M would leave of our wall (report35 \u00a74's second reading, which assumes our whole per-node scaffolding disappears too)"
+ },
+ "verdict": {
+  "A": 1785.88,
+  "B": 1678.6,
+  "C": 2200.66,
+  "min": 1678.6,
+  "max": 2200.66,
+  "band_ns": [
+   1678.6,
+   2200.66
+  ],
+  "generosity_floor_ns": 1559.71,
+  "outcome": "INCONCLUSIVE-BY-UNITS",
+  "rule": "the band straddles the bar: min <= 1,723 < max",
+  "note": "plan36 pre-registers FUNDED <=> min <= 1,723 and INCONCLUSIVE-BY-UNITS <=> min <= 1,723 < max; the two clauses overlap by construction, so the third (the refinement) is applied whenever max > 1,723"
+ },
+ "env": {
+  "host": "Linux-7.2.13-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "machine_id_from_plan35": "e10de197da58",
+  "shape_json": "docs/plans/prover/measurements/plan35/shape.json",
+  "shape_sha256": "ff3e566f426bc525f409665f573cc503ca38fecfd730088ca9dce1afc9138589",
+  "census_json": "docs/plans/prover/measurements/plan34/census_120s.json",
+  "census_sha256": "373f3267fbab70fb48b09a5d437accc3eeb59b544f3d28cce1effb3cc6c861f0",
+  "runs": "none: arithmetic on committed integers only"
+ },
+ "gates": {
+  "G-36a": {
+   "bar": "every one of the 21 census buckets is in exactly one of priced / inside / folded / unhashable, summing to 100 % of the op budget (68.97 pp)",
+   "buckets": 21,
+   "partition_pp": {
+    "priced": 65.005,
+    "folded": 3.96,
+    "unhashable": 0,
+    "inside": 0,
+    "total": 68.965,
+    "total_of_parts": 68.965
+   },
+   "op_budget_pp": 68.97,
+   "sum_note": "pp recomputed from the committed seconds (s / wall x 100), so the total is 68.965 pp = the census's rounded 68.97; `inside` and `unhashable` are empty",
+   "pass": true
+  },
+  "G-36b": {
+   "bar": "convention A reproduces 1,785.9 ns from the committed files (+- 1 ns)",
+   "committed_M_ns": 1785.88,
+   "recomputed_M_ns": 1785.88,
+   "delta_ns": 0.0,
+   "pass": true
+  },
+  "G-36c": {
+   "bar": "no family priced twice (asserted on the leaf set)",
+   "priced_buckets": 18,
+   "distinct_priced_buckets": 18,
+   "families_charging_a_bucket": 19,
+   "buckets_shared_by_two_counters": [
+    "key/rule50"
+   ],
+   "shared_note": "two counters that are two faces of one unit (the effect and its hash) enter one bucket's single charge",
+   "heavy_legality_priced_at": [
+    "legality@replay 22.92 ns (excess 0)",
+    "mover_check@enter 3.66 ns (excess 0)"
+   ],
+   "region_C": "the four region buckets carry one charge between them (on closure_frame), the other three at 0.00",
+   "pass": true
+  },
+  "G-36d": {
+   "bar": "A, B, C, min, max and the verdict reported",
+   "A": 1785.88,
+   "B": 1678.6,
+   "C": 2200.66,
+   "min": 1678.6,
+   "max": 2200.66,
+   "unhashable_pp": 0,
+   "unhashable_share_of_op_budget": 0.0,
+   "verdict": "INCONCLUSIVE-BY-UNITS",
+   "pass": true
+  }
+ }
+}

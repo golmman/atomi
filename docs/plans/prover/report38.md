@@ -2,7 +2,7 @@
 
 Plan: [`plan38.md`](plan38.md) (item 52 Phase A). Initiative:
 [`initiative.md`](initiative.md), D4/D14/D19/D45/D49, [`gotchas`](gotchas.md).
-Data: [`measurements/plan38/`](../../../measurements/plan38/README.md). No
+Data: [`measurements/plan38/`](measurements/plan38/README.md). No
 default change, no `bench.md` row, no `T_4` claim, no provari source.
 
 ## 1. Verdict
@@ -56,7 +56,7 @@ measured target.
 ## 3. Measurements (one process at a time)
 
 Cell `deep-win`, `--guide hand --memory 192 --seed 0`, same binary. Full
-counters in [`runs.json`](../../../measurements/plan38/runs.json).
+counters in [`runs.json`](measurements/plan38/runs.json).
 
 | Run | exit | length | child_evals | expansions | ms |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -118,7 +118,7 @@ also round-trips both checkers; its proof `limit` is 97, not the bound.
   `--max-length` output field; the CLI contract is unchanged.
 - The `L = 20/22/24` proof files are 5.6–7.4 MiB and stay in `/tmp`; their
   sha256 and both checker results are in
-  [`bounded_deepwin.validation.json`](../../../measurements/plan38/bounded_deepwin.validation.json).
+  [`bounded_deepwin.validation.json`](measurements/plan38/bounded_deepwin.validation.json).
 
 ## 6. Next steps
 

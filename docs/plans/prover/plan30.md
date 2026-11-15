@@ -5,7 +5,7 @@ propose); D2, D11, D19, D21, D24, D26, D30, D34, D39, D40, D41. Upstream:
 `atomic-movegen` 2.7.0 **MG15–MG18**, [`../movegen/report2.md`](../movegen/report2.md)
 §5/§7.1, [`../movegen/handoff2.md`](../movegen/handoff2.md) §3. Drafted
 2026-11-13 after [`report29`](report29.md), [`analysis2`](analysis2.md) §5 and
-[`measurements/movegen/plan2/`](../../../measurements/movegen/plan2/README.md)
+[`../movegen/measurements/plan2/`](../movegen/measurements/plan2/README.md)
 (bare tree 2,025 ns/expansion, 21.3 % `needs_board`). Read-only session; scratch
 probe outside the repo.
 

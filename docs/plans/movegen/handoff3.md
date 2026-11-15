@@ -116,7 +116,7 @@ The prover's product stack reads the child board for the **guide** on every
 built child (hand evaluation, check/blast classification, the one-ply settle),
 so a board-free terminality cannot move its tree or its wall at all today; the
 realisable share is ~0 %. MG15 is closed downstream
-(`measurements/plan30/`, item 37, D42) and the child build stays its
+(`../prover/measurements/plan30/`, item 37, D42) and the child build stays its
 terminality path.
 
 A future integration is authorised only against a **measured** pair:

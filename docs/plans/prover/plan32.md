@@ -1,7 +1,7 @@
 # Plan 32 — item 39 (PROOF-FILTER): the filter is measured net-zero; the exact residue is PROOF-PROBE-TRIM
 
 Plan session, item 39, decisions D39/D43. Measurements:
-[`measurements/plan32/`](../../../measurements/plan32/README.md). The oracle
+[`measurements/plan32/`](measurements/plan32/README.md). The oracle
 stays an external process (GPL boundary). No engine change this session.
 
 ## 0. Verdict, first

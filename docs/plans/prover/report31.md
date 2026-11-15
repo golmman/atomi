@@ -2,7 +2,7 @@
 
 Plan: [`plan31.md`](plan31.md). Initiative: [`initiative.md`](initiative.md),
 item 38, decision **D43**. Measurements:
-[`measurements/plan31/`](../../../measurements/plan31/README.md). Engine
+[`measurements/plan31/`](measurements/plan31/README.md). Engine
 change: `src/guide/{threat,null,class,replay}.rs` + one new integration test.
 Nothing in this report came from provari source; the oracle is an external
 process (GPL boundary).

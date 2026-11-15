@@ -124,7 +124,7 @@ integration `planN.md` in `docs/plans/movegen/` with the gate written before
 data, a `reportN.md` recording each MG outcome, and no path dependency, fork
 or unreleased crate in a commit. The prover-side gate for MG15 is already
 written and cheap: re-run the committed Phase A driver
-(`measurements/plan29/probe.py`) — the decided share must exceed 10 % of the
+(`../prover/measurements/plan29/probe.py`) — the decided share must exceed 10 % of the
 built children on the hand stack before any wall measurement is authorised.
 
 ## 4. Non-asks

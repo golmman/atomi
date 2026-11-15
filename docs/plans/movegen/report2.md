@@ -2,7 +2,7 @@
 
 Plan: [`plan2.md`](plan2.md). Initiative: [`initiative.md`](initiative.md),
 D-MG1–D-MG7. Handoff answered: [`handoff2.md`](handoff2.md) (MG15–MG18). Data:
-[`measurements/movegen/plan2/`](../../../measurements/movegen/plan2/README.md)
+[`measurements/plan2/`](measurements/plan2/README.md)
 (`bench.py`/`bench.json`, `tree_probe.py`/`tree_probe.json`, `pernode.json`,
 `pernode_make.json`, `env.json`, README). Host: Ryzen 9 5950X, one process at a
 time. Repo dirty at `atomi@f88533e`.
@@ -199,4 +199,4 @@ published version that carries MG15–MG18 for the prover plans.
    reader extraction.
 3. `docs(movegen): report2, measurements and bench rows` —
    `docs/plans/movegen/{plan2,report2,initiative}.md`, `docs/plans/README.md`,
-   `docs/plans/prover/bench.md`, `measurements/movegen/plan2/`.
+   `docs/plans/prover/bench.md`, `measurements/plan2/`.

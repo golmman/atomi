@@ -2,7 +2,7 @@
 
 Plan: [`plan3.md`](plan3.md). Initiative: [`initiative.md`](initiative.md),
 D-MG1–D-MG7. Handoff answered: [`handoff3.md`](handoff3.md) (MG19–MG20). Data:
-[`measurements/movegen/plan3/`](../../../measurements/movegen/plan3/README.md)
+[`measurements/plan3/`](measurements/plan3/README.md)
 (`bench.json`, `tree_probe.json`, `pernode.json`, `pernode_make.json`,
 `env.json`, README). Host: Ryzen 9 5950X, one process at a time. Repo dirty at
 `atomi@d675701`.
@@ -200,4 +200,4 @@ MG19–MG20 — recorded as API, not as a cost win.
    `tests/child_surface_differential.rs`, `tests/legality_screen_differential.rs`.
 3. `docs(movegen): report3, measurements and bench rows` —
    `docs/plans/movegen/{report3,initiative}.md`, `docs/plans/README.md`,
-   `docs/plans/prover/bench.md`, `measurements/movegen/plan3/`.
+   `docs/plans/prover/bench.md`, `measurements/plan3/`.

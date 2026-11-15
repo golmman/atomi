@@ -1,7 +1,7 @@
 # Plan 37 — item 46 (proposed, OVERHEAD-PROFILE): the 28.45 pp no counter owns
 
 Read only: [`report34`](report34.md) §2–§4 and
-[`measurements/plan34/`](../../../measurements/plan34/README.md) (the census),
+[`measurements/plan34/`](measurements/plan34/README.md) (the census),
 [`report35`](report35.md) §4 (`R`), [`gotchas`](gotchas.md) §Scope, D22/D36/
 D40/D43–D45. Pins: `atomic-movegen` 2.8.0. **The oracle is not used** — no GPL
 exposure at all.
