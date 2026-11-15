@@ -40,6 +40,10 @@ factor(cell) = median candidate wall [s] / median provari --guide hand wall [s]
   claim fails (D14, e.g. an export refused as `store-full`) is *not claimed
   (`<verdict>`)* with the found wall. A censored cell is never dropped and
   never converted into a win.
+- **`--guide none` is a standing diagnostic control**, never a column: it
+  isolates the guide's contribution ([`analysis1`](analysis1.md)) and, with
+  proof length as the axis, separates a badly ordered guide from genuinely long
+  proofs. It is never a bench cell and never a factor.
 - **Rungs are not a column.** [`initiative.md`](initiative.md) decides which
   rung a set of measurements reaches (D30); rows keep their own session and
   are never rewritten.
@@ -47,6 +51,18 @@ factor(cell) = median candidate wall [s] / median provari --guide hand wall [s]
   deterministic per stack) and provari's `nodes` for the same cell. They are
   not comparable one-to-one (D11): evals per expansion against provari's nodes
   is a diagnostic, not a ratio to optimise.
+- **Proof length is a companion column, and it is compared.** Every row records
+  our `length` (attacker moves, D4) beside the *same-session* reference `mate`
+  for that cell, and states the delta. It is not a factor — a longer proof is a
+  sound proof — but it is the tree's depth, and depth drives expansions
+  superlinearly: on `deep-win` the pair `length 36` vs `mate 19` (bench set
+  card: `mate 22` from plan1) sat on this page for ~20 plans **uncompared**,
+  because no gate reports it — D14 checks soundness, not minimality. A row
+  that cannot state both numbers is incomplete.
+- **A measurement states what it cannot see.** Any census, profile or
+  differential row names the structure it is blind to (for the plan34 rdtsc
+  census: proof length, the tree, the guide's ordering) so the next agenda is
+  not the previous instrument's field of view.
 
 ### Measurement protocol
 

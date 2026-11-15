@@ -18,6 +18,15 @@ Referenced from `AGENTS.md` §Correctness.
   `(1, 1)`; its stalemate is found at node entry, **unless** the child's side
   to move has only its commoner and pawns, in which case every child is built.
   Without that gate `rem01` went from 9.4 M evals to censored at 60 M.
+- **A length-bounded pass must not store bound-dependent refutations.** If a
+  remaining-length bound is ever introduced (items 47/52), "no win within `L`"
+  is **not** "no win": a proof found under a bound is a genuine proof and may
+  be stored, a `Refuted` found under a bound may not go into the full-key table
+  unless the key carries the moves left (analysis1 R25's mechanism). The TT's
+  proof-free invariant does not save it — the proof table is where a bounded
+  pass would write. `Value::Proved { length, limit }` (D4) keeps its meaning:
+  `limit` is the 50-move counter, never the bound. An unbounded control run
+  (`L = ∞`) must be tree-identical to today.
 - **The per-file en passant key is derived** (`rules::ep_key`) because the
   movegen's Zobrist tables are private; its test pins it against
   `hash_after_with(Legal)`.
@@ -172,6 +181,18 @@ Referenced from `AGENTS.md` §Correctness.
   53 of 668,608 expansions (0.0079 %, plan12). Do not re-propose entry reuse
   without new data.
 
+## Evidence (binding on plans)
+
+- **No gate compares proof length, so length is compared by convention.** D14
+  checks that a proof is *sound*, not that it is *short*: two proofs of the same
+  win at `length` 36 and 19 both pass. The comparison lives in
+  [`bench.md`](bench.md)'s reading rules (every row records our `length` beside
+  the same-session reference `mate`). Do not read "both checkers accept" as
+  "the proof is as good as the reference's" — on `deep-win` it was twice as
+  deep for ~20 plans and nothing failed ([`plan36`](plan36.md) §3).
+- **A measurement states its blind spots.** No plan may treat the previous
+  instrument's field of view as the list of levers (working agreement 11).
+
 ## Scope (not a correctness gotcha, but binding on plans)
 
 - **No formulation change is proposable in `prover`** (D45, owner decision
@@ -187,3 +208,14 @@ Referenced from `AGENTS.md` §Correctness.
   and no item may be created for one. If implementation **plateaus** with a
   large multiple still missing, the goal question goes to a **kill review**.
   Measure against ≈8×, not D36's pre-plan31 11.5–15.5×.
+  **Pending owner ruling (D47, proposed):** this bullet rests on two premises,
+  and one of them has been withdrawn — D36's tree-at-parity clause is
+  deprecated by [`plan36`](plan36.md) §3 (it divides by the reference's
+  reported `nodes`; the two engines prove different lengths on `deep-win`).
+  D47 would keep **PDS-PN/PN², TT move ordering, restarts and the goal
+  re-pin** standing-rejected and leave open *whether* an in-base search-order
+  change (iterative deepening on proof length, items 47/52) may be an item at
+  all — that part of D47 is the owner's to decide, not a reading of this
+  bullet. Until the owner rules, this bullet
+  as written holds: a plan may not name a formulation change, and no item may
+  be created for a *different base* — item 52 is not one.
