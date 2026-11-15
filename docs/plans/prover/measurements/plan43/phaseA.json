@@ -1,0 +1,121 @@
+{
+ "edges": [
+  0,
+  26
+ ],
+ "runs": [
+  {
+   "label": "core-control",
+   "cell": "core",
+   "seed": 0,
+   "seconds": 120,
+   "mapped": false,
+   "found": true,
+   "exit": "proved",
+   "ms": 4965,
+   "child_evals": 12439376,
+   "expansions": 424249,
+   "length": 15,
+   "proof_entries": 926706
+  },
+  {
+   "label": "core-map",
+   "cell": "core",
+   "seed": 0,
+   "seconds": 120,
+   "mapped": true,
+   "found": true,
+   "exit": "proved",
+   "ms": 7900,
+   "child_evals": 22550828,
+   "expansions": 750081,
+   "length": 19,
+   "proof_entries": 898411
+  },
+  {
+   "label": "easy-win-control",
+   "cell": "easy",
+   "seed": 0,
+   "seconds": 120,
+   "mapped": false,
+   "found": true,
+   "exit": "proved",
+   "ms": 366,
+   "child_evals": 1016547,
+   "expansions": 37999,
+   "length": 19,
+   "proof_entries": 65425
+  },
+  {
+   "label": "easy-win-map",
+   "cell": "easy",
+   "seed": 0,
+   "seconds": 120,
+   "mapped": true,
+   "found": true,
+   "exit": "proved",
+   "ms": 777,
+   "child_evals": 2198023,
+   "expansions": 80338,
+   "length": 19,
+   "proof_entries": 190320
+  },
+  {
+   "label": "deep-win-control",
+   "cell": "deep",
+   "seed": 0,
+   "seconds": 120,
+   "mapped": false,
+   "found": true,
+   "exit": "proved",
+   "ms": 54164,
+   "child_evals": 155236740,
+   "expansions": 5803257,
+   "length": 36,
+   "proof_entries": 5716874
+  },
+  {
+   "label": "deep-win-map",
+   "cell": "deep",
+   "seed": 0,
+   "seconds": 120,
+   "mapped": true,
+   "found": true,
+   "exit": "proved",
+   "ms": 41449,
+   "child_evals": 126940319,
+   "expansions": 4359526,
+   "length": 34,
+   "proof_entries": 3813219
+  }
+ ],
+ "ratios": {
+  "core": {
+   "control_ms": 4965,
+   "map_ms": 7900,
+   "ratio": 1.5911379657603222,
+   "control_expansions": 424249,
+   "map_expansions": 750081,
+   "control_length": 15,
+   "map_length": 19
+  },
+  "easy-win": {
+   "control_ms": 366,
+   "map_ms": 777,
+   "ratio": 2.122950819672131,
+   "control_expansions": 37999,
+   "map_expansions": 80338,
+   "control_length": 19,
+   "map_length": 19
+  },
+  "deep-win": {
+   "control_ms": 54164,
+   "map_ms": 41449,
+   "ratio": 0.7652499815375526,
+   "control_expansions": 5803257,
+   "map_expansions": 4359526,
+   "control_length": 36,
+   "map_length": 34
+  }
+ }
+}

@@ -54,6 +54,13 @@ Cap-120 row after plan33 (D46) is `core` 4.923 s, `easy-win` 0.376 s,
   1.0122×. D14 w = 2 is 9/9 both checkers. The plan's held-out `sample20`
   set is all-censored at 120 s, so G-41b fails on an unmeasurable guard; the
   default stays 16 and w = 2 is opt-in. Owner ruling pending.
+- **plan43 (item 56, GUIDE-SCALE-FREE):** a distribution-normalised quantile
+  band (shared parent edges 0/26, R2's 11/6/1 and 21/11/1 table) replacing the
+  linear EF-PN weight map is **0.765×** on `deep-win` at 120 s seed 0 (41,449
+  vs 54,164 ms, length 34 vs 36) but **1.591×** on `core` and **2.123×** on
+  `easy-win`, so G-43b fails on the easy-cell guard. Phase B was not run; no
+  `--guide-ef-map`, no default, no `bench.md` row. The map repeats w = 2's
+  `deep-win`/easy-cell split. Item 56 closed negative.
 
 **Consequence for priority.** The per-node micro-line is exhausted as a route
 to `T_4` (plans 34–37: 3.22× ceiling, NOT FUNDED, INCONCLUSIVE, ≈1.20×). The
@@ -263,6 +270,7 @@ number.
 | 53 | **Tree-metric harness** (TREE-METRIC) | **proposed — the instrument for items 47/48/52.** A fixed-context metric per cell (`expansions`, `child_evals`, `length`, ns/exp at the 5 M probe and a fixed cap) with `--guide none` as a standing control. Gates: reproduces the committed values byte-for-byte on the three cells and the 5 M probe; two same-binary runs identical; ranking agrees in sign with the 120 s ranking on three historical levers (NULL-PIPE, HOTPATH-V2, G1). Never a bench cell, never a factor |
 | 54 | **EF-PN weight** (GUIDE-SCALE) | **executed — w = 2 is a `deep-win` lever, default unchanged** ([plan41](plan41.md), [report41](report41.md), [report42](report42.md)). 120 s, seeds 0–2: `deep-win` **0.604×** (30,401 vs 50,327 ms), `core` 1.082×, `easy-win` 1.647×, geomean **1.0249×**; w = 4 is 0.746× / 1.0122×. D14 w = 2 9/9 both checkers, timed/untimed evals 9/9. G-41b **FAIL**: the held-out `sample20` set is all-censored at 120 s. Plan42's fixed held-out (`guidance-v1` 0-based 6–10, `dec*`) is **2/5 faster** (`dec01` 2.8×, `dec05` 1.33× slower), so w = 2 is `deep-win`-specific, not a general default; `ef_weight` stays 16, no `bench.md` row. Owner ruling pending |
 | 55 | **Compose w = 2 with a bounded length** (SCALE-LENGTH) | **executed — negative, closed** ([plan42](plan42.md), [report42](report42.md)). `deep-win` seed 0, w = 2, 120 s: `L = ∞` 30,469 ms / 3,165,142 / length 25; `L = 24` 2.184×, `L = 22` 1.135×, `L = 20` 1.232×. No `L < ∞` beats `L = ∞`, so the pre-registered stop fired and no Phase A matrix ran. The two tree levers overlap on the length axis; the bounded pass is a strict regression on top of w = 2. G-42b also fails (w = 2 alone 0.604× > 0.50×). Default stays w = 16, `L = ∞` |
+| 56 | **Distribution-normalised EF-PN map** (GUIDE-SCALE-FREE) | **executed — negative, closed** ([plan43](plan43.md), [report43](report43.md)). Phase 0 fit on 8 fixed non-claim `corpus-v1` cells (2 M evals) gives a narrow skewed eval (shared parent p20/p80 = 0/26); the frozen map is a shared-edge quantile band with R2's table, replacing the linear weight map. Phase A, 120 s seed 0: `deep-win` **0.765×** (41,449 vs 54,164 ms, length 34 vs 36), but `core` **1.591×** and `easy-win` **2.123×**. G-43b fails on the easy-cell guard, so no Phase B, no `--guide-ef-map`, no default, no `bench.md` row. The map repeats w = 2's `deep-win`/easy-cell split |
 
 ### Closed items
 
