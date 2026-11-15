@@ -280,3 +280,21 @@ and store your results as `docs/plans/prover/analysis3.md`.
 ---
 
 Read docs/plans/prover/plan34.md, report34.md, analysis2.md §5–§6 and docs/plans/prover/gotchas.md. Write a plan session (≤ 8 KB, plan35.md) for G-35, the shape differential: in a scratch clone outside the repo, tabulate counts only from provari's node body (moves, lists, probes, guide numbers per move, child builds, null scans) and map each to our measured ns/op from the plan34 census, producing a summed addressable-pp figure and a predicted µs/expansion for a re-shaped node body. Do not read or copy code into the repo. Output the decision: reshape is funded (≥ 81.3 pp / ≤ 1.7 µs/exp reachable) or it is not (⇒ options C/D for the owner).
+
+---
+
+1. per-node confusion
+An earlier analysis said we have node count parity with provari and the per-node performance needs optimization.
+Now you tell me per-node is not on par. What changed?
+
+2. per-node details table
+2a. how can legality checks and movegen be faster in provari when analysis shows that shakmaty is slower than atomic-movegen?
+2b. why don't we go through each row in this list and pick apart the actual details and find out where we can improve?
+
+---
+
+1. so tree size is indeed a vector for improvements
+2. 
+
+---
+
