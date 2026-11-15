@@ -207,7 +207,13 @@ Referenced from `AGENTS.md` §Correctness.
   progress is measured. A plan may not list one in its options or next steps,
   and no item may be created for one. If implementation **plateaus** with a
   large multiple still missing, the goal question goes to a **kill review**.
-  Measure against ≈8×, not D36's pre-plan31 11.5–15.5×.
+  Measure against **4.38× per node** (9,246 ns/exp against 2,111 ns/body,
+  [`report35`](report35.md) §1) — **not** ≈8×/11.3 µs, which multiplied a
+  wall ratio by a tree term that has been withdrawn (**D48, proposed**):
+  D36's "tree at parity" divided by the reference's *reported* `nodes` (1.44×
+  its bodies) and the two engines prove different lengths on `deep-win` (ours
+  36/37/29, `mate` 19, re-measured by [`plan36`](plan36.md) Phase 0;
+  [`report36`](report36.md) §5). Quote no tree ratio in a plan.
   **Pending owner ruling (D47, proposed):** this bullet rests on two premises,
   and one of them has been withdrawn — D36's tree-at-parity clause is
   deprecated by [`plan36`](plan36.md) §3 (it divides by the reference's

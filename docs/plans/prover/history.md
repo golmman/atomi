@@ -566,3 +566,31 @@ premise are the recorded starting point for the D21 kill review.
   rules on plan34's C/D. Data:
   [`measurements/plan35/`](../../../measurements/plan35/README.md); report:
   [`report35.md`](report35.md).
+
+- **2026-11-14 — plan36, kill review of plans 34–35 + item 45 (M-REMAP),
+  read-only**: the plans 34–35 kill review asked what the absolute distance to
+  the goal is and cancelled **item 44 as a shape port** while keeping two
+  measurement items. Item 45's Phase 0 (3 seeds + 1 reference run, one process
+  at a time) found our `deep-win` `length` **36 / 37 / 29** against the
+  reference's `mate` **19** (our seed 0 tree reproduced: 5,803,257 expansions),
+  so the 2.76× "tree ratio" is **void** — it divided a mate-36 tree by a
+  mate-19 tree, and both by the wrong denominator (their reported `nodes` is
+  1.44× their bodies) — and the plan's `core` unit check (17 = 17) does not
+  reproduce (ours is 15; `easy-win` 19/19/16 against 15). Phase A audited
+  report35's `M` (no runs, integers only): **A 1,785.88** (report35 verbatim) /
+  **B 1,678.60** (per-op, excess-only) / **C 2,200.66** (region-total) against
+  the 1,723 ns/exp `T_4` allows ⇒ **INCONCLUSIVE-BY-UNITS**, the band straddles
+  the bar under every reading of B's one judgement call (B0 1,678.60 / B1
+  1,643.52 / B2 1,559.71). Two findings that do survive: report35's 93×
+  status/terminality row was a **unit artifact** — the reference's per-reply
+  legality is `heavy_legality_tests`, 33.07/body against our 34.08/exp — so the
+  addressable pp fall from **51.01 to 44.17** (−6.84 pp = −632 ns), and its
+  child-decide loop costs our decide region **77.1 ns/child** (2,183.7 ns/exp
+  over 28.31 children ⇒ 1,403.9 ns/exp for its 18.2 children), which is exactly
+  what item 50's ≤ 34.3 ns/child bar tests. Proposed **D48** (D36's tree clause
+  and its `tree × per-expansion` decomposition superseded: per node **4.38×**,
+  9,246 ns/exp against 2,111 ns/body) and corrected the ≈8×/11.3 µs figures
+  `initiative.md`, `decisions.md`'s D45 row and `gotchas.md` §Scope still
+  quoted. No engine/flag/default/test/`bench.md` change. Data:
+  [`measurements/plan36/`](../../../measurements/plan36/README.md); report:
+  [`report36.md`](report36.md).

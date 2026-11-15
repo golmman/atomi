@@ -1,0 +1,209 @@
+{
+ "plan": "36",
+ "item": 45,
+ "phase": 0,
+ "cells": {
+  "deep-win": {
+   "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+   "seconds": 120,
+   "ours": [
+    {
+     "seed": 0,
+     "found": true,
+     "length": 36,
+     "ms": 52637,
+     "expansions": 5803257,
+     "child_evals": 155236740,
+     "aux_nodes": 40145198
+    },
+    {
+     "seed": 1,
+     "found": true,
+     "length": 37,
+     "ms": 49045,
+     "expansions": 5376491,
+     "child_evals": 146712125,
+     "aux_nodes": 36633566
+    },
+    {
+     "seed": 2,
+     "found": true,
+     "length": 29,
+     "ms": 35340,
+     "expansions": 3862476,
+     "child_evals": 107672243,
+     "aux_nodes": 27253626
+    }
+   ],
+   "reference": {
+    "first_mate_ms": 4214,
+    "found": true,
+    "mate": 19,
+    "memory_mb": 192,
+    "ms": 4363,
+    "nodes": 3024117,
+    "seconds": 120.0
+   },
+   "length_median": 36,
+   "length_min": 29,
+   "vs_reference_mate": "longer"
+  },
+  "core": {
+   "fen": "r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1",
+   "seconds": 10,
+   "ours": [
+    {
+     "seed": 0,
+     "found": true,
+     "length": 15,
+     "ms": 4730,
+     "expansions": 424249,
+     "child_evals": 12439376,
+     "aux_nodes": 5294057
+    },
+    {
+     "seed": 1,
+     "found": true,
+     "length": 26,
+     "ms": 3987,
+     "expansions": 344750,
+     "child_evals": 10097702,
+     "aux_nodes": 4616585
+    },
+    {
+     "seed": 2,
+     "found": true,
+     "length": 20,
+     "ms": 3890,
+     "expansions": 333878,
+     "child_evals": 9850365,
+     "aux_nodes": 4393588
+    }
+   ],
+   "reference": {
+    "first_mate_ms": 446,
+    "found": true,
+    "mate": 17,
+    "memory_mb": 192,
+    "ms": 490,
+    "nodes": 342289,
+    "seconds": 10.0
+   },
+   "length_median": 20,
+   "length_min": 15,
+   "vs_reference_mate": "mixed"
+  },
+  "easy-win": {
+   "fen": "rnbq1b1r/pp1p1kpp/2p1pp1n/8/3PP1P1/2N2N2/PPP2P1P/R1BQKB1R w KQ - 0 1",
+   "seconds": 10,
+   "ours": [
+    {
+     "seed": 0,
+     "found": true,
+     "length": 19,
+     "ms": 359,
+     "expansions": 37999,
+     "child_evals": 1016547,
+     "aux_nodes": 259411
+    },
+    {
+     "seed": 1,
+     "found": true,
+     "length": 19,
+     "ms": 393,
+     "expansions": 43071,
+     "child_evals": 1177648,
+     "aux_nodes": 304867
+    },
+    {
+     "seed": 2,
+     "found": true,
+     "length": 16,
+     "ms": 609,
+     "expansions": 67674,
+     "child_evals": 1803483,
+     "aux_nodes": 445571
+    }
+   ],
+   "reference": {
+    "first_mate_ms": 99,
+    "found": true,
+    "mate": 15,
+    "memory_mb": 192,
+    "ms": 107,
+    "nodes": 72523,
+    "seconds": 10.0
+   },
+   "length_median": 19,
+   "length_min": 16,
+   "vs_reference_mate": "longer"
+  }
+ },
+ "pre_registration": {
+  "bar": "our deep-win length <= 20 on at least one seed",
+  "observed": [
+   36,
+   37,
+   29
+  ],
+  "fires": true,
+  "consequence": "our lengths are [36, 37, 29] against the reference's mate 19, so the 2.76x tree ratio (5,803,257 expansions / 2,099,100 reference node bodies) compares two different mating distances and is void; the length axis becomes item 47 at the owner's discretion"
+ },
+ "length_table": {
+  "deep-win": {
+   "ours": [
+    36,
+    37,
+    29
+   ],
+   "reference_mate": 19,
+   "relation": "longer"
+  },
+  "core": {
+   "ours": [
+    15,
+    26,
+    20
+   ],
+   "reference_mate": 17,
+   "relation": "mixed"
+  },
+  "easy-win": {
+   "ours": [
+    19,
+    19,
+    16
+   ],
+   "reference_mate": 15,
+   "relation": "longer"
+  }
+ },
+ "plan36_unit_check": {
+  "claimed": "core mate 17 = our length 17, so the unit check passes",
+  "observed": {
+   "reference_mate": 17,
+   "ours_lengths": [
+    15,
+    26,
+    20
+   ],
+   "plan33_120s_ours_length": 15
+  },
+  "holds": false,
+  "note": "the plan's 17 = 17 does not reproduce: our core proof is 15 attacker moves against the reference's mate 17 (plan33's committed Cap-120 row has the same 15), i.e. we prove core shorter, not equal; the lengths are still the same order, so core remains the like-for-like cell"
+ },
+ "wall_reference": {
+  "ours_median_s": 49.045,
+  "reference_s": 4.363,
+  "ratio": 11.241,
+  "note": "wall is per node x tree; on trees of different depth it is not decomposable into the two factors"
+ },
+ "env": {
+  "host": "Linux-7.2.13-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "machine_id_from_plan35": "e10de197da58",
+  "atomi_sha256": "887f97f85e68fbc37027b8096c5a2004571ffeb74348e509c505be8b8cf6f574",
+  "atomi_version": "atomi 0.1.0 (this tree)",
+  "reference_sha256": "d9452dbcc73afbfa98051b72473fbe3dd6ce8a55970e5b169107be2748a0a399",
+  "procedure": "one process at a time, 3 atomi seeds per cell then 1 reference run per cell; nothing is timed for a verdict"
+ }
+}

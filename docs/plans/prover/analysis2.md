@@ -80,6 +80,15 @@ analysis1 §2), so a row's gap is a local reading, not a share of the total.
 
 ## 6. The gap in one place
 
+> **[Deprecated in place, [`plan36`](plan36.md) §3 / [`report36`](report36.md) §5,
+> proposed D48.]** The `Tree` row is **void**: it divides by the reference's
+> *reported* `nodes` (1.44× its node bodies on `deep-win`) and the two engines
+> prove different mating distances there (ours 36/37/29, `mate` 19). The
+> per-node row is **4.38×** (9,246 ns/exp against 2,111 ns/body), not ~11×, and
+> the three factors above do not multiply to the wall factor because the tree
+> term is unknown. The last column's `7.17×` is superseded by the ledger
+> (plan33: `deep-win` 53.42 s ⇒ **5.34×**, geomean **6.606**).
+
 | Measure | provari | atomi | Gap |
 | --- | ---: | ---: | ---: |
 | Per-node cost | 1.42 µs/node | 15.5 µs/expansion | **~11×** |
