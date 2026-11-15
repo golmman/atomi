@@ -1,0 +1,45 @@
+{
+ "plan": "prover plan42 — item 55 SCALE-LENGTH (w = 2 x bounded length)",
+ "binary_sha256": "fd2216fcd2c37cb9b62642456dbf5e4327c157029260220e49c0052f539fcf8b",
+ "source_head": "99f16284849f84e55d6bdfcba560cfaa493d8d7e",
+ "note": "no engine, CLI or default change; Phase 0 stop rule fired, no Phase A matrix",
+ "phase0": {
+  "cell": "deep-win",
+  "seed": 0,
+  "weight": 2,
+  "seconds": 120,
+  "rows": [
+   {"max_length": null, "ms": 30469, "child_evals": 87426523, "expansions": 3165142, "length": 25, "found": true, "ratio_vs_inf": 1.0},
+   {"max_length": 24, "ms": 66564, "child_evals": 176387185, "expansions": 7327572, "length": 24, "found": true, "ratio_vs_inf": 2.184},
+   {"max_length": 22, "ms": 34598, "child_evals": 97248200, "expansions": 3578565, "length": 22, "found": true, "ratio_vs_inf": 1.135},
+   {"max_length": 20, "ms": 37538, "child_evals": 106097390, "expansions": 3871051, "length": 20, "found": true, "ratio_vs_inf": 1.232}
+  ],
+  "best": "inf",
+  "stop_rule": "no L < inf beats L = inf at w = 2; composition closed negative, no Phase A matrix"
+ },
+ "heldout": {
+  "set": "guidance-v1.tsv 0-based indices 6-10 (wins.tsv dec01, dec03, dec04, dec05, dec07)",
+  "seed": 0,
+  "seconds": 120,
+  "rows": [
+   {"index": 6, "cell": "dec01", "w16_ms": 171, "w2_ms": 480, "ratio": 2.807, "w2_faster": false},
+   {"index": 7, "cell": "dec03", "w16_ms": 13, "w2_ms": 12, "ratio": 0.923, "w2_faster": true},
+   {"index": 8, "cell": "dec04", "w16_ms": 7, "w2_ms": 6, "ratio": 0.857, "w2_faster": true},
+   {"index": 9, "cell": "dec05", "w16_ms": 1197, "w2_ms": 1588, "ratio": 1.327, "w2_faster": false},
+   {"index": 10, "cell": "dec07", "w16_ms": 3, "w2_ms": 3, "ratio": 1.0, "w2_faster": false}
+  ],
+  "proved_both_sides": 5,
+  "w2_faster": 2,
+  "ties": 1,
+  "w2_slower": 2,
+  "direction": "FAIL (2/5 faster, need >= 3/5)"
+ },
+ "gates": {
+  "G-42a": "FAIL — Phase 0 reproduced (counters exact), held-out direction 2/5",
+  "G-42b": "FAIL — L = inf is best, so the gate is w = 2 alone: 0.604x (plan41) > 0.50x; composition is a no-op",
+  "G-42c": "not applied (G-42b fail); plan41 d14.json covers w = 2, L = inf 9/9 both checkers",
+  "G-42d": "not applied — default stays ef_weight 16, max_length off",
+  "G-42e": "PASS — make test, make lint, make test-full + veto",
+  "G-42f": "PASS — no new eval term, no model, no provari source, no T_4/T_5 claim"
+ }
+}
