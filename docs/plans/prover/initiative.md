@@ -10,7 +10,15 @@ Cap-120 row after plan33 (D46) is `core` 4.923 s, `easy-win` 0.376 s,
 **4.38×**. Plan38 measured the tree term: a bounded pass at `L = 24` cuts the
 `deep-win` proof from 36 to 24 and the wall from 53.3 s to 37.5 s.
 
-**What plans 34–38 established (2026-11-14/15).**
+**Owner ruling (2026-11-16, D50): `T_5` remains the goal.** The kill-review
+recommendation to retire it to a stretch column is declined, so the distance
+is the full **6.61× geomean**, not `T_4`'s 5.34×. If the per-node gap is
+roughly uniform across cells, per-node parity alone leaves ≈1.5×
+(`6.61 / 4.38`), so `T_5` needs per-node parity **and** a ≈1.5× tree
+advantage. The next plan (44) is the instrument that lets a tree lever be
+judged.
+
+**What plans 34–43 established (2026-11-14/16).**
 
 - **plan34 (item 42, census):** the measured per-node op budget is 68.97 pp;
   `T_4` needs ≥ 81.3 pp removed, so no arrangement of measured per-node work
@@ -54,6 +62,11 @@ Cap-120 row after plan33 (D46) is `core` 4.923 s, `easy-win` 0.376 s,
   1.0122×. D14 w = 2 is 9/9 both checkers. The plan's held-out `sample20`
   set is all-censored at 120 s, so G-41b fails on an unmeasurable guard; the
   default stays 16 and w = 2 is opt-in. Owner ruling pending.
+- **plan42 (kill review + item 55, SCALE-LENGTH):** the w = 2 × bounded-length
+  composition is **negative**. On `deep-win` seed 0 at w = 2, `L = ∞` is
+  30,469 ms / length 25 and every `L < ∞` is slower (`L = 24` 2.184×,
+  `L = 22` 1.135×, `L = 20` 1.232×); the two tree levers overlap on the length
+  axis. The fixed held-out set is 2/5 for w = 2, so w = 2 is `deep-win`-specific.
 - **plan43 (item 56, GUIDE-SCALE-FREE):** a distribution-normalised quantile
   band (shared parent edges 0/26, R2's 11/6/1 and 21/11/1 table) replacing the
   linear EF-PN weight map is **0.765×** on `deep-win` at 120 s seed 0 (41,449
@@ -70,12 +83,15 @@ judged (items 49/51/53). Plan38 gives the first positive tree row: length
 36 → 24 at `L = 24`, 1.42× wall. Phase B is closed negative (plan39): every
 small-`L` prefix is slower than the whole `L = 24` pass. The remaining
 tree lever, **item 48** (guide quality), is now also closed negative
-(plan40): added eval terms barely change the 5 M tree. The next move is the
-owner's `T_4`/`T_5` ruling; not another per-node micro-plan, deepening plan or
-eval-term list.
+(plan40): added eval terms barely change the 5 M tree. The owner has ruled (D50): `T_5` stays the goal. The next move is therefore
+the **instrument** (item 53, plan44), not another per-node micro-plan, deepening
+plan or eval-term list: the last three tree levers (w = 2, the quantile map,
+`L = 24`) were each cell-specific and the held-out gate was blind.
 
-**Open decisions:** D47/D48 confirmed; D49 default policy in force. Item 44
-remains unauthorised; item 41 is blocked on items 46/50. `--max-length` is an
+**Open decisions:** D47/D48 confirmed; D49 default policy in force; **D50
+(2026-11-16): `T_5` remains the goal** — the kill-review recommendation to
+retire it is declined. Item 44 remains unauthorised; item 41 is blocked on
+items 46/50; the w = 2 ruling (item 54) is still pending. `--max-length` is an
 opt-in measurement flag, not a default and not a `bench.md` row.
 
 ## Reference
@@ -215,44 +231,45 @@ One-line resolutions; full text, rationale, source take-list and legacy measured
 | D47 | Formulation ban narrowed | In-base search-order/objective changes (iterative deepening on proof length) are admissible; a new base and the goal re-pin stay standing-rejected |
 | D48 | Wall decomposition corrected | Per node **4.38×** (9,246 ns/exp vs 2,111 ns/body); D36's tree clause and decomposition withdrawn; `T_4` distance 5.34× |
 | D49 | Default iff a measured wall-time win | A mechanism becomes a default only on a measured wall-time reduction on the product `--guide hand` stack; otherwise opt-in |
+| D50 | `T_5` remains the goal | **Owner decision 2026-11-16:** the kill-review recommendation to retire `T_5` to a stretch column is declined; the goal, rungs and `check_goal.py` are unchanged. Distance is the full 6.61× geomean; the enabling step is the tree instrument (item 53, plan44). Does not rule on w = 2 (item 54) |
 
 ## Backlog
 
-Items are stable semantic identities. Plans are numbered sequentially and independently of items. Plans use stack-level gating (D21), except a single-mechanism plan that is independently meaningful. **Next kill review: due after plan37** (plans 34–35 were reviewed by [`plan36`](plan36.md)); per working agreement 10 it re-argues at least one skipped prior-art row with a number.
+Items are stable semantic identities. Plans are numbered sequentially and independently of items. Plans use stack-level gating (D21), except a single-mechanism plan that is independently meaningful. **Next kill review: due after plan43** (plans 42–43; plans 40–41 were reviewed by [`plan42`](plan42.md)); per working agreement 10 it re-argues at least one skipped prior-art row with a number.
 
-### Current priority (2026-11-15, after plan37)
+### Current priority (2026-11-16, after plan43)
 
-The per-node route to `T_4` is closed by measurement (plans 34–37). The queue
-below is ordered by expected distance to the goal per session, not by item
-number.
+`T_5` remains the goal (D50). The per-node route is closed by measurement
+(plans 34–37) and the tree levers measured so far are cell-specific (plans
+38–43), so the queue is ordered by what makes the next tree lever judgeable,
+not by item number.
 
-1. **Kill review (due; plans 36–37).** Not an item. Rule on plan37's G-46d
-   defect (the census `outside` is a plug), accept or qualify the LEVER verdict,
-   and re-rank the tree-changing items below. This is the next session.
-2. **Item 53 — TREE-METRIC.** The instrument for items 47/48/52: a fixed-context
-   tree metric at the 5 M probe and a fixed cap, with `--guide none` as a
-   standing control. Cheap, read-only, and it stops every tree question from
-   costing a 120 s × seeds session.
-3. **Items 47 + 52 — SHORT-WIN / SHORT-PASS.** The length axis is the only
-   measured tree-changing lever with headroom: our `deep-win` proofs are
-   36/37/29 against the reference's mate 19. Item 47 scopes the question; item
-   52 is the bounded-length mechanism. Read item 47's Phase 0 verdict first.
-4. **Item 48 — GUIDE-EVAL.** The only untested in-tree lever besides items
-   44/50: does a real hand-cut term set beat the starting-number algebra's
-   `child_evals` at like cost? Read-only probe first.
-5. **Item 49 — BENCH-POWER.** Widen the tuning sample outside the three claim
-   cells; feeds item 51 and stops ±15 % noise from deciding levers.
-6. **Item 51 — TREE-GATE.** Owner ruling on a second gate shape for
+1. **Plan44 — kill review (plans 42–43) + item 53 TREE-METRIC.** The
+   instrument: a fixed-context tree metric at the 5 M probe and a fixed cap,
+   `--guide none` as a standing control, validated against three historical
+   levers. Folds item 49's widened sample. Read-only; no engine change.
+2. **Item 49 — BENCH-POWER.** The widened tuning sample; feeds item 51 and
+   stops ±15 % noise from deciding levers. Folded into plan44 Phase 0.
+3. **Item 50 — EFFECT-SHAPE.** The funding test for item 44: the per-child
+   decide in ns/child against the ≤ 34.3 ns bar. The only remaining per-node
+   question; run after the instrument so its result is read on a tree that can
+   be compared.
+4. **Item 54 — w = 2 owner ruling (D49).** Measured 0.604× on `deep-win`,
+   geomean 1.0249×, held-out 2/5. A `T_4`-only opt-in is the owner's call; it
+   is not a `T_5` route on its own.
+5. **Item 51 — TREE-GATE.** Owner ruling on a second gate shape for
    tree-changing changes (no counter-identity requirement, ≥ 1.15× bar at the
    widened sample). Depends on item 49.
-7. **Item 50 — EFFECT-SHAPE.** The funding test for item 44. Run only if the
-   owner still wants item 44 after the kill review; otherwise close item 44.
-8. **Item 41 — upstream `movegen` ask.** Blocked on items 46/50; do not draft
+6. **Items 47 + 52 — SHORT-WIN / SHORT-PASS.** Length is the only measured
+   tree-changing axis with headroom, but Phase B is closed negative and the
+   pass is a strict regression on top of w = 2; `--max-length` stays a
+   measurement flag. Re-test only through the item 53 metric.
+7. **Item 41 — upstream `movegen` ask.** Blocked on items 46/50; do not draft
    `handoff4` before then.
-9. **Plan37 follow-up (item 46 candidates).** `populate_state` reuse (269 ns)
+8. **Plan37 follow-up (item 46 candidates).** `populate_state` reuse (269 ns)
    or the `Mover::effect` reorder (318 ns) is the cheapest tree-neutral
    experiment, but the whole class is ≈1.20×. Opportunistic, not a route to
-   `T_4`; it needs an item before a plan.
+   `T_5`.
 
 ### Active and proposed items
 
@@ -263,12 +280,12 @@ number.
 | 46 | **The 28.45 pp no counter owns** (OVERHEAD-PROFILE) | **executed — LEVER** ([plan37](plan37.md), [report37](report37.md)). Untimed symbols are 29.01 % of cycles vs `other` 28.45 pp; class split 1,964 ns retired / 199 branch / 481 cache (74.3 / 7.5 / 18.2 %). Candidates: `Frame::enter` 867 ns, `null_win` 598, `Mover::effect` 318, `populate_state` 269. Defects: per-region subtraction gives 31.03 pp, and `outside` is a plug (true 2.328 s vs 1.384 s); G-46d partial. Owner ruling pending; follow-up candidate scoping is priority 9 |
 | 47 | **Proof length** (SHORT-WIN) | **Phase 0 answered; still not scoped.** `deep-win` `length` is 36/37/29 at 120 s against the reference's mate 19, so the 2.76× tree ratio is void and the length axis is live. The unit check this row used to quote (`core` 17 = 17) is wrong: our `core` proof is 15 against mate 17, and `easy-win` is 19/19/16 against 15, so the relation is cell-dependent. Scoping is the owner's call after the kill review; item 52 is the mechanism |
 | 48 | **Guide quality** (GUIDE-EVAL) | **executed — negative, closed** ([plan40](plan40.md), [report40](report40.md)). TERMS-V1 (signed targets, exposure, fuse, checkers, existing material/pressure/mobility) prices at 175.24 ns/call vs the 199 bar, but the 5 M `deep-win` tree is 168,879 expansions vs 168,910 (**0.99982×**), far above the 0.90× gate. Stopped before `--guide-eval rich`; no default, no `bench.md` row, no repo change; gates green. A re-open needs a new ordering hypothesis, not another term list |
-| 49 | **Tuning resolution** (BENCH-POWER) | **proposed — unblocked after plans 36–37.** Run today's binary on `corpus-v1` cells outside the bench set (fixed 10 s, seed 0) and report the factor/tree-identity distribution: does a widened tuning bench predict the three claim cells' direction? Not item 10 (coverage); no tuning cell becomes a claim cell, nothing enters `bench.md` |
+| 49 | **Tuning resolution** (BENCH-POWER) | **folded into plan44 Phase 0.** Run today's binary on `corpus-v1` cells outside the bench set (fixed 10 s, seed 0) and report the factor/tree-identity distribution: does a widened tuning bench predict the three claim cells' direction? Not item 10 (coverage); no tuning cell becomes a claim cell, nothing enters `bench.md` |
 | 50 | **Per-child decide in masks** (EFFECT-SHAPE) — funding test for item 44 | **proposed — unblocked after plans 36–37.** Rewrite only the per-child screen+decide as bit tests on the move effect (no board build) and time the decide in ns/child. Funding bar: ≤ 34.3 ns/child (today 37.71 at our composite rate; 19.13 at our `status` rate). Plan29's effect decides 0 of 1,067,066 built children, so this is a *screen* rewrite, not terminality. If item 46 finds no lever, this is the last per-node question |
 | 51 | **Evidence shape** (TREE-GATE) | **proposed — owner ruling, no plan of its own.** Pre-register a second gate shape for tree-changing changes: admissible when `length` does not increase and `expansions`, `child_evals`, `length` and wall are reported at the 5 M probe and at 120 s × seeds with D14 9/9 — no counter-identity requirement — plus a standing ≥ 1.15× bar at the widened sample. Depends on item 49; pairs with D47 |
 | 52 | **Bounded-length pass** (SHORT-PASS) — mechanism for item 47 | **Phase A positive; Phase B closed negative** ([report38](report38.md), [report39](report39.md)). Phase A: opt-in `--max-length L` proves lengths 20/22/24 on `deep-win`; `L = 24` 37.5 s vs control 53.3 s (1.42×); unbounded control tree-identical; D14 clean. Phase B: Phase 0 shows every `L < 20` pass exceeds `L = 24` (best `L = 16` 45.5 s / 132.5 M vs 37.2 s / 109.7 M), so the deepening driver was not built. Default stays `L = ∞`; `--max-length` remains a measurement flag, no `bench.md` row |
-| 53 | **Tree-metric harness** (TREE-METRIC) | **proposed — the instrument for items 47/48/52.** A fixed-context metric per cell (`expansions`, `child_evals`, `length`, ns/exp at the 5 M probe and a fixed cap) with `--guide none` as a standing control. Gates: reproduces the committed values byte-for-byte on the three cells and the 5 M probe; two same-binary runs identical; ranking agrees in sign with the 120 s ranking on three historical levers (NULL-PIPE, HOTPATH-V2, G1). Never a bench cell, never a factor |
-| 54 | **EF-PN weight** (GUIDE-SCALE) | **executed — w = 2 is a `deep-win` lever, default unchanged** ([plan41](plan41.md), [report41](report41.md), [report42](report42.md)). 120 s, seeds 0–2: `deep-win` **0.604×** (30,401 vs 50,327 ms), `core` 1.082×, `easy-win` 1.647×, geomean **1.0249×**; w = 4 is 0.746× / 1.0122×. D14 w = 2 9/9 both checkers, timed/untimed evals 9/9. G-41b **FAIL**: the held-out `sample20` set is all-censored at 120 s. Plan42's fixed held-out (`guidance-v1` 0-based 6–10, `dec*`) is **2/5 faster** (`dec01` 2.8×, `dec05` 1.33× slower), so w = 2 is `deep-win`-specific, not a general default; `ef_weight` stays 16, no `bench.md` row. Owner ruling pending |
+| 53 | **Tree-metric harness** (TREE-METRIC) | **plan44 (proposed) — the instrument for items 47/48/52.** A fixed-context metric per cell (`expansions`, `child_evals`, `length`, ns/exp at the 5 M probe and a fixed cap) with `--guide none` as a standing control. Gates: reproduces the committed values byte-for-byte on the three cells and the 5 M probe; two same-binary runs identical; ranking agrees in sign with the 120 s ranking on three historical levers (NULL-PIPE, HOTPATH-V2, G1). Never a bench cell, never a factor |
+| 54 | **EF-PN weight** (GUIDE-SCALE) | **executed — w = 2 is a `deep-win` lever, default unchanged** ([plan41](plan41.md), [report41](report41.md), [report42](report42.md)). 120 s, seeds 0–2: `deep-win` **0.604×** (30,401 vs 50,327 ms), `core` 1.082×, `easy-win` 1.647×, geomean **1.0249×**; w = 4 is 0.746× / 1.0122×. D14 w = 2 9/9 both checkers, timed/untimed evals 9/9. G-41b **FAIL**: the held-out `sample20` set is all-censored at 120 s. Plan42's fixed held-out (`guidance-v1` 0-based 6–10, `dec*`) is **2/5 faster** (`dec01` 2.8×, `dec05` 1.33× slower), so w = 2 is `deep-win`-specific, not a general default; `ef_weight` stays 16, no `bench.md` row. Owner ruling pending (D50 does not decide it) |
 | 55 | **Compose w = 2 with a bounded length** (SCALE-LENGTH) | **executed — negative, closed** ([plan42](plan42.md), [report42](report42.md)). `deep-win` seed 0, w = 2, 120 s: `L = ∞` 30,469 ms / 3,165,142 / length 25; `L = 24` 2.184×, `L = 22` 1.135×, `L = 20` 1.232×. No `L < ∞` beats `L = ∞`, so the pre-registered stop fired and no Phase A matrix ran. The two tree levers overlap on the length axis; the bounded pass is a strict regression on top of w = 2. G-42b also fails (w = 2 alone 0.604× > 0.50×). Default stays w = 16, `L = ∞` |
 | 56 | **Distribution-normalised EF-PN map** (GUIDE-SCALE-FREE) | **executed — negative, closed** ([plan43](plan43.md), [report43](report43.md)). Phase 0 fit on 8 fixed non-claim `corpus-v1` cells (2 M evals) gives a narrow skewed eval (shared parent p20/p80 = 0/26); the frozen map is a shared-edge quantile band with R2's table, replacing the linear weight map. Phase A, 120 s seed 0: `deep-win` **0.765×** (41,449 vs 54,164 ms, length 34 vs 36), but `core` **1.591×** and `easy-win` **2.123×**. G-43b fails on the easy-cell guard, so no Phase B, no `--guide-ef-map`, no default, no `bench.md` row. The map repeats w = 2's `deep-win`/easy-cell split |
 
