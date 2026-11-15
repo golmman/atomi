@@ -1,0 +1,127 @@
+{
+  "plan": "38 (item 52 Phase A) \u2014 bounded-length pass on deep-win",
+  "date": "2026-11-15",
+  "cell": {
+    "name": "deep-win",
+    "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+    "flags": "--guide hand --memory 192 --seed 0"
+  },
+  "runs": [
+    {
+      "label": "control-5M",
+      "max_length": null,
+      "cap": "--evals 5000000",
+      "found": false,
+      "exit": "evals",
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "ms": 1690,
+      "proof_entries": 215267,
+      "sim_nodes": 1296692,
+      "settle_nodes": 267286
+    },
+    {
+      "label": "L20-5M",
+      "max_length": 20,
+      "cap": "--evals 5000000",
+      "found": false,
+      "exit": "evals",
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "ms": 1694,
+      "proof_entries": 215267,
+      "sim_nodes": 1296692,
+      "settle_nodes": 267286
+    },
+    {
+      "label": "L22-5M",
+      "max_length": 22,
+      "cap": "--evals 5000000",
+      "found": false,
+      "exit": "evals",
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "ms": 1682,
+      "proof_entries": 215267,
+      "sim_nodes": 1296692,
+      "settle_nodes": 267286
+    },
+    {
+      "label": "L24-5M",
+      "max_length": 24,
+      "cap": "--evals 5000000",
+      "found": false,
+      "exit": "evals",
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "ms": 1709,
+      "proof_entries": 215267,
+      "sim_nodes": 1296692,
+      "settle_nodes": 267286
+    },
+    {
+      "label": "control-120s",
+      "max_length": null,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 36,
+      "child_evals": 155236740,
+      "expansions": 5803257,
+      "ms": 53341,
+      "proof_entries": 5716874,
+      "sim_nodes": 31067713,
+      "settle_nodes": 9077485
+    },
+    {
+      "label": "L20-120s",
+      "max_length": 20,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 20,
+      "child_evals": 166682537,
+      "expansions": 6206650,
+      "ms": 58436,
+      "proof_entries": 6532015,
+      "sim_nodes": 33825138,
+      "settle_nodes": 9682905
+    },
+    {
+      "label": "L22-120s",
+      "max_length": 22,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 22,
+      "child_evals": 169409413,
+      "expansions": 6216502,
+      "ms": 59198,
+      "proof_entries": 6641278,
+      "sim_nodes": 33078340,
+      "settle_nodes": 10229453
+    },
+    {
+      "label": "L24-120s",
+      "max_length": 24,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 24,
+      "child_evals": 109715277,
+      "expansions": 4109113,
+      "ms": 37503,
+      "proof_entries": 4481393,
+      "sim_nodes": 23795668,
+      "settle_nodes": 6837603
+    }
+  ],
+  "gates": {
+    "G38a": "PASS \u2014 control 5M 5,000,034 / 168,910; control 120 s 5,803,257 / 155,236,740 / length 36",
+    "G38b": "PASS \u2014 L=20/22/24 deep-win proofs and the rule50 bounded proof accepted by atomi validate and provari check (bounded_deepwin.validation.json, bounded_rule50.validation.json)",
+    "G38c": "PASS \u2014 Value::Bounded is never stored (table::tests::bounded_value_is_never_stored); bounded algebra never turns a Bounded child into Refuted (search::value::tests::bounded_never_turns_a_bound_into_a_refutation)",
+    "G38d": "PASS \u2014 L=20/22/24 at 5M and 120 s recorded; all three prove at 120 s, lengths 20/22/24",
+    "G38e": "PASS \u2014 make test and make test-full (including make veto)"
+  },
+  "finding": "the bounded pass is sound and tree-identical at L=\u221e; on deep-win it finds shorter proofs at L=20/22/24 (length 20/22/24 vs the control's 36). L=24 is also faster (37.5 s vs 53.3 s); L=20/22 are slower (58.4/59.2 s). The length axis is a real tree lever, not a quick win at every L."
+}

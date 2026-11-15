@@ -7,9 +7,10 @@ Cap-120 row after plan33 (D46) is `core` 4.923 s, `easy-win` 0.376 s,
 `deep-win` 53.42 s, geomean **6.606**, 3/3 claimed, D14 9/9 both checkers.
 `T_4` distance is `deep-win` **5.34×** (53.42 s / 10 s). The wall is read
 **per node** (D48): 9,246 ns/exp against the reference's 2,111 ns/body =
-**4.38×**; no tree term is quoted until item 47 measures length.
+**4.38×**. Plan38 measured the tree term: a bounded pass at `L = 24` cuts the
+`deep-win` proof from 36 to 24 and the wall from 53.3 s to 37.5 s.
 
-**What plans 34–37 established (2026-11-14/15).**
+**What plans 34–38 established (2026-11-14/15).**
 
 - **plan34 (item 42, census):** the measured per-node op budget is 68.97 pp;
   `T_4` needs ≥ 81.3 pp removed, so no arrangement of measured per-node work
@@ -27,16 +28,26 @@ Cap-120 row after plan33 (D46) is `core` 4.923 s, `easy-win` 0.376 s,
   318, `populate_state` 269, but the whole class is ≈16.5 pp ≈1.20×, not a
   route to `T_4`. Two plan defects are recorded: the census `outside` is a
   plug, and G-46d is partial; an owner ruling is pending.
+- **plan38 (kill review + item 52 Phase A, bounded-length pass):** the
+  opt-in `--max-length L` pass is sound and the `L = ∞` control is
+  tree-identical. On `deep-win` at 120 s, `L = 20/22/24` prove with lengths
+  **20/22/24** against the control's **36**; `L = 24` is **37.5 s** vs
+  **53.3 s** (1.42×), while `L = 20/22` are slower (58.4/59.2 s). Every
+  bounded proof is D14-accepted by both checkers. The length axis is a real
+  tree lever; Phase B (iterative deepening) is the next scoped experiment.
 
 **Consequence for priority.** The per-node micro-line is exhausted as a route
 to `T_4` (plans 34–37: 3.22× ceiling, NOT FUNDED, INCONCLUSIVE, ≈1.20×). The
 remaining headroom is **tree-changing**: proof length (items 47/52), guide
 quality (item 48), and the measurement/gate shape that lets such levers be
-judged (items 49/51/53). The next session is the **kill review due after
-plan37**, not another micro-plan.
+judged (items 49/51/53). Plan38 gives the first positive tree row: length
+36 → 24 at `L = 24`, 1.42× wall. The next session is **Phase B** (iterative
+deepening `L = 12, 14, …`, opt-in) or the owner's `T_4`/`T_5` ruling; not
+another per-node micro-plan.
 
 **Open decisions:** D47/D48 confirmed; D49 default policy in force. Item 44
-remains unauthorised; item 41 is blocked on items 46/50.
+remains unauthorised; item 41 is blocked on items 46/50. `--max-length` is an
+opt-in measurement flag, not a default and not a `bench.md` row.
 
 ## Reference
 

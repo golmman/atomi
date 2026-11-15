@@ -36,6 +36,7 @@ fn wins_oracle() {
         seed: 0,
         stats: false,
         max_depth: None,
+        max_length: None,
     };
     let dir = Path::new(env!("CARGO_TARGET_TMPDIR"));
     let (mut proved, mut censored, mut refuted, mut multi, mut fails) = (0, 0, 0, 0, 0);
@@ -88,6 +89,7 @@ fn never_prove_oracle() {
         seed: 0,
         stats: false,
         max_depth: None,
+        max_length: None,
     };
     for r in rows("never_prove.tsv") {
         let (name, fen) = (&r[0], &r[1]);
@@ -119,6 +121,7 @@ fn pawn_ending_proved() {
         seed: 0,
         stats: false,
         max_depth: None,
+        max_length: None,
     };
     let out = search::prove(&b, &lim, NullSink);
     assert_eq!(out.result.exit, Exit::Proved, "{:?}", out.result.exit);
@@ -156,6 +159,7 @@ fn false_refutation_regressions() {
             seed: 0,
             stats: false,
             max_depth: None,
+            max_length: None,
         };
         let out = search::prove(&b, &lim, NullSink);
         assert_eq!(
@@ -185,6 +189,7 @@ fn wins_oracle_hand() {
         seed: 0,
         stats: false,
         max_depth: None,
+        max_length: None,
     };
     let dir = Path::new(env!("CARGO_TARGET_TMPDIR"));
     let (mut proved, mut censored, mut refuted) = (0, 0, 0);

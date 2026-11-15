@@ -156,6 +156,10 @@ impl Tt {
                 debug_assert!(false, "proofs are routed to the proof table");
                 return;
             }
+            Value::Bounded => {
+                debug_assert!(false, "bound-dependent values are never stored");
+                return;
+            }
         };
         let meta = work.min((1 << 24) - 1) << 8 | u32::from(from);
         let c = check(key);

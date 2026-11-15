@@ -107,6 +107,8 @@ pub struct ProveOptions {
     pub stats: bool,
     /// Opt-in ply cap (`--max-depth`, default off; measurement only).
     pub max_depth: Option<u16>,
+    /// Opt-in remaining-proof-length bound (`--max-length`, default off).
+    pub max_length: Option<u16>,
 }
 
 /// Parse `prove` arguments (everything after the `prove` subcommand).
@@ -123,6 +125,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
     let mut seed = 0u64;
     let mut stats = false;
     let mut max_depth = None;
+    let mut max_length = None;
 
     let mut i = 0;
     while i < args.len() {
@@ -201,6 +204,15 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
                     }
                     max_depth = Some(n);
                 }
+                "--max-length" => {
+                    let n: u16 = value
+                        .parse()
+                        .map_err(|_| format!("bad value for {arg}: {value}"))?;
+                    if n == 0 {
+                        return Err(format!("bad value for {arg}: {value}"));
+                    }
+                    max_length = Some(n);
+                }
                 "--proof-share" => {
                     let n: u8 = value
                         .parse()
@@ -241,6 +253,7 @@ pub fn parse_prove(args: &[String]) -> Result<ProveOptions, String> {
         seed,
         stats,
         max_depth,
+        max_length,
     })
 }
 
@@ -329,6 +342,16 @@ mod tests {
         // their own except through `--guide-on`).
         let off = parse(&["--guide", "none", "--guide-off", "classes"]);
         assert_eq!(off.guide, GuideConfig::none());
+    }
+
+    /// `--max-length` is opt-in, positive and independent of `--max-depth`.
+    #[test]
+    fn max_length_is_opt_in_and_positive() {
+        assert_eq!(parse(&[]).max_length, None);
+        assert_eq!(parse(&["--max-length", "24"]).max_length, Some(24));
+        let mut args = vec![FEN.to_string()];
+        args.extend(["--max-length".into(), "0".into()]);
+        assert!(parse_prove(&args).is_err());
     }
 
     /// The exposed-limit cache request defaults to the measured 2^17 and

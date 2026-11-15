@@ -38,7 +38,10 @@ use atomic_movegen::types::Color;
 use frame::{Entered, Frame, Group};
 use keyset::KeySet;
 use std::time::{Duration, Instant};
-use value::{Child, INFINITY, Value, and_value, exit_value, or_value, pn_dn};
+use value::{
+    Child, INFINITY, Value, and_value, and_value_bounded, exit_value, or_value, or_value_bounded,
+    pn_dn,
+};
 
 /// The search budgets.
 #[derive(Debug, Clone)]
@@ -68,6 +71,11 @@ pub struct Limits {
     /// Opt-in ply cap (`--max-depth`, default off). A node at this ply
     /// censors the run with `Exit::Depth`; measurement only.
     pub max_depth: Option<u16>,
+    /// Opt-in remaining-proof-length bound (`--max-length`, default off).
+    /// `None` is the unbounded search and must stay tree-identical; `Some(L)`
+    /// proves only a win of at most `L` attacker moves, or reports
+    /// `Exit::Length` when the bound is exhausted.
+    pub max_length: Option<u16>,
 }
 
 /// How the search ended.
@@ -84,6 +92,8 @@ pub enum Exit {
     Evals,
     /// The 4096-ply cap fired (censors the run).
     Depth,
+    /// The opt-in proof-length bound was exhausted without a proof.
+    Length,
 }
 
 impl Exit {
@@ -95,6 +105,7 @@ impl Exit {
             Exit::Timeout => "timeout",
             Exit::Evals => "evals",
             Exit::Depth => "depth",
+            Exit::Length => "length",
         }
     }
 }
@@ -220,6 +231,7 @@ pub fn prove<S: ProofSink + Send + 'static>(root: &Board, limits: &Limits, sink:
                 history: History::new(),
                 seed: limits.seed,
                 max_depth: limits.max_depth,
+                max_length: limits.max_length,
                 unique: limits.stats.then(|| KeySet::new(1 << 21)),
                 entry_proof_hits: 0,
                 entry_tt_hits: 0,
@@ -271,6 +283,9 @@ struct Engine<S> {
     seed: u64,
     /// The opt-in ply cap (`--max-depth`; `None` = `MAX_PLY`).
     max_depth: Option<u16>,
+    /// The opt-in remaining-proof-length bound (`--max-length`; `None` =
+    /// unbounded).
+    max_length: Option<u16>,
     /// The distinct-key set (`--stats` only).
     unique: Option<KeySet>,
     entry_proof_hits: u64,
@@ -290,17 +305,18 @@ impl<S: ProofSink> Engine<S> {
             return self.result(Exit::Refuted, None);
         }
         let root_key = rules::key(root);
-        let mut value = self.mid(root, root_key, 0, INFINITY, INFINITY);
+        let mut value = self.mid(root, root_key, 0, INFINITY, INFINITY, self.max_length);
         // A saturated Open value is still undecided: keep searching. Only a
         // Refuted root is a refutation; Open can never become one (the bug
         // this loop fixes was Open saturation reaching INFINITY).
         while self.stop.is_none() && matches!(value, Value::Open { .. }) {
-            value = self.mid(root, root_key, 0, INFINITY, INFINITY);
+            value = self.mid(root, root_key, 0, INFINITY, INFINITY, self.max_length);
         }
         let (exit, length) = match (self.stop, value) {
             (Some(stop), _) => (stop, None),
             (None, Value::Proved { length, .. }) => (Exit::Proved, Some(length)),
             (None, Value::Refuted { .. }) => (Exit::Refuted, None),
+            (None, Value::Bounded) => (Exit::Length, None),
             (None, Value::Open { .. }) => unreachable!("Open root without a stop"),
         };
         self.result(exit, length)
@@ -351,7 +367,15 @@ impl<S: ProofSink> Engine<S> {
     /// caller — the frame's pass 1 supplies it for every descent): loop
     /// selecting the best child until the node value crosses a threshold,
     /// then store and return it.
-    fn mid(&mut self, board: &Board, key: u64, ply: u16, tpn: u32, tdn: u32) -> Value {
+    fn mid(
+        &mut self,
+        board: &Board,
+        key: u64,
+        ply: u16,
+        tpn: u32,
+        tdn: u32,
+        bound: Option<u16>,
+    ) -> Value {
         if self.stop.is_some() {
             return Value::Open { pn: 0, dn: 0 };
         }
@@ -453,14 +477,28 @@ impl<S: ProofSink> Engine<S> {
             self.line.pop();
             return Value::Open { pn: 0, dn: 0 };
         }
+        if let Some(b) = bound {
+            if frame.attacker_node && b == 0 {
+                // An OR node needs one attacker move; no proof of length 0
+                // can exist below it (a terminal win was handled at entry).
+                self.line.pop();
+                return Value::Bounded;
+            }
+            apply_bound(&mut frame, b);
+        }
         // Plan-18 exact null-threat replay: at a defender node, a proof for
         // the passed position can prove or lower every open defence.
         if self.guide.config.enabled && self.guide.config.null_exact && !frame.attacker_node {
             self.null_replay(&mut frame, board);
+            if let Some(b) = bound {
+                // The exact replay may install a proof longer than the bound;
+                // keep the child view consistent with the bounded algebra.
+                apply_bound(&mut frame, b);
+            }
         }
         // MID loop.
         loop {
-            let v = node_value(&frame);
+            let v = node_value(&frame, bound);
             let (pn, dn) = pn_dn(&v);
             if pn >= tpn || dn >= tdn {
                 break;
@@ -492,11 +530,13 @@ impl<S: ProofSink> Engine<S> {
                 let mkey = group.members[mi].key;
                 let mut next = board.clone();
                 next.do_move(mv, &mut StateInfo::new());
-                let cv = self.mid(&next, mkey, ply + 1, mtpn, mtdn);
+                let cb = child_bound(frame.attacker_node, bound);
+                let cv = self.mid(&next, mkey, ply + 1, mtpn, mtdn, cb);
                 if self.stop.is_some() {
                     self.line.pop();
                     return Value::Open { pn: 0, dn: 0 };
                 }
+                let cv = bound_value(cv, cb);
                 if self.guide.config.enabled {
                     let good = frame.attacker_node && matches!(cv, Value::Proved { .. });
                     self.history.observe(frame.mover, mv, good);
@@ -510,11 +550,13 @@ impl<S: ProofSink> Engine<S> {
             }
             let mut next = board.clone();
             next.do_move(frame.children[best].mv, &mut StateInfo::new());
-            let cv = self.mid(&next, frame.keys[best], ply + 1, ctpn, ctdn);
+            let cb = child_bound(frame.attacker_node, bound);
+            let cv = self.mid(&next, frame.keys[best], ply + 1, ctpn, ctdn, cb);
             if self.stop.is_some() {
                 self.line.pop();
                 return Value::Open { pn: 0, dn: 0 };
             }
+            let cv = bound_value(cv, cb);
             if self.guide.config.enabled {
                 let good = (frame.attacker_node && matches!(cv, Value::Proved { .. }))
                     || (!frame.attacker_node && matches!(cv, Value::Refuted { .. }));
@@ -531,10 +573,13 @@ impl<S: ProofSink> Engine<S> {
                 && length > 0
             {
                 self.replay_siblings(&mut frame, best, board, &next, length);
+                if let Some(b) = bound {
+                    apply_bound(&mut frame, b);
+                }
             }
         }
         // Frame exit.
-        let v = exit_value(node_value(&frame), ply);
+        let v = exit_value(node_value(&frame, bound), ply);
         let work = (self.expansions - frame.work_start).min(u64::from(u32::MAX)) as u32;
         let key = *self.line.last().unwrap();
         self.tables.store(key, &v, work);
@@ -790,11 +835,71 @@ fn selected_proved_child(frame: &Frame) -> Option<usize> {
     best
 }
 
-fn node_value(frame: &Frame) -> Value {
-    if frame.attacker_node {
-        or_value(&frame.children)
+fn node_value(frame: &Frame, bound: Option<u16>) -> Value {
+    match bound {
+        None => {
+            if frame.attacker_node {
+                or_value(&frame.children)
+            } else {
+                and_value(&frame.children)
+            }
+        }
+        Some(b) => {
+            if frame.attacker_node {
+                or_value_bounded(&frame.children, b)
+            } else {
+                and_value_bounded(&frame.children, b)
+            }
+        }
+    }
+}
+
+/// The bound a child of this node inherits: an OR move spends one attacker
+/// move, an AND reply spends none.
+fn child_bound(attacker_node: bool, bound: Option<u16>) -> Option<u16> {
+    bound.map(|b| {
+        if attacker_node {
+            b.saturating_sub(1)
+        } else {
+            b
+        }
+    })
+}
+
+/// A proved child longer than the child's bound is a genuine win that does
+/// not fit: keep it open so the bounded search looks for a shorter proof.
+/// It is never turned into a refutation (G-38c).
+fn bound_value(v: Value, bound: Option<u16>) -> Value {
+    match (v, bound) {
+        (Value::Proved { length, .. }, Some(b)) if length > b => Value::Open { pn: 1, dn: 1 },
+        _ => v,
+    }
+}
+
+/// Apply the node's bound to the values `Frame::enter` classified (table
+/// proofs, settled proofs and terminal wins). The group's members are the
+/// real children of the virtual OR child, so they use the same allowance.
+fn apply_bound(frame: &mut Frame, bound: u16) {
+    let allowed = if frame.attacker_node {
+        bound.saturating_sub(1)
     } else {
-        and_value(&frame.children)
+        bound
+    };
+    for c in &mut frame.children {
+        c.value = bound_value(c.value, Some(allowed));
+    }
+    let Frame {
+        group,
+        children,
+        keys,
+        ..
+    } = frame;
+    if let Some(g) = group.as_mut() {
+        for m in &mut g.members {
+            m.child.value = bound_value(m.child.value, Some(allowed));
+        }
+        let idx = g.index;
+        g.sync(&mut children[idx], &mut keys[idx]);
     }
 }
 
@@ -802,7 +907,7 @@ fn value_invariant(v: &Value, counter: u16) -> bool {
     match *v {
         Value::Proved { limit, .. } => u16::from(limit) >= counter,
         Value::Refuted { from, .. } => u16::from(from) <= counter,
-        Value::Open { .. } => true,
+        Value::Bounded | Value::Open { .. } => true,
     }
 }
 
@@ -1060,6 +1165,7 @@ mod tests {
             history: History::new(),
             seed: 0,
             max_depth: None,
+            max_length: None,
             unique: None,
             entry_proof_hits: 0,
             entry_tt_hits: 0,
@@ -1095,7 +1201,7 @@ mod tests {
         engine.line.pop();
         // A mid descent into the stalemate child refutes it at node entry.
         let ck = rules::key(&child);
-        let v = engine.mid(&child, ck, 1, INFINITY, INFINITY);
+        let v = engine.mid(&child, ck, 1, INFINITY, INFINITY, None);
         assert_eq!(
             v,
             Value::Refuted {
@@ -1132,6 +1238,7 @@ mod tests {
             history: History::new(),
             seed: 0,
             max_depth: None,
+            max_length: None,
             unique: None,
             entry_proof_hits: 0,
             entry_tt_hits: 0,

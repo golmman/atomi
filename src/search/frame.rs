@@ -112,13 +112,26 @@ impl Group {
             *key = m.key;
             return;
         }
-        // Refuted: every member refuted. `from` is pre-adjusted by one so the
-        // parent's OR subtraction lands on the members' own combination.
+        // Refuted or bounded: every member is a decided failure. A bounded
+        // member makes the group bounded (no win within the bound); only an
+        // all-genuine-refuted group is a refutation.
         if self
             .members
             .iter()
-            .all(|m| matches!(m.child.value, Value::Refuted { .. }))
+            .all(|m| matches!(m.child.value, Value::Refuted { .. } | Value::Bounded))
         {
+            let any_bounded = self
+                .members
+                .iter()
+                .any(|m| matches!(m.child.value, Value::Bounded));
+            child.zeroing = false;
+            child.mv = self.members[0].child.mv;
+            child.class = self.members[0].child.class;
+            *key = self.members[0].key;
+            if any_bounded {
+                child.value = Value::Bounded;
+                return;
+            }
             let mut cycle = ANY;
             let mut from = 0u8;
             for m in &self.members {
@@ -128,11 +141,7 @@ impl Group {
                 cycle = cycle.min(c);
                 from = from.max(if m.child.zeroing { 1 } else { f });
             }
-            child.zeroing = false;
-            child.mv = self.members[0].child.mv;
-            child.class = self.members[0].child.class;
             child.value = Value::Refuted { cycle, from };
-            *key = self.members[0].key;
             return;
         }
         // Open: the deferred OR over the member values, or the group start

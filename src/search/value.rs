@@ -40,6 +40,10 @@ pub enum Value {
     /// No attacker win (as far as the search can tell). `cycle` is a ply
     /// index or [`ANY`]; `from` is the lowest counter the refutation holds at.
     Refuted { cycle: u16, from: u8 },
+    /// No attacker win **within the remaining length bound** at this node.
+    /// This is not a refutation: it is bound-dependent and must never be
+    /// stored in the TT or the proof table (gotchas, item 52).
+    Bounded,
     /// Undecided, with proof and disproof numbers.
     Open { pn: u32, dn: u32 },
 }
@@ -206,6 +210,182 @@ pub fn and_value(children: &[Child]) -> Value {
     }
 }
 
+/// The value of an attacker (OR) node under a remaining length bound.
+///
+/// `bound` is the maximum proof length (in attacker moves) allowed at this
+/// node. A proved child longer than `bound - 1` is treated as `Open(1, 1)`:
+/// it is a genuine win, but not one that fits, so the bounded search must
+/// keep looking for a shorter proof. A `Bounded` child is a decided failure
+/// for this bound. The node is `Bounded` only when every child is `Refuted`
+/// or `Bounded` and at least one is `Bounded`; it is `Refuted` only when
+/// every child is genuinely refuted. `bound == 0` is immediately `Bounded`
+/// (an OR node needs one attacker move).
+pub fn or_value_bounded(children: &[Child], bound: u16) -> Value {
+    if bound == 0 {
+        return Value::Bounded;
+    }
+    let allowed = bound - 1;
+    let mut best: Option<(u16, u8, Move)> = None;
+    let mut all_fail = true;
+    let mut any_bounded = false;
+    let mut cycle = ANY;
+    let mut from = 0u8;
+    let mut pn = INFINITY;
+    let mut dn = 0u64;
+    for c in children {
+        match c.value {
+            Value::Proved { length, limit, .. } if length <= allowed => {
+                all_fail = false;
+                let len = length.saturating_add(1);
+                let lim = if length == 0 || c.zeroing {
+                    99
+                } else {
+                    limit - 1
+                };
+                if best.is_none_or(|(bl, blim, _)| len < bl || (len == bl && lim > blim)) {
+                    best = Some((len, lim, c.mv));
+                }
+            }
+            Value::Proved { .. } => {
+                // A genuine win that does not fit: keep searching for a
+                // shorter one, exactly as an open child would.
+                all_fail = false;
+                pn = pn.min(1);
+                dn += 1;
+            }
+            Value::Refuted {
+                cycle: cc,
+                from: cf,
+            } => {
+                cycle = cycle.min(cc);
+                if !c.zeroing {
+                    from = from.max(cf.saturating_sub(1));
+                }
+            }
+            Value::Bounded => {
+                any_bounded = true;
+            }
+            Value::Open { pn: cp, dn: cd } => {
+                all_fail = false;
+                pn = pn.min(cp);
+                dn += u64::from(cd);
+            }
+        }
+    }
+    if let Some((length, limit, mv)) = best {
+        return Value::Proved {
+            length,
+            limit,
+            mv: Some(mv),
+        };
+    }
+    if all_fail {
+        return if any_bounded {
+            Value::Bounded
+        } else {
+            Value::Refuted { cycle, from }
+        };
+    }
+    Value::Open {
+        pn,
+        dn: dn.min(u64::from(OPEN_MAX)) as u32,
+    }
+}
+
+/// The value of a defender (AND) node under a remaining length bound.
+///
+/// A proved child longer than `bound` is treated as `Open(1, 1)` (a win that
+/// does not fit). A `Bounded` child means the defender can avoid a win within
+/// the bound, so the node is `Bounded` unless another child is genuinely
+/// `Refuted` (which is stronger). A proof needs every child proved within the
+/// bound.
+pub fn and_value_bounded(children: &[Child], bound: u16) -> Value {
+    debug_assert!(!children.is_empty());
+    let mut all_proved = true;
+    let mut any_refuted = false;
+    let mut any_bounded = false;
+    let mut length = 0u16;
+    let mut limit = 99u8;
+    let mut pn = 0u64;
+    let mut dn = INFINITY;
+    for c in children {
+        match c.value {
+            Value::Proved {
+                length: cl,
+                limit: clm,
+                ..
+            } if cl <= bound => {
+                length = length.max(cl);
+                if !c.zeroing {
+                    limit = limit.min(clm - 1);
+                }
+            }
+            Value::Proved { .. } => {
+                all_proved = false;
+                pn += 1;
+                dn = dn.min(1);
+            }
+            Value::Refuted { .. } => {
+                all_proved = false;
+                any_refuted = true;
+            }
+            Value::Bounded => {
+                all_proved = false;
+                any_bounded = true;
+            }
+            Value::Open { pn: cp, dn: cd } => {
+                all_proved = false;
+                pn += u64::from(cp);
+                dn = dn.min(cd);
+            }
+        }
+    }
+    if all_proved {
+        return Value::Proved {
+            length,
+            limit,
+            mv: None,
+        };
+    }
+    if any_refuted {
+        let mut best: Option<(u8, u16, u16)> = None; // (from, cycle, index)
+        for (i, c) in children.iter().enumerate() {
+            let Value::Refuted {
+                cycle: cc,
+                from: cf,
+            } = c.value
+            else {
+                continue;
+            };
+            let from = if c.zeroing { 0 } else { cf.saturating_sub(1) };
+            let better = match best {
+                None => true,
+                Some((bf, bc, _)) => {
+                    if (cc == ANY) != (bc == ANY) {
+                        cc == ANY
+                    } else if from != bf {
+                        from < bf
+                    } else {
+                        cc > bc
+                    }
+                }
+            };
+            if better {
+                best = Some((from, cc, i as u16));
+            }
+        }
+        let (from, cycle, _) = best.unwrap();
+        return Value::Refuted { cycle, from };
+    }
+    if any_bounded {
+        return Value::Bounded;
+    }
+    Value::Open {
+        pn: pn.min(u64::from(OPEN_MAX)) as u32,
+        dn,
+    }
+}
+
 /// Frame-exit `cycle` reset: a refutation whose repeated position is the node
 /// itself (`cycle != ANY && cycle >= ply`) becomes path-independent
 /// (`cycle = ANY`), because it holds from every path through the node.
@@ -223,7 +403,7 @@ pub fn exit_value(v: Value, ply: u16) -> Value {
 pub fn pn_dn(v: &Value) -> (u32, u32) {
     match *v {
         Value::Proved { .. } => (0, INFINITY),
-        Value::Refuted { .. } => (INFINITY, 0),
+        Value::Refuted { .. } | Value::Bounded => (INFINITY, 0),
         Value::Open { pn, dn } => (pn, dn),
     }
 }
@@ -487,6 +667,159 @@ mod tests {
     fn pn_dn_mapping() {
         assert_eq!(pn_dn(&proved(1, 99)), (0, INFINITY));
         assert_eq!(pn_dn(&refuted(2, 5)), (INFINITY, 0));
+        assert_eq!(pn_dn(&Value::Bounded), (INFINITY, 0));
         assert_eq!(pn_dn(&Value::Open { pn: 3, dn: 4 }), (3, 4));
+    }
+
+    #[test]
+    fn bounded_or_attacker_boundaries() {
+        let m1 = mv(Square::A1, Square::A2);
+        let m2 = mv(Square::B1, Square::B2);
+        // bound 0: an OR node needs one attacker move.
+        assert_eq!(
+            or_value_bounded(&[child(m1, false, proved(0, 99))], 0),
+            Value::Bounded
+        );
+        // A proof of length 1 fits bound 2 (child length 0), not bound 1.
+        assert_eq!(
+            or_value_bounded(&[child(m1, false, proved(0, 99))], 1),
+            Value::Proved {
+                length: 1,
+                limit: 99,
+                mv: Some(m1)
+            }
+        );
+        assert_eq!(
+            or_value_bounded(&[child(m1, false, proved(0, 99))], 2),
+            Value::Proved {
+                length: 1,
+                limit: 99,
+                mv: Some(m1)
+            }
+        );
+        // A too-long proof is not a proof and not a bounded refutation: it
+        // stays open so the search can look for a shorter one.
+        assert_eq!(
+            or_value_bounded(&[child(m1, false, proved(3, 90))], 2),
+            Value::Open { pn: 1, dn: 1 }
+        );
+        // All children bounded -> bounded; a genuine refutation is stronger.
+        assert_eq!(
+            or_value_bounded(
+                &[
+                    child(m1, false, Value::Bounded),
+                    child(m2, false, Value::Bounded)
+                ],
+                2
+            ),
+            Value::Bounded
+        );
+        assert_eq!(
+            or_value_bounded(
+                &[
+                    child(m1, false, Value::Bounded),
+                    child(m2, false, refuted(ANY, 0))
+                ],
+                2
+            ),
+            Value::Bounded
+        );
+        assert_eq!(
+            or_value_bounded(
+                &[
+                    child(m1, false, refuted(ANY, 0)),
+                    child(m2, false, refuted(ANY, 0))
+                ],
+                2
+            ),
+            Value::Refuted {
+                cycle: ANY,
+                from: 0
+            }
+        );
+    }
+
+    #[test]
+    fn bounded_and_defender_boundaries() {
+        let m1 = mv(Square::A1, Square::A2);
+        let m2 = mv(Square::B1, Square::B2);
+        // A defender proof needs every reply within the bound.
+        assert_eq!(
+            and_value_bounded(
+                &[
+                    child(m1, false, proved(2, 90)),
+                    child(m2, false, proved(1, 80))
+                ],
+                2
+            ),
+            Value::Proved {
+                length: 2,
+                limit: 79,
+                mv: None
+            }
+        );
+        // One too-long reply keeps the node open (search for a shorter one).
+        assert_eq!(
+            and_value_bounded(
+                &[
+                    child(m1, false, proved(3, 90)),
+                    child(m2, false, proved(1, 80))
+                ],
+                2
+            ),
+            Value::Open { pn: 1, dn: 1 }
+        );
+        // One bounded reply is enough for the defender to avoid the bound.
+        assert_eq!(
+            and_value_bounded(
+                &[
+                    child(m1, false, Value::Bounded),
+                    child(m2, false, Value::Open { pn: 5, dn: 7 })
+                ],
+                2
+            ),
+            Value::Bounded
+        );
+        // A genuine refutation is stronger than a bounded reply.
+        assert_eq!(
+            and_value_bounded(
+                &[
+                    child(m1, false, Value::Bounded),
+                    child(m2, false, refuted(ANY, 0))
+                ],
+                2
+            ),
+            Value::Refuted {
+                cycle: ANY,
+                from: 0
+            }
+        );
+    }
+
+    #[test]
+    fn bounded_never_turns_a_bound_into_a_refutation() {
+        // The G-38c invariant at the algebra level: a Bounded child can only
+        // produce Bounded or a proof, never Refuted, at either node kind.
+        let m1 = mv(Square::A1, Square::A2);
+        let m2 = mv(Square::B1, Square::B2);
+        for bound in 0u16..=4 {
+            for other in [
+                Value::Bounded,
+                Value::Open { pn: 1, dn: 1 },
+                proved(0, 99),
+                proved(9, 99),
+            ] {
+                let or = or_value_bounded(
+                    &[child(m1, false, Value::Bounded), child(m2, false, other)],
+                    bound,
+                );
+                let and = and_value_bounded(
+                    &[child(m1, false, Value::Bounded), child(m2, false, other)],
+                    bound,
+                );
+                assert!(!matches!(or, Value::Refuted { .. }), "or {or:?}");
+                assert!(!matches!(and, Value::Refuted { .. }), "and {and:?}");
+            }
+        }
     }
 }

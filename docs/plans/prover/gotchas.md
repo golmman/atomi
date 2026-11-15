@@ -26,7 +26,13 @@ Referenced from `AGENTS.md` §Correctness.
   proof-free invariant does not save it — the proof table is where a bounded
   pass would write. `Value::Proved { length, limit }` (D4) keeps its meaning:
   `limit` is the 50-move counter, never the bound. An unbounded control run
-  (`L = ∞`) must be tree-identical to today.
+  (`L = ∞`) must be tree-identical to today. A too-long proof is **not** a
+  bounded refutation: keep it `Open` so the search looks for a shorter proof.
+  Re-apply the bound after the exact null/sibling replay as well as at frame
+  entry and after a child return; otherwise the selector sees a too-long
+  `Proved` child while the bounded algebra sees `Open`, and the pass is not
+  the bounded search it claims to be (plan38: that version timed out at
+  `L = 20/22/24`; the consistent version proves in 37.5–59.2 s).
 - **The per-file en passant key is derived** (`rules::ep_key`) because the
   movegen's Zobrist tables are private; its test pins it against
   `hash_after_with(Legal)`.

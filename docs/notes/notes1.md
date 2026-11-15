@@ -284,17 +284,18 @@ Read docs/plans/prover/plan34.md, report34.md, analysis2.md §5–§6 and docs/p
 ---
 
 1. per-node confusion
-An earlier analysis said we have node count parity with provari and the per-node performance needs optimization.
-Now you tell me per-node is not on par. What changed?
+   An earlier analysis said we have node count parity with provari and the per-node performance needs optimization.
+   Now you tell me per-node is not on par. What changed?
 
 2. per-node details table
-2a. how can legality checks and movegen be faster in provari when analysis shows that shakmaty is slower than atomic-movegen?
-2b. why don't we go through each row in this list and pick apart the actual details and find out where we can improve?
+   2a. how can legality checks and movegen be faster in provari when analysis shows that shakmaty is slower than atomic-movegen?
+   2b. why don't we go through each row in this list and pick apart the actual details and find out where we can improve?
 
 ---
 
 1. so tree size is indeed a vector for improvements
-2. 
+2.
 
 ---
 
+Read docs/plans/prover/report38.md and plan38.md. Scope Phase B: an opt-in iterative-deepening. Take inspiration from `atomic_solver` where iterative deepening was extensively explored.

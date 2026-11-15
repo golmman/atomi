@@ -42,6 +42,7 @@ fn limits() -> Limits {
         seed: 0,
         stats: false,
         max_depth: None,
+        max_length: None,
     }
 }
 
@@ -100,6 +101,7 @@ fn never_prove_rows_are_never_found() {
         seed: 0,
         stats: false,
         max_depth: None,
+        max_length: None,
     };
     let mut rows = 0;
     for line in text.lines() {
@@ -232,6 +234,7 @@ fn filter_on_off_identical() {
             seed: 0,
             stats: false,
             max_depth: None,
+            max_length: None,
         };
         let on = search::prove(&root, &lim, NullSink).result;
         lim.filter = false;
@@ -259,6 +262,7 @@ fn evals_cap_is_honoured() {
         seed: 0,
         stats: false,
         max_depth: None,
+        max_length: None,
     };
     let out = search::prove(
         &board("r1b1kbnr/ppp3pp/n4q2/3pppN1/1P1PP3/8/P1P2PPP/RNBQKB1R w KQkq - 0 1"),
@@ -425,6 +429,7 @@ fn prove(fen: &str, evals: Option<u64>) -> search::Output<NullSink> {
         seed: 0,
         stats: false,
         max_depth: None,
+        max_length: None,
     };
     search::prove(&board(fen), &lim, NullSink)
 }
@@ -493,6 +498,7 @@ fn writer_differential_veto_rows() {
         seed: 0,
         stats: false,
         max_depth: None,
+        max_length: None,
     };
     let mut rows = 0;
     for line in text.lines() {
@@ -786,6 +792,56 @@ fn max_depth_censors_at_the_cap() {
 }
 
 #[test]
+fn max_length_default_off_is_trajectory_neutral() {
+    // G-38a: the unbounded control is the current search. `None` and an
+    // explicit bound above every proof must be tree-identical.
+    let root = board(MATE_IN_2);
+    let off = limits();
+    let mut explicit = limits();
+    explicit.max_length = Some(u16::MAX);
+    let a = search::prove(&root, &off, NullSink).result;
+    let b = search::prove(&root, &explicit, NullSink).result;
+    assert_eq!(
+        (a.exit, a.length, a.child_evals, a.expansions),
+        (b.exit, b.length, b.child_evals, b.expansions)
+    );
+}
+
+#[test]
+fn max_length_bounds_the_proof() {
+    // MATE_IN_2 is a length-2 proof. A bound of 1 must report `length`
+    // without inventing a proof or a refutation; 2 and 3 prove it.
+    let root = board(MATE_IN_2);
+    let mut lim = limits();
+    lim.max_length = Some(1);
+    let out = search::prove(&root, &lim, NullSink);
+    assert_eq!(out.result.exit, Exit::Length);
+    assert_eq!(out.result.length, None);
+    assert_eq!(out.proofs.live(), 0, "a bounded pass stored a proof");
+    for bound in [2u16, 3] {
+        lim.max_length = Some(bound);
+        let out = search::prove(&root, &lim, NullSink);
+        assert_eq!(out.result.exit, Exit::Proved, "bound {bound}");
+        assert_eq!(out.result.length, Some(2), "bound {bound}");
+    }
+}
+
+#[test]
+fn max_length_does_not_poison_a_later_unbounded_search() {
+    // G-38c end to end: a bounded run's "no win within L" is not a
+    // refutation. The same root still proves when the bound is removed.
+    let root = board(MATE_IN_2);
+    let mut lim = limits();
+    lim.max_length = Some(1);
+    let bounded = search::prove(&root, &lim, NullSink).result;
+    assert_eq!(bounded.exit, Exit::Length);
+    lim.max_length = None;
+    let unbounded = search::prove(&root, &lim, NullSink).result;
+    assert_eq!(unbounded.exit, Exit::Proved);
+    assert_eq!(unbounded.length, Some(2));
+}
+
+#[test]
 fn guide_conformance_flags_are_default_off() {
     // Plan 13 Phase C: `--guide-fresh-dn` and `--guide-replay-exact` are
     // opt-in. With `--guide none` they are inert and the trajectory is the
@@ -1067,6 +1123,7 @@ fn settled_child_proof_round_trip() {
             seed: 0,
             stats: false,
             max_depth: None,
+            max_length: None,
         };
         let out = search::prove(&root, &lim, ProofStore::new(64));
         assert_eq!(out.result.exit, Exit::Proved);

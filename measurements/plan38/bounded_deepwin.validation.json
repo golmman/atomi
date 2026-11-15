@@ -1,0 +1,68 @@
+{
+  "plan": "38 (item 52 Phase A) \u2014 G-38b deep-win bounded proofs",
+  "date": "2026-11-15",
+  "cell": "deep-win",
+  "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+  "flags": "--guide hand --memory 192 --seed 0 --seconds 600 --max-length L --proof-out",
+  "note": "the proof files are 5.6\u20137.4 MiB and stay in /tmp; the sha256 and both checker results are recorded here",
+  "runs": [
+    {
+      "max_length": 20,
+      "proof_sha256": "78181da24c601b00409432a9f8fdd65840cb8a1b45a9213d35cb3b040adcc6af",
+      "own_validator": {
+        "file": "/tmp/plan38-L20.jsonl",
+        "valid": true,
+        "positions": 88351,
+        "length": 20,
+        "header_moves": 20,
+        "error": null
+      },
+      "provari_check": {
+        "highest_counter": 0,
+        "moves": 20,
+        "proof": "/tmp/plan38-L20.jsonl",
+        "valid": true,
+        "won_positions": 88351
+      }
+    },
+    {
+      "max_length": 22,
+      "proof_sha256": "385708d7e1c757e93faeca143ab8895a5874c713b0694c982b3c08f6e6517c8a",
+      "own_validator": {
+        "file": "/tmp/plan38-L22.jsonl",
+        "valid": true,
+        "positions": 93053,
+        "length": 22,
+        "header_moves": 22,
+        "error": null
+      },
+      "provari_check": {
+        "highest_counter": 0,
+        "moves": 22,
+        "proof": "/tmp/plan38-L22.jsonl",
+        "valid": true,
+        "won_positions": 93053
+      }
+    },
+    {
+      "max_length": 24,
+      "proof_sha256": "3dd061b57abfbb13ae60bd52439e4fbac71a369d596ab6ca7ff70b55aa48f152",
+      "own_validator": {
+        "file": "/tmp/plan38-L24.jsonl",
+        "valid": true,
+        "positions": 70745,
+        "length": 24,
+        "header_moves": 24,
+        "error": null
+      },
+      "provari_check": {
+        "highest_counter": 0,
+        "moves": 24,
+        "proof": "/tmp/plan38-L24.jsonl",
+        "valid": true,
+        "won_positions": 70745
+      }
+    }
+  ],
+  "result": "all three bounded proofs accepted by both checkers"
+}

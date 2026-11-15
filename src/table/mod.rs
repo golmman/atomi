@@ -298,6 +298,11 @@ impl Tables {
                 self.filter.set(key);
             }
             Value::Refuted { cycle, .. } if cycle != ANY => {}
+            // A bound-dependent "no win within L" is never a table entry:
+            // it may make a bounded search return early, but it must not
+            // survive as a refutation for an unbounded (or differently
+            // bounded) search.
+            Value::Bounded => {}
             _ => {
                 self.tt.store(key, value, work);
                 self.filter.set(key);
@@ -570,6 +575,16 @@ mod tests {
         t.store(tt_only, &Value::Open { pn: 1, dn: 1 }, 0);
         assert_eq!(t.lookup(tt_only, 0), Some(Value::Open { pn: 1, dn: 1 }));
         assert_eq!(t.proved(tt_only, 0), None);
+    }
+
+    #[test]
+    fn bounded_value_is_never_stored() {
+        // G-38c: a bound-dependent "no win within L" must not become a
+        // table entry for an unbounded or differently bounded search.
+        let mut t = Tables::new(16, true);
+        t.store(9, &Value::Bounded, 3);
+        assert_eq!(t.lookup(9, 0), None);
+        assert_eq!(t.proofs().live(), 0);
     }
 
     #[test]
