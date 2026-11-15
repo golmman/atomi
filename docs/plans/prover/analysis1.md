@@ -109,7 +109,7 @@ wrong spec, **add** = absent, **skip** = out of scope by decision.
 | R22 | Node-entry early return on stored numbers | `proof_within` + `lookup` at entry | ✗ `--stats` only; measured 45 of 153 k expansions would return | skip |
 | R23 | Proof store: full keys, shortest/higher-limit domination, no eviction, refuse at 90 % | 12-byte entries, 64 MB at 10 s | ✓ 16-byte, 75 % share by default (D35); **measured 5.20 pp** of the `deep-win` wall (269.1 M probes = 23.7/expansion, 10 ns each; plan34 census) | keep |
 | R24 | Table: 4-slot clusters, least-work replacement, sparse filter | | ✓; TT probe **0.04 pp**, filter probe 0.00 pp, store 1.18 pp (plan34, lower bounds — cheap ops clamp against the 7.6–8.3 ns per-interval tax) | keep |
-| R25 | Length-limited passes (`--most`, key salted by moves left), `--shorten` | off by default | ✗ absent (plan13's ply cap was a different thing) | skip for now |
+| R25 | Length-limited passes (`--most`, key salted by moves left), `--shorten` | off by default | ✗ absent (plan13's ply cap was a different thing); `--max-depth` is a censor, not a bounded pass | **active** — item 47/52. `deep-win` length 36/37/29 against mate 19 (plan38); bound `L = 24` is 1.21–1.89× shorter than every current proof |
 | R26 | Network/model guide, tablebases, threads, virtual numbers (v0.4) | | ✗ | skip (D6/D7/D8) |
 
 ## 4. The decisive probe: provari's number algebra, flags only

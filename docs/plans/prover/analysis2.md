@@ -68,7 +68,7 @@ analysis1 §2), so a row's gap is a local reading, not a share of the total.
 | M1 | Don't store recomputable proofs; mate cache in TT; drop mates when proofs fill | `recomputed`, `Known::Mate`, `drop_mates` | no mate cache, no `drop_mates`; proof table refuses at 90 % | **open but not wall** — item 30 triggered; `T_3` resolved by the 75 % proof share (D35) |
 | M2 | Proof store: full keys, shortest/higher-limit domination, no eviction, refuse at 90 % | 12-byte entries, 64 MB at 10 s | 16-byte, 75 % share | **parity** (R23) |
 | M3 | Table: 4-slot clusters, least-work replacement, sparse filter | | same | **parity** (R24) |
-| M4 | Length-limited passes (`--most`, `--shorten`) | off by default | absent | **skipped** (R25) |
+| M4 | Length-limited passes (`--most`, `--shorten`) | off by default | absent; `--max-depth` is a censor, not a bounded pass | **active** (R25, items 47/52): `deep-win` length 36/37/29 vs mate 19 |
 
 ## 5. Per-node cost (the dominant remaining gap)
 

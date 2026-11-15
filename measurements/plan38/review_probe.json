@@ -1,0 +1,53 @@
+{
+  "plan": "38 (kill review plans 36-37) — read-only length-cap probe",
+  "date": "2026-11-15",
+  "cell": {
+    "name": "deep-win",
+    "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+    "flags": "--guide hand --memory 192 --seed 0",
+    "binary": "target/release/atomi",
+    "sha256": "81c3b0ebba86d9f8587082e3d0e5cb40f1006e9ac3e19059887882d744ac5a89",
+    "head": "e6d6e388ddabef1be7464f8441485bdd350d72eb",
+    "atomic_movegen": "2.8.0"
+  },
+  "runs": [
+    {
+      "cap": "--evals 5000000",
+      "max_depth": null,
+      "found": false,
+      "exit": "evals",
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "ms": 1661
+    },
+    {
+      "cap": "--evals 5000000",
+      "max_depth": 24,
+      "found": false,
+      "exit": "depth",
+      "child_evals": 3167606,
+      "expansions": 105774,
+      "ms": 1021
+    },
+    {
+      "cap": "--evals 5000000",
+      "max_depth": 20,
+      "found": false,
+      "exit": "depth",
+      "child_evals": 2003591,
+      "expansions": 67005,
+      "ms": 643
+    },
+    {
+      "cap": "--seconds 120",
+      "max_depth": 24,
+      "found": false,
+      "exit": "depth",
+      "child_evals": 3167606,
+      "expansions": 105774,
+      "ms": 1024
+    }
+  ],
+  "finding": "the existing --max-depth is a censor, not a bounded-length pass: on deep-win it exits depth at the first depth hit (L=24: 3,167,606 child_evals, about 1.0 s) and never re-searches within the bound, so it cannot price analysis1 R25; a real bounded pass is item 52 Phase A",
+  "note": "read-only probe; no engine, flag, default, test or bench.md row changed"
+}
