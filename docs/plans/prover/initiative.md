@@ -48,6 +48,12 @@ Cap-120 row after plan33 (D46) is `core` 4.923 s, `easy-win` 0.376 s,
   168,910, **0.99982×**) against a 0.90× bar (G-40b **FAIL/STOP**). No
   `--guide-eval rich`, no default, no `bench.md` row, no engine change; gates
   green. The added eval signal is too weak to change the early ordering.
+- **plan41 (item 54, GUIDE-SCALE):** the EF-PN weight is a real `deep-win`
+  lever: w = 2 is **0.604×** (30,401 vs 50,327 ms, seeds 0–2) with `core`
+  1.082× / `easy-win` 1.647×, geomean **1.0249×**; w = 4 is 0.746× /
+  1.0122×. D14 w = 2 is 9/9 both checkers. The plan's held-out `sample20`
+  set is all-censored at 120 s, so G-41b fails on an unmeasurable guard; the
+  default stays 16 and w = 2 is opt-in. Owner ruling pending.
 
 **Consequence for priority.** The per-node micro-line is exhausted as a route
 to `T_4` (plans 34–37: 3.22× ceiling, NOT FUNDED, INCONCLUSIVE, ≈1.20×). The
@@ -255,6 +261,7 @@ number.
 | 51 | **Evidence shape** (TREE-GATE) | **proposed — owner ruling, no plan of its own.** Pre-register a second gate shape for tree-changing changes: admissible when `length` does not increase and `expansions`, `child_evals`, `length` and wall are reported at the 5 M probe and at 120 s × seeds with D14 9/9 — no counter-identity requirement — plus a standing ≥ 1.15× bar at the widened sample. Depends on item 49; pairs with D47 |
 | 52 | **Bounded-length pass** (SHORT-PASS) — mechanism for item 47 | **Phase A positive; Phase B closed negative** ([report38](report38.md), [report39](report39.md)). Phase A: opt-in `--max-length L` proves lengths 20/22/24 on `deep-win`; `L = 24` 37.5 s vs control 53.3 s (1.42×); unbounded control tree-identical; D14 clean. Phase B: Phase 0 shows every `L < 20` pass exceeds `L = 24` (best `L = 16` 45.5 s / 132.5 M vs 37.2 s / 109.7 M), so the deepening driver was not built. Default stays `L = ∞`; `--max-length` remains a measurement flag, no `bench.md` row |
 | 53 | **Tree-metric harness** (TREE-METRIC) | **proposed — the instrument for items 47/48/52.** A fixed-context metric per cell (`expansions`, `child_evals`, `length`, ns/exp at the 5 M probe and a fixed cap) with `--guide none` as a standing control. Gates: reproduces the committed values byte-for-byte on the three cells and the 5 M probe; two same-binary runs identical; ranking agrees in sign with the 120 s ranking on three historical levers (NULL-PIPE, HOTPATH-V2, G1). Never a bench cell, never a factor |
+| 54 | **EF-PN weight** (GUIDE-SCALE) | **executed — w = 2 is a `deep-win` lever, default unchanged** ([plan41](plan41.md), [report41](report41.md)). 120 s, seeds 0–2: `deep-win` **0.604×** (30,401 vs 50,327 ms), `core` 1.082×, `easy-win` 1.647×, geomean **1.0249×**; w = 4 is 0.746× / 1.0122×. D14 w = 2 9/9 both checkers, timed/untimed evals 9/9. G-41b **FAIL**: the held-out `sample20` set is all-censored at 120 s (3/5 by expansions 0-based, 2/5 1-based), so the guard is unmeasurable; `ef_weight` stays 16, no `bench.md` row. Owner ruling pending |
 
 ### Closed items
 

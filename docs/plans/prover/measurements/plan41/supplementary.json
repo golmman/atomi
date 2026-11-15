@@ -1,0 +1,12 @@
+{
+ "note": "One supplementary 600 s run, outside the plan's 120 s held-out gate: the first 0-based held-out cell does prove when the cap is long enough, so the 120 s held-out wall check is blind, not negative.",
+ "cell": "b9a7ed7eb368",
+ "fen": "rnbqkbnr/p1pp2pp/8/1p1P1pN1/4p3/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+ "flags": "--guide hand --memory 192 --seed 0 --seconds 600 --guide-ef-weight 16",
+ "found": true,
+ "exit": "proved",
+ "ms": 584003,
+ "child_evals": 1042484800,
+ "expansions": 41770467,
+ "length": 23
+}

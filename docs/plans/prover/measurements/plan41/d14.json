@@ -1,0 +1,288 @@
+{
+  "weight": 2,
+  "seconds": 120,
+  "untimed_seconds": 600,
+  "rows": [
+    {
+      "cell": "core",
+      "seed": 0,
+      "weight": 2,
+      "wall_ms": 4568,
+      "found": true,
+      "exit": "proved",
+      "length": 16,
+      "child_evals": 11309770,
+      "untimed_child_evals": 11309770,
+      "untimed_found": true,
+      "untimed_exit": "proved",
+      "evals_match": true,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan41-proofs/core-s0-w2.jsonl",
+        "valid": true,
+        "positions": 15952,
+        "length": 16,
+        "header_moves": 16,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 16,
+        "proof": "/tmp/atomi-plan41-proofs/core-s0-w2.jsonl",
+        "valid": true,
+        "won_positions": 15952
+      },
+      "claim": true
+    },
+    {
+      "cell": "core",
+      "seed": 1,
+      "weight": 2,
+      "wall_ms": 4440,
+      "found": true,
+      "exit": "proved",
+      "length": 19,
+      "child_evals": 11248957,
+      "untimed_child_evals": 11248957,
+      "untimed_found": true,
+      "untimed_exit": "proved",
+      "evals_match": true,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan41-proofs/core-s1-w2.jsonl",
+        "valid": true,
+        "positions": 16749,
+        "length": 19,
+        "header_moves": 19,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 19,
+        "proof": "/tmp/atomi-plan41-proofs/core-s1-w2.jsonl",
+        "valid": true,
+        "won_positions": 16749
+      },
+      "claim": true
+    },
+    {
+      "cell": "core",
+      "seed": 2,
+      "weight": 2,
+      "wall_ms": 4372,
+      "found": true,
+      "exit": "proved",
+      "length": 13,
+      "child_evals": 11030377,
+      "untimed_child_evals": 11030377,
+      "untimed_found": true,
+      "untimed_exit": "proved",
+      "evals_match": true,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan41-proofs/core-s2-w2.jsonl",
+        "valid": true,
+        "positions": 14871,
+        "length": 13,
+        "header_moves": 13,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 13,
+        "proof": "/tmp/atomi-plan41-proofs/core-s2-w2.jsonl",
+        "valid": true,
+        "won_positions": 14871
+      },
+      "claim": true
+    },
+    {
+      "cell": "easy-win",
+      "seed": 0,
+      "weight": 2,
+      "wall_ms": 678,
+      "found": true,
+      "exit": "proved",
+      "length": 23,
+      "child_evals": 1722925,
+      "untimed_child_evals": 1722925,
+      "untimed_found": true,
+      "untimed_exit": "proved",
+      "evals_match": true,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan41-proofs/easy-win-s0-w2.jsonl",
+        "valid": true,
+        "positions": 2430,
+        "length": 23,
+        "header_moves": 23,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 23,
+        "proof": "/tmp/atomi-plan41-proofs/easy-win-s0-w2.jsonl",
+        "valid": true,
+        "won_positions": 2430
+      },
+      "claim": true
+    },
+    {
+      "cell": "easy-win",
+      "seed": 1,
+      "weight": 2,
+      "wall_ms": 513,
+      "found": true,
+      "exit": "proved",
+      "length": 19,
+      "child_evals": 1350636,
+      "untimed_child_evals": 1350636,
+      "untimed_found": true,
+      "untimed_exit": "proved",
+      "evals_match": true,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan41-proofs/easy-win-s1-w2.jsonl",
+        "valid": true,
+        "positions": 2750,
+        "length": 19,
+        "header_moves": 19,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 19,
+        "proof": "/tmp/atomi-plan41-proofs/easy-win-s1-w2.jsonl",
+        "valid": true,
+        "won_positions": 2750
+      },
+      "claim": true
+    },
+    {
+      "cell": "easy-win",
+      "seed": 2,
+      "weight": 2,
+      "wall_ms": 1070,
+      "found": true,
+      "exit": "proved",
+      "length": 14,
+      "child_evals": 3163165,
+      "untimed_child_evals": 3163165,
+      "untimed_found": true,
+      "untimed_exit": "proved",
+      "evals_match": true,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan41-proofs/easy-win-s2-w2.jsonl",
+        "valid": true,
+        "positions": 3104,
+        "length": 14,
+        "header_moves": 14,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 14,
+        "proof": "/tmp/atomi-plan41-proofs/easy-win-s2-w2.jsonl",
+        "valid": true,
+        "won_positions": 3104
+      },
+      "claim": true
+    },
+    {
+      "cell": "deep-win",
+      "seed": 0,
+      "weight": 2,
+      "wall_ms": 30502,
+      "found": true,
+      "exit": "proved",
+      "length": 25,
+      "child_evals": 87426523,
+      "untimed_child_evals": 87426523,
+      "untimed_found": true,
+      "untimed_exit": "proved",
+      "evals_match": true,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan41-proofs/deep-win-s0-w2.jsonl",
+        "valid": true,
+        "positions": 72470,
+        "length": 25,
+        "header_moves": 25,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 25,
+        "proof": "/tmp/atomi-plan41-proofs/deep-win-s0-w2.jsonl",
+        "valid": true,
+        "won_positions": 72470
+      },
+      "claim": true
+    },
+    {
+      "cell": "deep-win",
+      "seed": 1,
+      "weight": 2,
+      "wall_ms": 27133,
+      "found": true,
+      "exit": "proved",
+      "length": 47,
+      "child_evals": 76623467,
+      "untimed_child_evals": 76623467,
+      "untimed_found": true,
+      "untimed_exit": "proved",
+      "evals_match": true,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan41-proofs/deep-win-s1-w2.jsonl",
+        "valid": true,
+        "positions": 101786,
+        "length": 47,
+        "header_moves": 47,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 47,
+        "proof": "/tmp/atomi-plan41-proofs/deep-win-s1-w2.jsonl",
+        "valid": true,
+        "won_positions": 101786
+      },
+      "claim": true
+    },
+    {
+      "cell": "deep-win",
+      "seed": 2,
+      "weight": 2,
+      "wall_ms": 38527,
+      "found": true,
+      "exit": "proved",
+      "length": 36,
+      "child_evals": 110579850,
+      "untimed_child_evals": 110579850,
+      "untimed_found": true,
+      "untimed_exit": "proved",
+      "evals_match": true,
+      "proof": "written",
+      "ours": {
+        "file": "/tmp/atomi-plan41-proofs/deep-win-s2-w2.jsonl",
+        "valid": true,
+        "positions": 87553,
+        "length": 36,
+        "header_moves": 36,
+        "error": null
+      },
+      "checker": {
+        "highest_counter": 0,
+        "moves": 36,
+        "proof": "/tmp/atomi-plan41-proofs/deep-win-s2-w2.jsonl",
+        "valid": true,
+        "won_positions": 87553
+      },
+      "claim": true
+    }
+  ],
+  "claimed": 9,
+  "runs": 9
+}

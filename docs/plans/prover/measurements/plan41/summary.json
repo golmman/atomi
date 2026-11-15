@@ -1,0 +1,450 @@
+{
+ "plan": "prover plan41 \u2014 item 54 GUIDE-SCALE (EF-PN weight)",
+ "binary_sha256": "dd3c07c6a181a25c7543f14b3652cf7ea6385ea84a09c98c67428734ed9fc338",
+ "source_head": "6282c2a2ed96a30e05fabfd27f2d64d5b60a5907",
+ "note": "measurement binary dd3c07c6 (same source as 4e973d2); a post-gate rebuild is 749d77c2 with identical counters on the deep-win w=2 seed-0 check",
+ "phase0": {
+  "deep_scan": [
+   {
+    "weight": 16,
+    "ms": 53773,
+    "child_evals": 155236740,
+    "expansions": 5803257,
+    "length": 36,
+    "found": true
+   },
+   {
+    "weight": 8,
+    "ms": 61953,
+    "child_evals": 172469845,
+    "expansions": 6248348,
+    "length": 31,
+    "found": true
+   },
+   {
+    "weight": 6,
+    "ms": 48320,
+    "child_evals": 135033034,
+    "expansions": 4945117,
+    "length": 35,
+    "found": true
+   },
+   {
+    "weight": 4,
+    "ms": 37564,
+    "child_evals": 105145267,
+    "expansions": 3888745,
+    "length": 37,
+    "found": true
+   },
+   {
+    "weight": 3,
+    "ms": 33304,
+    "child_evals": 94299896,
+    "expansions": 3499269,
+    "length": 38,
+    "found": true
+   },
+   {
+    "weight": 2,
+    "ms": 30401,
+    "child_evals": 87426523,
+    "expansions": 3165142,
+    "length": 25,
+    "found": true
+   },
+   {
+    "weight": 1,
+    "ms": 34846,
+    "child_evals": 100807496,
+    "expansions": 3771434,
+    "length": 35,
+    "found": true
+   },
+   {
+    "weight": 0,
+    "ms": 62243,
+    "child_evals": 191210656,
+    "expansions": 6902183,
+    "length": 28,
+    "found": true
+   }
+  ],
+  "deep_seeds": [
+   {
+    "weight": 16,
+    "seed": 1,
+    "ms": 50327,
+    "child_evals": 146712125,
+    "expansions": 5376491,
+    "length": 37,
+    "found": true
+   },
+   {
+    "weight": 2,
+    "seed": 1,
+    "ms": 27280,
+    "child_evals": 76623467,
+    "expansions": 2840088,
+    "length": 47,
+    "found": true
+   },
+   {
+    "weight": 16,
+    "seed": 2,
+    "ms": 36266,
+    "child_evals": 107672243,
+    "expansions": 3862476,
+    "length": 29,
+    "found": true
+   },
+   {
+    "weight": 2,
+    "seed": 2,
+    "ms": 38916,
+    "child_evals": 110579850,
+    "expansions": 4035397,
+    "length": 36,
+    "found": true
+   }
+  ],
+  "core": [
+   {
+    "weight": 16,
+    "seed": 0,
+    "ms": 4886,
+    "child_evals": 12439376,
+    "expansions": 424249,
+    "length": 15,
+    "found": true
+   },
+   {
+    "weight": 2,
+    "seed": 0,
+    "ms": 4435,
+    "child_evals": 11309770,
+    "expansions": 382485,
+    "length": 16,
+    "found": true
+   },
+   {
+    "weight": 16,
+    "seed": 1,
+    "ms": 4069,
+    "child_evals": 10097702,
+    "expansions": 344750,
+    "length": 26,
+    "found": true
+   },
+   {
+    "weight": 2,
+    "seed": 1,
+    "ms": 4404,
+    "child_evals": 11248957,
+    "expansions": 383603,
+    "length": 19,
+    "found": true
+   },
+   {
+    "weight": 16,
+    "seed": 2,
+    "ms": 4042,
+    "child_evals": 9850365,
+    "expansions": 333878,
+    "length": 20,
+    "found": true
+   },
+   {
+    "weight": 2,
+    "seed": 2,
+    "ms": 4362,
+    "child_evals": 11030377,
+    "expansions": 374939,
+    "length": 13,
+    "found": true
+   }
+  ],
+  "easy-win": [
+   {
+    "weight": 16,
+    "seed": 0,
+    "ms": 374,
+    "child_evals": 1016547,
+    "expansions": 37999,
+    "length": 19,
+    "found": true
+   },
+   {
+    "weight": 2,
+    "seed": 0,
+    "ms": 680,
+    "child_evals": 1722925,
+    "expansions": 61489,
+    "length": 23,
+    "found": true
+   },
+   {
+    "weight": 16,
+    "seed": 1,
+    "ms": 413,
+    "child_evals": 1177648,
+    "expansions": 43071,
+    "length": 19,
+    "found": true
+   },
+   {
+    "weight": 2,
+    "seed": 1,
+    "ms": 513,
+    "child_evals": 1350636,
+    "expansions": 48123,
+    "length": 19,
+    "found": true
+   },
+   {
+    "weight": 16,
+    "seed": 2,
+    "ms": 625,
+    "child_evals": 1803483,
+    "expansions": 67674,
+    "length": 16,
+    "found": true
+   },
+   {
+    "weight": 2,
+    "seed": 2,
+    "ms": 1092,
+    "child_evals": 3163165,
+    "expansions": 113903,
+    "length": 14,
+    "found": true
+   }
+  ]
+ },
+ "phaseA": {
+  "w2": {
+   "cells": {
+    "core": {
+     "control_ms": [
+      4886,
+      4069,
+      4042
+     ],
+     "candidate_ms": [
+      4435,
+      4404,
+      4362
+     ],
+     "control_median_ms": 4069,
+     "candidate_median_ms": 4404,
+     "ratio": 1.0823
+    },
+    "easy-win": {
+     "control_ms": [
+      374,
+      413,
+      625
+     ],
+     "candidate_ms": [
+      680,
+      513,
+      1092
+     ],
+     "control_median_ms": 413,
+     "candidate_median_ms": 680,
+     "ratio": 1.6465
+    },
+    "deep-win": {
+     "control_ms": [
+      53773,
+      50327,
+      36266
+     ],
+     "candidate_ms": [
+      30401,
+      27280,
+      38916
+     ],
+     "control_median_ms": 50327,
+     "candidate_median_ms": 30401,
+     "ratio": 0.6041
+    }
+   },
+   "geomean_ratio": 1.0249
+  },
+  "w4": {
+   "cells": {
+    "core": {
+     "control_ms": [
+      4886,
+      4069,
+      4042
+     ],
+     "candidate_ms": [
+      4252,
+      4422,
+      4511
+     ],
+     "control_median_ms": 4069,
+     "candidate_median_ms": 4422,
+     "ratio": 1.0868
+    },
+    "easy-win": {
+     "control_ms": [
+      374,
+      413,
+      625
+     ],
+     "candidate_ms": [
+      786,
+      528,
+      520
+     ],
+     "control_median_ms": 413,
+     "candidate_median_ms": 528,
+     "ratio": 1.2785
+    },
+    "deep-win": {
+     "control_ms": [
+      53773,
+      50327,
+      36266
+     ],
+     "candidate_ms": [
+      37564,
+      54148,
+      34323
+     ],
+     "control_median_ms": 50327,
+     "candidate_median_ms": 37564,
+     "ratio": 0.7464
+    }
+   },
+   "geomean_ratio": 1.0122
+  }
+ },
+ "heldout": {
+  "0_based": [
+   {
+    "index": 1,
+    "id": "b9a7ed7eb368",
+    "w16_ms": 120005,
+    "w2_ms": 120011,
+    "w16_expansions": 10535936,
+    "w2_expansions": 10848256,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 1.0296
+   },
+   {
+    "index": 5,
+    "id": "3004d09cef79",
+    "w16_ms": 120002,
+    "w2_ms": 120008,
+    "w16_expansions": 11657216,
+    "w2_expansions": 11294720,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 0.9689
+   },
+   {
+    "index": 9,
+    "id": "60af5542800b",
+    "w16_ms": 120005,
+    "w2_ms": 120000,
+    "w16_expansions": 11152384,
+    "w2_expansions": 11070464,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 0.9927
+   },
+   {
+    "index": 13,
+    "id": "3a7f66e6b796",
+    "w16_ms": 120006,
+    "w2_ms": 120006,
+    "w16_expansions": 8330240,
+    "w2_expansions": 8904704,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 1.069
+   },
+   {
+    "index": 17,
+    "id": "5d89e584375f",
+    "w16_ms": 120006,
+    "w2_ms": 120009,
+    "w16_expansions": 12689408,
+    "w2_expansions": 12193792,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 0.9609
+   }
+  ],
+  "1_based": [
+   {
+    "index": 1,
+    "id": "2a0443d446ee",
+    "w16_ms": 120013,
+    "w2_ms": 120009,
+    "w16_expansions": 11698176,
+    "w2_expansions": 11374592,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 0.9723
+   },
+   {
+    "index": 5,
+    "id": "6559fbdddb47",
+    "w16_ms": 120009,
+    "w2_ms": 120004,
+    "w16_expansions": 11997184,
+    "w2_expansions": 11604992,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 0.9673
+   },
+   {
+    "index": 9,
+    "id": "8271708709d4",
+    "w16_ms": 120016,
+    "w2_ms": 120008,
+    "w16_expansions": 8865792,
+    "w2_expansions": 8893440,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 1.0031
+   },
+   {
+    "index": 13,
+    "id": "8862dbcb70d4",
+    "w16_ms": 120000,
+    "w2_ms": 120003,
+    "w16_expansions": 9057280,
+    "w2_expansions": 9483264,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 1.047
+   },
+   {
+    "index": 17,
+    "id": "9da3ab788e86",
+    "w16_ms": 120008,
+    "w2_ms": 120012,
+    "w16_expansions": 10528768,
+    "w2_expansions": 11094016,
+    "w16_found": false,
+    "w2_found": false,
+    "expansions_ratio": 1.0537
+   }
+  ]
+ },
+ "gates": {
+  "G-41a": "PASS \u2014 Phase 0 counters reproduced exactly (ms within noise)",
+  "G-41b": "FAIL \u2014 w=2 selected on deep-win (30,401 vs 37,564 ms) and geomean 1.0249 <= 1.05, but the held-out clause is unmeasurable: all 10 runs censored at 120 s; expansions direction 3/5 (0-based) / 2/5 (1-based)",
+  "G-41c": "PASS as evidence \u2014 D14 w=2 9/9 both checkers, timed/untimed child_evals 9/9; not applied because G-41b failed",
+  "G-41d": "not applied \u2014 default stays ef_weight=16; no bench.md row",
+  "G-41e": "PASS \u2014 make test, make lint, make test-full + veto green",
+  "G-41f": "PASS \u2014 no engine/default/bench row, no new term, no provari source, no T_4/T_5 claim"
+ }
+}
