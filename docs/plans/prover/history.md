@@ -614,3 +614,18 @@ premise are the recorded starting point for the D21 kill review.
   methodology/analysis rulings and are confirmed as such (D36's tree clause
   already superseded by D48). Stale "owner to confirm" headers on D25/D26/D36/
   D37/D38 cleared. Docs only; no engine/flag/default/test/`bench.md` change.
+
+- **2026-11-15 — plan37, item 46 (OVERHEAD-PROFILE), read-only**: the 28.45 pp
+  `other` is **instruction-bound, not stall-bound**. Flat `perf record` (call
+  graph is blocked by `perf_event_paranoid=2`) puts the untimed symbols at
+  **29.01 % of cycles** vs `other = 28.45 pp`; the class split is **1,964 ns
+  retired / 199 ns branch / 481 ns cache** (74.3 / 7.5 / 18.2 %), so the
+  pre-registered verdict is **LEVER**. Candidates: `Frame::enter` self 867 ns,
+  `null_win` self 598, `Mover::effect` 318, `populate_state` 269. Two plan
+  defects recorded: Phase 0's per-region subtraction gives **31.03 pp**, not
+  28.45, and the census `outside` is a **plug** (`wall − measured regions`,
+  1.384 s) while the true outside is 2.328 s and the mid site leaves are
+  2.735 s; G-46d passes for `enter`/`null` and fails for `outside`. No engine,
+  flag, default, test or `bench.md` change; the oracle was not used. Data:
+  [`measurements/plan37/`](../../../measurements/plan37/README.md); report:
+  [`report37.md`](report37.md).

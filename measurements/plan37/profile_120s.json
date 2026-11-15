@@ -1,0 +1,359 @@
+{
+ "plan": "prover plan37 (item 46, OVERHEAD-PROFILE)",
+ "date": "2026-11-15",
+ "host": {
+  "cpu": "AMD Ryzen 9 5950X 16-Core (4 vCPU)",
+  "perf": "7.2.15-200.fc44.x86_64",
+  "perf_event_paranoid": 2,
+  "note": "perf stat and flat perf record work; call-graph (-g) is blocked by perf_event_paranoid=2, so the profile is flat symbol/srcline, not call-graph"
+ },
+ "repo": {
+  "head": "d3c1c657447faab4be662a017dedb617d93fa898",
+  "release_sha256": "81c3b0ebba86d9f8587082e3d0e5cb40f1006e9ac3e19059887882d744ac5a89",
+  "debug_sha256": "1bb497417d3d934d294c2fe07c41734b7215d59031241cf3afaf51365437eafb",
+  "debug_build": "git archive HEAD + [profile.release] debug = 1; wall 52.606 s vs release 53.721 s (-2.1%), tree identical"
+ },
+ "cell": {
+  "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+  "flags": "--guide hand --memory 192 --seconds 120 --seed 0",
+  "expansions": 5803257,
+  "child_evals": 155236740,
+  "length": 36
+ },
+ "phase0": {
+  "census_wall_s": 53.656,
+  "ops_total_s": 37.005,
+  "outside_plug_s": 1.384,
+  "other_s": 15.267,
+  "other_pp": 28.45,
+  "gate_G46a": "PARTIAL \u2014 the census formula wall - ops_total - outside reproduces 28.45 pp by construction, but the plan's per-region subtraction (region total - leaves inside it) gives 31.03 pp, not 28.45 pp; named regions alone give 33.55 pp. The gap is the mid site leaves (2.735 s) counted in ops_total but not in the named regions, and the outside plug (1.384 s) defined as wall - named regions. The plan's \"other = 28.45 pp\" is therefore not the sum of the per-region own times.",
+  "finding": "the census outside is a plug (reference wall - measured regions), not a measured region; the sites build wall is 54.600 s, so the true outside is 2.328 s (4.34 pp) and the plug absorbs the +0.944 s sites-build overhead. The mid site leaves are 2.735 s (5.10 pp), larger than the 1.384 s plug, so the outside own time is negative. The per-region own-time subtraction is only meaningful at site granularity and does not reproduce the plan's 28.45 pp.",
+  "site_own_s": {
+   "enter_union": 9.737,
+   "null_pass1": 5.17,
+   "null_pass2": 1.599,
+   "null_envelope": 1.169,
+   "siblings": 0.328,
+   "outside_plug": -1.351
+  },
+  "site_own_note": "enter_union = A_enter - enter-site leaves; null_pass1 = A_null_win - A_null_pass2_loop - null_p1 leaves; null_pass2 = A_null_pass2_loop - null_p2 leaves; null_envelope = A_null_replay - A_null_win - replay leaves; outside_plug = outside - mid leaves (negative: the plug is smaller than the mid site leaves).",
+  "named_regions_total_s": 52.272,
+  "named_regions_leaves_s": 34.27,
+  "named_own_s": 18.002,
+  "named_own_pp": 33.55,
+  "outside_true_s": -1.351,
+  "outside_true_pp": -2.52,
+  "per_region_own_sum_s": 16.651,
+  "per_region_own_sum_pp": 31.03,
+  "other_formula_s": 15.267,
+  "other_formula_pp": 28.45
+ },
+ "phaseA": {
+  "stat_runs": [
+   {
+    "cycles": 253979384110,
+    "instructions": 754425615220,
+    "branches": 114290608259,
+    "branch-misses": 1176740458,
+    "L1-dcache-load-misses": 2041805395,
+    "L1-dcache-loads": 248444667419,
+    "cache-references": 7223594581,
+    "cache-misses": 1075745195,
+    "dTLB-load-misses": 5638393,
+    "stalled-cycles-frontend": 14740259541
+   },
+   {
+    "cycles": 253857382076,
+    "instructions": 754731955764,
+    "branches": 114273167425,
+    "branch-misses": 1196567298,
+    "L1-dcache-load-misses": 2038570271,
+    "L1-dcache-loads": 248584247510,
+    "cache-references": 7216967624,
+    "cache-misses": 1070717244,
+    "dTLB-load-misses": 4500737,
+    "stalled-cycles-frontend": 14671027045
+   },
+   {
+    "cycles": 254245843838,
+    "instructions": 754978814357,
+    "branches": 114339992695,
+    "branch-misses": 1178867881,
+    "L1-dcache-load-misses": 2029647054,
+    "L1-dcache-loads": 248486695512,
+    "cache-references": 7262117991,
+    "cache-misses": 1101802485,
+    "dTLB-load-misses": 3961187,
+    "stalled-cycles-frontend": 14794478473
+   }
+  ],
+  "stat_medians": {
+   "L1-dcache-load-misses": 2038570271,
+   "L1-dcache-loads": 248486695512,
+   "branch-misses": 1178867881,
+   "branches": 114290608259,
+   "cache-misses": 1075745195,
+   "cache-references": 7223594581,
+   "cycles": 253979384110,
+   "dTLB-load-misses": 4500737,
+   "instructions": 754731955764,
+   "stalled-cycles-frontend": 14740259541
+  },
+  "walls_s": [
+   53.932,
+   54.006,
+   53.821
+  ],
+  "wall_median_s": 53.932,
+  "freq_ghz": 4.709,
+  "ipc": 2.972,
+  "penalties": {
+   "branch_mispredict_cycles": 16.2,
+   "l1_hit_l2_cycles": 10.6,
+   "l2_miss_cycles_derived": 33.5,
+   "method": "branch penalty measured by measurements/plan37/latency.c (8.143 cycles/iter / 0.502 misses/iter = 16.2); cache latencies by the same file (L1 4.0, L2 10.6, L3 37.0, DRAM 197.0 cycles); the L2-miss penalty is derived from the cycle budget, not assumed"
+  },
+  "class_whole_run": {
+   "retired_instructions": 74.29,
+   "branch_mispredicts": 7.52,
+   "cache_misses": 18.19,
+   "compiler_artifacts": 0.0
+  },
+  "untimed_symbols": {
+   "<atomi::search::frame::Frame>::enter": {
+    "cycles_pct": 9.51,
+    "branch_pct": 10.08,
+    "l1_pct": 11.55,
+    "cache_pct": 9.38
+   },
+   "atomi::guide::null::null_win": {
+    "cycles_pct": 6.56,
+    "branch_pct": 5.37,
+    "l1_pct": 6.45,
+    "cache_pct": 8.64
+   },
+   "<atomi::mover::Mover>::effect": {
+    "cycles_pct": 3.49,
+    "branch_pct": 3.91,
+    "l1_pct": 5.42,
+    "cache_pct": 3.7
+   },
+   "<atomic_movegen::board::Board>::populate_state": {
+    "cycles_pct": 2.95,
+    "branch_pct": 2.8,
+    "l1_pct": 2.73,
+    "cache_pct": 2.91
+   },
+   "<atomi::search::Engine<atomi::events::NullSink>>::mid": {
+    "cycles_pct": 1.83,
+    "branch_pct": 2.02,
+    "l1_pct": 2.63,
+    "cache_pct": 2.23
+   },
+   "<atomi::table::Tables>::lookup_with_source": {
+    "cycles_pct": 1.04,
+    "branch_pct": 1.01,
+    "l1_pct": 0.83,
+    "cache_pct": 0.96
+   },
+   "<atomi::mover::Mover>::gives_check": {
+    "cycles_pct": 0.92,
+    "branch_pct": 0.93,
+    "l1_pct": 1.45,
+    "cache_pct": 0.81
+   },
+   "__memmove_avx_unaligned_erms": {
+    "cycles_pct": 1.1,
+    "branch_pct": 1.08,
+    "l1_pct": 1.07,
+    "cache_pct": 1.17
+   },
+   "atomic_movegen::board::castling_rights_after": {
+    "cycles_pct": 0.63,
+    "branch_pct": 0.61,
+    "l1_pct": 0.62,
+    "cache_pct": 0.76
+   },
+   "<atomic_movegen::board::Board>::legal_ep_square": {
+    "cycles_pct": 0.51,
+    "branch_pct": 0.47,
+    "l1_pct": 0.44,
+    "cache_pct": 0.46
+   },
+   "<atomic_movegen::board::Board>::blast_casualties": {
+    "cycles_pct": 0.47,
+    "branch_pct": 0.43,
+    "l1_pct": 0.43,
+    "cache_pct": 0.46
+   },
+   "<alloc::raw_vec::RawVecInner>::finish_grow": {
+    "cycles_pct": 0.0,
+    "branch_pct": 0.0,
+    "l1_pct": 0.0,
+    "cache_pct": 0.0
+   },
+   "<atomic_movegen::board::Board>::is_pseudo_legal": {
+    "cycles_pct": 0.0,
+    "branch_pct": 0.0,
+    "l1_pct": 0.0,
+    "cache_pct": 0.0
+   }
+  },
+  "untimed_cycles_pct": 29.01,
+  "other_cycles_pct": 28.45,
+  "class_ns_per_exp": {
+   "retired_instructions": 1964.2,
+   "branch_mispredicts": 198.8,
+   "cache_misses": 480.9,
+   "compiler_artifacts": 0.0
+  },
+  "candidates": [
+   {
+    "symbol": "<atomi::search::frame::Frame>::enter",
+    "cycles_pct": 9.51,
+    "ns_per_exp": 4081706007633.5
+   },
+   {
+    "symbol": "atomi::guide::null::null_win",
+    "cycles_pct": 6.56,
+    "ns_per_exp": 2815561662468.5
+   },
+   {
+    "symbol": "<atomi::mover::Mover>::effect",
+    "cycles_pct": 3.49,
+    "ns_per_exp": 1497913140551.1
+   },
+   {
+    "symbol": "<atomic_movegen::board::Board>::populate_state",
+    "cycles_pct": 2.95,
+    "ns_per_exp": 1266144345165.0
+   },
+   {
+    "symbol": "<atomi::search::Engine<atomi::events::NullSink>>::mid",
+    "cycles_pct": 1.83,
+    "ns_per_exp": 785438695475.2
+   },
+   {
+    "symbol": "__memmove_avx_unaligned_erms",
+    "cycles_pct": 1.1,
+    "ns_per_exp": 472121620231.0
+   },
+   {
+    "symbol": "<atomi::table::Tables>::lookup_with_source",
+    "cycles_pct": 1.04,
+    "ns_per_exp": 446369531854.8
+   },
+   {
+    "symbol": "<atomi::mover::Mover>::gives_check",
+    "cycles_pct": 0.92,
+    "ns_per_exp": 394865355102.3
+   },
+   {
+    "symbol": "atomic_movegen::board::castling_rights_after",
+    "cycles_pct": 0.63,
+    "ns_per_exp": 270396927950.5
+   },
+   {
+    "symbol": "<atomic_movegen::board::Board>::legal_ep_square",
+    "cycles_pct": 0.51,
+    "ns_per_exp": 218892751198.0
+   },
+   {
+    "symbol": "<atomic_movegen::board::Board>::blast_casualties",
+    "cycles_pct": 0.47,
+    "ns_per_exp": 201724692280.5
+   },
+   {
+    "symbol": "<alloc::raw_vec::RawVecInner>::finish_grow",
+    "cycles_pct": 0.0,
+    "ns_per_exp": 0.0
+   },
+   {
+    "symbol": "<atomic_movegen::board::Board>::is_pseudo_legal",
+    "cycles_pct": 0.0,
+    "ns_per_exp": 0.0
+   }
+  ],
+  "cross_check": {
+   "enter_sampled_pp": 41.6,
+   "enter_census_pp": 51.77,
+   "enter_delta_pct": -19.7,
+   "null_sampled_pp": 39.1,
+   "null_census_pp": 45.04,
+   "null_delta_pct": -13.1,
+   "outside_sampled_pp": 6.1,
+   "outside_census_pp": 2.58,
+   "outside_delta_pct": 136.4,
+   "note": "enter -19.7%, null -13.1%, measured partition (enter+null+siblings) -15.5%: all within +/-20%. outside +136% is the census plug (2.58 pp vs the 5.10 pp mid site leaves), not a measured region.",
+   "measured_partition_sampled_pp": 81.0,
+   "measured_partition_census_pp": 95.8,
+   "measured_partition_delta_pct": -15.5
+  }
+ },
+ "phaseB": {
+  "decision": "LEVER",
+  "rule": "top class >= 25% of 2,631 ns (>= 658 ns) with a stated mechanism",
+  "top_class": "retired instructions in the untimed loop code and its inlined helpers",
+  "top_class_ns": 1964.2,
+  "top_class_share_pct": 74.3,
+  "mechanism": "the untimed code is instruction-bound, not stall-bound: Frame::enter self (pass-1 loop body, per-child stores, Vec pushes, bounds checks), null_win self (null pass1/pass2 loop body), Mover::effect (per-move needs_board/gives_check), populate_state (per-node state population), mid self, lookup_with_source, memmove.",
+  "candidate_list": [
+   {
+    "candidate": "Frame::enter self (pass-1 loop body)",
+    "ns": 866.7,
+    "mechanism": "per-child stores, Vec pushes, bounds checks, inlined helpers",
+    "prototype": "hoist bounds checks / preallocate child arrays, 1-2 days scratch"
+   },
+   {
+    "candidate": "null_win self (null pass1/pass2 loop body)",
+    "ns": 597.9,
+    "mechanism": "key/status/proof scan loop control, per-move stores",
+    "prototype": "fuse pass1/pass2 or preallocate, 1-2 days scratch"
+   },
+   {
+    "candidate": "Mover::effect",
+    "ns": 318.1,
+    "mechanism": "per-move needs_board predicate + gives_check",
+    "prototype": "reorder to skip hash for built children / cache effect, 1 day scratch"
+   },
+   {
+    "candidate": "populate_state",
+    "ns": 268.9,
+    "mechanism": "per-node state population",
+    "prototype": "reuse parent child state, 1-2 days scratch"
+   },
+   {
+    "candidate": "mid self",
+    "ns": 166.8,
+    "mechanism": "MID loop value algebra/select wrappers",
+    "prototype": "inline/precompute, 1 day scratch"
+   },
+   {
+    "candidate": "lookup_with_source",
+    "ns": 94.8,
+    "mechanism": "lookup orchestration",
+    "prototype": "fuse TT/proof/filter probes, 1 day scratch"
+   },
+   {
+    "candidate": "gives_check",
+    "ns": 83.8,
+    "mechanism": "per-move check test",
+    "prototype": "bitboard precompute, 1 day scratch"
+   },
+   {
+    "candidate": "memmove",
+    "ns": 100.3,
+    "mechanism": "Vec growth/copies",
+    "prototype": "stack arrays, 0.5 day scratch"
+   }
+  ],
+  "phaseC": "not run: the candidate sizes are from the profile; a scratch prototype is the next plan session's job (plan37 Phase C is optional)."
+ },
+ "gates": {
+  "G46a": "PARTIAL \u2014 the census formula reproduces 28.45 pp; the per-region subtraction gives 31.03 pp (see phase0)",
+  "G46b": "PASS \u2014 every profiled run 5,803,257 expansions / 155,236,740 child evals / length 36; debug build identical",
+  "G46c": "PASS \u2014 untimed symbols cover 29.01% of cycles vs other 28.45% (102%); class table covers 100% by construction",
+  "G46d": "PASS on the measured partition (enter -19.7%, null -13.1%, enter+null+siblings -15.5%, all within +/-20%); the outside +136% mismatch is the census plug, not a measured region",
+  "G46e": "LEVER \u2014 top class retired instructions 1,964.2 ns = 74.3% of other, mechanism stated; candidate list in phaseB"
+ }
+}
