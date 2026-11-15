@@ -1,0 +1,28 @@
+    Updating crates.io index
+     Locking 13 packages to highest Rust 1.99.1 compatible versions
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.19
+   Compiling atomi v0.1.0 (/workspace/atomi)
+   Compiling atomic-movegen v2.8.0
+   Compiling atomi-plan40-phase0 v0.1.0 (/workspace/atomi/docs/plans/prover/measurements/plan40/phase0)
+    Finished `release` profile [optimized] target(s) in 9.32s
+     Running `target/release/atomi-plan40-phase0`
+corpus positions: 21
+total positions: 8293
+current_ns_per_call 149.11
+terms_v1_ns_per_call 175.24
+terms_v1_trimmed_ns_per_call 139.20
+current_dist (-171, 191, 0, 2.5274327746292053)
+v1_dist (-226, 191, 0, -3.2518991920897142)
+trim_dist (-219, 185, 0, -3.240443747739057)
+term material/32     min   -76 max    76 mean   -0.05 zero 2534/8293
+term pressure*12     min  -108 max   108 mean   -0.18 zero 2875/8293
+term targets*20      min   -60 max    60 mean   -1.07 zero 6924/8293
+term exposure*8      min   -16 max    16 mean   -0.11 zero 7260/8293
+term fuse*16         min   -16 max    16 mean   -0.91 zero 7715/8293
+term checkers*-16    min   -16 max     0 mean   -0.93 zero 7812/8293
+term mobility/4      min    -9 max     8 mean   -0.01 zero 3325/8293
+current_ne_v1 2169/8293

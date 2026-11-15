@@ -1,0 +1,52 @@
+{
+  "plan": "prover plan40 — item 48 Phase A scratch 5 M probe",
+  "cell": "deep-win",
+  "flags": "--guide hand --memory 192 --seed 0 --evals 5000000",
+  "runs": [
+    {
+      "label": "control-1",
+      "binary": "control",
+      "found": false,
+      "exit": "evals",
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "length": null,
+      "sim_nodes": 1296692,
+      "settle_nodes": 267286,
+      "proof_entries": 215267,
+      "ms": 1681
+    },
+    {
+      "label": "terms-v1",
+      "binary": "candidate",
+      "found": false,
+      "exit": "evals",
+      "child_evals": 5000005,
+      "expansions": 168879,
+      "length": null,
+      "sim_nodes": 1209052,
+      "settle_nodes": 266714,
+      "proof_entries": 215956,
+      "ms": 1652
+    },
+    {
+      "label": "control-2",
+      "binary": "control",
+      "found": false,
+      "exit": "evals",
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "length": null,
+      "sim_nodes": 1296692,
+      "settle_nodes": 267286,
+      "proof_entries": 215267,
+      "ms": 1652
+    }
+  ],
+  "gate": {
+    "id": "G-40b",
+    "bar": "candidate expansions <= 0.90 * 168910 = 152019 at the 5 M probe",
+    "result": "FAIL",
+    "candidate_ratio": 0.99982
+  }
+}

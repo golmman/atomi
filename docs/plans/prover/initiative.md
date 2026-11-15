@@ -42,6 +42,12 @@ Cap-120 row after plan33 (D46) is `core` 4.923 s, `easy-win` 0.376 s,
   45.526 s, `L = 18` 65.820 s, `L = 12` 83.136 s. The cumulative bar fails
   >11×. No driver, `clear_open`, cap or S1–S4; control tree-identical;
   `make test-full` + veto green.
+- **plan40 (kill review + item 48 GUIDE-EVAL):** TERMS-V1 prices at
+  **175.24 ns/call** against the 199 bar (G-40a PASS), but at the 5 M
+  `deep-win` probe it moves the tree by **31 expansions** (168,879 vs
+  168,910, **0.99982×**) against a 0.90× bar (G-40b **FAIL/STOP**). No
+  `--guide-eval rich`, no default, no `bench.md` row, no engine change; gates
+  green. The added eval signal is too weak to change the early ordering.
 
 **Consequence for priority.** The per-node micro-line is exhausted as a route
 to `T_4` (plans 34–37: 3.22× ceiling, NOT FUNDED, INCONCLUSIVE, ≈1.20×). The
@@ -49,9 +55,11 @@ remaining headroom is **tree-changing**: proof length (items 47/52), guide
 quality (item 48), and the measurement/gate shape that lets such levers be
 judged (items 49/51/53). Plan38 gives the first positive tree row: length
 36 → 24 at `L = 24`, 1.42× wall. Phase B is closed negative (plan39): every
-small-`L` prefix is slower than the whole `L = 24` pass. The next scoped
-tree lever is **item 48** (guide quality), or the owner's `T_4`/`T_5`
-ruling; not another per-node micro-plan and not another deepening plan.
+small-`L` prefix is slower than the whole `L = 24` pass. The remaining
+tree lever, **item 48** (guide quality), is now also closed negative
+(plan40): added eval terms barely change the 5 M tree. The next move is the
+owner's `T_4`/`T_5` ruling; not another per-node micro-plan, deepening plan or
+eval-term list.
 
 **Open decisions:** D47/D48 confirmed; D49 default policy in force. Item 44
 remains unauthorised; item 41 is blocked on items 46/50. `--max-length` is an
@@ -241,7 +249,7 @@ number.
 | 44 | **Node-body rewrite** (plan34 B, "v3 expansion") | **not authorised — owner decision (D45).** Keep DF-PN, allow an in-base expansion rewrite. Priced at 15.6 pp tree-neutral / ≈31.6 pp with closures (1.18× / 1.46×, not 2–4×); plan36 §3 cancels it as a shape port and keeps only its funding test (item 50). A ruling lands in `decisions.md` first |
 | 46 | **The 28.45 pp no counter owns** (OVERHEAD-PROFILE) | **executed — LEVER** ([plan37](plan37.md), [report37](report37.md)). Untimed symbols are 29.01 % of cycles vs `other` 28.45 pp; class split 1,964 ns retired / 199 branch / 481 cache (74.3 / 7.5 / 18.2 %). Candidates: `Frame::enter` 867 ns, `null_win` 598, `Mover::effect` 318, `populate_state` 269. Defects: per-region subtraction gives 31.03 pp, and `outside` is a plug (true 2.328 s vs 1.384 s); G-46d partial. Owner ruling pending; follow-up candidate scoping is priority 9 |
 | 47 | **Proof length** (SHORT-WIN) | **Phase 0 answered; still not scoped.** `deep-win` `length` is 36/37/29 at 120 s against the reference's mate 19, so the 2.76× tree ratio is void and the length axis is live. The unit check this row used to quote (`core` 17 = 17) is wrong: our `core` proof is 15 against mate 17, and `easy-win` is 19/19/16 against 15, so the relation is cell-dependent. Scoping is the owner's call after the kill review; item 52 is the mechanism |
-| 48 | **Guide quality** (GUIDE-EVAL) | **proposed — unblocked after plans 36–37.** Does a real hand-cut term set (material, explosion targets, fuses, pressure, checkers) beat the algebra's `child_evals` at like cost? Gates: `ns`/call ≤ `hand_eval`'s 199, then 5 M `deep-win` `child_evals`, then the three cells' tree, then 120 s ≤ 0.85× with D14 9/9. Read-only probe first; D8 stands (own code, no model) |
+| 48 | **Guide quality** (GUIDE-EVAL) | **executed — negative, closed** ([plan40](plan40.md), [report40](report40.md)). TERMS-V1 (signed targets, exposure, fuse, checkers, existing material/pressure/mobility) prices at 175.24 ns/call vs the 199 bar, but the 5 M `deep-win` tree is 168,879 expansions vs 168,910 (**0.99982×**), far above the 0.90× gate. Stopped before `--guide-eval rich`; no default, no `bench.md` row, no repo change; gates green. A re-open needs a new ordering hypothesis, not another term list |
 | 49 | **Tuning resolution** (BENCH-POWER) | **proposed — unblocked after plans 36–37.** Run today's binary on `corpus-v1` cells outside the bench set (fixed 10 s, seed 0) and report the factor/tree-identity distribution: does a widened tuning bench predict the three claim cells' direction? Not item 10 (coverage); no tuning cell becomes a claim cell, nothing enters `bench.md` |
 | 50 | **Per-child decide in masks** (EFFECT-SHAPE) — funding test for item 44 | **proposed — unblocked after plans 36–37.** Rewrite only the per-child screen+decide as bit tests on the move effect (no board build) and time the decide in ns/child. Funding bar: ≤ 34.3 ns/child (today 37.71 at our composite rate; 19.13 at our `status` rate). Plan29's effect decides 0 of 1,067,066 built children, so this is a *screen* rewrite, not terminality. If item 46 finds no lever, this is the last per-node question |
 | 51 | **Evidence shape** (TREE-GATE) | **proposed — owner ruling, no plan of its own.** Pre-register a second gate shape for tree-changing changes: admissible when `length` does not increase and `expansions`, `child_evals`, `length` and wall are reported at the 5 M probe and at 120 s × seeds with D14 9/9 — no counter-identity requirement — plus a standing ≥ 1.15× bar at the widened sample. Depends on item 49; pairs with D47 |

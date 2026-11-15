@@ -1,0 +1,83 @@
+--- a/src/guide/eval.rs
++++ b/src/guide/eval.rs
+@@ -78,6 +78,9 @@
+ 
+ /// The hand eval in `[-256, 256]` from `board.side_to_move()`'s perspective.
+ pub fn hand_eval(board: &Board) -> i32 {
++    if std::env::var("ATOMI_GUIDE_EVAL").as_deref() == Ok("rich") {
++        return terms_v1(board);
++    }
+     let us = board.side_to_move();
+     let them = us.flip();
+     let mut material_score = 0i32;
+@@ -101,6 +104,70 @@
+     raw.clamp(-256, 256)
+ }
+ 
++/// TERMS-V1 scratch candidate (plan40 Phase A): signed explosion targets,
++/// exposure, commoner fuse, checkers and the existing material, pressure and
++/// mobility terms.
++fn exposure(board: &Board, us: Color) -> i32 {
++    let them = us.flip();
++    let target = board.commoners(them);
++    if target.is_empty() {
++        return 0;
++    }
++    let zone = Board::blast_zone(target.lsb());
++    let pieces = board.pieces_color(us) & !board.pieces_color_pt(us, PieceType::Pawn);
++    (pieces & zone).count().min(3) as i32
++}
++
++fn fuse(board: &Board, us: Color) -> i32 {
++    let them = us.flip();
++    let occ = board.occupied();
++    let enemy = board.commoners(them);
++    let ours = board.commoners(us);
++    let mut score = 0;
++    if !enemy.is_empty() {
++        score += board
++            .attackers_to_color(enemy.lsb(), us, occ)
++            .count()
++            .min(3) as i32;
++    }
++    if !ours.is_empty() {
++        score -= board
++            .attackers_to_color(ours.lsb(), them, occ)
++            .count()
++            .min(3) as i32;
++    }
++    score
++}
++
++fn terms_v1(board: &Board) -> i32 {
++    let us = board.side_to_move();
++    let them = us.flip();
++    let mut material_score = 0i32;
++    for pt in [
++        PieceType::Pawn,
++        PieceType::Knight,
++        PieceType::Bishop,
++        PieceType::Rook,
++        PieceType::Queen,
++    ] {
++        let ours = board.pieces_color_pt(us, pt).count() as i32;
++        let theirs = board.pieces_color_pt(them, pt).count() as i32;
++        material_score += (ours - theirs) * material(pt);
++    }
++    let safety = commoner_pressure(board, us) - commoner_pressure(board, them);
++    let targets = (threat::signature_for(board, us).count() as i32
++        - threat::signature_for(board, them).count() as i32)
++        * 20;
++    let exposure = (exposure(board, us) - exposure(board, them)) * 8;
++    let fuse = fuse(board, us) * 16;
++    let checkers = -(board.checkers().count() as i32) * 16;
++    let mobility = (attacked_squares(board, us).count() as i32
++        - attacked_squares(board, them).count() as i32)
++        / 4;
++    let raw = material_score / 32 + safety * 12 + targets + exposure + fuse + checkers + mobility;
++    raw.clamp(-256, 256)
++}
++
+ /// `f = clamp(16 + e, 8, 32)`.
+ pub fn factor(eval: i32) -> i32 {
+     (16 + eval).clamp(8, 32)
