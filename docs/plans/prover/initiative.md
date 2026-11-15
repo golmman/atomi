@@ -34,16 +34,24 @@ Cap-120 row after plan33 (D46) is `core` 4.923 s, `easy-win` 0.376 s,
   **20/22/24** against the control's **36**; `L = 24` is **37.5 s** vs
   **53.3 s** (1.42×), while `L = 20/22` are slower (58.4/59.2 s). Every
   bounded proof is D14-accepted by both checkers. The length axis is a real
-  tree lever; Phase B (iterative deepening) is the next scoped experiment.
+  tree lever.
+- **plan39 (item 52 Phase B, SHORT-PASS):** Phase 0 **closes the deepening
+  driver negative**. On `deep-win` every `L < 20` pass costs more than the
+  `L = 24` control (37.190 s / 109,715,277 `child_evals`): the best is
+  `L = 16` at **45.500 s / 132,487,780** (1.22×/1.21×), then `L = 14`
+  45.526 s, `L = 18` 65.820 s, `L = 12` 83.136 s. The cumulative bar fails
+  >11×. No driver, `clear_open`, cap or S1–S4; control tree-identical;
+  `make test-full` + veto green.
 
 **Consequence for priority.** The per-node micro-line is exhausted as a route
 to `T_4` (plans 34–37: 3.22× ceiling, NOT FUNDED, INCONCLUSIVE, ≈1.20×). The
 remaining headroom is **tree-changing**: proof length (items 47/52), guide
 quality (item 48), and the measurement/gate shape that lets such levers be
 judged (items 49/51/53). Plan38 gives the first positive tree row: length
-36 → 24 at `L = 24`, 1.42× wall. The next session is **Phase B** (iterative
-deepening `L = 12, 14, …`, opt-in) or the owner's `T_4`/`T_5` ruling; not
-another per-node micro-plan.
+36 → 24 at `L = 24`, 1.42× wall. Phase B is closed negative (plan39): every
+small-`L` prefix is slower than the whole `L = 24` pass. The next scoped
+tree lever is **item 48** (guide quality), or the owner's `T_4`/`T_5`
+ruling; not another per-node micro-plan and not another deepening plan.
 
 **Open decisions:** D47/D48 confirmed; D49 default policy in force. Item 44
 remains unauthorised; item 41 is blocked on items 46/50. `--max-length` is an
@@ -237,7 +245,7 @@ number.
 | 49 | **Tuning resolution** (BENCH-POWER) | **proposed — unblocked after plans 36–37.** Run today's binary on `corpus-v1` cells outside the bench set (fixed 10 s, seed 0) and report the factor/tree-identity distribution: does a widened tuning bench predict the three claim cells' direction? Not item 10 (coverage); no tuning cell becomes a claim cell, nothing enters `bench.md` |
 | 50 | **Per-child decide in masks** (EFFECT-SHAPE) — funding test for item 44 | **proposed — unblocked after plans 36–37.** Rewrite only the per-child screen+decide as bit tests on the move effect (no board build) and time the decide in ns/child. Funding bar: ≤ 34.3 ns/child (today 37.71 at our composite rate; 19.13 at our `status` rate). Plan29's effect decides 0 of 1,067,066 built children, so this is a *screen* rewrite, not terminality. If item 46 finds no lever, this is the last per-node question |
 | 51 | **Evidence shape** (TREE-GATE) | **proposed — owner ruling, no plan of its own.** Pre-register a second gate shape for tree-changing changes: admissible when `length` does not increase and `expansions`, `child_evals`, `length` and wall are reported at the 5 M probe and at 120 s × seeds with D14 9/9 — no counter-identity requirement — plus a standing ≥ 1.15× bar at the widened sample. Depends on item 49; pairs with D47 |
-| 52 | **Bounded-length pass** (SHORT-PASS) — mechanism for item 47 | **proposed — read item 47's verdict first.** A remaining-length bound per frame, raised by iterative deepening (`L` = 12, 14, …); at attacker nodes a bound of 0 is "no win within `L`". Phase A: bounded pass, proofs-only in the full-key table (bound-dependent `Refuted` values may not be stored), an unbounded `L = ∞` control that must be tree-identical, `make test-full` + veto. Phase B: deepening driver behind an opt-in flag. Gates at `L` = 20/22/24 on `deep-win`; default stays `L = ∞` until the knob wins under item 51. Outcome may be negative |
+| 52 | **Bounded-length pass** (SHORT-PASS) — mechanism for item 47 | **Phase A positive; Phase B closed negative** ([report38](report38.md), [report39](report39.md)). Phase A: opt-in `--max-length L` proves lengths 20/22/24 on `deep-win`; `L = 24` 37.5 s vs control 53.3 s (1.42×); unbounded control tree-identical; D14 clean. Phase B: Phase 0 shows every `L < 20` pass exceeds `L = 24` (best `L = 16` 45.5 s / 132.5 M vs 37.2 s / 109.7 M), so the deepening driver was not built. Default stays `L = ∞`; `--max-length` remains a measurement flag, no `bench.md` row |
 | 53 | **Tree-metric harness** (TREE-METRIC) | **proposed — the instrument for items 47/48/52.** A fixed-context metric per cell (`expansions`, `child_evals`, `length`, ns/exp at the 5 M probe and a fixed cap) with `--guide none` as a standing control. Gates: reproduces the committed values byte-for-byte on the three cells and the 5 M probe; two same-binary runs identical; ranking agrees in sign with the 120 s ranking on three historical levers (NULL-PIPE, HOTPATH-V2, G1). Never a bench cell, never a factor |
 
 ### Closed items

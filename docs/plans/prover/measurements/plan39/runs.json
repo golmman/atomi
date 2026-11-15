@@ -1,0 +1,203 @@
+{
+  "plan": "39 (item 52 Phase B, SHORT-PASS) \u2014 Phase 0 L-curve probe on deep-win",
+  "date": "2026-11-15",
+  "cell": {
+    "name": "deep-win",
+    "fen": "rnb1kbnr/pppp2pp/5q2/4ppN1/3P4/8/PPP1PPPP/RNBQKB1R w KQkq - 0 1",
+    "flags": "--guide hand --memory 192 --seed 0"
+  },
+  "runs": [
+    {
+      "label": "control-120s",
+      "max_length": null,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 36,
+      "child_evals": 155236740,
+      "expansions": 5803257,
+      "ms": 52184,
+      "proof_entries": 5716874,
+      "sim_nodes": 31067713,
+      "settle_nodes": 9077485,
+      "proof_full": false
+    },
+    {
+      "label": "control-5M",
+      "max_length": null,
+      "cap": "--evals 5000000",
+      "found": false,
+      "exit": "evals",
+      "length": null,
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "ms": 1671,
+      "proof_entries": 215267,
+      "sim_nodes": 1296692,
+      "settle_nodes": 267286,
+      "proof_full": false
+    },
+    {
+      "label": "L24-120s",
+      "max_length": 24,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 24,
+      "child_evals": 109715277,
+      "expansions": 4109113,
+      "ms": 37190,
+      "proof_entries": 4481393,
+      "sim_nodes": 23795668,
+      "settle_nodes": 6837603,
+      "proof_full": false
+    },
+    {
+      "label": "L12-5M",
+      "max_length": 12,
+      "cap": "--evals 5000000",
+      "found": false,
+      "exit": "evals",
+      "length": null,
+      "child_evals": 5000003,
+      "expansions": 169652,
+      "ms": 1718,
+      "proof_entries": 224754,
+      "sim_nodes": 1347373,
+      "settle_nodes": 268740,
+      "proof_full": false
+    },
+    {
+      "label": "L12-120s",
+      "max_length": 12,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 12,
+      "child_evals": 203878285,
+      "expansions": 7116345,
+      "ms": 83136,
+      "proof_entries": 8493465,
+      "sim_nodes": 41818311,
+      "settle_nodes": 12870099,
+      "proof_full": true
+    },
+    {
+      "label": "L14-5M",
+      "max_length": 14,
+      "cap": "--evals 5000000",
+      "found": false,
+      "exit": "evals",
+      "length": null,
+      "child_evals": 5000021,
+      "expansions": 168983,
+      "ms": 1651,
+      "proof_entries": 213562,
+      "sim_nodes": 1290077,
+      "settle_nodes": 262528,
+      "proof_full": false
+    },
+    {
+      "label": "L14-120s",
+      "max_length": 14,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 14,
+      "child_evals": 133735711,
+      "expansions": 4812636,
+      "ms": 45526,
+      "proof_entries": 6132143,
+      "sim_nodes": 25649332,
+      "settle_nodes": 8289896,
+      "proof_full": false
+    },
+    {
+      "label": "L16-5M",
+      "max_length": 16,
+      "cap": "--evals 5000000",
+      "found": false,
+      "exit": "evals",
+      "length": null,
+      "child_evals": 5000037,
+      "expansions": 169031,
+      "ms": 1700,
+      "proof_entries": 213249,
+      "sim_nodes": 1283722,
+      "settle_nodes": 262232,
+      "proof_full": false
+    },
+    {
+      "label": "L16-120s",
+      "max_length": 16,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 16,
+      "child_evals": 132487780,
+      "expansions": 4821074,
+      "ms": 45500,
+      "proof_entries": 5783348,
+      "sim_nodes": 25575998,
+      "settle_nodes": 8304731,
+      "proof_full": false
+    },
+    {
+      "label": "L18-5M",
+      "max_length": 18,
+      "cap": "--evals 5000000",
+      "found": false,
+      "exit": "evals",
+      "length": null,
+      "child_evals": 5000034,
+      "expansions": 168910,
+      "ms": 1689,
+      "proof_entries": 215267,
+      "sim_nodes": 1296692,
+      "settle_nodes": 267286,
+      "proof_full": false
+    },
+    {
+      "label": "L18-120s",
+      "max_length": 18,
+      "cap": "--seconds 120",
+      "found": true,
+      "exit": "proved",
+      "length": 18,
+      "child_evals": 180850219,
+      "expansions": 6776360,
+      "ms": 65820,
+      "proof_entries": 7816685,
+      "sim_nodes": 40010641,
+      "settle_nodes": 9954723,
+      "proof_full": false
+    }
+  ],
+  "phase0_stop_rule": {
+    "L24_control": {
+      "child_evals": 109715277,
+      "ms": 37190
+    },
+    "cumulative_L_lt_20": {
+      "child_evals": 650951995,
+      "ms": 239982
+    },
+    "bars": {
+      "child_evals": 54857638,
+      "ms": 18595
+    },
+    "cumulative_pass": false,
+    "any_single_exceeds_L24": true,
+    "verdict": "STOP \u2014 every L < 20 pass exceeds the L = 24 pass in child_evals and wall; no deepening schedule can reach L = 24 faster"
+  },
+  "gates": {
+    "G39a": "PASS \u2014 L=12/14/16/18 at 5 M and 120 s recorded in runs.json; env.json and README committed",
+    "G39b": "PASS (control, no driver change) \u2014 unbounded control is tree-identical to G-38a: 5,803,257 / 155,236,740 / length 36 at 120 s; the 5 M probe is 5,000,034 / 168,910",
+    "G39c": "NOT RUN \u2014 no deepening driver (Phase 0 stop rule fired)",
+    "G39d": "NOT RUN \u2014 no clear_open (Phase 0 stop rule fired)",
+    "G39e": "N/A \u2014 no new proof generated",
+    "G39f": "FAIL \u2014 no schedule measured; every L < 20 pass costs more than the L = 24 control (the best wall, L = 16, is 1.22\u00d7 and 1.21\u00d7 its child_evals)",
+    "G39g": "PASS \u2014 make test and make test-full on the unchanged tree; make veto reports VETO: PASS",
+    "G39h": "PASS \u2014 no default, no bench.md row, no T_4 claim, no provari source"
+  }
+}
