@@ -594,3 +594,23 @@ premise are the recorded starting point for the D21 kill review.
   quoted. No engine/flag/default/test/`bench.md` change. Data:
   [`measurements/plan36/`](../../../measurements/plan36/README.md); report:
   [`report36.md`](report36.md).
+
+- **2026-11-15**: owner rulings on the open decisions. **D42, D43, D44, D46
+  confirmed** (measured and already in the tree: MG15 declined, HOTPATH-V2
+  adopted, PROOF-FILTER closed with G1 adopted on the pooled sample, NULL-PIPE
+  adopted). **D47 and D48 confirmed together**: D48 withdraws D36's
+  tree-at-parity premise and its `tree × per-expansion` decomposition (per node
+  **4.38×**); D47 narrows D45's formulation ban so an in-base search-order
+  change (iterative deepening on proof length, items 47/52) is admissible while
+  a new solver base and the goal re-pin stay standing-rejected. D36's row is
+  marked superseded in place; D45's `decisions.md` row carries the D48
+  correction bracket. No engine/flag/default/test/`bench.md` change; docs only.
+
+- **2026-11-15**: owner policy **D49** — a mechanism becomes a **default** only
+  on a measured wall-time win on the product `--guide hand` stack; otherwise it
+  stays **opt-in**. Applied to the remaining open rows: **D25** stays opt-in
+  (aux budget lowers `easy-win` but censors `core`), **D37** NULL-V1 default /
+  NULL-S opt-in, **D38** NULL-V2 default via D39; **D26** and **D36** are
+  methodology/analysis rulings and are confirmed as such (D36's tree clause
+  already superseded by D48). Stale "owner to confirm" headers on D25/D26/D36/
+  D37/D38 cleared. Docs only; no engine/flag/default/test/`bench.md` change.
